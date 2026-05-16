@@ -4897,20 +4897,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whiskeysockets/baileys@npm:^7.0.0-rc.9":
-  version: 7.0.0-rc10
-  resolution: "@whiskeysockets/baileys@npm:7.0.0-rc10"
+"@whiskeysockets/baileys@npm:^7.0.0-rc11":
+  version: 7.0.0-rc11
+  resolution: "@whiskeysockets/baileys@npm:7.0.0-rc11"
   dependencies:
     "@cacheable/node-cache": "npm:^1.4.0"
     "@hapi/boom": "npm:^9.1.3"
     async-mutex: "npm:^0.5.0"
-    libsignal: "git+https://github.com/whiskeysockets/libsignal-node.git"
+    libsignal: "npm:^6.0.0"
     lru-cache: "npm:^11.1.0"
     music-metadata: "npm:^11.12.3"
     p-queue: "npm:^9.0.0"
     pino: "npm:^9.6"
     protobufjs: "npm:^7.5.6"
-    whatsapp-rust-bridge: "npm:0.5.3"
+    whatsapp-rust-bridge: "npm:0.5.4"
     ws: "npm:^8.13.0"
   peerDependencies:
     audio-decode: ^2.1.3
@@ -4924,7 +4924,7 @@ __metadata:
       optional: true
     link-preview-js:
       optional: true
-  checksum: 10c0/9f936855db4be13c0b915b917084075ee0629393e321ebc16800fefa4d6f8f695e1ecbe8c621b90812acb27a55e9fd7c5418a27b75d617fb706ee67bea85a32e
+  checksum: 10c0/1faa0c08b4d4fddb8e826663c79a815fd20354ae1ca303a865b4aa4a29fef12061d5d48b384442b42f794aeff79aa97231317b38e2316572723dda3f3c4106e6
   languageName: node
   linkType: hard
 
@@ -8458,7 +8458,7 @@ __metadata:
     "@types/react-syntax-highlighter": "npm:^15.5.13"
     "@types/three": "npm:^0.184.1"
     "@vitejs/plugin-react": "npm:^5.0.2"
-    "@whiskeysockets/baileys": "npm:^7.0.0-rc.9"
+    "@whiskeysockets/baileys": "npm:^7.0.0-rc11"
     chokidar: "npm:^5.0.0"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
@@ -11022,13 +11022,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsignal@git+https://github.com/whiskeysockets/libsignal-node.git":
+"libsignal@npm:^6.0.0":
   version: 6.0.0
-  resolution: "libsignal@https://github.com/whiskeysockets/libsignal-node.git#commit=bcea72df9ec34d9d9140ab30619cf479c7c144c7"
+  resolution: "libsignal@npm:6.0.0"
   dependencies:
     curve25519-js: "npm:^0.0.4"
     protobufjs: "npm:^7.5.5"
-  checksum: 10c0/662c443c10f4b222799c792831ba0d32f742bc73cb82910194cc21e19397c54e7022726516759e816efe094284a3122b530582d574999ef3f27e940074c8ecb2
+  checksum: 10c0/111675e3834641f4c4635c7ad4a6a03a92d24a3a8e9b1c517479de9d3a6ae68abe71af16c25a9d669a3c71b5b6c5cc30d5d45df160beb0010505118dcc3f966c
   languageName: node
   linkType: hard
 
@@ -16786,10 +16786,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"whatsapp-rust-bridge@npm:0.5.3":
-  version: 0.5.3
-  resolution: "whatsapp-rust-bridge@npm:0.5.3"
-  checksum: 10c0/fe9b4c6d6807fd48d51c39b4d8eb41713138b974d01e581626afdb106cfa0ac816782d0a4e3e51164b8f5d70fb55f450a70d224f6a7ed8ddaf9764a0aa1ffbcc
+"whatsapp-rust-bridge@npm:0.5.4":
+  version: 0.5.4
+  resolution: "whatsapp-rust-bridge@npm:0.5.4"
+  checksum: 10c0/bcf13eb0b933a19e701fad2666926d25442e24b59599412e59f283e321402869e846adb64e4d10f01674f871ad339bef1ba55649beeedba898de034fee651600
   languageName: node
   linkType: hard
 
