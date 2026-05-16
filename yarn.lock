@@ -1534,10 +1534,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grammyjs/types@npm:3.26.0":
-  version: 3.26.0
-  resolution: "@grammyjs/types@npm:3.26.0"
-  checksum: 10c0/511e63948a6fb245bac78b945d6314b807c3b331edcd31276e134cb4555778696d9bb752bf3501268a52ca88d754967a3acc5b06a838e00c9c0dd4860fd36684
+"@grammyjs/types@npm:3.27.3":
+  version: 3.27.3
+  resolution: "@grammyjs/types@npm:3.27.3"
+  checksum: 10c0/d14008a8357fe29fb2f09da3973f470ee699dd3b5183e703668cbfbf1933bf2d3c65a79a33d6a023cd07111f7079a14dbc38be85f49e4ae0d02595651554cd5d
   languageName: node
   linkType: hard
 
@@ -8476,7 +8476,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.16"
     framer-motion: "npm:^11.0.0"
     globals: "npm:^15.14.0"
-    grammy: "npm:^1.42.0"
+    grammy: "npm:^1.43.0"
     gray-matter: "npm:^4.0.3"
     hnswlib-node: "npm:^3.0.0"
     i18next: "npm:^25.8.7"
@@ -8969,15 +8969,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grammy@npm:^1.42.0":
-  version: 1.42.0
-  resolution: "grammy@npm:1.42.0"
+"grammy@npm:^1.43.0":
+  version: 1.43.0
+  resolution: "grammy@npm:1.43.0"
   dependencies:
-    "@grammyjs/types": "npm:3.26.0"
+    "@grammyjs/types": "npm:3.27.3"
     abort-controller: "npm:^3.0.0"
     debug: "npm:^4.4.3"
     node-fetch: "npm:^2.7.0"
-  checksum: 10c0/661a57b143cdabc8544e155c509a3e40ea671813c4796e09f38316aef841f230afe8e3f0145817f973bad18e8f853bf18ed2a93827ff0f1fc4f03fd5edb66255
+  checksum: 10c0/975a76cbe1da8a049c3ac407f1b59e1f49819954c0207f73ff45bd0b853a96b2aec809908c40185777a993fbd793a7baa94c9c42e438cadb69622e3bed4de00c
   languageName: node
   linkType: hard
 
