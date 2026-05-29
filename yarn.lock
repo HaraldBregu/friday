@@ -8539,7 +8539,7 @@ __metadata:
     remark-breaks: "npm:^4.0.0"
     remark-gfm: "npm:^4.0.1"
     rimraf: "npm:^6.0.1"
-    shadcn: "npm:^4.7.0"
+    shadcn: "npm:^4.8.3"
     shadcn-ui: "npm:^0.9.5"
     shiki: "npm:^4.0.2"
     tailwind-merge: "npm:^3.4.0"
@@ -14938,9 +14938,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shadcn@npm:^4.7.0":
-  version: 4.7.0
-  resolution: "shadcn@npm:4.7.0"
+"shadcn@npm:^4.8.3":
+  version: 4.8.3
+  resolution: "shadcn@npm:4.8.3"
   dependencies:
     "@babel/core": "npm:^7.28.0"
     "@babel/parser": "npm:^7.28.0"
@@ -14978,7 +14978,7 @@ __metadata:
     zod-to-json-schema: "npm:^3.24.6"
   bin:
     shadcn: dist/index.js
-  checksum: 10c0/0766956e9f15d4755b6e9ee2a0ce231c6c251c6ae5e9611bfe8fffda91359c411720dc64a2f64981cc25f17687b9a81f3684d59ba169b5d3d482feedb5d6d08e
+  checksum: 10c0/0554bfd33bb8522dccd21b9bb170da23117d865524ab8aaf49567e3662df7cd0de89e98330bd9a04595d78ec603fa8f443ba9e2afc09f408a06e125663e6aca1
   languageName: node
   linkType: hard
 
