@@ -2505,14 +2505,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mistralai/mistralai@npm:^2.2.0":
-  version: 2.2.1
-  resolution: "@mistralai/mistralai@npm:2.2.1"
+"@mistralai/mistralai@npm:^2.2.5":
+  version: 2.2.5
+  resolution: "@mistralai/mistralai@npm:2.2.5"
   dependencies:
     ws: "npm:^8.18.0"
     zod: "npm:^3.25.0 || ^4.0.0"
     zod-to-json-schema: "npm:^3.25.0"
-  checksum: 10c0/131d218192dde76c38739d498d0b9a5944eb0bacf0c832ed812961e7f366f527de33942bb3274d2be15132a4834a7f57ef2a315e4ee95ad9a050b79d76300535
+  checksum: 10c0/0c5dfcec8dcce75c5c99f416d5b4e1e29ef1b2ac512827f2abe4239e59f9410ecb9c1f5e0f163f506bb32ac50e2b6ec9cfcebed6aec4e7e60e2e26c8a42afece
   languageName: node
   linkType: hard
 
@@ -8457,7 +8457,7 @@ __metadata:
     "@electron-toolkit/tsconfig": "npm:^1.0.1"
     "@electron-toolkit/utils": "npm:^4.0.0"
     "@eslint/js": "npm:^9.17.0"
-    "@mistralai/mistralai": "npm:^2.2.0"
+    "@mistralai/mistralai": "npm:^2.2.5"
     "@modelcontextprotocol/sdk": "npm:^1.29.0"
     "@playwright/test": "npm:^1.58.2"
     "@radix-ui/react-avatar": "npm:^1.1.11"
