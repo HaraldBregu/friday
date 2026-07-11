@@ -3115,7 +3115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-direction@npm:1.1.1, @radix-ui/react-direction@npm:^1.1.1":
+"@radix-ui/react-direction@npm:1.1.1":
   version: 1.1.1
   resolution: "@radix-ui/react-direction@npm:1.1.1"
   peerDependencies:
@@ -3128,7 +3128,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-direction@npm:1.1.2":
+"@radix-ui/react-direction@npm:1.1.2, @radix-ui/react-direction@npm:^1.1.2":
   version: 1.1.2
   resolution: "@radix-ui/react-direction@npm:1.1.2"
   peerDependencies:
@@ -9478,7 +9478,7 @@ __metadata:
     "@radix-ui/react-avatar": "npm:^1.1.11"
     "@radix-ui/react-collapsible": "npm:^1.1.12"
     "@radix-ui/react-dialog": "npm:^1.1.15"
-    "@radix-ui/react-direction": "npm:^1.1.1"
+    "@radix-ui/react-direction": "npm:^1.1.2"
     "@radix-ui/react-dropdown-menu": "npm:^2.1.16"
     "@radix-ui/react-label": "npm:^2.1.8"
     "@radix-ui/react-popover": "npm:^1.1.19"
