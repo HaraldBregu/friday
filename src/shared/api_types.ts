@@ -44,6 +44,7 @@ import type {
 	AgentToolPermissionScope,
 	AgentUserInputAnswer,
 	AgentUserInputScope,
+	WorkspaceChangeEvent,
 	WorkspaceTreeEntry,
 } from './agent_types';
 import type { CatalogModel, ProviderModel } from './model_types';
@@ -142,6 +143,7 @@ export interface AgentApi {
 	deleteSession: (sessionId: string) => Promise<void>;
 	getWorkspaceLocation: () => Promise<string>;
 	listWorkspaceFiles: () => Promise<WorkspaceTreeEntry[]>;
+	onWorkspaceChanged: (callback: (event: WorkspaceChangeEvent) => void) => () => void;
 	readWorkspaceFile: (filePath: string) => Promise<string>;
 	readWorkspaceAsset: (filePath: string) => Promise<WorkspaceAsset>;
 	writeWorkspaceMarkdown: (filePath: string, content: string) => Promise<void>;
