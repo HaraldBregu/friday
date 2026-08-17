@@ -264,7 +264,10 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		const startWorkspaceWatcher = (root: string): void => {
 			if (watcherStarted) return;
 			watcherStarted = true;
-			const watcher = watch(root, { ignoreInitial: true, persistent: false });
+			const watcher = watch(root, {
+				ignoreInitial: true,
+				awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 25 },
+			});
 			for (const type of ['add', 'change', 'unlink', 'addDir', 'unlinkDir'] as const) {
 				watcher.on(type, (changedPath) => {
 					const event: WorkspaceChangeEvent = {
