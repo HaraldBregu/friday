@@ -1882,6 +1882,7 @@
 	},
 	"titleBar": {
 		"applicationMenu": "Application menu",
+		"search": "Search",
 		"toggleSidebar": "Toggle sidebar",
 		"toggleAgenticSidebar": "Toggle AI agent",
 		"toggleEditorSidebar": "Toggle formatting toolbar",

@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { Menu, User } from 'lucide-react';
+import { Menu, Search, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TitleBarContainer } from './TitleBarContainer';
@@ -29,6 +29,8 @@ export interface TitleBarProps {
 	centerContent?: ReactNode;
 	/** Optional positioning override for route context */
 	centerContentClassName?: string;
+	/** Opens the global route and settings search */
+	onSearch?: () => void;
 	/** When true, renders agentic + info sidebar toggle buttons on the right */
 	showSidebarToggles?: boolean;
 }
@@ -39,6 +41,7 @@ export const TitleBar = React.memo(function TitleBar({
 	rightContent,
 	centerContent,
 	centerContentClassName,
+	onSearch,
 	showSidebarToggles: _showSidebarToggles = false,
 }: TitleBarProps) {
 	const { t } = useTranslation();
@@ -51,6 +54,20 @@ export const TitleBar = React.memo(function TitleBar({
 	const isSettings = location.pathname.startsWith('/settings');
 	const settingsLabel = t('settings.title', 'Settings');
 	const homeButtonLabel = t('titleBar.home', 'Home');
+	const searchLabel = t('titleBar.search', 'Search');
+	const searchButton = onSearch ? (
+		<Button
+			type="button"
+			variant="ghost"
+			size="icon"
+			className="size-8 rounded-full"
+			onClick={onSearch}
+			title={searchLabel}
+			aria-label={searchLabel}
+		>
+			<Search className="size-4" strokeWidth={1.8} />
+		</Button>
+	) : null;
 	const routeButton = isSettings ? (
 		<Button
 			type="button"
@@ -115,6 +132,7 @@ export const TitleBar = React.memo(function TitleBar({
 						</button>
 					)}
 
+					{!isMac && searchButton}
 					{!isMac && routeButton}
 					{!isHome && !isStart && !isSettings && (
 						<Button
@@ -161,11 +179,12 @@ export const TitleBar = React.memo(function TitleBar({
 				)}
 
 				{/* ── Right action: home/settings toggle ── */}
-				{isMac && routeButton && (
+				{isMac && (searchButton || routeButton) && (
 					<div
 						className="z-10 mr-3 flex h-full items-center gap-1"
 						style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
 					>
+						{searchButton}
 						{routeButton}
 					</div>
 				)}

@@ -1881,6 +1881,7 @@
 	},
 	"titleBar": {
 		"applicationMenu": "Menu applicazione",
+		"search": "Cerca",
 		"toggleSidebar": "Mostra/nascondi barra laterale",
 		"toggleAgenticSidebar": "Mostra/nascondi assistente AI",
 		"toggleEditorSidebar": "Mostra/nascondi barra formattazione",

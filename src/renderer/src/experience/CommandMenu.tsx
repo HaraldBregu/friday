@@ -214,11 +214,19 @@ function CommandMenuItem({
 	);
 }
 
-export function CommandMenu(): React.JSX.Element {
+interface CommandMenuProps {
+	readonly open?: boolean;
+	readonly onOpenChange?: (open: boolean) => void;
+}
+
+export function CommandMenu({
+	open: controlledOpen,
+	onOpenChange,
+}: CommandMenuProps = {}): React.JSX.Element {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { t } = useTranslation();
-	const [open, setOpen] = useState(false);
+	const [internalOpen, setInternalOpen] = useState(false);
 	const [search, setSearch] = useState('');
 	const listRef = useRef<HTMLDivElement>(null);
 	const { groups, searchOnlyItems } = useMemo(() => buildCommandGroups(t), [t]);
@@ -232,6 +240,14 @@ export function CommandMenu(): React.JSX.Element {
 		location.pathname.startsWith('/home/') ||
 		location.pathname === '/settings' ||
 		location.pathname.startsWith('/settings/');
+	const open = controlledOpen ?? internalOpen;
+	const setOpen = useCallback(
+		(nextOpen: boolean) => {
+			if (controlledOpen === undefined) setInternalOpen(nextOpen);
+			onOpenChange?.(nextOpen);
+		},
+		[controlledOpen, onOpenChange]
+	);
 
 	// Filtered results re-render into the scroll container without resetting its
 	// position, leaving top matches hidden above the viewport. Scroll to top on
@@ -240,17 +256,20 @@ export function CommandMenu(): React.JSX.Element {
 		listRef.current?.scrollTo({ top: 0 });
 	}, [search]);
 
-	const handleOpenChange = useCallback((nextOpen: boolean) => {
-		setOpen(nextOpen);
-		if (!nextOpen) setSearch('');
-	}, []);
+	const handleOpenChange = useCallback(
+		(nextOpen: boolean) => {
+			setOpen(nextOpen);
+			if (!nextOpen) setSearch('');
+		},
+		[setOpen]
+	);
 
 	const navigateTo = useCallback(
 		(path: string) => {
 			setOpen(false);
 			navigate(path);
 		},
-		[navigate]
+		[navigate, setOpen]
 	);
 
 	useEffect(() => {

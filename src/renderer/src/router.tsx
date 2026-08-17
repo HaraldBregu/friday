@@ -111,6 +111,7 @@ function RootRouteComponent(): React.JSX.Element {
 	const { state, isMobile } = usePageContext();
 	const [chatMode, setChatMode] = useState<ChatMode>('chat');
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
+	const [commandMenuOpen, setCommandMenuOpen] = useState(false);
 	const [showSettingsBreadcrumb, setShowSettingsBreadcrumb] = useState(true);
 	const previousSidebarOpen = useRef(state.sidebarOpen);
 
@@ -158,6 +159,7 @@ function RootRouteComponent(): React.JSX.Element {
 						centerContentClassName={
 							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
 						}
+						onSearch={hasSidebar ? () => setCommandMenuOpen(true) : undefined}
 						style={
 							hasSidebar
 								? { left: !isMobile && state.sidebarOpen ? 'var(--app-sidebar-width)' : 0 }
@@ -169,7 +171,11 @@ function RootRouteComponent(): React.JSX.Element {
 							<Outlet />
 						</PageTransition>
 					</div>
-					<CommandMenu key={location.pathname} />
+					<CommandMenu
+						key={location.pathname}
+						open={commandMenuOpen}
+						onOpenChange={setCommandMenuOpen}
+					/>
 				</div>
 			</ChatSessionContext.Provider>
 		</ChatModeContext.Provider>

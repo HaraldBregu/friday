@@ -106,6 +106,23 @@ it('shows the settings icon on Home', async () => {
 	expect(screen.getByText('/settings')).toBeInTheDocument();
 });
 
+it('renders search immediately before the Home or Settings button', async () => {
+	const user = userEvent.setup();
+	const onSearch = jest.fn();
+
+	render(
+		<MemoryRouter initialEntries={['/home']}>
+			<TitleBar onSearch={onSearch} />
+		</MemoryRouter>
+	);
+	const search = screen.getByRole('button', { name: 'titleBar.search' });
+	const settings = screen.getByRole('button', { name: 'settings.title' });
+
+	expect(search.compareDocumentPosition(settings) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+	await user.click(search);
+	expect(onSearch).toHaveBeenCalledTimes(1);
+});
+
 it('renders a transparent titlebar without visible title text', () => {
 	const { container } = render(
 		<MemoryRouter initialEntries={['/home']}>
