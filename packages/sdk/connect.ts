@@ -3,11 +3,13 @@ import { AgentChannels, AppChannels } from '../../src/shared/ipc_channels_defini
 import type { AgentApi, AppApi } from '../../src/shared/api_types';
 import type { ChannelStatusEvent } from '../../src/shared/channels_types';
 import type { AppThemeData } from '../../src/shared/app_types';
+import type { WorkspaceChangeEvent } from '../../src/shared/agent_types';
 
 export type WorkspaceAgentApi = Pick<
 	AgentApi,
 	| 'getWorkspaceLocation'
 	| 'listWorkspaceFiles'
+	| 'onWorkspaceChanged'
 	| 'readWorkspaceFile'
 	| 'readWorkspaceAsset'
 	| 'writeWorkspaceMarkdown'
@@ -155,6 +157,14 @@ export function connect(options: ConnectOptions): FridayClient {
 			},
 		}),
 		agent: {
+			onWorkspaceChanged: (callback: (event: WorkspaceChangeEvent) => void) => {
+				const pending = listen((channel, data) => {
+					if (channel === AgentChannels.workspaceChanged) callback(data as WorkspaceChangeEvent);
+				});
+				return (): void => {
+					void pending.then((off) => off());
+				};
+			},
 			getWorkspaceLocation: () => invoke(AgentChannels.getWorkspaceLocation, []) as Promise<string>,
 			listWorkspaceFiles: () =>
 				invoke(AgentChannels.listWorkspaceFiles, []) as ReturnType<AgentApi['listWorkspaceFiles']>,
