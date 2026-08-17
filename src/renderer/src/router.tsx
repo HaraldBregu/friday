@@ -105,6 +105,7 @@ function RootRouteComponent(): React.JSX.Element {
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
 
 	const isStart = location.pathname === '/start';
+	const isSettings = location.pathname.startsWith('/settings');
 
 	return (
 		<ChatModeContext.Provider value={{ mode: chatMode, setMode: setChatMode }}>
