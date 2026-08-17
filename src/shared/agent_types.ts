@@ -124,6 +124,11 @@ export interface AgentRunOptions {
 	lightContext?: boolean;
 }
 
+export interface WorkspaceChangeEvent {
+	type: 'add' | 'change' | 'unlink' | 'addDir' | 'unlinkDir';
+	path: string;
+}
+
 export interface WorkspaceTreeEntry {
 	name: string;
 	path: string;
