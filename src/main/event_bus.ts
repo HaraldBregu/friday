@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, webContents } from 'electron';
 
 export interface AppEvent {
 	type: string;
@@ -38,10 +38,8 @@ export class EventBus {
 	 * Broadcast a message to all open renderer windows.
 	 */
 	broadcast(channel: string, ...args: unknown[]): void {
-		BrowserWindow.getAllWindows().forEach((win) => {
-			if (!win.isDestroyed()) {
-				win.webContents.send(channel, ...args);
-			}
+		webContents.getAllWebContents().forEach((contents) => {
+			if (!contents.isDestroyed()) contents.send(channel, ...args);
 		});
 	}
 
