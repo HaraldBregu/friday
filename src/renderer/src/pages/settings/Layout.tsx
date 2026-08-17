@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { PageContainer } from '@/components/app/base/page';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { PageContainer, Split } from '@/components/app/base/page';
 import { useTranslation } from 'react-i18next';
 import { useSettingsBreadcrumbItems } from './hooks';
 import { SettingsSidebar } from './Sidebar';
@@ -49,17 +48,14 @@ function SettingsBreadcrumbHeader(): React.JSX.Element | null {
 export function Layout(): React.JSX.Element {
 	return (
 		<PageContainer className="bg-muted/20">
-			<SidebarProvider className="h-full min-h-0">
-				<SettingsSidebar />
-				<SidebarInset className="min-h-0 min-w-0 overflow-hidden">
+			<Split sidebar={<SettingsSidebar />}>
 					<div data-slot="settings-workspace" className="min-h-0 flex-1 overflow-y-auto">
 						<SettingsBreadcrumbHeader />
 						<div className="py-6">
 							<Outlet />
 						</div>
 					</div>
-				</SidebarInset>
-			</SidebarProvider>
+			</Split>
 		</PageContainer>
 	);
 }

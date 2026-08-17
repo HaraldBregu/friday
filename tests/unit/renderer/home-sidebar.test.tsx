@@ -1,10 +1,9 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { PageContainer } from '../../../src/renderer/src/components/app/base/page';
+import { PageContainer, Split } from '../../../src/renderer/src/components/app/base/page';
 import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
 import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
-import { SidebarProvider } from '../../../src/renderer/src/components/ui/sidebar';
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -118,20 +117,20 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
 				<PageContainer>
-					<SidebarProvider>
-						<HomeSidebar refreshKey="initial" />
-					</SidebarProvider>
+					<Split sidebar={<HomeSidebar refreshKey="initial" />}>
+						<div>Workspace</div>
+					</Split>
 				</PageContainer>
 			</ChatSessionContext.Provider>
 		</MemoryRouter>
 	);
 	const resizer = screen.getByRole('separator', { name: 'Resize sidebar' });
-	const wrapper = container.querySelector('[data-slot="sidebar-wrapper"]');
+	const wrapper = container.querySelector('[data-slot="split-pane"]');
 	await screen.findByText('settings.chatHistory.empty');
 
 	fireEvent.keyDown(resizer, { key: 'ArrowRight' });
 	expect(resizer).toHaveAttribute('aria-valuenow', '264');
-	expect(wrapper).toHaveStyle({ '--sidebar-width': '264px' });
+	expect(wrapper).toHaveStyle({ '--split-pane-sidebar-width': '264px' });
 
 	fireEvent.pointerDown(resizer, { button: 0, clientX: 264 });
 	fireEvent.pointerMove(window, { clientX: 320 });

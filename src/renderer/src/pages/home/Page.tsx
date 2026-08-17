@@ -13,8 +13,7 @@ import {
 	X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageContainer } from '@/components/app/base/page';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { PageContainer, Split } from '@/components/app/base/page';
 import { AudioPlayer } from '@/components/audio-player';
 import { Button } from '@/components/ui/button';
 import {
@@ -708,11 +707,13 @@ function PageContent(): ReactElement {
 
 	return (
 		<PageContainer className="overflow-hidden text-foreground">
-			<SidebarProvider className="h-full min-h-0">
-				<HomeSidebar
+			<Split
+				sidebar={
+					<HomeSidebar
 					refreshKey={`${chatSessionId}:${visibleMessages.length}:${agent.isLoading}`}
-				/>
-				<SidebarInset className="min-h-0 min-w-0 overflow-hidden">
+					/>
+				}
+			>
 					<div
 						data-slot="home-workspace"
 						className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
@@ -906,8 +907,7 @@ function PageContent(): ReactElement {
 					</div>
 				</div>
 					</div>
-				</SidebarInset>
-			</SidebarProvider>
+			</Split>
 		</PageContainer>
 	);
 }

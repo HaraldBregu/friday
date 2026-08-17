@@ -7,31 +7,7 @@ export {
 	PageSidebar,
 	PageSidebarInset,
 } from './Page';
-export {
-	PageSidebarLayout,
-	PageSidebarLayoutContainer,
-	PageSidebarLayoutContent,
-	PageSidebarLayoutFooter,
-	PageSidebarLayoutGroup,
-	PageSidebarLayoutGroupAction,
-	PageSidebarLayoutGroupContent,
-	PageSidebarLayoutGroupLabel,
-	PageSidebarLayoutHeader,
-	PageSidebarLayoutInput,
-	PageSidebarLayoutInset,
-	PageSidebarLayoutMenu,
-	PageSidebarLayoutMenuAction,
-	PageSidebarLayoutMenuBadge,
-	PageSidebarLayoutMenuButton,
-	PageSidebarLayoutMenuItem,
-	PageSidebarLayoutMenuSkeleton,
-	PageSidebarLayoutMenuSub,
-	PageSidebarLayoutMenuSubButton,
-	PageSidebarLayoutMenuSubItem,
-	PageSidebarLayoutRail,
-	PageSidebarLayoutSeparator,
-	PageSidebarLayoutTrigger,
-} from './PageSidebarLayout';
+export { Split, SPLIT_ITEM_ACTIVE_CLASS, SPLIT_ITEM_CLASS } from './Split';
 export { Provider } from './Provider';
 export { usePageContext } from './hooks';
 export {

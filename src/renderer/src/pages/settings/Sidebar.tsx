@@ -2,17 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarRail,
-} from '@/components/ui/sidebar';
+	SPLIT_ITEM_ACTIVE_CLASS,
+	SPLIT_ITEM_CLASS,
+} from '@/components/app/base/page';
+import { cn } from '@/lib/utils';
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
 
 const SETTINGS_SIDEBAR_ITEMS = [
@@ -62,46 +55,45 @@ export function SettingsSidebar(): React.JSX.Element {
 	}, '');
 
 	return (
-		<Sidebar side="left" collapsible="offcanvas">
-			<SidebarHeader
+		<div data-slot="settings-sidebar" className="flex h-full min-h-0 flex-col">
+			<header
 				aria-hidden="true"
 				className="h-12 shrink-0 border-b border-sidebar-border/50 p-0"
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
-			<SidebarContent className="pt-3">
+			<div className="no-scrollbar min-h-0 flex-1 overflow-y-auto pt-3">
 				<nav aria-label={t('settings.title')}>
 					{SETTINGS_SIDEBAR_GROUPS.map((group) => (
-						<SidebarGroup key={group.id} className="px-2 py-1 first:pt-0">
+						<section data-slot="split-pane-group" key={group.id} className="px-2 py-1 first:pt-0">
 							{'titleKey' in group ? (
-								<SidebarGroupLabel className="h-7 text-[10px] font-semibold uppercase tracking-[0.12em]">
+								<h2 className="flex h-7 items-center px-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sidebar-foreground/70">
 									{t(group.titleKey)}
-								</SidebarGroupLabel>
+								</h2>
 							) : null}
-							<SidebarGroupContent>
-								<SidebarMenu className="gap-1">
+							<ul className="flex min-w-0 flex-col gap-1">
 									{group.items.map((item) => {
 										const Icon = item.icon;
+										const isActive = item.path === activePath;
 
 										return (
-											<SidebarMenuItem key={item.path}>
-												<SidebarMenuButton
-													render={<Link to={item.path} />}
-													isActive={item.path === activePath}
-													className="h-9 px-2.5"
+											<li key={item.path}>
+												<Link
+													to={item.path}
+													data-active={isActive ? '' : undefined}
+													aria-current={isActive ? 'page' : undefined}
+													className={cn(SPLIT_ITEM_CLASS, isActive && SPLIT_ITEM_ACTIVE_CLASS)}
 												>
-													<Icon strokeWidth={1.8} />
+													<Icon className="size-4 shrink-0" strokeWidth={1.8} />
 													<span>{t(item.labelKey)}</span>
-												</SidebarMenuButton>
-											</SidebarMenuItem>
+												</Link>
+											</li>
 										);
 									})}
-								</SidebarMenu>
-							</SidebarGroupContent>
-						</SidebarGroup>
+							</ul>
+						</section>
 					))}
 				</nav>
-			</SidebarContent>
-			<SidebarRail />
-		</Sidebar>
+			</div>
+		</div>
 	);
 }

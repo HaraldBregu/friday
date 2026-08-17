@@ -3,19 +3,14 @@ import { MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarRail,
-} from '@/components/ui/sidebar';
+	SPLIT_ITEM_ACTIVE_CLASS,
+	SPLIT_ITEM_CLASS,
+} from '@/components/app/base/page';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
 import type { AgentSessionSummary } from '@/lib/compat';
+import { cn } from '@/lib/utils';
 
 interface HomeSidebarProps {
 	readonly refreshKey: string;
@@ -69,13 +64,13 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 		sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
 
 	return (
-		<Sidebar side="left" collapsible="offcanvas">
+		<div data-slot="home-sidebar" className="flex h-full min-h-0 flex-col">
 			<div
 				aria-hidden="true"
 				className="h-12 shrink-0 border-b border-sidebar-border/50"
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
-			<SidebarHeader className="border-b border-sidebar-border/50 p-2">
+			<header className="border-b border-sidebar-border/50 p-2">
 				<Button
 					type="button"
 					variant="outline"
@@ -86,8 +81,8 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					<Plus className="size-4" />
 					{t('titleBar.newChat', 'New chat')}
 				</Button>
-			</SidebarHeader>
-			<SidebarContent className="p-2 pt-3" aria-busy={loading}>
+			</header>
+			<section className="no-scrollbar min-h-0 flex-1 overflow-y-auto p-2 pt-3" aria-busy={loading}>
 				<div className="px-2 pb-2 text-xs font-medium text-sidebar-foreground/70">
 					{t('settings.chatHistory.title')}
 				</div>
@@ -110,42 +105,41 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					</p>
 				) : (
 					<nav aria-label={t('settings.chatHistory.title')}>
-						<SidebarMenu className="gap-1">
+						<ul className="flex min-w-0 flex-col gap-1">
 							{sessions.map((session) => {
 								const title = session.title.trim() || t('settings.chatHistory.untitled');
 								const isActive = session.id === currentSessionId;
 								return (
-									<SidebarMenuItem key={session.id}>
-										<SidebarMenuButton
-											isActive={isActive}
+									<li key={session.id}>
+										<button
+											type="button"
+											data-active={isActive ? '' : undefined}
 											aria-current={isActive ? 'page' : undefined}
-											className="h-9 px-2.5"
+											className={cn(SPLIT_ITEM_CLASS, isActive && SPLIT_ITEM_ACTIVE_CLASS)}
 											onClick={() => setSessionId(session.id)}
 										>
-											<MessageSquare strokeWidth={1.8} />
+											<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
 											<span>{title}</span>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
+										</button>
+									</li>
 								);
 							})}
-						</SidebarMenu>
+						</ul>
 					</nav>
 				)}
-			</SidebarContent>
-			<SidebarFooter className="border-t border-sidebar-border/50">
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<SidebarMenuButton
-							render={<Link to="/settings" />}
-							className="h-9 px-2.5"
-						>
-							<Settings2 strokeWidth={1.8} />
-							<span>{t('settings.title')}</span>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarFooter>
-			<SidebarRail />
-		</Sidebar>
+			</section>
+			<footer className="border-t border-sidebar-border/50 p-2">
+				<nav aria-label={t('settings.title')}>
+					<ul>
+						<li>
+							<Link to="/settings" className={SPLIT_ITEM_CLASS}>
+								<Settings2 className="size-4 shrink-0" strokeWidth={1.8} />
+								<span>{t('settings.title')}</span>
+							</Link>
+						</li>
+					</ul>
+				</nav>
+			</footer>
+		</div>
 	);
 }

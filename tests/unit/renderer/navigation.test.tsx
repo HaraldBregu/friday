@@ -68,7 +68,7 @@ it('renders settings navigation beside the workspace and marks the current secti
 		</MemoryRouter>
 	);
 
-	const sidebar = container.querySelector('[data-slot="sidebar-container"]');
+	const sidebar = container.querySelector('[data-slot="split-pane-sidebar"]');
 	const workspace = container.querySelector('[data-slot="settings-workspace"]');
 	const navigation = screen.getByRole('navigation', { name: 'settings.title' });
 	const currentSection = within(navigation).getByRole('link', {
@@ -76,10 +76,10 @@ it('renders settings navigation beside the workspace and marks the current secti
 	});
 	const assistantGroup = within(navigation)
 		.getByText('settings.overview.groups.assistant')
-		.closest('[data-slot="sidebar-group"]');
+		.closest('[data-slot="split-pane-group"]');
 	const providersGroup = within(navigation)
 		.getByText('settings.tabs.providers')
-		.closest('[data-slot="sidebar-group"]');
+		.closest('[data-slot="split-pane-group"]');
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();
