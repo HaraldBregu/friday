@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { MessageSquare, Plus } from 'lucide-react';
+import { MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import {
 	PageSidebarLayout,
 	PageSidebarLayoutContent,
+	PageSidebarLayoutFooter,
 	PageSidebarLayoutHeader,
 	PageSidebarLayoutMenu,
 	PageSidebarLayoutMenuButton,
@@ -129,6 +131,19 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					</nav>
 				)}
 			</PageSidebarLayoutContent>
+			<PageSidebarLayoutFooter className="border-t border-sidebar-border/50">
+				<PageSidebarLayoutMenu>
+					<PageSidebarLayoutMenuItem>
+						<PageSidebarLayoutMenuButton
+							render={<Link to="/settings" />}
+							className="h-9 px-2.5"
+						>
+							<Settings2 strokeWidth={1.8} />
+							<span>{t('settings.title')}</span>
+						</PageSidebarLayoutMenuButton>
+					</PageSidebarLayoutMenuItem>
+				</PageSidebarLayoutMenu>
+			</PageSidebarLayoutFooter>
 		</PageSidebarLayout>
 	);
 }

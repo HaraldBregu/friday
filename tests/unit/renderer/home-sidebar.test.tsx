@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { PageContainer } from '../../../src/renderer/src/components/app/base/page';
 import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
 import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
@@ -39,11 +40,13 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	]);
 
 	render(
-		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
-			<PageContainer>
-				<HomeSidebar refreshKey="initial" />
-			</PageContainer>
-		</ChatSessionContext.Provider>
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
 	);
 
 	const navigation = await screen.findByRole('navigation', {
@@ -55,6 +58,10 @@ it('loads chat history, marks the latest default session, and switches sessions'
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
+	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute(
+		'href',
+		'/settings'
+	);
 });
 
 it('starts a new chat from the sidebar', async () => {
@@ -67,11 +74,13 @@ it('starts a new chat from the sidebar', async () => {
 	});
 
 	render(
-		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
-			<PageContainer>
-				<HomeSidebar refreshKey="initial" />
-			</PageContainer>
-		</ChatSessionContext.Provider>
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
 	);
 
 	await user.click(screen.getByRole('button', { name: 'generic.newChat' }));
@@ -82,11 +91,13 @@ it('shows an empty state when there is no chat history', async () => {
 	listSessions.mockResolvedValue([]);
 
 	render(
-		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
-			<PageContainer>
-				<HomeSidebar refreshKey="initial" />
-			</PageContainer>
-		</ChatSessionContext.Provider>
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
 	);
 
 	await waitFor(() => {
