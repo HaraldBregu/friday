@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 import { MessageSquare, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,21 +25,42 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 
-	const loadSessions = useCallback(async (): Promise<void> => {
-		try {
-			const nextSessions = await window.agent.listSessions();
-			setError(false);
-			setSessions(nextSessions);
-		} catch {
-			setError(true);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
-
 	useEffect(() => {
-		void loadSessions();
-	}, [loadSessions, refreshKey, sessionId]);
+		let active = true;
+
+		void window.agent
+			.listSessions()
+			.then((nextSessions) => {
+				if (!active) return;
+				setError(false);
+				setSessions(nextSessions);
+				setLoading(false);
+			})
+			.catch(() => {
+				if (!active) return;
+				setError(true);
+				setLoading(false);
+			});
+
+		return () => {
+			active = false;
+		};
+	}, [refreshKey, sessionId]);
+
+	const retrySessions = (): void => {
+		setLoading(true);
+		setError(false);
+		void window.agent
+			.listSessions()
+			.then((nextSessions) => {
+				setSessions(nextSessions);
+				setLoading(false);
+			})
+			.catch(() => {
+				setError(true);
+				setLoading(false);
+			});
+	};
 
 	const currentSessionId =
 		sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
@@ -76,7 +97,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 				) : error ? (
 					<div className="grid gap-2 px-2 py-1 text-xs text-muted-foreground">
 						<p>{t('settings.chatHistory.errors.load')}</p>
-						<Button type="button" variant="ghost" size="sm" onClick={() => void loadSessions()}>
+						<Button type="button" variant="ghost" size="sm" onClick={retrySessions}>
 							{t('settings.chatHistory.refresh')}
 						</Button>
 					</div>
