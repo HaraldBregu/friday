@@ -83,7 +83,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					onClick={() => setSessionId(crypto.randomUUID())}
 				>
 					<Plus className="size-4" />
-					{t('generic.newChat')}
+					{t('titleBar.newChat', 'New chat')}
 				</Button>
 			</PageSidebarLayoutHeader>
 			<PageSidebarLayoutContent className="p-2 pt-3" aria-busy={loading}>

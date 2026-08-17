@@ -83,7 +83,7 @@ it('starts a new chat from the sidebar', async () => {
 		</MemoryRouter>
 	);
 
-	await user.click(screen.getByRole('button', { name: 'generic.newChat' }));
+	await user.click(screen.getByRole('button', { name: 'titleBar.newChat' }));
 	expect(setSessionId).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000001');
 });
 
