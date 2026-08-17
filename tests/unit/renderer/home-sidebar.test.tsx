@@ -15,6 +15,10 @@ const listSessions = jest.fn();
 beforeEach(() => {
 	window.localStorage.clear();
 	document.documentElement.style.removeProperty('--app-sidebar-width');
+	Object.defineProperty(window, 'PointerEvent', {
+		configurable: true,
+		value: MouseEvent,
+	});
 	Object.defineProperty(window, 'matchMedia', {
 		configurable: true,
 		value: jest.fn((query: string) => ({
@@ -123,6 +127,7 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 	);
 	const resizer = screen.getByRole('separator', { name: 'Resize sidebar' });
 	const wrapper = container.querySelector('[data-slot="sidebar-wrapper"]');
+	await screen.findByText('settings.chatHistory.empty');
 
 	fireEvent.keyDown(resizer, { key: 'ArrowRight' });
 	expect(resizer).toHaveAttribute('aria-valuenow', '264');
