@@ -1,6 +1,7 @@
-import React, { memo, type ReactNode } from 'react';
+import React, { memo, useContext, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { Provider } from './Provider';
+import { PageContext } from './context/context';
 import { usePageContext } from './hooks/use-page-context';
 import type { PageState } from './context/state';
 
@@ -15,20 +16,21 @@ export const PageContainer = memo(function PageContainer({
 	className,
 	initialState,
 }: PageContainerProps): React.ReactElement {
-	return (
-		<Provider initialState={initialState}>
-			<div
-				className={cn('flex h-full flex-col bg-transparent', className)}
-				style={
-					{
-						backgroundColor: 'var(--page-background)',
-					} as React.CSSProperties
-				}
-			>
-				{children}
-			</div>
-		</Provider>
+	const pageContext = useContext(PageContext);
+	const content = (
+		<div
+			className={cn('flex h-full flex-col bg-transparent', className)}
+			style={
+				{
+					backgroundColor: 'var(--page-background)',
+				} as React.CSSProperties
+			}
+		>
+			{children}
+		</div>
 	);
+
+	return pageContext ? content : <Provider initialState={initialState}>{content}</Provider>;
 });
 
 interface PageHeaderProps {

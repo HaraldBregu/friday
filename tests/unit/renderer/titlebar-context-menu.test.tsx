@@ -117,3 +117,16 @@ it('renders a transparent titlebar without visible title text', () => {
 	expect(titleBar).not.toHaveClass('app-translucent-surface');
 	expect(within(titleBar as HTMLElement).queryByText('Application Name')).not.toBeInTheDocument();
 });
+
+it('exposes the sidebar toggle in the titlebar', async () => {
+	const user = userEvent.setup();
+	const onToggleSidebar = jest.fn();
+	render(
+		<MemoryRouter initialEntries={['/home']}>
+			<TitleBar onToggleSidebar={onToggleSidebar} />
+		</MemoryRouter>
+	);
+
+	await user.click(screen.getByRole('button', { name: 'titleBar.toggleSidebar' }));
+	expect(onToggleSidebar).toHaveBeenCalledTimes(1);
+});

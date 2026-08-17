@@ -25,6 +25,7 @@ import {
 } from './contexts/chat-session';
 import { cn } from './lib/utils';
 import HomePage from './pages/home/Page';
+import { usePageContext } from './components/app/base/page';
 
 const StartPage = lazy(() => import('./pages/start/StartPage'));
 const SettingsOverviewPage = lazy(() => import('./pages/settings/pages/overview/Page'));
@@ -99,6 +100,7 @@ function SettingsRouteWrapper({ children }: { readonly children: ReactNode }): R
 
 function RootRouteComponent(): React.JSX.Element {
 	const location = useLocation();
+	const { state, toggleSidebar } = usePageContext();
 	const [chatMode, setChatMode] = useState<ChatMode>('chat');
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
 
@@ -122,7 +124,14 @@ function RootRouteComponent(): React.JSX.Element {
 						'app-translucent-window flex h-screen flex-col overflow-hidden bg-background text-foreground'
 					)}
 				>
-					<TitleBar style={hasSidebar ? { left: 'var(--app-sidebar-width)' } : undefined} />
+					<TitleBar
+						onToggleSidebar={hasSidebar ? toggleSidebar : undefined}
+						style={
+							hasSidebar
+								? { left: state.sidebarOpen ? 'var(--app-sidebar-width)' : 0 }
+								: undefined
+						}
+					/>
 					<div className="min-h-0 flex-1 overflow-hidden pt-12">
 						<PageTransition>
 							<Outlet />

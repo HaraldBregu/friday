@@ -4,6 +4,7 @@ import { AppProvider } from './contexts';
 import { ErrorBoundary } from './components/app/base/ErrorBoundary';
 import { initRecorderCapture } from './lib/recorder';
 import { router } from './router';
+import { Provider as PageProvider } from './components/app/base/page';
 import './index.css';
 
 const App: React.FC = () => {
@@ -12,7 +13,9 @@ const App: React.FC = () => {
 	return (
 		<ErrorBoundary level="root">
 			<AppProvider>
-				<RouterProvider router={router} />
+				<PageProvider>
+					<RouterProvider router={router} />
+				</PageProvider>
 			</AppProvider>
 		</ErrorBoundary>
 	);

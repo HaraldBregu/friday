@@ -14,9 +14,10 @@ export function NavButton({ onClick, title, disabled = false, ghost = false, cla
 	return (
 		<button
 			type="button"
-			onClick={onClick}
-			disabled={disabled}
-			title={title}
+				onClick={onClick}
+				disabled={disabled}
+				title={title}
+				aria-label={title}
 			className={cn(
 				'flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors duration-100',
 				ghost ? 'hover:text-foreground' : 'hover:bg-accent/80 hover:text-foreground',
