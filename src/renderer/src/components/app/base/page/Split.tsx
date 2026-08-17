@@ -45,7 +45,8 @@ export function Split({
 				>
 					<SheetContent
 						side="left"
-						className="w-[min(18rem,calc(100vw-3rem))] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+						className="bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+						style={{ width: 'min(18rem, calc(100vw - 3rem))', maxWidth: 'none' }}
 					>
 						<SheetHeader className="sr-only">
 							<SheetTitle>{sidebarLabel}</SheetTitle>
