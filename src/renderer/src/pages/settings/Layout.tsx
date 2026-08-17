@@ -22,15 +22,14 @@ function SettingsBreadcrumbHeader(): React.JSX.Element | null {
 				aria-label={t('settings.breadcrumb.label')}
 				className="mx-auto flex w-full max-w-4xl min-w-0 items-center gap-1 text-[11px] text-muted-foreground"
 			>
-				<Link
-					to="/settings"
-					className="min-w-0 rounded-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/55"
-				>
-					{t('settings.title')}
-				</Link>
 				{items.map((item, index) => (
 					<React.Fragment key={`${item.label}-${index}`}>
-						<ChevronRight className="size-3 shrink-0 text-muted-foreground/60" strokeWidth={1.8} />
+						{index > 0 ? (
+							<ChevronRight
+								className="size-3 shrink-0 text-muted-foreground/60"
+								strokeWidth={1.8}
+							/>
+						) : null}
 						{item.path ? (
 							<Link
 								to={item.path}

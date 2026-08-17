@@ -38,6 +38,7 @@ it('treats an MCP detail route as a child of the MCP list breadcrumb', async () 
 	);
 
 	const breadcrumb = screen.getByRole('navigation', { name: 'settings.breadcrumb.label' });
+	expect(within(breadcrumb).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(within(breadcrumb).queryByText('settings.tabs.providers')).not.toBeInTheDocument();
 	expect(within(breadcrumb).getByText('demo-server')).toBeInTheDocument();
 
