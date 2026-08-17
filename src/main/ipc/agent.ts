@@ -1,6 +1,7 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { watch } from 'chokidar';
 import { realPath } from '../shared/real_path';
 import type { IpcModule } from './core/module';
 import type { EventBus } from '../event_bus';
@@ -19,6 +20,7 @@ import type {
 	AgentUserInputAnswer,
 	AgentUserInputScope,
 	ModelReasoningEffort,
+	WorkspaceChangeEvent,
 	WorkspaceTreeEntry,
 } from '../../shared/agent_types';
 import { normalizeAgentInputFiles } from '../../shared/agent_files';
@@ -258,6 +260,18 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 	readonly name = 'agent';
 
 	register({ logger, agent, conversation }: AgentIpcDeps, eventBus: EventBus): void {
+		const root = workspacePath(agent.config);
+		const watcher = watch(root, { ignoreInitial: true, persistent: false });
+		for (const type of ['add', 'change', 'unlink', 'addDir', 'unlinkDir'] as const) {
+			watcher.on(type, (changedPath) => {
+				const event: WorkspaceChangeEvent = {
+					type,
+					path: path.relative(root, changedPath),
+				};
+				eventBus.broadcast(AgentChannels.workspaceChanged, event);
+			});
+		}
+
 		ipcMain.handle(
 			AgentChannels.send,
 			wrapIpcHandler(async (event, message: string, options?: unknown): Promise<string> => {
