@@ -7,7 +7,8 @@ export {
 	PageSidebar,
 	PageSidebarInset,
 } from './Page';
-export { Split, SPLIT_ITEM_ACTIVE_CLASS, SPLIT_ITEM_CLASS } from './Split';
+export { Split } from './Split';
+export { SPLIT_ITEM_ACTIVE_CLASS, SPLIT_ITEM_CLASS } from './styles';
 export { Provider } from './Provider';
 export { usePageContext } from './hooks';
 export {
