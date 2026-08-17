@@ -33,6 +33,10 @@ export const BrowserWindow = Object.assign(jest.fn(), {
 
 export const WebContentsView = jest.fn();
 
+export const webContents = {
+	getAllWebContents: jest.fn(() => []),
+};
+
 export const dialog = {
 	showMessageBox: jest.fn(async () => ({ response: 0, checkboxChecked: false })),
 	showOpenDialog: jest.fn(async () => ({ canceled: true, filePaths: [] })),
