@@ -120,6 +120,25 @@ export default function App() {
 		if (!isFriday()) return;
 
 		let active = true;
+		let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+		const unsubscribe = agent.onWorkspaceChanged(() => {
+			clearTimeout(refreshTimer);
+			refreshTimer = setTimeout(() => {
+				agent
+					.listWorkspaceFiles()
+					.then((files) => {
+						if (!active) return;
+						setWorkspaceFiles(files);
+						setWorkspaceError('');
+					})
+					.catch((error) => {
+						if (active)
+							setWorkspaceError(
+								error instanceof Error ? error.message : 'Unable to refresh workspace.'
+							);
+					});
+			}, 100);
+		});
 		setWorkspaceLoading(true);
 		setWorkspaceError('');
 
@@ -139,6 +158,8 @@ export default function App() {
 
 		return () => {
 			active = false;
+			clearTimeout(refreshTimer);
+			unsubscribe();
 		};
 	}, []);
 
