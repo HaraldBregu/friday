@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
 	SPLIT_ITEM_ACTIVE_CLASS,
 	SPLIT_ITEM_CLASS,
+	usePageContext,
 } from '@/components/app/base/page';
 import { cn } from '@/lib/utils';
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
@@ -48,6 +49,7 @@ const SETTINGS_SIDEBAR_GROUPS = [
 export function SettingsSidebar(): React.JSX.Element {
 	const { t } = useTranslation();
 	const location = useLocation();
+	const { isMobile, dispatch } = usePageContext();
 	const activePath = SETTINGS_SIDEBAR_ITEMS.reduce((currentPath, item) => {
 		const matches =
 			location.pathname === item.path ||
@@ -63,7 +65,13 @@ export function SettingsSidebar(): React.JSX.Element {
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
 			<div className="shrink-0 border-b border-sidebar-border/50 p-2">
-				<Link to="/home" className={SPLIT_ITEM_CLASS}>
+				<Link
+					to="/home"
+					className={SPLIT_ITEM_CLASS}
+					onClick={() => {
+						if (isMobile) dispatch({ type: 'SIDEBAR_OPEN_MOBILE_SET', open: false });
+					}}
+				>
 					<ArrowLeft className="size-4 shrink-0" strokeWidth={1.8} />
 					<span>{t('settings.returnToChat', 'Return to Chat')}</span>
 				</Link>

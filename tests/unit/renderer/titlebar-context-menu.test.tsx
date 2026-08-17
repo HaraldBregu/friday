@@ -146,3 +146,18 @@ it('renders settings breadcrumbs inside the titlebar', () => {
 	);
 	expect(within(breadcrumb).getByText('settings.persona.title')).toBeInTheDocument();
 });
+
+it('does not open the titlebar menu from a breadcrumb link', () => {
+	const { container } = render(
+		<MemoryRouter initialEntries={['/settings/general/persona']}>
+			<TitleBar centerContent={<SettingsBreadcrumb />} />
+		</MemoryRouter>
+	);
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
+	const breadcrumbLink = within(titleBar as HTMLElement).getByRole('link', {
+		name: 'settings.tabs.general',
+	});
+
+	fireEvent.contextMenu(breadcrumbLink);
+	expect(showContextMenu).not.toHaveBeenCalled();
+});

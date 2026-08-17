@@ -27,6 +27,8 @@ export interface TitleBarProps {
 	rightContent?: ReactNode;
 	/** Route context rendered inside the title bar */
 	centerContent?: ReactNode;
+	/** Optional positioning override for route context */
+	centerContentClassName?: string;
 	/** When true, renders agentic + info sidebar toggle buttons on the right */
 	showSidebarToggles?: boolean;
 }
@@ -36,6 +38,7 @@ export const TitleBar = React.memo(function TitleBar({
 	style,
 	rightContent,
 	centerContent,
+	centerContentClassName,
 	showSidebarToggles: _showSidebarToggles = false,
 }: TitleBarProps) {
 	const { t } = useTranslation();
@@ -79,7 +82,7 @@ export const TitleBar = React.memo(function TitleBar({
 				className={className}
 				style={style}
 				onContextMenu={(event) => {
-					if (event.target instanceof Element && event.target.closest('button')) {
+					if (event.target instanceof Element && event.target.closest('button, a')) {
 						return;
 					}
 
@@ -133,7 +136,8 @@ export const TitleBar = React.memo(function TitleBar({
 						data-slot="titlebar-content"
 						className={cn(
 							'pointer-events-none absolute inset-y-0 flex min-w-0 items-center overflow-hidden',
-							isMac ? 'left-4 right-16' : 'left-24 right-28'
+							isMac ? 'left-4 right-16' : 'left-24 right-28',
+							centerContentClassName
 						)}
 					>
 						<div

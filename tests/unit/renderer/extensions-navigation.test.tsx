@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '../../../src/renderer/src/pages/settings/Layout';
+import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Breadcrumb';
 import ExtensionsPage from '../../../src/renderer/src/pages/settings/pages/extensions/Page';
 import type { Extension } from '../../../src/shared/extension_types';
 
@@ -137,6 +138,7 @@ it('treats an extension detail route as a child of the extensions breadcrumb', a
 
 	render(
 		<MemoryRouter initialEntries={['/settings/extensions/demo-extension']}>
+			<SettingsBreadcrumb />
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
 					<Route path="extensions">

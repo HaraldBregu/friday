@@ -126,6 +126,9 @@ function RootRouteComponent(): React.JSX.Element {
 				>
 					<TitleBar
 						centerContent={isSettings ? <SettingsBreadcrumb /> : undefined}
+						centerContentClassName={
+							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
+						}
 						style={
 							hasSidebar
 								? { left: !isMobile && state.sidebarOpen ? 'var(--app-sidebar-width)' : 0 }
