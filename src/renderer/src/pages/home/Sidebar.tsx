@@ -26,9 +26,10 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const [error, setError] = useState(false);
 
 	const loadSessions = useCallback(async (): Promise<void> => {
-		setError(false);
 		try {
-			setSessions(await window.agent.listSessions());
+			const nextSessions = await window.agent.listSessions();
+			setError(false);
+			setSessions(nextSessions);
 		} catch {
 			setError(true);
 		} finally {
