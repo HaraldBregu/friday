@@ -153,7 +153,7 @@ export const TitleBar = React.memo(function TitleBar({
 				</TitleBarLeftContainer>
 
 				{/* ── Center: absolutely placed so it's always truly centered ── */}
-				<TitleBarCenterContainer>
+				<TitleBarCenterContainer className={isSettings ? 'justify-start pl-12' : undefined}>
 					{centerContent && !isSettings ? (
 						centerContent
 					) : (

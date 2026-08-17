@@ -4,10 +4,12 @@ import type { RendererContentOptions, WindowFactory } from './window_factory';
 import type { WindowContextManager } from './window_context';
 import { attachWindowHandlers } from './window_events';
 
-const DEFAULT_WINDOW_WIDTH = 462;
-const DEFAULT_WINDOW_HEIGHT = 600;
-const STARTUP_WINDOW_WIDTH = 462;
-const STARTUP_WINDOW_HEIGHT = 600;
+const DEFAULT_WINDOW_WIDTH = 812;
+const DEFAULT_WINDOW_HEIGHT = 625;
+const MINIMUM_WINDOW_WIDTH = 768;
+const MINIMUM_WINDOW_HEIGHT = 600;
+const STARTUP_WINDOW_WIDTH = 812;
+const STARTUP_WINDOW_HEIGHT = 625;
 const TRANSPARENT_WINDOW_BACKGROUND = '#00000000';
 
 function getPlatformTranslucencyOptions(): Partial<BrowserWindowConstructorOptions> {
@@ -41,7 +43,9 @@ export class Main {
 		return {
 			width: DEFAULT_WINDOW_WIDTH,
 			height: DEFAULT_WINDOW_HEIGHT,
-			resizable: false,
+			minWidth: MINIMUM_WINDOW_WIDTH,
+			minHeight: MINIMUM_WINDOW_HEIGHT,
+			resizable: true,
 			maximizable: true,
 			fullscreenable: false,
 			frame: false,

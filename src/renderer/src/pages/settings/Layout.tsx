@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { PageContainer } from '@/components/app/base/page';
+import {
+	PageContainer,
+	PageSidebarLayoutContainer,
+	PageSidebarLayoutInset,
+} from '@/components/app/base/page';
 import { useTranslation } from 'react-i18next';
 import { useSettingsBreadcrumbItems } from './hooks';
+import { SettingsSidebar } from './Sidebar';
 
 function SettingsBreadcrumbHeader(): React.JSX.Element | null {
 	const { t } = useTranslation();
@@ -48,12 +53,17 @@ function SettingsBreadcrumbHeader(): React.JSX.Element | null {
 export function Layout(): React.JSX.Element {
 	return (
 		<PageContainer className="bg-muted/20">
-			<main className="min-h-0 flex-1 overflow-y-auto">
-				<SettingsBreadcrumbHeader />
-				<div className="px-4 py-6">
-					<Outlet />
-				</div>
-			</main>
+			<PageSidebarLayoutContainer className="h-full min-h-0">
+				<SettingsSidebar />
+				<PageSidebarLayoutInset className="min-h-0 min-w-0 overflow-hidden">
+					<div data-slot="settings-workspace" className="min-h-0 flex-1 overflow-y-auto">
+						<SettingsBreadcrumbHeader />
+						<div className="py-6">
+							<Outlet />
+						</div>
+					</div>
+				</PageSidebarLayoutInset>
+			</PageSidebarLayoutContainer>
 		</PageContainer>
 	);
 }

@@ -122,7 +122,10 @@ function RootRouteComponent(): React.JSX.Element {
 						'app-translucent-window flex h-screen flex-col overflow-hidden bg-background text-foreground'
 					)}
 				>
-					<TitleBar title={isStart ? 'Set up Friday' : t('appTitle')} />
+					<TitleBar
+						title={isStart ? 'Set up Friday' : t('appTitle')}
+						style={isSettings ? { left: '16rem' } : undefined}
+					/>
 					<div className="min-h-0 flex-1 overflow-hidden pt-12">
 						<PageTransition>
 							<Outlet />
