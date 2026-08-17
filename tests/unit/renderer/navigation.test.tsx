@@ -74,9 +74,19 @@ it('renders settings navigation beside the workspace and marks the current secti
 	const currentSection = within(navigation).getByRole('link', {
 		name: 'settings.modelServices.assistantName',
 	});
+	const assistantGroup = within(navigation)
+		.getByText('settings.overview.groups.assistant')
+		.closest('[data-slot="sidebar-group"]');
+	const providersGroup = within(navigation)
+		.getByText('settings.tabs.providers')
+		.closest('[data-slot="sidebar-group"]');
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();
 	expect(within(navigation).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
+	expect(assistantGroup).not.toBeNull();
+	expect(providersGroup).not.toBeNull();
+	expect(within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.tabs.skills' })).toBeInTheDocument();
+	expect(within(providersGroup as HTMLElement).getByRole('link', { name: 'settings.overview.groups.mlModels' })).toBeInTheDocument();
 	expect(currentSection).toHaveAttribute('data-active');
 });
