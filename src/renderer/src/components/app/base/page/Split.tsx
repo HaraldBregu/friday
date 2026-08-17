@@ -1,5 +1,7 @@
 import React, { type ReactNode } from 'react';
+import { PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
 	Sheet,
 	SheetContent,
@@ -24,7 +26,9 @@ export function Split({
 	style,
 	...props
 }: SplitProps): React.JSX.Element {
-	const { state, dispatch, isMobile, sidebarWidth, setSidebarWidth } = usePageContext();
+	const { state, dispatch, isMobile, sidebarWidth, setSidebarWidth, toggleSidebar } =
+		usePageContext();
+	const sidebarOpen = isMobile ? state.sidebarOpenMobile : state.sidebarOpen;
 
 	return (
 		<div
@@ -38,6 +42,21 @@ export function Split({
 			}
 			{...props}
 		>
+			<Button
+				type="button"
+				variant="ghost"
+				size="icon-sm"
+				data-slot="split-pane-toggle"
+				aria-label="Toggle Sidebar"
+				aria-controls="split-pane-sidebar"
+				aria-expanded={sidebarOpen}
+				title="Toggle Sidebar"
+				onClick={toggleSidebar}
+				className="fixed left-20 top-2 z-[60] text-muted-foreground"
+				style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+			>
+				<PanelLeft className="size-4" strokeWidth={1.5} />
+			</Button>
 			{isMobile ? (
 				<Sheet
 					open={state.sidebarOpenMobile}
@@ -52,7 +71,12 @@ export function Split({
 							<SheetTitle>{sidebarLabel}</SheetTitle>
 							<SheetDescription>{sidebarLabel}</SheetDescription>
 						</SheetHeader>
-						<aside data-slot="split-pane-sidebar" aria-label={sidebarLabel} className="h-full">
+						<aside
+							id="split-pane-sidebar"
+							data-slot="split-pane-sidebar"
+							aria-label={sidebarLabel}
+							className="h-full"
+						>
 							{sidebar}
 						</aside>
 					</SheetContent>
@@ -68,6 +92,7 @@ export function Split({
 						)}
 					/>
 					<aside
+						id="split-pane-sidebar"
 						data-slot="split-pane-sidebar"
 						data-state={state.sidebarOpen ? 'expanded' : 'collapsed'}
 						aria-label={sidebarLabel}

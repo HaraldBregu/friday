@@ -1,12 +1,11 @@
 import React, { type ReactNode } from 'react';
-import { Menu, PanelLeft, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TitleBarContainer } from './TitleBarContainer';
 import { TitleBarLeftContainer } from './TitleBarLeftContainer';
 import { Button } from '@/components/ui/button';
 import { TitleBarProvider } from './context/TitleBarContext';
-import { NavButton } from './components/NavButton';
 // import { NavigationButtons } from './components/NavigationButtons';
 import { WindowControls } from './components/WindowControls';
 import { useWindowState } from './hooks/useWindowState';
@@ -25,8 +24,6 @@ export interface TitleBarProps {
 	style?: React.CSSProperties;
 	/** Custom content rendered on the right before window controls */
 	rightContent?: ReactNode;
-	/** Called when the sidebar toggle button is clicked */
-	onToggleSidebar?: () => void;
 	/** When true, renders agentic + info sidebar toggle buttons on the right */
 	showSidebarToggles?: boolean;
 }
@@ -35,7 +32,6 @@ export const TitleBar = React.memo(function TitleBar({
 	className,
 	style,
 	rightContent,
-	onToggleSidebar,
 	showSidebarToggles: _showSidebarToggles = false,
 }: TitleBarProps) {
 	const { t } = useTranslation();
@@ -99,7 +95,7 @@ export const TitleBar = React.memo(function TitleBar({
 						});
 				}}
 			>
-				{/* ── Left: platform menu + sidebar toggle + nav buttons ── */}
+				{/* ── Left: platform menu + nav buttons ── */}
 				<TitleBarLeftContainer isMac={isMac} isFullScreen={isFullScreen}>
 					{!isMac && (
 						<button
@@ -123,16 +119,6 @@ export const TitleBar = React.memo(function TitleBar({
 						>
 							{homeButtonLabel}
 						</Button>
-					)}
-
-					{onToggleSidebar && (
-						<NavButton
-							onClick={onToggleSidebar}
-							title={t('titleBar.toggleSidebar')}
-							className={!isMac ? 'hover:bg-transparent hover:text-muted-foreground transition-none' : ''}
-						>
-							<PanelLeft className="h-[15px] w-[15px]" strokeWidth={1.5} />
-						</NavButton>
 					)}
 
 					{/* {isSettings && <NavigationButtons />} */}

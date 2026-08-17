@@ -118,15 +118,12 @@ it('renders a transparent titlebar without visible title text', () => {
 	expect(within(titleBar as HTMLElement).queryByText('Application Name')).not.toBeInTheDocument();
 });
 
-it('exposes the sidebar toggle in the titlebar', async () => {
-	const user = userEvent.setup();
-	const onToggleSidebar = jest.fn();
+it('does not render the sidebar toggle in the titlebar', () => {
 	render(
 		<MemoryRouter initialEntries={['/home']}>
-			<TitleBar onToggleSidebar={onToggleSidebar} />
+			<TitleBar />
 		</MemoryRouter>
 	);
 
-	await user.click(screen.getByRole('button', { name: 'titleBar.toggleSidebar' }));
-	expect(onToggleSidebar).toHaveBeenCalledTimes(1);
+	expect(screen.queryByRole('button', { name: 'titleBar.toggleSidebar' })).not.toBeInTheDocument();
 });

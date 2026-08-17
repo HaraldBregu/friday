@@ -125,7 +125,9 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 		</MemoryRouter>
 	);
 	const resizer = screen.getByRole('separator', { name: 'Resize sidebar' });
+	const toggle = screen.getByRole('button', { name: 'Toggle Sidebar' });
 	const wrapper = container.querySelector('[data-slot="split-pane"]');
+	const sidebar = container.querySelector('[data-slot="split-pane-sidebar"]');
 	await screen.findByText('settings.chatHistory.empty');
 
 	fireEvent.keyDown(resizer, { key: 'ArrowRight' });
@@ -139,4 +141,8 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 	expect(resizer).toHaveAttribute('aria-valuenow', '320');
 	expect(document.documentElement.style.getPropertyValue('--app-sidebar-width')).toBe('320px');
 	expect(window.localStorage.getItem('friday_sidebar_width')).toBe('320');
+
+	fireEvent.click(toggle);
+	expect(toggle).toHaveAttribute('aria-expanded', 'false');
+	expect(sidebar).toHaveAttribute('data-state', 'collapsed');
 });

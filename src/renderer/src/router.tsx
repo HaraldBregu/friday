@@ -100,7 +100,7 @@ function SettingsRouteWrapper({ children }: { readonly children: ReactNode }): R
 
 function RootRouteComponent(): React.JSX.Element {
 	const location = useLocation();
-	const { state, isMobile, toggleSidebar } = usePageContext();
+	const { state, isMobile } = usePageContext();
 	const [chatMode, setChatMode] = useState<ChatMode>('chat');
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
 
@@ -125,7 +125,6 @@ function RootRouteComponent(): React.JSX.Element {
 					)}
 				>
 					<TitleBar
-						onToggleSidebar={hasSidebar ? toggleSidebar : undefined}
 						style={
 							hasSidebar
 								? { left: !isMobile && state.sidebarOpen ? 'var(--app-sidebar-width)' : 0 }
