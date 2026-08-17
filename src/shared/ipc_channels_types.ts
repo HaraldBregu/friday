@@ -293,6 +293,7 @@ export interface McpInvokeChannelMap {
 
 export interface AgentEventChannelMap {
 	[AgentChannels.response]: { data: import('./agent_types').AgentResponseEvent };
+	[AgentChannels.workspaceChanged]: { data: import('./agent_types').WorkspaceChangeEvent };
 }
 
 export interface AppInvokeChannelMap {
