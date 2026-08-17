@@ -158,7 +158,7 @@ function applyResponseEvent(
 				...message,
 				state: 'awaiting_input',
 				tools: updateAgentToolPart(message.tools, event.toolCallId, {
-					type: 'request_user_input',
+					type: 'ask',
 					state: 'input-available',
 					input: { questions: event.questions },
 				}),
@@ -179,7 +179,7 @@ function applyResponseEvent(
 			...message,
 			pendingUserInput: undefined,
 			tools: updateAgentToolPart(message.tools, event.toolCallId, {
-				type: 'request_user_input',
+				type: 'ask',
 				state: event.status === 'resolved' ? 'output-available' : 'output-error',
 				output: { status: event.status, answers: event.answers },
 				outputText: JSON.stringify({ status: event.status, answers: event.answers }),
@@ -361,7 +361,7 @@ export function historyToChatMessages(history: AgentHistoryMessage[]): HomeChatM
 		return {
 			...message,
 			tools: message.tools.map((tool) =>
-				tool.type === 'request_user_input' && tool.state === 'input-available'
+				tool.type === 'ask' && tool.state === 'input-available'
 					? {
 							...tool,
 							state: 'output-error' as const,
@@ -465,7 +465,7 @@ export function agentChatReducer(state: AgentChatState, action: AgentChatAction)
 				pendingUserInput: undefined,
 				tools: message.pendingUserInput
 					? updateAgentToolPart(message.tools, message.pendingUserInput.toolCallId, {
-							type: 'request_user_input',
+							type: 'ask',
 							state: 'output-error',
 							output: { status: 'interrupted', answers: [] },
 							outputText: JSON.stringify({ status: 'interrupted', answers: [] }),

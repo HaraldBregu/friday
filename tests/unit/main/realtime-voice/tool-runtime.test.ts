@@ -186,7 +186,7 @@ it('preserves the existing permission request identity and returns rejected tool
 		windowId: 6,
 		tools: [
 			{
-				id: 'write_file',
+				id: 'write',
 				name: 'Write file',
 				description: 'Write a file.',
 				schema: { type: 'object' },
@@ -222,7 +222,7 @@ it('preserves the existing permission request identity and returns rejected tool
 			callId: 'call-permission',
 			itemId: 'item-permission',
 			responseId: 'response-permission',
-			name: 'write_file',
+			name: 'write',
 			arguments: '{"path":"/etc/friday-test","content":"test"}',
 		});
 		const permission = await permissionEvent;
@@ -231,7 +231,7 @@ it('preserves the existing permission request identity and returns rejected tool
 			sessionId: 'voice-permission',
 			runId: 'voice-permission',
 			toolCallId: 'call-permission',
-			toolName: 'write_file',
+			toolName: 'write',
 			mode: 'ask',
 		});
 		expect(permission).toHaveProperty('approvalId');
@@ -241,7 +241,7 @@ it('preserves the existing permission request identity and returns rejected tool
 			{
 				approvalId: String(permission.approvalId),
 				runId: 'voice-permission',
-				toolName: 'write_file',
+				toolName: 'write',
 				inputFingerprint: String(permission.inputFingerprint),
 			},
 			'reject',
@@ -251,7 +251,7 @@ it('preserves the existing permission request identity and returns rejected tool
 		const call = loadMessagesBySessionId(CHAT_SESSION_ID, location)[0].toolCalls?.[0];
 		expect(call).toMatchObject({
 			id: 'call-permission',
-			name: 'write_file',
+			name: 'write',
 			args: { path: '/etc/friday-test', content: 'test' },
 			result: { isError: true },
 		});

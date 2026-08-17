@@ -8,7 +8,7 @@ describe('sanitizeMessages', () => {
 	it('removes interrupted empty assistant turns while preserving valid text and tool calls', () => {
 		const toolCall = {
 			id: 'tool',
-			name: 'read_file',
+			name: 'read',
 			args: { path: 'README.md' },
 		};
 		const messages: Message[] = [

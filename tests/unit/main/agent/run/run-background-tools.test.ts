@@ -23,7 +23,7 @@ import { stream } from '../../../../../src/main/agent/runner/run_stream';
 import { jsonTool } from '../../../../../src/main/agent/tools/tool';
 
 it('distinguishes an omitted background allowlist from an explicit empty allowlist', async () => {
-	const tools = ['read_file', 'exec_command'].map((id) =>
+	const tools = ['read', 'bash'].map((id) =>
 		jsonTool({
 			id,
 			name: id,
@@ -55,7 +55,7 @@ it('distinguishes an omitted background allowlist from an explicit empty allowli
 		return started.tools;
 	};
 
-	await expect(run()).resolves.toEqual(['read_file', 'exec_command']);
+	await expect(run()).resolves.toEqual(['read', 'bash']);
 	await expect(run([])).resolves.toEqual([]);
-	await expect(run(['read_file'])).resolves.toEqual(['read_file']);
+	await expect(run(['read'])).resolves.toEqual(['read']);
 });

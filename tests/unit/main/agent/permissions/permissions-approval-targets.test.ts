@@ -5,18 +5,18 @@ const agentDir = path.resolve('/appdata/agent');
 
 describe('toolApprovalTargets', () => {
 	it('stores the containing folder for read', () => {
-		expect(toolApprovalTargets('read_file', { path: '/workspace/a.txt' }, agentDir)).toEqual([
+		expect(toolApprovalTargets('read', { path: '/workspace/a.txt' }, agentDir)).toEqual([
 			path.resolve('/workspace'),
 		]);
 	});
 
 	it('stores the containing folder for write and the declared exec roots', () => {
-		expect(toolApprovalTargets('write_file', { path: '/workspace/a.txt' }, agentDir)).toEqual([
+		expect(toolApprovalTargets('write', { path: '/workspace/a.txt' }, agentDir)).toEqual([
 			path.resolve('/workspace'),
 		]);
 		expect(
 			toolApprovalTargets(
-				'exec_command',
+				'bash',
 				{ command: 'npm test', workdir: '/workspace', additionalRoots: ['/shared'] },
 				agentDir
 			)

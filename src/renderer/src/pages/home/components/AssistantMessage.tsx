@@ -180,9 +180,9 @@ export function AssistantMessage({
 	const messageText = displayContent.trim();
 	const hasTools = message.tools.length > 0;
 	const skillTools = message.tools.filter(isSkillTool);
-	const questionTools = message.tools.filter((tool) => tool.type === 'request_user_input');
+	const questionTools = message.tools.filter((tool) => tool.type === 'ask');
 	const otherTools = message.tools.filter(
-		(tool) => !isSkillTool(tool) && tool.type !== 'request_user_input'
+		(tool) => !isSkillTool(tool) && tool.type !== 'ask'
 	);
 	const mediaPaths = generatedMediaPaths(message.tools);
 	const standaloneMediaPaths = mediaPaths.filter(

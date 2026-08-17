@@ -121,14 +121,14 @@ describe('subagentTool', () => {
 				})()
 		);
 		const safe = jsonTool({
-			id: 'read_file',
+			id: 'read',
 			name: 'Read file',
 			description: 'read',
 			schema: { type: 'object' },
 			execute: () => undefined,
 		});
 		const unsafe = jsonTool({
-			id: 'exec_command',
+			id: 'bash',
 			name: 'Exec command',
 			description: 'execute',
 			schema: { type: 'object' },
@@ -145,7 +145,7 @@ describe('subagentTool', () => {
 
 		for (const call of mockStream.mock.calls) {
 			expect(call[4].tools.map((candidate: { id: string }) => candidate.id)).toEqual([
-				'read_file',
+				'read',
 			]);
 		}
 	});

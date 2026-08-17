@@ -5,7 +5,7 @@ import { tool } from '../tool';
 
 export function redoFileTool(history: FileHistory) {
 	return tool({
-		id: 'redo_file_operation',
+		id: 'redo',
 		name: 'Redo file operation',
 		description:
 			'Redo the most recently undone file operation in this session. Refuses if a file changed afterward.',

@@ -226,7 +226,7 @@ function applyUpdateChunks(filePath: string, contents: string, chunks: UpdateChu
 }
 
 export const applyPatchTool = tool({
-	id: 'apply_patch',
+	id: 'patch',
 	name: 'Apply patch',
 	description:
 		'Apply a multi-file patch using the *** Begin Patch/*** End Patch format. Supports Add File, Delete File, and Update File (with optional Move to) hunks.',

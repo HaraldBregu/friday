@@ -5,10 +5,10 @@ import { tool } from '../tool';
 
 export function undoFileTool(history: FileHistory) {
 	return tool({
-		id: 'undo_file_operation',
+		id: 'undo',
 		name: 'Undo file operation',
 		description:
-			'Undo the most recent write_file, edit_file, or apply_patch operation in this session. Refuses if a file changed afterward.',
+			'Undo the most recent write, edit, or patch operation in this session. Refuses if a file changed afterward.',
 		hardApproval: true,
 		inputSchema: z.object({}),
 		execute: () => {

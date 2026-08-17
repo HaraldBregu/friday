@@ -15,7 +15,7 @@ const permission: PendingToolPermission = {
 	approvalId: 'approval',
 	runId: 'run',
 	toolCallId: 'call',
-	toolName: 'exec_command',
+	toolName: 'bash',
 	inputFingerprint: 'fingerprint',
 	input: { command: 'pwd' },
 	targets: ['/outside'],

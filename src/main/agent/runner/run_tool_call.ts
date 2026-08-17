@@ -90,12 +90,12 @@ export async function* runToolCall(
 		isError = true;
 	} else if (
 		security.interactionMode === 'plan' &&
-		toolCall.name === 'exec_command' &&
+		toolCall.name === 'bash' &&
 		planCommandError(canonicalInput, agentLocation())
 	) {
 		output = `Error: ${planCommandError(canonicalInput, agentLocation())}`;
 		isError = true;
-	} else if (toolCall.name === 'request_user_input') {
+	} else if (toolCall.name === 'ask') {
 		if (security.interactionMode !== 'plan' || security.windowId === undefined) {
 			output = 'Error: structured user input is only available in an interactive Plan run.';
 			isError = true;
@@ -170,7 +170,7 @@ export async function* runToolCall(
 			const expiresAtMs = Date.now() + 120_000;
 			const allowOnce = !(
 				process.platform === 'win32' &&
-				toolCall.name === 'exec_command' &&
+				toolCall.name === 'bash' &&
 				resolution.reason === 'outside_trusted_location'
 			);
 			yield {
@@ -242,12 +242,12 @@ export async function* runToolCall(
 						abort = () => reject(toolSignal.reason ?? new Error('Tool call aborted.'));
 						toolSignal.addEventListener('abort', abort, { once: true });
 					});
-					const historyTargets = ['write_file', 'edit_file', 'apply_patch'].includes(toolCall.name)
+					const historyTargets = ['write', 'edit', 'patch'].includes(toolCall.name)
 						? toolPermissionTargets(toolCall.name, canonicalInput, agentLocation())
 						: [];
 					const before = historyTargets.length > 0 ? captureFiles(historyTargets) : [];
 					const run = (): Promise<unknown> => Promise.resolve(tool.run(canonicalInput, toolSignal));
-					const approvedRoots = permissionOutcome === 'approve' && toolCall.name === 'exec_command'
+					const approvedRoots = permissionOutcome === 'approve' && toolCall.name === 'bash'
 						? resolution.approvalTargets
 						: [];
 					output = await Promise.race([
@@ -265,7 +265,7 @@ export async function* runToolCall(
 						);
 					}
 					output = limitToolOutput(output, tool.maxOutputBytes);
-					if (toolCall.name === 'read_file' && state) rememberTool(context, state);
+					if (toolCall.name === 'read' && state) rememberTool(context, state);
 					if (createsFile && state) rememberTool(context, state);
 				} finally {
 					release();

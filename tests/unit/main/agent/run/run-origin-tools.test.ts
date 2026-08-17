@@ -15,7 +15,7 @@ function namedTool(name: string, allowedOrigins?: AgentOrigin[]) {
 const tools = [
 	namedTool('read', ['main', 'task', 'subagent']),
 	namedTool('write'),
-	namedTool('apply_patch'),
+	namedTool('patch'),
 	namedTool('web_search', ['main', 'bot', 'task', 'subagent']),
 	namedTool('web_fetch', ['main', 'bot', 'task', 'subagent']),
 	namedTool('bot_write', ['bot']),
@@ -46,7 +46,7 @@ it('gives tasks all compatible tools by default and keeps a non-empty allowlist 
 	expect(selectOriginTools(tools, 'task').map((tool) => tool.name)).toEqual([
 		'read',
 		'write',
-		'apply_patch',
+		'patch',
 		'web_search',
 		'web_fetch',
 		'exec',
@@ -54,7 +54,7 @@ it('gives tasks all compatible tools by default and keeps a non-empty allowlist 
 	expect(selectOriginTools(tools, 'task', []).map((tool) => tool.name)).toEqual([
 		'read',
 		'write',
-		'apply_patch',
+		'patch',
 		'web_search',
 		'web_fetch',
 		'exec',
@@ -72,7 +72,7 @@ it('prevents nested subagents and respects per-tool origin restrictions', () => 
 	expect(selectOriginTools(tools, 'subagent').map((tool) => tool.name)).toEqual([
 		'read',
 		'write',
-		'apply_patch',
+		'patch',
 		'web_search',
 		'web_fetch',
 		'exec',

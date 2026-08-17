@@ -15,11 +15,11 @@ import type { AgentToolPermissionDecision } from '@/lib/compat';
 import type { PendingToolPermission } from '../context';
 
 const TOOL_ACTIONS: Record<string, string> = {
-	read_file: 'read files',
-	write_file: 'write files',
-	edit_file: 'edit files',
-	apply_patch: 'apply this patch',
-	exec_command: 'run this command',
+	read: 'read files',
+	write: 'write files',
+	edit: 'edit files',
+	patch: 'apply this patch',
+	bash: 'run this command',
 };
 
 export function ToolPermissionCard({

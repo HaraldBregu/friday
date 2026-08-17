@@ -72,7 +72,7 @@ Rules:
 - You are NOT the main agent: do not converse with the user or spawn more agents.`;
 
 const fallbackPool = new KeyedLimiter(3);
-const PARALLEL_TOOL_IDS = new Set(['read_file', 'search_web', 'fetch_web_page', 'query_knowledge']);
+const PARALLEL_TOOL_IDS = new Set(['read', 'search_web', 'fetch_web_page', 'query_knowledge']);
 
 export function subagentTool(
 	config: Config,
@@ -93,7 +93,7 @@ export function subagentTool(
 				(candidate) =>
 					candidate.id !== 'subagent' &&
 					candidate.id !== 'subagents' &&
-					candidate.id !== 'request_user_input' &&
+					candidate.id !== 'ask' &&
 					candidate.id !== 'load_skill'
 			);
 			return runChild(

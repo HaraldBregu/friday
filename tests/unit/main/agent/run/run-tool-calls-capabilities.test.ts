@@ -1,6 +1,6 @@
 import { runToolCalls } from '../../../../../src/main/agent/runner/run_tool_calls';
 import type { Tool, ToolCall } from '../../../../../src/main/agent/types';
-import { requestUserInputTool } from '../../../../../src/main/agent/tools/core/request_user_input';
+import { requestUserInputTool } from '../../../../../src/main/agent/tools/core/ask';
 
 function fakeTool(name: string, output: string): Tool {
 	return {
@@ -18,11 +18,11 @@ function fakeTool(name: string, output: string): Tool {
 describe('runToolCalls capability changes', () => {
 	it('uses the current tool set for every call in a model batch', async () => {
 		const load = fakeTool('load_skill', 'loaded');
-		const write = fakeTool('write_file', 'wrote');
+		const write = fakeTool('write', 'wrote');
 		const tools = [load, write];
 		const calls: ToolCall[] = [
 			{ id: '1', name: 'load_skill', args: {} },
-			{ id: '2', name: 'write_file', args: {} },
+			{ id: '2', name: 'write', args: {} },
 		];
 		const outputs: unknown[] = [];
 
@@ -38,16 +38,16 @@ describe('runToolCalls capability changes', () => {
 			if (event.toolName === 'load_skill') tools.splice(0, tools.length, load);
 		}
 
-		expect(outputs).toEqual(['loaded', "Error: unknown tool 'write_file'"]);
+		expect(outputs).toEqual(['loaded', "Error: unknown tool 'write'"]);
 	});
 
 	it('stops an aborted batch after persisting an interrupted input result', async () => {
 		const controller = new AbortController();
-		const read = fakeTool('read_file', 'read');
+		const read = fakeTool('read', 'read');
 		const calls: ToolCall[] = [
 			{
 				id: 'question',
-				name: 'request_user_input',
+				name: 'ask',
 				args: {
 					questions: [
 						{
@@ -62,7 +62,7 @@ describe('runToolCalls capability changes', () => {
 					],
 				},
 			},
-			{ id: 'read', name: 'read_file', args: {} },
+			{ id: 'read', name: 'read', args: {} },
 		];
 		const events = runToolCalls(
 			[requestUserInputTool, read],

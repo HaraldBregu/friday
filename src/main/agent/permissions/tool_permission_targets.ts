@@ -19,9 +19,9 @@ export function toolPermissionTargets(
 	args: Record<string, unknown>,
 	baseDir: string
 ): string[] {
-	if (toolName === 'apply_patch')
+	if (toolName === 'patch')
 		return typeof args.input === 'string' ? patchTargets(args.input, baseDir) : [];
-	if (toolName === 'exec_command')
+	if (toolName === 'bash')
 		return typeof args.command === 'string' && args.command.length > 0 ? [args.command] : [];
 	if (toolName === 'process') {
 		const session = typeof args.sessionId === 'string' ? registry.get(args.sessionId) : undefined;

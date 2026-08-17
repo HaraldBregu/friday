@@ -18,7 +18,7 @@ it('undoes and redoes a file creation in session memory', () => {
 	const target = path.join(root, 'created.txt');
 	const before = captureFiles([target]);
 	fs.writeFileSync(target, 'created');
-	recordFileOperation(history, 'run', 'call', 'write_file', before, captureFiles([target]));
+	recordFileOperation(history, 'run', 'call', 'write', before, captureFiles([target]));
 
 	undoFileOperation(history);
 	expect(fs.existsSync(target)).toBe(false);
@@ -32,7 +32,7 @@ it('restores deleted content and refuses to overwrite divergent changes', () => 
 	fs.writeFileSync(target, 'original');
 	const before = captureFiles([target]);
 	fs.rmSync(target);
-	recordFileOperation(history, 'run', 'call', 'apply_patch', before, captureFiles([target]));
+	recordFileOperation(history, 'run', 'call', 'patch', before, captureFiles([target]));
 
 	undoFileOperation(history);
 	expect(fs.readFileSync(target, 'utf8')).toBe('original');

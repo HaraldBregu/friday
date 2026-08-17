@@ -15,10 +15,10 @@ describe('tool context state', () => {
 
 	it('stores the tool name, canonical path, and directory', () => {
 		const context = createRunContext().fileAccess;
-		const state = fileToolState('write_file', { path: 'directory/example.txt' }, root);
+		const state = fileToolState('write', { path: 'directory/example.txt' }, root);
 
 		expect(state).toEqual({
-			toolName: 'write_file',
+			toolName: 'write',
 			path: realPath(path.join(root, 'directory', 'example.txt')),
 			directory: realPath(path.join(root, 'directory')),
 		});
@@ -28,8 +28,8 @@ describe('tool context state', () => {
 
 	it('matches the full path rather than only the file name', () => {
 		const context = createRunContext().fileAccess;
-		const created = fileToolState('write_file', { path: 'one/example.txt' }, root)!;
-		const other = fileToolState('edit_file', { path: 'two/example.txt' }, root)!;
+		const created = fileToolState('write', { path: 'one/example.txt' }, root)!;
+		const other = fileToolState('edit', { path: 'two/example.txt' }, root)!;
 		rememberTool(context, created);
 
 		expect(hasCreatedFile(context, other.path)).toBe(false);
@@ -37,7 +37,7 @@ describe('tool context state', () => {
 
 	it('stores and matches an allowed tool folder exactly', () => {
 		const context = createRunContext().fileAccess;
-		const state = fileToolState('read_file', { path: 'readable/example.txt' }, root)!;
+		const state = fileToolState('read', { path: 'readable/example.txt' }, root)!;
 		rememberTool(context, state);
 
 		expect(context.readDirectories).toEqual(new Set([state.directory]));
@@ -48,7 +48,7 @@ describe('tool context state', () => {
 	it('does not share file grants between run contexts', () => {
 		const first = createRunContext();
 		const second = createRunContext();
-		const state = fileToolState('read_file', { path: 'readable/example.txt' }, root)!;
+		const state = fileToolState('read', { path: 'readable/example.txt' }, root)!;
 		rememberTool(first.fileAccess, state);
 
 		expect(first.fileAccess.readDirectories).toContain(state.directory);

@@ -1,7 +1,7 @@
 import { runToolCall } from '../../../../../src/main/agent/runner/run_tool_call';
 import { jsonTool } from '../../../../../src/main/agent/tools/tool';
 import type { ToolCall } from '../../../../../src/main/agent/types';
-import { requestUserInputTool } from '../../../../../src/main/agent/tools/core/request_user_input';
+import { requestUserInputTool } from '../../../../../src/main/agent/tools/core/ask';
 import { respondUserInput } from '../../../../../src/main/agent/user_input/user_input_pending';
 
 describe('runToolCall', () => {
@@ -136,7 +136,7 @@ describe('runToolCall', () => {
 	it('resumes the same Plan tool call after structured answers', async () => {
 		const call: ToolCall = {
 			id: 'question-call',
-			name: 'request_user_input',
+			name: 'ask',
 			args: {
 				questions: [
 					{

@@ -4,7 +4,7 @@ const spawn = jest.fn();
 
 jest.mock('node:child_process', () => ({ spawn }));
 
-import { execTool } from '../../../../../src/main/agent/tools/core/exec_command';
+import { execTool } from '../../../../../src/main/agent/tools/core/bash';
 import type { ExecSandbox } from '../../../../../src/main/agent/sandbox';
 import {
 	processTool,

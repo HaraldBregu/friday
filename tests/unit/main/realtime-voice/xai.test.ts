@@ -70,7 +70,7 @@ describe('XAIRealtimeVoiceAdapter', () => {
 				],
 				tools: [
 					{
-						id: 'read_file',
+						id: 'read',
 						name: 'Read file',
 						description: 'Read a file.',
 						schema: { type: 'object' },
@@ -101,7 +101,7 @@ describe('XAIRealtimeVoiceAdapter', () => {
 					},
 					output: { format: { type: 'audio/pcm', rate: 24_000 } },
 				},
-				tools: [{ type: 'function', name: 'read_file' }],
+				tools: [{ type: 'function', name: 'read' }],
 			},
 		});
 		expect(socket.sent).toHaveLength(1);

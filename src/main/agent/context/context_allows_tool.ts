@@ -11,6 +11,6 @@ export function contextAllowsTool(
 ): boolean {
 	const state = fileToolState(toolName, args, baseDir);
 	if (!state) return false;
-	if (toolName === 'edit_file') return hasCreatedFile(context, state.path);
-	return toolName === 'read_file' && hasToolPermission(context, state.directory);
+	if (toolName === 'edit') return hasCreatedFile(context, state.path);
+	return toolName === 'read' && hasToolPermission(context, state.directory);
 }

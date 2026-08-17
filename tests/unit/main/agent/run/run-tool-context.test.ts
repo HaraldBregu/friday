@@ -16,7 +16,7 @@ import { createRunContext } from '../../../../../src/main/agent/context';
 import { respondToolPermission } from '../../../../../src/main/agent/permissions';
 import { runToolCall } from '../../../../../src/main/agent/runner/run_tool_call';
 import { jsonTool } from '../../../../../src/main/agent/tools/tool';
-import { execTool } from '../../../../../src/main/agent/tools/core/exec_command';
+import { execTool } from '../../../../../src/main/agent/tools/core/bash';
 import type { ExecSandbox } from '../../../../../src/main/agent/sandbox';
 import type { RuntimeEvent, Tool, ToolCall } from '../../../../../src/main/agent/types';
 
@@ -40,8 +40,8 @@ describe('exec path approval', () => {
 		const run = jest.fn().mockResolvedValue('done');
 		const events = await collect(
 			runToolCall(
-				fakeTool('exec_command', run),
-				{ id: 'exec', name: 'exec_command', args: { command: 'echo $(pwd) > result.txt' } },
+				fakeTool('bash', run),
+				{ id: 'exec', name: 'bash', args: { command: 'echo $(pwd) > result.txt' } },
 				undefined,
 				undefined,
 				{ runId: 'run', windowId: 1 }
@@ -54,8 +54,8 @@ describe('exec path approval', () => {
 	it('asks before an outside command and reports the canonical location', async () => {
 		const run = jest.fn().mockResolvedValue('done');
 		const events = runToolCall(
-			fakeTool('exec_command', run),
-			{ id: 'exec', name: 'exec_command', args: { command: 'pwd', workdir: '/outside' } },
+			fakeTool('bash', run),
+			{ id: 'exec', name: 'bash', args: { command: 'pwd', workdir: '/outside' } },
 			undefined,
 			undefined,
 			{ runId: 'run', windowId: 1 }
@@ -100,7 +100,7 @@ describe('exec path approval', () => {
 		} as unknown as ExecSandbox;
 		const events = runToolCall(
 			execTool(sandbox),
-			{ id: 'exec', name: 'exec_command', args: { command: 'pwd', workdir: '/outside' } },
+			{ id: 'exec', name: 'bash', args: { command: 'pwd', workdir: '/outside' } },
 			undefined,
 			undefined,
 			{ runId: 'run', windowId: 1 }
@@ -131,8 +131,8 @@ describe('exec path approval', () => {
 
 	it('never offers a persistent grant for host execution', async () => {
 		const events = runToolCall(
-			fakeTool('exec_command', jest.fn()),
-			{ id: 'host', name: 'exec_command', args: { command: 'pwd', elevated: true } },
+			fakeTool('bash', jest.fn()),
+			{ id: 'host', name: 'bash', args: { command: 'pwd', elevated: true } },
 			undefined,
 			undefined,
 			{ runId: 'run', windowId: 1 }
@@ -164,20 +164,20 @@ describe('per-run file access', () => {
 	it('reuses a successful read directory only in the originating run', async () => {
 		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-read-context-'));
 		const read = jest.fn().mockResolvedValue('content');
-		const tool = fakeTool('read_file', read);
+		const tool = fakeTool('read', read);
 		const first = createRunContext().fileAccess;
 		const second = createRunContext().fileAccess;
 
 		await approveCall(tool, {
 			id: 'first',
-			name: 'read_file',
+			name: 'read',
 			args: { path: path.join(root, 'first.txt') },
 		}, first, 'run-one');
 
 		const reused = await collect(
 			runToolCall(
 				tool,
-				{ id: 'second', name: 'read_file', args: { path: path.join(root, 'second.txt') } },
+				{ id: 'second', name: 'read', args: { path: path.join(root, 'second.txt') } },
 				new AbortController().signal,
 				first,
 				{ runId: 'run-one' }
@@ -188,7 +188,7 @@ describe('per-run file access', () => {
 		const isolated = await collect(
 			runToolCall(
 				tool,
-				{ id: 'third', name: 'read_file', args: { path: path.join(root, 'third.txt') } },
+				{ id: 'third', name: 'read', args: { path: path.join(root, 'third.txt') } },
 				new AbortController().signal,
 				second,
 				{ runId: 'run-two' }
@@ -212,8 +212,8 @@ describe('per-run file access', () => {
 		const fileAccess = createRunContext().fileAccess;
 		await collect(
 			runToolCall(
-				fakeTool('write_file', write),
-				{ id: 'write', name: 'write_file', args: { path: target, content: 'one' } },
+				fakeTool('write', write),
+				{ id: 'write', name: 'write', args: { path: target, content: 'one' } },
 				new AbortController().signal,
 				fileAccess,
 				{ runId: 'run' }
@@ -223,10 +223,10 @@ describe('per-run file access', () => {
 		getPermissions.mockReturnValue(emptyPermissions);
 		const exact = await collect(
 			runToolCall(
-				fakeTool('edit_file', edit),
+				fakeTool('edit', edit),
 				{
 					id: 'edit',
-					name: 'edit_file',
+					name: 'edit',
 					args: { path: target, oldText: 'one', newText: 'two' },
 				},
 				new AbortController().signal,
@@ -239,10 +239,10 @@ describe('per-run file access', () => {
 
 		const differentPath = await collect(
 			runToolCall(
-				fakeTool('edit_file', edit),
+				fakeTool('edit', edit),
 				{
 					id: 'other',
-					name: 'edit_file',
+					name: 'edit',
 					args: { path: other, oldText: 'one', newText: 'two' },
 				},
 				new AbortController().signal,
@@ -267,8 +267,8 @@ describe('per-run file access', () => {
 
 		await collect(
 			runToolCall(
-				fakeTool('read_file', jest.fn().mockRejectedValue(new Error('read failed'))),
-				{ id: 'read', name: 'read_file', args: { path: readPath } },
+				fakeTool('read', jest.fn().mockRejectedValue(new Error('read failed'))),
+				{ id: 'read', name: 'read', args: { path: readPath } },
 				new AbortController().signal,
 				fileAccess,
 				{ runId: 'run' }
@@ -276,8 +276,8 @@ describe('per-run file access', () => {
 		);
 		await collect(
 			runToolCall(
-				fakeTool('write_file', jest.fn().mockRejectedValue(new Error('write failed'))),
-				{ id: 'write', name: 'write_file', args: { path: writePath } },
+				fakeTool('write', jest.fn().mockRejectedValue(new Error('write failed'))),
+				{ id: 'write', name: 'write', args: { path: writePath } },
 				new AbortController().signal,
 				fileAccess,
 				{ runId: 'run' }
@@ -301,8 +301,8 @@ describe('per-run file access', () => {
 
 		const events = await collect(
 			runToolCall(
-				fakeTool('read_file', read),
-				{ id: 'deny', name: 'read_file', args: { path: target } },
+				fakeTool('read', read),
+				{ id: 'deny', name: 'read', args: { path: target } },
 				new AbortController().signal,
 				fileAccess,
 				{ runId: 'run' }

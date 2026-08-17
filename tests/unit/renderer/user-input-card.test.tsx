@@ -27,7 +27,7 @@ const pending: PendingUserInput = {
 };
 const tool: AgentToolPart = {
 	toolCallId: 'tool',
-	type: 'request_user_input',
+	type: 'ask',
 	state: 'input-available',
 	input: { questions: pending.questions },
 };

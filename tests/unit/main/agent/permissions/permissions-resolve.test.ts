@@ -28,7 +28,7 @@ describe('resolveToolPermission', () => {
 
 		expect(
 			resolveToolPermission(
-				'read_file',
+				'read',
 				{ path: '/outside/a.txt' },
 				undefined,
 				true,
@@ -40,8 +40,8 @@ describe('resolveToolPermission', () => {
 	});
 
 	it('uses configured rules and the caller fallback for unknown tools', () => {
-		expect(resolveToolPermission('read_file', { path: '/outside/a.txt' })).toBe('allow');
-		expect(resolveToolPermission('edit_file', { path: '/outside/a.txt' })).toBe('ask');
+		expect(resolveToolPermission('read', { path: '/outside/a.txt' })).toBe('allow');
+		expect(resolveToolPermission('edit', { path: '/outside/a.txt' })).toBe('ask');
 		expect(resolveToolPermission('mcp__safe__lookup', {}, undefined, true, 'allow')).toBe('allow');
 		expect(resolveToolPermission('mcp__records__delete')).toBe('allow');
 	});
@@ -54,9 +54,9 @@ describe('resolveToolPermission', () => {
 		const fileAccess = createRunContext().fileAccess;
 		fileAccess.readDirectories.add('/repo/private');
 
-		expect(resolveToolPermission('read_file', { path: '/repo/public/a.txt' })).toBe('allow');
+		expect(resolveToolPermission('read', { path: '/repo/public/a.txt' })).toBe('allow');
 		expect(
-			resolveToolPermission('read_file', { path: '/repo/private/a.txt' }, fileAccess)
+			resolveToolPermission('read', { path: '/repo/private/a.txt' }, fileAccess)
 		).toBe('deny');
 	});
 
@@ -66,16 +66,16 @@ describe('resolveToolPermission', () => {
 			exec: { allow: ['/appdata/agent/**'], deny: ['/appdata/agent/private/**'] },
 		});
 
-		expect(resolveToolPermission('exec_command', { command: 'echo ok > result.txt' })).toBe('allow');
-		expect(resolveToolPermission('exec_command', { command: 'echo $(pwd)' })).toBe('allow');
-		expect(resolveToolPermission('exec_command', { command: 'pwd', workdir: '/outside' })).toBe('ask');
-		expect(resolveToolPermission('exec_command', { command: 'pwd', workdir: 'private' })).toBe('deny');
-		expect(resolveToolPermission('exec_command', { command: 'pwd', elevated: true })).toBe('ask');
+		expect(resolveToolPermission('bash', { command: 'echo ok > result.txt' })).toBe('allow');
+		expect(resolveToolPermission('bash', { command: 'echo $(pwd)' })).toBe('allow');
+		expect(resolveToolPermission('bash', { command: 'pwd', workdir: '/outside' })).toBe('ask');
+		expect(resolveToolPermission('bash', { command: 'pwd', workdir: 'private' })).toBe('deny');
+		expect(resolveToolPermission('bash', { command: 'pwd', elevated: true })).toBe('ask');
 	});
 
 	it('asks when any declared external root is not trusted', () => {
 		expect(
-			resolveToolPermission('exec_command', {
+			resolveToolPermission('bash', {
 				command: 'cp file /shared',
 				additionalRoots: ['/shared'],
 			})
@@ -85,7 +85,7 @@ describe('resolveToolPermission', () => {
 			exec: { allow: ['/appdata/agent/**', '/shared/**'], deny: [] },
 		});
 		expect(
-			resolveToolPermission('exec_command', {
+			resolveToolPermission('bash', {
 				command: 'cp file /shared',
 				additionalRoots: ['/shared'],
 			})

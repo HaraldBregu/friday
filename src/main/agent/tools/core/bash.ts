@@ -431,7 +431,7 @@ export function execTool(
 	interactionMode: AgentInteractionMode = 'default'
 ) {
 	return tool({
-		id: 'exec_command',
+		id: 'bash',
 		name: 'Execute command',
 		description:
 			'Run a shell command in a filesystem sandbox. Commands are trusted by working directory. Declare every directory accessed outside workdir in additionalRoots so Friday can request permission before execution. ' +

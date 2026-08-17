@@ -42,20 +42,20 @@ export function directoryPermissionTargets(
 	baseDir: string,
 	history?: FileHistory
 ): string[] {
-	if (toolName === 'exec_command') {
+	if (toolName === 'bash') {
 		return resolveExecRoots(args, baseDir);
 	}
-	if (toolName === 'undo_file_operation') return history ? fileHistoryTargets(history, 'undo') : [];
-	if (toolName === 'redo_file_operation') return history ? fileHistoryTargets(history, 'redo') : [];
+	if (toolName === 'undo') return history ? fileHistoryTargets(history, 'undo') : [];
+	if (toolName === 'redo') return history ? fileHistoryTargets(history, 'redo') : [];
 	if (toolName === 'process') {
 		const session = typeof args.sessionId === 'string' ? registry.get(args.sessionId) : undefined;
 		return session && session.executionMode === 'sandbox'
 			? [realPath(session.workdir), ...(session.roots ?? []).map(realPath)]
 			: [];
 	}
-	if (typeof args.path === 'string' || toolName === 'apply_patch') {
+	if (typeof args.path === 'string' || toolName === 'patch') {
 		const targets = toolPermissionTargets(toolName, args, baseDir);
-		return toolName === 'read_file' ? targets.map((target) => path.dirname(target)) : targets;
+		return toolName === 'read' ? targets.map((target) => path.dirname(target)) : targets;
 	}
 	const fileName = AGENT_FILES[toolName];
 	if (fileName) return [realPath(path.join(baseDir, fileName))];

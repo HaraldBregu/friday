@@ -9,7 +9,7 @@ export function toolApprovalTargets(
 	baseDir: string,
 	history?: FileHistory
 ): string[] {
-	if (toolName === 'exec_command' || toolName === 'process') {
+	if (toolName === 'bash' || toolName === 'process') {
 		return directoryPermissionTargets(toolName, args, baseDir, history);
 	}
 	const targets = toolPermissionTargets(toolName, args, baseDir);

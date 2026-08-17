@@ -10,9 +10,9 @@ import { toolApprovalTargets } from './tool_approval_targets';
 import type { FileHistory } from '../history/types';
 
 const WRITE_TOOLS = new Set([
-	'write_file',
-	'edit_file',
-	'apply_patch',
+	'write',
+	'edit',
+	'patch',
 	'create_image',
 	'create_video',
 	'create_sound',
@@ -28,13 +28,13 @@ export function resolveToolPermissionDetails(
 	history?: FileHistory
 ): ToolPermissionResolution {
 	let kind: PermissionKind | undefined;
-	if (toolName === 'read_file') kind = 'read';
+	if (toolName === 'read') kind = 'read';
 	else if (
 		WRITE_TOOLS.has(toolName) ||
-		toolName === 'undo_file_operation' ||
-		toolName === 'redo_file_operation'
+		toolName === 'undo' ||
+		toolName === 'redo'
 	) kind = 'write';
-	else if (toolName === 'exec_command' || toolName === 'process') kind = 'exec';
+	else if (toolName === 'bash' || toolName === 'process') kind = 'exec';
 	if (!kind)
 		return { mode: 'allow', targets: [], approvalTargets: [], persistable: false };
 

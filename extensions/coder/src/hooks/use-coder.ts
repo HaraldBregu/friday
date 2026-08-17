@@ -49,9 +49,9 @@ export function useCoder(): CoderController {
 	const [activities, setActivities] = useState<CoderActivity[]>(
 		preview
 			? [
-					{ id: 'preview-a', name: 'read_file', status: 'ok', detail: 'CommandMenu.tsx', durationMs: 42 },
-					{ id: 'preview-b', name: 'edit_file', status: 'ok', detail: 'recent.ts', durationMs: 117 },
-					{ id: 'preview-c', name: 'exec_command', status: 'ok', detail: 'renderer tests', durationMs: 2310 },
+					{ id: 'preview-a', name: 'read', status: 'ok', detail: 'CommandMenu.tsx', durationMs: 42 },
+					{ id: 'preview-b', name: 'edit', status: 'ok', detail: 'recent.ts', durationMs: 117 },
+					{ id: 'preview-c', name: 'bash', status: 'ok', detail: 'renderer tests', durationMs: 2310 },
 				]
 			: []
 	);

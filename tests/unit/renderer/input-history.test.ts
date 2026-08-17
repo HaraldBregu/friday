@@ -10,7 +10,7 @@ it('restores an unresolved structured input call as interrupted', () => {
 				{
 					type: 'tool_use',
 					toolUseId: 'question',
-					toolName: 'request_user_input',
+					toolName: 'ask',
 					toolArgs: {
 						questions: [
 							{
@@ -29,7 +29,7 @@ it('restores an unresolved structured input call as interrupted', () => {
 	expect(message?.role).toBe('agent');
 	if (!message || message.role !== 'agent') throw new Error('Expected restored assistant.');
 	expect(message.tools[0]).toMatchObject({
-		type: 'request_user_input',
+		type: 'ask',
 		state: 'output-error',
 		output: { status: 'interrupted', answers: [] },
 	});

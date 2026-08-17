@@ -60,7 +60,7 @@ describe('run stream system prompt', () => {
 		manifest: {
 			name: 'writer',
 			description: 'Draft polished documents',
-			allowedTools: ['read_file'],
+			allowedTools: ['read'],
 		},
 		source: 'local-filesystem',
 		trust: 'user-controlled',
@@ -74,7 +74,7 @@ describe('run stream system prompt', () => {
 		source: 'local-filesystem',
 		trust: 'user-controlled',
 		hash: 'writer-hash',
-		allowedTools: ['read_file'],
+		allowedTools: ['read'],
 		resources: ['references/style.md'],
 		warnings: [],
 	} as const;
@@ -284,7 +284,7 @@ describe('run stream system prompt', () => {
 			denied.push(event);
 		expect(denied[0]).toMatchObject({ type: 'run_started' });
 		if (denied[0]?.type !== 'run_started') throw new Error('Expected run_started');
-		expect(denied[0].tools).toContain('read_file');
+		expect(denied[0].tools).toContain('read');
 		expect(denied[0].tools).not.toContain('subagent');
 		expect(closeMcpMock).toHaveBeenCalledTimes(1);
 	});

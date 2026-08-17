@@ -11,7 +11,7 @@ describe('directoryPermissionTargets', () => {
 	it('uses an exec working directory instead of its command', () => {
 		expect(
 			directoryPermissionTargets(
-				'exec_command',
+				'bash',
 				{ command: 'npm test', workdir: '/workspace/app' },
 				agentDir
 			)
@@ -21,7 +21,7 @@ describe('directoryPermissionTargets', () => {
 	it('includes canonical additional exec roots resolved from workdir', () => {
 		expect(
 			directoryPermissionTargets(
-				'exec_command',
+				'bash',
 				{ command: 'npm test', workdir: '/workspace/app', additionalRoots: ['../shared'] },
 				agentDir
 			)
@@ -29,23 +29,23 @@ describe('directoryPermissionTargets', () => {
 	});
 
 	it('uses the agent directory for exec without an explicit working directory', () => {
-		expect(directoryPermissionTargets('exec_command', { command: 'npm test' }, agentDir)).toEqual([
+		expect(directoryPermissionTargets('bash', { command: 'npm test' }, agentDir)).toEqual([
 			agentDir,
 		]);
 	});
 
 	it('does not create an exec target without a command', () => {
-		expect(directoryPermissionTargets('exec_command', { workdir: '/workspace/app' }, agentDir)).toEqual([]);
+		expect(directoryPermissionTargets('bash', { workdir: '/workspace/app' }, agentDir)).toEqual([]);
 	});
 
 	it('reuses file targets for filesystem tools', () => {
-		expect(directoryPermissionTargets('write_file', { path: '/workspace/a.txt' }, agentDir)).toEqual([
+		expect(directoryPermissionTargets('write', { path: '/workspace/a.txt' }, agentDir)).toEqual([
 			path.resolve('/workspace/a.txt'),
 		]);
 	});
 
 	it('uses the containing folder for read', () => {
-		expect(directoryPermissionTargets('read_file', { path: '/workspace/a.txt' }, agentDir)).toEqual([
+		expect(directoryPermissionTargets('read', { path: '/workspace/a.txt' }, agentDir)).toEqual([
 			path.resolve('/workspace'),
 		]);
 	});

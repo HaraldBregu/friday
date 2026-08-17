@@ -41,7 +41,7 @@ it('gives scheduled agents the full tool catalog unless a non-empty restriction 
 
 	await runner(schedule());
 	await runner(schedule([]));
-	await runner(schedule(['read_file', 'exec_command']));
+	await runner(schedule(['read', 'bash']));
 
 	for (const call of send.mock.calls.slice(0, 2)) {
 		expect(call).toEqual([
@@ -62,7 +62,7 @@ it('gives scheduled agents the full tool catalog unless a non-empty restriction 
 		'tasks',
 		{
 			type: 'background',
-			toolsAllow: ['read_file', 'exec_command'],
+			toolsAllow: ['read', 'bash'],
 			streaming: false,
 			contextMode: 'minimal',
 			effort: 'low',
