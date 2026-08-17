@@ -16,7 +16,6 @@ import { TitleBar } from './components/app/titlebar/TitleBar';
 import { Layout as SettingsLayout } from './pages/settings';
 import { SettingsPageSkeleton } from './pages/settings/components';
 import { SETTINGS_MODEL_SERVICE_ITEMS } from './pages/settings/navigation';
-import { useTranslation } from 'react-i18next';
 import { CommandMenu, PageTransition } from './experience';
 import { ChatModeContext, type ChatMode } from './contexts/chat-mode';
 import {
@@ -99,12 +98,10 @@ function SettingsRouteWrapper({ children }: { readonly children: ReactNode }): R
 }
 
 function RootRouteComponent(): React.JSX.Element {
-	const { t } = useTranslation();
 	const location = useLocation();
 	const [chatMode, setChatMode] = useState<ChatMode>('chat');
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
 
-	const isStart = location.pathname === '/start';
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
 	const hasSidebar = isHome || isSettings;

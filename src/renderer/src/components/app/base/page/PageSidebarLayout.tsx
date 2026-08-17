@@ -20,6 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePageContext } from './hooks/use-page-context';
+import { MAX_SIDEBAR_WIDTH, MIN_SIDEBAR_WIDTH } from './context/state';
 
 const PAGE_SIDEBAR_LAYOUT_WIDTH_MOBILE = '18rem';
 const PAGE_SIDEBAR_LAYOUT_WIDTH_ICON = '3rem';
