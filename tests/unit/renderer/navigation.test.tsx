@@ -59,7 +59,7 @@ it.each([
 
 it('renders settings navigation beside the workspace and marks the current section', () => {
 	const { container } = render(
-		<MemoryRouter initialEntries={['/settings/providers/mcp/demo-server']}>
+		<MemoryRouter initialEntries={['/settings/assistant/chathistory']}>
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
 					<Route path="*" element={<p>Settings page</p>} />
@@ -71,7 +71,9 @@ it('renders settings navigation beside the workspace and marks the current secti
 	const sidebar = container.querySelector('[data-slot="sidebar-container"]');
 	const workspace = container.querySelector('[data-slot="settings-workspace"]');
 	const navigation = screen.getByRole('navigation', { name: 'settings.title' });
-	const currentSection = within(navigation).getByRole('link', { name: 'settings.tabs.mcp' });
+	const currentSection = within(navigation).getByRole('link', {
+		name: 'settings.modelServices.assistantName',
+	});
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();

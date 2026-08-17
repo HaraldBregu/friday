@@ -10,7 +10,7 @@ import {
 	PageSidebarLayoutMenuButton,
 	PageSidebarLayoutMenuItem,
 } from '@/components/app/base/page';
-import { SETTINGS_NAVIGATION } from './navigation';
+import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
 
 const SETTINGS_SIDEBAR_ITEMS = [
 	{
@@ -18,12 +18,20 @@ const SETTINGS_SIDEBAR_ITEMS = [
 		labelKey: 'settings.title',
 		icon: Settings2,
 	},
-	...SETTINGS_NAVIGATION,
+	...SETTINGS_NAVIGATION.slice(0, 3),
+	SETTINGS_MODEL_SERVICE_ITEMS[0],
+	...SETTINGS_NAVIGATION.slice(3),
 ] as const;
 
 export function SettingsSidebar(): React.JSX.Element {
 	const { t } = useTranslation();
 	const location = useLocation();
+	const activePath = SETTINGS_SIDEBAR_ITEMS.reduce((currentPath, item) => {
+		const matches =
+			location.pathname === item.path ||
+			(item.path !== '/settings' && location.pathname.startsWith(`${item.path}/`));
+		return matches && item.path.length > currentPath.length ? item.path : currentPath;
+	}, '');
 
 	return (
 		<PageSidebarLayout side="left" collapsible="offcanvas">
@@ -36,16 +44,13 @@ export function SettingsSidebar(): React.JSX.Element {
 				<nav aria-label={t('settings.title')}>
 					<PageSidebarLayoutMenu className="gap-1">
 						{SETTINGS_SIDEBAR_ITEMS.map((item) => {
-							const isActive =
-								location.pathname === item.path ||
-								(item.path !== '/settings' && location.pathname.startsWith(`${item.path}/`));
 							const Icon = item.icon;
 
 							return (
 								<PageSidebarLayoutMenuItem key={item.path}>
 									<PageSidebarLayoutMenuButton
 										render={<Link to={item.path} />}
-										isActive={isActive}
+										isActive={item.path === activePath}
 										className="h-9 px-2.5"
 									>
 										<Icon strokeWidth={1.8} />
