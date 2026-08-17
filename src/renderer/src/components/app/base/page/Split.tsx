@@ -1,4 +1,5 @@
 import React, { type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { PanelLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,21 +43,24 @@ export function Split({
 			}
 			{...props}
 		>
-			<Button
-				type="button"
-				variant="ghost"
-				size="icon-sm"
-				data-slot="split-pane-toggle"
-				aria-label="Toggle Sidebar"
-				aria-controls="split-pane-sidebar"
-				aria-expanded={sidebarOpen}
-				title="Toggle Sidebar"
-				onClick={toggleSidebar}
-				className="fixed left-20 top-2 z-[60] text-muted-foreground"
-				style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-			>
-				<PanelLeft className="size-4" strokeWidth={1.5} />
-			</Button>
+			{createPortal(
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon-sm"
+					data-slot="split-pane-toggle"
+					aria-label="Toggle Sidebar"
+					aria-controls="split-pane-sidebar"
+					aria-expanded={sidebarOpen}
+					title="Toggle Sidebar"
+					onClick={toggleSidebar}
+					className="fixed left-20 top-2.5 z-50 size-7 text-muted-foreground"
+					style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+				>
+					<PanelLeft className="size-4" strokeWidth={1.5} />
+				</Button>,
+				document.body
+			)}
 			{isMobile ? (
 				<Sheet
 					open={state.sidebarOpenMobile}
@@ -64,7 +68,7 @@ export function Split({
 				>
 					<SheetContent
 						side="left"
-						className="bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+						className="bg-sidebar p-0 text-sidebar-foreground"
 						style={{ width: 'min(18rem, calc(100vw - 3rem))', maxWidth: 'none' }}
 					>
 						<SheetHeader className="sr-only">
