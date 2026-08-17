@@ -12,6 +12,7 @@ export const AgentChannels = {
 	deleteSession: 'agent:delete-session',
 	getWorkspaceLocation: 'agent:workspace:location:get',
 	listWorkspaceFiles: 'agent:workspace:files:list',
+	workspaceChanged: 'agent:workspace:changed',
 	readWorkspaceFile: 'agent:workspace:file:read',
 	readWorkspaceAsset: 'agent:workspace:asset:read',
 	writeWorkspaceMarkdown: 'agent:workspace:markdown:write',
