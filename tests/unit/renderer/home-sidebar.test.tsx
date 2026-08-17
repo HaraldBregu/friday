@@ -129,7 +129,7 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 	const wrapper = container.querySelector('[data-slot="split-pane"]');
 	const sidebar = container.querySelector('[data-slot="split-pane-sidebar"]');
 	await screen.findByText('settings.chatHistory.empty');
-	expect(toggle).not.toBeWithinElement(sidebar as HTMLElement);
+	expect(sidebar).not.toContainElement(toggle);
 	expect(toggle).toHaveStyle({ WebkitAppRegion: 'no-drag' });
 
 	fireEvent.keyDown(resizer, { key: 'ArrowRight' });
