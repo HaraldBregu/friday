@@ -10,6 +10,7 @@ import { TitleBarProvider } from './context/TitleBarContext';
 import { WindowControls } from './components/WindowControls';
 import { useWindowState } from './hooks/useWindowState';
 import { GradientSphere } from '@/components/ui/gradient-sphere';
+import { cn } from '@/lib/utils';
 
 // Synchronous platform check — no hooks, no async, no state.
 // macOS uses native traffic-light buttons; every other OS needs custom controls.
