@@ -260,17 +260,21 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 	readonly name = 'agent';
 
 	register({ logger, agent, conversation }: AgentIpcDeps, eventBus: EventBus): void {
-		const root = workspacePath(agent.config);
-		const watcher = watch(root, { ignoreInitial: true, persistent: false });
-		for (const type of ['add', 'change', 'unlink', 'addDir', 'unlinkDir'] as const) {
-			watcher.on(type, (changedPath) => {
-				const event: WorkspaceChangeEvent = {
-					type,
-					path: path.relative(root, changedPath),
-				};
-				eventBus.broadcast(AgentChannels.workspaceChanged, event);
-			});
-		}
+		let watcherStarted = false;
+		const startWorkspaceWatcher = (root: string): void => {
+			if (watcherStarted) return;
+			watcherStarted = true;
+			const watcher = watch(root, { ignoreInitial: true, persistent: false });
+			for (const type of ['add', 'change', 'unlink', 'addDir', 'unlinkDir'] as const) {
+				watcher.on(type, (changedPath) => {
+					const event: WorkspaceChangeEvent = {
+						type,
+						path: path.relative(root, changedPath),
+					};
+					eventBus.broadcast(AgentChannels.workspaceChanged, event);
+				});
+			}
+		};
 
 		ipcMain.handle(
 			AgentChannels.send,
@@ -378,14 +382,18 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		ipcMain.handle(
 			AgentChannels.getWorkspaceLocation,
 			wrapSimpleHandler((): string => {
-				return workspacePath(agent.config);
+				const root = workspacePath(agent.config);
+				startWorkspaceWatcher(root);
+				return root;
 			}, AgentChannels.getWorkspaceLocation)
 		);
 
 		ipcMain.handle(
 			AgentChannels.listWorkspaceFiles,
 			wrapSimpleHandler((): Promise<WorkspaceTreeEntry[]> => {
-				return readWorkspaceTree(workspacePath(agent.config));
+				const root = workspacePath(agent.config);
+				startWorkspaceWatcher(root);
+				return readWorkspaceTree(root);
 			}, AgentChannels.listWorkspaceFiles)
 		);
 
