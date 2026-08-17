@@ -7,7 +7,6 @@ import { tool } from '../tool';
 import { registry } from './process';
 import type { ExecSandbox } from '../../sandbox';
 import type { ExecutionMode } from '../../../../shared/sandbox';
-import { shellQuote } from './quote';
 import { approvedExecRoots } from '../../permissions/approved_exec_roots';
 import { resolveExecRoots } from '../../permissions/resolve_exec_roots';
 import type { AgentInteractionMode } from '../../../../shared/agent_types';
@@ -31,6 +30,10 @@ interface ExecResult {
 	timedOut?: boolean;
 	stdoutTruncated?: boolean;
 	stderrTruncated?: boolean;
+}
+
+function shellQuote(value: string): string {
+	return `'${value.replaceAll("'", `'\\''`)}'`;
 }
 
 const execInputSchema = z.object({
