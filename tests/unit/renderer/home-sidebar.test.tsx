@@ -1,9 +1,10 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { PageContainer } from '../../../src/renderer/src/components/app/base/page';
 import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
 import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
+import { SidebarProvider } from '../../../src/renderer/src/components/ui/sidebar';
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -12,6 +13,8 @@ jest.mock('react-i18next', () => ({
 const listSessions = jest.fn();
 
 beforeEach(() => {
+	window.localStorage.clear();
+	document.documentElement.style.removeProperty('--app-sidebar-width');
 	Object.defineProperty(window, 'matchMedia', {
 		configurable: true,
 		value: jest.fn((query: string) => ({
@@ -103,4 +106,33 @@ it('shows an empty state when there is no chat history', async () => {
 	await waitFor(() => {
 		expect(screen.getByText('settings.chatHistory.empty')).toBeInTheDocument();
 	});
+});
+
+it('resizes the sidebar with keyboard and pointer input and persists the width', async () => {
+	listSessions.mockResolvedValue([]);
+	const { container } = render(
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
+				<PageContainer>
+					<SidebarProvider>
+						<HomeSidebar refreshKey="initial" />
+					</SidebarProvider>
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
+	);
+	const resizer = screen.getByRole('separator', { name: 'Resize sidebar' });
+	const wrapper = container.querySelector('[data-slot="sidebar-wrapper"]');
+
+	fireEvent.keyDown(resizer, { key: 'ArrowRight' });
+	expect(resizer).toHaveAttribute('aria-valuenow', '264');
+	expect(wrapper).toHaveStyle({ '--sidebar-width': '264px' });
+
+	fireEvent.pointerDown(resizer, { button: 0, clientX: 264 });
+	fireEvent.pointerMove(window, { clientX: 320 });
+	fireEvent.pointerUp(window);
+
+	expect(resizer).toHaveAttribute('aria-valuenow', '320');
+	expect(document.documentElement.style.getPropertyValue('--app-sidebar-width')).toBe('320px');
+	expect(window.localStorage.getItem('friday_sidebar_width')).toBe('320');
 });

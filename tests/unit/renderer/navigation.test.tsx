@@ -83,6 +83,7 @@ it('renders settings navigation beside the workspace and marks the current secti
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();
+	expect(screen.getByRole('separator', { name: 'Resize sidebar' })).toBeInTheDocument();
 	expect(within(navigation).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(assistantGroup).not.toBeNull();
 	expect(providersGroup).not.toBeNull();

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { TitleBar } from '../../../src/renderer/src/components/app/titlebar/TitleBar';
@@ -47,7 +47,7 @@ it.each([
 			</Routes>
 		</MemoryRouter>
 	);
-	const titleBar = container.querySelector('.app-translucent-surface');
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
 
 	expect(titleBar).not.toBeNull();
 	const contextMenuEvent = new MouseEvent('contextmenu', {
@@ -57,7 +57,7 @@ it.each([
 	fireEvent(titleBar as Element, contextMenuEvent);
 
 	expect(contextMenuEvent.defaultPrevented).toBe(true);
-	expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
+		expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
 	await waitFor(() => expect(screen.getByText(path)).toBeInTheDocument());
 });
 
@@ -80,7 +80,7 @@ it.each(['/settings', '/start'])('opens the titlebar menu while viewing %s', (pa
 		</MemoryRouter>
 	);
 
-	fireEvent.contextMenu(container.querySelector('.app-translucent-surface') as Element);
+	fireEvent.contextMenu(container.querySelector('[data-slot="titlebar"]') as Element);
 
 	expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
 });
@@ -103,4 +103,17 @@ it('shows the settings icon on Home', async () => {
 	await user.click(screen.getByRole('button', { name: 'settings.title' }));
 
 	expect(screen.getByText('/settings')).toBeInTheDocument();
+});
+
+it('renders a transparent titlebar without visible title text', () => {
+	const { container } = render(
+		<MemoryRouter initialEntries={['/home']}>
+			<TitleBar />
+		</MemoryRouter>
+	);
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
+
+	expect(titleBar).toHaveClass('bg-transparent');
+	expect(titleBar).not.toHaveClass('app-translucent-surface');
+	expect(within(titleBar as HTMLElement).queryByText('Application Name')).not.toBeInTheDocument();
 });

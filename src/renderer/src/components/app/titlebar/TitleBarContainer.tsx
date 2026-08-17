@@ -16,6 +16,7 @@ export const TitleBarContainer = memo(function AppTitleBarContainer({
 }: TitleBarContainerProps): ReactElement {
 	return (
 		<div
+			data-slot="titlebar"
 			className={cn(
 				'fixed inset-x-0 top-0 z-50 flex h-12 shrink-0 items-center bg-transparent select-none',
 				className
