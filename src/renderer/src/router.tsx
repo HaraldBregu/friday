@@ -1,4 +1,11 @@
-import React, { Suspense, lazy, useState, type ReactNode } from 'react';
+import React, {
+	Suspense,
+	lazy,
+	useLayoutEffect,
+	useRef,
+	useState,
+	type ReactNode,
+} from 'react';
 import {
 	Navigate,
 	Outlet,
@@ -59,6 +66,7 @@ const VideoPage = lazy(() => import('./pages/settings/pages/video/Page'));
 const MusicPage = lazy(() => import('./pages/settings/pages/music/Page'));
 const ExtensionsPage = lazy(() => import('./pages/settings/pages/extensions/Page'));
 const ExtensionDetailsPage = lazy(() => import('./pages/settings/pages/extensions/details/Page'));
+const SIDEBAR_TRANSITION_MS = 200;
 
 function ModelServiceLegacyRedirect(): React.JSX.Element {
 	const location = useLocation();
@@ -103,10 +111,29 @@ function RootRouteComponent(): React.JSX.Element {
 	const { state, isMobile } = usePageContext();
 	const [chatMode, setChatMode] = useState<ChatMode>('chat');
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
+	const [showSettingsBreadcrumb, setShowSettingsBreadcrumb] = useState(true);
+	const previousSidebarOpen = useRef(state.sidebarOpen);
 
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
 	const hasSidebar = isHome || isSettings;
+
+	useLayoutEffect(() => {
+		const sidebarChanged = previousSidebarOpen.current !== state.sidebarOpen;
+		previousSidebarOpen.current = state.sidebarOpen;
+
+		if (!isSettings || isMobile || !sidebarChanged) {
+			setShowSettingsBreadcrumb(true);
+			return;
+		}
+
+		setShowSettingsBreadcrumb(false);
+		const timeout = window.setTimeout(
+			() => setShowSettingsBreadcrumb(true),
+			SIDEBAR_TRANSITION_MS
+		);
+		return () => window.clearTimeout(timeout);
+	}, [isMobile, isSettings, state.sidebarOpen]);
 
 	return (
 		<ChatModeContext.Provider value={{ mode: chatMode, setMode: setChatMode }}>
@@ -125,7 +152,9 @@ function RootRouteComponent(): React.JSX.Element {
 					)}
 				>
 					<TitleBar
-						centerContent={isSettings ? <SettingsBreadcrumb /> : undefined}
+						centerContent={
+							isSettings && showSettingsBreadcrumb ? <SettingsBreadcrumb /> : undefined
+						}
 						centerContentClassName={
 							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
 						}
