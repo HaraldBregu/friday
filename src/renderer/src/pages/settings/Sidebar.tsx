@@ -1,5 +1,4 @@
 import React from 'react';
-import { Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -13,11 +12,6 @@ import {
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
 
 const SETTINGS_SIDEBAR_ITEMS = [
-	{
-		path: '/settings',
-		labelKey: 'settings.title',
-		icon: Settings2,
-	},
 	...SETTINGS_NAVIGATION.slice(0, 3),
 	SETTINGS_MODEL_SERVICE_ITEMS[0],
 	...SETTINGS_NAVIGATION.slice(3),

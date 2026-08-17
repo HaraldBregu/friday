@@ -77,5 +77,6 @@ it('renders settings navigation beside the workspace and marks the current secti
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();
+	expect(within(navigation).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(currentSection).toHaveAttribute('data-active');
 });
