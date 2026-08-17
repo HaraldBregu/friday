@@ -3,14 +3,14 @@ import { MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
-	PageSidebarLayout,
-	PageSidebarLayoutContent,
-	PageSidebarLayoutFooter,
-	PageSidebarLayoutHeader,
-	PageSidebarLayoutMenu,
-	PageSidebarLayoutMenuButton,
-	PageSidebarLayoutMenuItem,
-} from '@/components/app/base/page';
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
@@ -68,13 +68,13 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 		sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
 
 	return (
-		<PageSidebarLayout side="left" collapsible="offcanvas">
+		<Sidebar side="left" collapsible="offcanvas">
 			<div
 				aria-hidden="true"
 				className="h-12 shrink-0 border-b border-sidebar-border/50"
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
-			<PageSidebarLayoutHeader className="border-b border-sidebar-border/50 p-2">
+			<SidebarHeader className="border-b border-sidebar-border/50 p-2">
 				<Button
 					type="button"
 					variant="outline"
@@ -85,8 +85,8 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					<Plus className="size-4" />
 					{t('titleBar.newChat', 'New chat')}
 				</Button>
-			</PageSidebarLayoutHeader>
-			<PageSidebarLayoutContent className="p-2 pt-3" aria-busy={loading}>
+			</SidebarHeader>
+			<SidebarContent className="p-2 pt-3" aria-busy={loading}>
 				<div className="px-2 pb-2 text-xs font-medium text-sidebar-foreground/70">
 					{t('settings.chatHistory.title')}
 				</div>
@@ -109,13 +109,13 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					</p>
 				) : (
 					<nav aria-label={t('settings.chatHistory.title')}>
-						<PageSidebarLayoutMenu className="gap-1">
+						<SidebarMenu className="gap-1">
 							{sessions.map((session) => {
 								const title = session.title.trim() || t('settings.chatHistory.untitled');
 								const isActive = session.id === currentSessionId;
 								return (
-									<PageSidebarLayoutMenuItem key={session.id}>
-										<PageSidebarLayoutMenuButton
+									<SidebarMenuItem key={session.id}>
+										<SidebarMenuButton
 											isActive={isActive}
 											aria-current={isActive ? 'page' : undefined}
 											className="h-9 px-2.5"
@@ -123,27 +123,27 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 										>
 											<MessageSquare strokeWidth={1.8} />
 											<span>{title}</span>
-										</PageSidebarLayoutMenuButton>
-									</PageSidebarLayoutMenuItem>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
 								);
 							})}
-						</PageSidebarLayoutMenu>
+						</SidebarMenu>
 					</nav>
 				)}
-			</PageSidebarLayoutContent>
-			<PageSidebarLayoutFooter className="border-t border-sidebar-border/50">
-				<PageSidebarLayoutMenu>
-					<PageSidebarLayoutMenuItem>
-						<PageSidebarLayoutMenuButton
+			</SidebarContent>
+			<SidebarFooter className="border-t border-sidebar-border/50">
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton
 							render={<Link to="/settings" />}
 							className="h-9 px-2.5"
 						>
 							<Settings2 strokeWidth={1.8} />
 							<span>{t('settings.title')}</span>
-						</PageSidebarLayoutMenuButton>
-					</PageSidebarLayoutMenuItem>
-				</PageSidebarLayoutMenu>
-			</PageSidebarLayoutFooter>
-		</PageSidebarLayout>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarFooter>
+		</Sidebar>
 	);
 }

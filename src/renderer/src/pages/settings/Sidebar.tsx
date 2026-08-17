@@ -2,16 +2,16 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
-	PageSidebarLayout,
-	PageSidebarLayoutContent,
-	PageSidebarLayoutGroup,
-	PageSidebarLayoutGroupContent,
-	PageSidebarLayoutGroupLabel,
-	PageSidebarLayoutHeader,
-	PageSidebarLayoutMenu,
-	PageSidebarLayoutMenuButton,
-	PageSidebarLayoutMenuItem,
-} from '@/components/app/base/page';
+	Sidebar,
+	SidebarContent,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarGroupLabel,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from '@/components/ui/sidebar';
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
 
 const SETTINGS_SIDEBAR_ITEMS = [
@@ -61,45 +61,45 @@ export function SettingsSidebar(): React.JSX.Element {
 	}, '');
 
 	return (
-		<PageSidebarLayout side="left" collapsible="offcanvas">
-			<PageSidebarLayoutHeader
+		<Sidebar side="left" collapsible="offcanvas">
+			<SidebarHeader
 				aria-hidden="true"
 				className="h-12 shrink-0 border-b border-sidebar-border/50 p-0"
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
-			<PageSidebarLayoutContent className="pt-3">
+			<SidebarContent className="pt-3">
 				<nav aria-label={t('settings.title')}>
 					{SETTINGS_SIDEBAR_GROUPS.map((group) => (
-						<PageSidebarLayoutGroup key={group.id} className="px-2 py-1 first:pt-0">
+						<SidebarGroup key={group.id} className="px-2 py-1 first:pt-0">
 							{'titleKey' in group ? (
-								<PageSidebarLayoutGroupLabel className="h-7 text-[10px] font-semibold uppercase tracking-[0.12em]">
+								<SidebarGroupLabel className="h-7 text-[10px] font-semibold uppercase tracking-[0.12em]">
 									{t(group.titleKey)}
-								</PageSidebarLayoutGroupLabel>
+								</SidebarGroupLabel>
 							) : null}
-							<PageSidebarLayoutGroupContent>
-								<PageSidebarLayoutMenu className="gap-1">
+							<SidebarGroupContent>
+								<SidebarMenu className="gap-1">
 									{group.items.map((item) => {
 										const Icon = item.icon;
 
 										return (
-											<PageSidebarLayoutMenuItem key={item.path}>
-												<PageSidebarLayoutMenuButton
+											<SidebarMenuItem key={item.path}>
+												<SidebarMenuButton
 													render={<Link to={item.path} />}
 													isActive={item.path === activePath}
 													className="h-9 px-2.5"
 												>
 													<Icon strokeWidth={1.8} />
 													<span>{t(item.labelKey)}</span>
-												</PageSidebarLayoutMenuButton>
-											</PageSidebarLayoutMenuItem>
+												</SidebarMenuButton>
+											</SidebarMenuItem>
 										);
 									})}
-								</PageSidebarLayoutMenu>
-							</PageSidebarLayoutGroupContent>
-						</PageSidebarLayoutGroup>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
 					))}
 				</nav>
-			</PageSidebarLayoutContent>
-		</PageSidebarLayout>
+			</SidebarContent>
+		</Sidebar>
 	);
 }
