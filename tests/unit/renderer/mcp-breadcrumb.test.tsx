@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '../../../src/renderer/src/pages/settings/Layout';
+import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Breadcrumb';
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -24,6 +25,7 @@ it('treats an MCP detail route as a child of the MCP list breadcrumb', async () 
 	});
 	render(
 		<MemoryRouter initialEntries={['/settings/providers/mcp/demo-server']}>
+			<SettingsBreadcrumb />
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
 					<Route path="providers">

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { TitleBar } from '../../../src/renderer/src/components/app/titlebar/TitleBar';
+import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Breadcrumb';
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -126,4 +127,22 @@ it('does not render the sidebar toggle in the titlebar', () => {
 	);
 
 	expect(screen.queryByRole('button', { name: 'titleBar.toggleSidebar' })).not.toBeInTheDocument();
+});
+
+it('renders settings breadcrumbs inside the titlebar', () => {
+	const { container } = render(
+		<MemoryRouter initialEntries={['/settings/general/persona']}>
+			<TitleBar centerContent={<SettingsBreadcrumb />} />
+		</MemoryRouter>
+	);
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
+	const breadcrumb = within(titleBar as HTMLElement).getByRole('navigation', {
+		name: 'settings.breadcrumb.label',
+	});
+
+	expect(within(breadcrumb).getByRole('link', { name: 'settings.tabs.general' })).toHaveAttribute(
+		'href',
+		'/settings/general'
+	);
+	expect(within(breadcrumb).getByText('settings.persona.title')).toBeInTheDocument();
 });

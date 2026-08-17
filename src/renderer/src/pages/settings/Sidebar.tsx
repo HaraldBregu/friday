@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -61,6 +62,12 @@ export function SettingsSidebar(): React.JSX.Element {
 				className="h-12 shrink-0 border-b border-sidebar-border/50 p-0"
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
+			<div className="shrink-0 border-b border-sidebar-border/50 p-2">
+				<Link to="/home" className={SPLIT_ITEM_CLASS}>
+					<ArrowLeft className="size-4 shrink-0" strokeWidth={1.8} />
+					<span>{t('settings.returnToChat', 'Return to Chat')}</span>
+				</Link>
+			</div>
 			<div className="no-scrollbar min-h-0 flex-1 overflow-y-auto pt-3">
 				<nav aria-label={t('settings.title')}>
 					{SETTINGS_SIDEBAR_GROUPS.map((group) => (

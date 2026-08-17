@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '../../../src/renderer/src/pages/settings/Layout';
+import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Breadcrumb';
 import {
 	SETTINGS_DETAIL_ITEMS,
 	SETTINGS_NAVIGATION,
@@ -45,6 +46,7 @@ it.each([
 
 	render(
 		<MemoryRouter initialEntries={[path]}>
+			<SettingsBreadcrumb />
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
 					<Route path="*" element={<p>Settings page</p>} />
@@ -70,6 +72,9 @@ it('renders settings navigation beside the workspace and marks the current secti
 
 	const sidebar = container.querySelector('[data-slot="split-pane-sidebar"]');
 	const workspace = container.querySelector('[data-slot="settings-workspace"]');
+	const returnToChat = within(sidebar as HTMLElement).getByRole('link', {
+		name: 'settings.returnToChat',
+	});
 	const navigation = screen.getByRole('navigation', { name: 'settings.title' });
 	const currentSection = within(navigation).getByRole('link', {
 		name: 'settings.modelServices.assistantName',
@@ -83,6 +88,11 @@ it('renders settings navigation beside the workspace and marks the current secti
 
 	expect(sidebar).toBeInTheDocument();
 	expect(workspace).toBeInTheDocument();
+	expect(returnToChat).toHaveAttribute('href', '/home');
+	expect(within(sidebar as HTMLElement).getAllByRole('link')[0]).toBe(returnToChat);
+	expect(within(workspace as HTMLElement).queryByRole('navigation', {
+		name: 'settings.breadcrumb.label',
+	})).not.toBeInTheDocument();
 	expect(screen.getByRole('separator', { name: 'Resize sidebar' })).toBeInTheDocument();
 	expect(within(navigation).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(assistantGroup).not.toBeNull();

@@ -24,6 +24,8 @@ export interface TitleBarProps {
 	style?: React.CSSProperties;
 	/** Custom content rendered on the right before window controls */
 	rightContent?: ReactNode;
+	/** Route context rendered inside the title bar */
+	centerContent?: ReactNode;
 	/** When true, renders agentic + info sidebar toggle buttons on the right */
 	showSidebarToggles?: boolean;
 }
@@ -32,6 +34,7 @@ export const TitleBar = React.memo(function TitleBar({
 	className,
 	style,
 	rightContent,
+	centerContent,
 	showSidebarToggles: _showSidebarToggles = false,
 }: TitleBarProps) {
 	const { t } = useTranslation();
@@ -123,6 +126,23 @@ export const TitleBar = React.memo(function TitleBar({
 
 					{/* {isSettings && <NavigationButtons />} */}
 				</TitleBarLeftContainer>
+
+				{centerContent && (
+					<div
+						data-slot="titlebar-content"
+						className={cn(
+							'pointer-events-none absolute inset-y-0 flex min-w-0 items-center overflow-hidden',
+							isMac ? 'left-4 right-16' : 'left-24 right-28'
+						)}
+					>
+						<div
+							className="pointer-events-auto min-w-0 max-w-full"
+							style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+						>
+							{centerContent}
+						</div>
+					</div>
+				)}
 
 				<div className="flex-1" />
 

@@ -13,7 +13,7 @@ import {
 	PageLoadingSkeleton,
 } from './components/app/base/PageLoadingSkeleton';
 import { TitleBar } from './components/app/titlebar/TitleBar';
-import { Layout as SettingsLayout } from './pages/settings';
+import { Layout as SettingsLayout, SettingsBreadcrumb } from './pages/settings';
 import { SettingsPageSkeleton } from './pages/settings/components';
 import { SETTINGS_MODEL_SERVICE_ITEMS } from './pages/settings/navigation';
 import { CommandMenu, PageTransition } from './experience';
@@ -125,6 +125,7 @@ function RootRouteComponent(): React.JSX.Element {
 					)}
 				>
 					<TitleBar
+						centerContent={isSettings ? <SettingsBreadcrumb /> : undefined}
 						style={
 							hasSidebar
 								? { left: !isMobile && state.sidebarOpen ? 'var(--app-sidebar-width)' : 0 }
