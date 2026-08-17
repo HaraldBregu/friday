@@ -74,6 +74,7 @@
 :root {
 	--radius: 0.625rem;
 	--app-window-radius: 16px;
+	--app-sidebar-width: 16rem;
 	--app-bg-opacity: 1;
 	--app-surface-opacity: 1;
 	--app-popover-opacity: 1;

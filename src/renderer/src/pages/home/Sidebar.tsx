@@ -10,6 +10,7 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarRail,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -144,6 +145,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarFooter>
+			<SidebarRail />
 		</Sidebar>
 	);
 }

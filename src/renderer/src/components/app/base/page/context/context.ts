@@ -6,6 +6,8 @@ export interface ContextValue {
 	state: PageState;
 	dispatch: Dispatch<PageAction>;
 	isMobile: boolean;
+	sidebarWidth: number;
+	setSidebarWidth: (width: number) => void;
 	toggleSidebar: () => void;
 }
 

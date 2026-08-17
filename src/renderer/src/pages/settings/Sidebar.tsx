@@ -11,6 +11,7 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarRail,
 } from '@/components/ui/sidebar';
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
 
@@ -100,6 +101,7 @@ export function SettingsSidebar(): React.JSX.Element {
 					))}
 				</nav>
 			</SidebarContent>
+			<SidebarRail />
 		</Sidebar>
 	);
 }

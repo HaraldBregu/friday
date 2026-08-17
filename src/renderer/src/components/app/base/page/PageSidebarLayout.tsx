@@ -21,7 +21,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePageContext } from './hooks/use-page-context';
 
-const PAGE_SIDEBAR_LAYOUT_WIDTH = '16rem';
 const PAGE_SIDEBAR_LAYOUT_WIDTH_MOBILE = '18rem';
 const PAGE_SIDEBAR_LAYOUT_WIDTH_ICON = '3rem';
 
@@ -31,12 +30,14 @@ function PageSidebarLayoutContainer({
 	children,
 	...props
 }: React.ComponentProps<'div'>) {
+	const { sidebarWidth } = usePageContext();
+
 	return (
 		<div
 			data-slot="sidebar-wrapper"
 			style={
 				{
-					'--sidebar-width': PAGE_SIDEBAR_LAYOUT_WIDTH,
+					'--sidebar-width': `${sidebarWidth}px`,
 					'--sidebar-width-icon': PAGE_SIDEBAR_LAYOUT_WIDTH_ICON,
 					...style,
 				} as React.CSSProperties
@@ -183,24 +184,78 @@ function PageSidebarLayoutTrigger({
 	);
 }
 
-function PageSidebarLayoutRail({ className, ...props }: React.ComponentProps<'button'>) {
-	const { toggleSidebar } = usePageContext();
+function PageSidebarLayoutRail({
+	className,
+	onKeyDown,
+	onPointerDown,
+	...props
+}: React.ComponentProps<'button'>) {
+	const { sidebarWidth, setSidebarWidth } = usePageContext();
 
 	return (
 		<button
+			type="button"
 			data-sidebar="rail"
 			data-slot="sidebar-rail"
-			aria-label="Toggle Sidebar"
-			tabIndex={-1}
-			onClick={toggleSidebar}
-			title="Toggle Sidebar"
+			role="separator"
+			aria-label="Resize sidebar"
+			aria-orientation="vertical"
+			aria-valuemin={MIN_SIDEBAR_WIDTH}
+			aria-valuemax={MAX_SIDEBAR_WIDTH}
+			aria-valuenow={sidebarWidth}
+			tabIndex={0}
+			onKeyDown={(event) => {
+				onKeyDown?.(event);
+				if (event.defaultPrevented) return;
+				if (event.key === 'ArrowLeft') {
+					event.preventDefault();
+					setSidebarWidth(sidebarWidth - 8);
+				}
+				if (event.key === 'ArrowRight') {
+					event.preventDefault();
+					setSidebarWidth(sidebarWidth + 8);
+				}
+				if (event.key === 'Home') {
+					event.preventDefault();
+					setSidebarWidth(MIN_SIDEBAR_WIDTH);
+				}
+				if (event.key === 'End') {
+					event.preventDefault();
+					setSidebarWidth(MAX_SIDEBAR_WIDTH);
+				}
+			}}
+			onPointerDown={(event) => {
+				onPointerDown?.(event);
+				if (event.defaultPrevented || event.button !== 0) return;
+				event.preventDefault();
+				const startX = event.clientX;
+				const startWidth = sidebarWidth;
+				const side = event.currentTarget.closest('[data-side]')?.getAttribute('data-side');
+				const direction = side === 'right' ? -1 : 1;
+				const previousCursor = document.body.style.cursor;
+				const previousUserSelect = document.body.style.userSelect;
+				document.body.style.cursor = 'col-resize';
+				document.body.style.userSelect = 'none';
+
+				const handlePointerMove = (moveEvent: PointerEvent): void => {
+					setSidebarWidth(startWidth + (moveEvent.clientX - startX) * direction);
+				};
+				const stopResizing = (): void => {
+					window.removeEventListener('pointermove', handlePointerMove);
+					window.removeEventListener('pointerup', stopResizing);
+					window.removeEventListener('pointercancel', stopResizing);
+					document.body.style.cursor = previousCursor;
+					document.body.style.userSelect = previousUserSelect;
+				};
+
+				window.addEventListener('pointermove', handlePointerMove);
+				window.addEventListener('pointerup', stopResizing);
+				window.addEventListener('pointercancel', stopResizing);
+			}}
+			title="Resize sidebar"
 			className={cn(
-				'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
-				'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
-				'[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-				'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar',
-				'[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
-				'[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+				'absolute inset-y-0 z-20 hidden w-3 cursor-col-resize touch-none outline-none after:absolute after:inset-y-0 after:left-1/2 after:w-px after:-translate-x-1/2 hover:after:bg-sidebar-border focus-visible:after:bg-ring md:block',
+				'in-data-[side=left]:-right-1.5 in-data-[side=right]:-left-1.5',
 				className
 			)}
 			{...props}

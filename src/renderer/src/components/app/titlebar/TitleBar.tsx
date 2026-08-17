@@ -3,9 +3,7 @@ import { Menu, PanelLeft, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TitleBarContainer } from './TitleBarContainer';
-import { TitleBarCenterContainer } from './TitleBarCenterContainer';
 import { TitleBarLeftContainer } from './TitleBarLeftContainer';
-import { TitleBarCenterContainerTitle } from './TitleBarCenterContainerTitle';
 import { Button } from '@/components/ui/button';
 import { TitleBarProvider } from './context/TitleBarContext';
 import { NavButton } from './components/NavButton';
@@ -25,10 +23,6 @@ export interface TitleBarProps {
 	className?: string;
 	/** Optional inline style applied to the title bar container */
 	style?: React.CSSProperties;
-	/** Text displayed centered in the title bar */
-	title?: string;
-	/** Custom content rendered in the center, replaces the title */
-	centerContent?: ReactNode;
 	/** Custom content rendered on the right before window controls */
 	rightContent?: ReactNode;
 	/** Called when the sidebar toggle button is clicked */
@@ -40,8 +34,6 @@ export interface TitleBarProps {
 export const TitleBar = React.memo(function TitleBar({
 	className,
 	style,
-	title = 'Application Name',
-	centerContent,
 	rightContent,
 	onToggleSidebar,
 	showSidebarToggles: _showSidebarToggles = false,
@@ -55,7 +47,6 @@ export const TitleBar = React.memo(function TitleBar({
 	const isStart = location.pathname === '/start';
 	const isSettings = location.pathname.startsWith('/settings');
 	const settingsLabel = t('settings.title', 'Settings');
-	const titleBarTitle = isSettings ? settingsLabel : title;
 	const homeButtonLabel = t('titleBar.home', 'Home');
 	const routeButton = isSettings ? (
 		<Button
@@ -146,17 +137,6 @@ export const TitleBar = React.memo(function TitleBar({
 
 					{/* {isSettings && <NavigationButtons />} */}
 				</TitleBarLeftContainer>
-
-				{/* ── Center: absolutely placed so it's always truly centered ── */}
-				<TitleBarCenterContainer
-					className={isHome || isSettings ? 'justify-start pl-12' : undefined}
-				>
-					{centerContent && !isSettings ? (
-						centerContent
-					) : (
-						<TitleBarCenterContainerTitle>{titleBarTitle}</TitleBarCenterContainerTitle>
-					)}
-				</TitleBarCenterContainer>
 
 				<div className="flex-1" />
 
