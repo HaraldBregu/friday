@@ -105,7 +105,9 @@ function RootRouteComponent(): React.JSX.Element {
 	const [chatSessionId, setChatSessionId] = useState<string>(readPersistedChatSessionId);
 
 	const isStart = location.pathname === '/start';
+	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
+	const hasSidebar = isHome || isSettings;
 
 	return (
 		<ChatModeContext.Provider value={{ mode: chatMode, setMode: setChatMode }}>
@@ -125,7 +127,7 @@ function RootRouteComponent(): React.JSX.Element {
 				>
 					<TitleBar
 						title={isStart ? 'Set up Friday' : t('appTitle')}
-						style={isSettings ? { left: '16rem' } : undefined}
+						style={hasSidebar ? { left: '16rem' } : undefined}
 					/>
 					<div className="min-h-0 flex-1 overflow-hidden pt-12">
 						<PageTransition>

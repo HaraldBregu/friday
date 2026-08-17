@@ -85,7 +85,7 @@ it.each(['/settings', '/start'])('opens the titlebar menu while viewing %s', (pa
 	expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
 });
 
-it('shows the history and user icons on Home', async () => {
+it('shows the settings icon on Home', async () => {
 	const user = userEvent.setup();
 
 	render(
@@ -98,7 +98,6 @@ it('shows the history and user icons on Home', async () => {
 		</MemoryRouter>
 	);
 
-	expect(screen.getByRole('button', { name: 'titleBar.chatHistory' })).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'settings.title' })).toBeInTheDocument();
 
 	await user.click(screen.getByRole('button', { name: 'settings.title' }));

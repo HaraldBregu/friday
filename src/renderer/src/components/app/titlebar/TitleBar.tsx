@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { TitleBarProvider } from './context/TitleBarContext';
 import { NavButton } from './components/NavButton';
 // import { NavigationButtons } from './components/NavigationButtons';
-import { SessionsButton } from './components/SessionsButton';
 import { WindowControls } from './components/WindowControls';
 import { useWindowState } from './hooks/useWindowState';
 import { GradientSphere } from '@/components/ui/gradient-sphere';
@@ -83,8 +82,6 @@ export const TitleBar = React.memo(function TitleBar({
 			<User className="size-4" strokeWidth={1.8} />
 		</Button>
 	) : null;
-	const sessionsButton = isHome ? <SessionsButton /> : null;
-
 	return (
 		<TitleBarProvider value={{ isMac, isFullScreen }}>
 			<TitleBarContainer
@@ -125,8 +122,6 @@ export const TitleBar = React.memo(function TitleBar({
 					)}
 
 					{!isMac && routeButton}
-					{!isMac && sessionsButton}
-
 					{!isHome && !isStart && !isSettings && (
 						<Button
 							type="button"
@@ -153,7 +148,9 @@ export const TitleBar = React.memo(function TitleBar({
 				</TitleBarLeftContainer>
 
 				{/* ── Center: absolutely placed so it's always truly centered ── */}
-				<TitleBarCenterContainer className={isSettings ? 'justify-start pl-12' : undefined}>
+				<TitleBarCenterContainer
+					className={isHome || isSettings ? 'justify-start pl-12' : undefined}
+				>
 					{centerContent && !isSettings ? (
 						centerContent
 					) : (
@@ -178,7 +175,6 @@ export const TitleBar = React.memo(function TitleBar({
 						className="z-10 mr-3 flex h-full items-center gap-1"
 						style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
 					>
-						{sessionsButton}
 						{routeButton}
 					</div>
 				)}

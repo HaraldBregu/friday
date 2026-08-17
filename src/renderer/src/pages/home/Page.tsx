@@ -13,7 +13,11 @@ import {
 	X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageContainer } from '@/components/app/base/page';
+import {
+	PageContainer,
+	PageSidebarLayoutContainer,
+	PageSidebarLayoutInset,
+} from '@/components/app/base/page';
 import { AudioPlayer } from '@/components/audio-player';
 import { Button } from '@/components/ui/button';
 import {
@@ -57,6 +61,7 @@ import {
 import { appendTranscriptionText, fileToSttAudioInput } from './hooks/stt';
 import type { PromptAttachment } from './attachments/types';
 import { validatePromptAttachments } from './attachments/validation';
+import { HomeSidebar } from './Sidebar';
 
 const promptSuggestions = [
 	{
@@ -706,7 +711,15 @@ function PageContent(): ReactElement {
 
 	return (
 		<PageContainer className="overflow-hidden text-foreground">
-			<div className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground">
+			<PageSidebarLayoutContainer className="h-full min-h-0">
+				<HomeSidebar
+					refreshKey={`${chatSessionId}:${visibleMessages.length}:${agent.isLoading}`}
+				/>
+				<PageSidebarLayoutInset className="min-h-0 min-w-0 overflow-hidden">
+					<div
+						data-slot="home-workspace"
+						className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
+					>
 				<ChatContainerRoot className="min-h-0 p-0 [scrollbar-gutter:auto]" aria-live="polite">
 					<ChatContainerContent
 						className={cn(
@@ -895,7 +908,9 @@ function PageContent(): ReactElement {
 						/>
 					</div>
 				</div>
-			</div>
+					</div>
+				</PageSidebarLayoutInset>
+			</PageSidebarLayoutContainer>
 		</PageContainer>
 	);
 }

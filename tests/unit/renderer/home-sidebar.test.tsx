@@ -1,0 +1,95 @@
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { PageContainer } from '../../../src/renderer/src/components/app/base/page';
+import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
+import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
+
+jest.mock('react-i18next', () => ({
+	useTranslation: () => ({ t: (key: string): string => key }),
+}));
+
+const listSessions = jest.fn();
+
+beforeEach(() => {
+	Object.defineProperty(window, 'matchMedia', {
+		configurable: true,
+		value: jest.fn((query: string) => ({
+			matches: false,
+			media: query,
+			onchange: null,
+			addListener: jest.fn(),
+			removeListener: jest.fn(),
+			addEventListener: jest.fn(),
+			removeEventListener: jest.fn(),
+			dispatchEvent: jest.fn(),
+		})),
+	});
+	Object.defineProperty(window, 'agent', {
+		configurable: true,
+		value: { listSessions },
+	});
+});
+
+it('loads chat history, marks the latest default session, and switches sessions', async () => {
+	const user = userEvent.setup();
+	const setSessionId = jest.fn();
+	listSessions.mockResolvedValue([
+		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 },
+		{ id: 'session-older', title: 'Older chat', createdAtMs: 1 },
+	]);
+
+	render(
+		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
+			<PageContainer>
+				<HomeSidebar refreshKey="initial" />
+			</PageContainer>
+		</ChatSessionContext.Provider>
+	);
+
+	const navigation = await screen.findByRole('navigation', {
+		name: 'settings.chatHistory.title',
+	});
+	const latest = within(navigation).getByRole('button', { name: 'Latest chat' });
+	const older = within(navigation).getByRole('button', { name: 'Older chat' });
+	expect(latest).toHaveAttribute('aria-current', 'page');
+
+	await user.click(older);
+	expect(setSessionId).toHaveBeenCalledWith('session-older');
+});
+
+it('starts a new chat from the sidebar', async () => {
+	const user = userEvent.setup();
+	const setSessionId = jest.fn();
+	listSessions.mockResolvedValue([]);
+	Object.defineProperty(globalThis.crypto, 'randomUUID', {
+		configurable: true,
+		value: jest.fn(() => '00000000-0000-4000-8000-000000000001'),
+	});
+
+	render(
+		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
+			<PageContainer>
+				<HomeSidebar refreshKey="initial" />
+			</PageContainer>
+		</ChatSessionContext.Provider>
+	);
+
+	await user.click(screen.getByRole('button', { name: 'generic.newChat' }));
+	expect(setSessionId).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000001');
+});
+
+it('shows an empty state when there is no chat history', async () => {
+	listSessions.mockResolvedValue([]);
+
+	render(
+		<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
+			<PageContainer>
+				<HomeSidebar refreshKey="initial" />
+			</PageContainer>
+		</ChatSessionContext.Provider>
+	);
+
+	await waitFor(() => {
+		expect(screen.getByText('settings.chatHistory.empty')).toBeInTheDocument();
+	});
+});
