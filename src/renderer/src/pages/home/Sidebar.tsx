@@ -71,16 +71,14 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 				style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
 			/>
 			<header className="border-b border-sidebar-border/50 p-2">
-				<Button
+				<button
 					type="button"
-					variant="outline"
-					size="sm"
-					className="w-full justify-start"
+					className={SPLIT_ITEM_CLASS}
 					onClick={() => setSessionId(crypto.randomUUID())}
 				>
 					<Plus className="size-4" />
-					{t('titleBar.newChat', 'New chat')}
-				</Button>
+					<span>{t('titleBar.newChat', 'New chat')}</span>
+				</button>
 			</header>
 			<section className="no-scrollbar min-h-0 flex-1 overflow-y-auto p-2 pt-3" aria-busy={loading}>
 				<div className="px-2 pb-2 text-xs font-medium text-sidebar-foreground/70">

@@ -1,7 +1,11 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { PageContainer, Split } from '../../../src/renderer/src/components/app/base/page';
+import {
+	PageContainer,
+	SPLIT_ITEM_CLASS,
+	Split,
+} from '../../../src/renderer/src/components/app/base/page';
 import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
 import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
 
@@ -89,7 +93,9 @@ it('starts a new chat from the sidebar', async () => {
 		</MemoryRouter>
 	);
 
-	await user.click(screen.getByRole('button', { name: 'titleBar.newChat' }));
+	const newChat = screen.getByRole('button', { name: 'titleBar.newChat' });
+	expect(newChat).toHaveAttribute('class', SPLIT_ITEM_CLASS);
+	await user.click(newChat);
 	expect(setSessionId).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000001');
 });
 
