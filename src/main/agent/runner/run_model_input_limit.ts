@@ -1,6 +1,6 @@
 import { findModel } from '../../models';
 
-export const DEFAULT_MODEL_CONTEXT_TOKENS = 32_768;
+export const DEFAULT_MODEL_CONTEXT_TOKENS = 128_000;
 export const MODEL_CONTEXT_SAFETY_TOKENS = 1_024;
 
 export function modelInputLimit(
@@ -17,7 +17,7 @@ export function modelInputLimit(
 	const configuredInput = inputContract?.maximum ?? inputContract?.default;
 	const configuredContext =
 		metadata?.contextWindow ?? contextContract?.maximum ?? contextContract?.default;
-	// 32K is the conservative fallback when the local catalog has no verified context metadata.
+	// 128K is the conservative fallback when the local catalog has no verified context metadata.
 	const available =
 		typeof configuredInput === 'number'
 			? configuredInput - MODEL_CONTEXT_SAFETY_TOKENS
