@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
+import { CircleHelp, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -168,7 +168,6 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 														});
 												}}
 											>
-												<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
 												<span className="truncate">{title}</span>
 											</button>
 										)}
