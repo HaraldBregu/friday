@@ -85,7 +85,6 @@ const TaskDetailsPage: React.FC = () => {
 		);
 	}
 
-	const action = task.action.type === 'agent' ? task.action.prompt : task.action.message;
 	const actionType = task.action.type === 'agent'
 		? t('settings.cron.detail.agent')
 		: t('settings.cron.detail.debug');
@@ -173,12 +172,6 @@ const TaskDetailsPage: React.FC = () => {
 						<ItemContent><ItemTitle>{t('settings.cron.detail.updatedAt')}</ItemTitle></ItemContent>
 						<ItemActions className="ml-auto justify-end"><time className="text-xs" dateTime={task.updatedAt}>{new Date(task.updatedAt).toLocaleString()}</time></ItemActions>
 					</Item>
-				</Card>
-			</SettingsSection>
-
-			<SettingsSection title={t('settings.cron.detail.action')}>
-				<Card size="sm" className="p-4!">
-					<pre className="whitespace-pre-wrap break-words font-sans text-xs leading-5 text-foreground">{action}</pre>
 				</Card>
 			</SettingsSection>
 
