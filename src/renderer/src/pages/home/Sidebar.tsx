@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { AudioLines, CircleHelp, MessageSquare, Plus } from 'lucide-react';
+import { AudioLines, CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -7,7 +7,6 @@ import {
 	SPLIT_ITEM_CLASS,
 } from '@/components/app/base/page';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
 import type { AgentSessionSummary } from '@/lib/compat';
@@ -26,8 +25,6 @@ export function HomeSidebar({
 }: HomeSidebarProps): ReactElement {
 	const { t } = useTranslation();
 	const { sessionId, setSessionId } = useChatSession();
-	const userName = window.app.getUserName();
-	const userInitials = userName.trim().slice(0, 2).toLocaleUpperCase() || 'FR';
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -140,15 +137,16 @@ export function HomeSidebar({
 					<Link
 						to="/settings"
 						aria-label={t('settings.title')}
-						title={userName}
+						title={t('settings.title')}
 						className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
 					>
-						<Avatar className="size-8" aria-hidden="true">
-							<AvatarFallback className="bg-orange-600 text-xs font-medium text-white">
-								{userInitials}
-							</AvatarFallback>
-						</Avatar>
-						<span className="min-w-0 truncate text-sm font-medium">{userName}</span>
+						<span
+							className="flex size-8 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white"
+							aria-hidden="true"
+						>
+							<Settings2 className="size-4" strokeWidth={1.8} />
+						</span>
+						<span className="min-w-0 truncate text-sm font-medium">{t('settings.title')}</span>
 					</Link>
 					<button
 						type="button"

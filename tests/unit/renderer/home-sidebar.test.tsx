@@ -42,7 +42,6 @@ beforeEach(() => {
 	Object.defineProperty(window, 'app', {
 		configurable: true,
 		value: {
-			getUserName: jest.fn(() => 'haraldbregu'),
 			openExternalUrl: jest.fn().mockResolvedValue(undefined),
 		},
 	});
@@ -84,8 +83,7 @@ it('loads chat history, marks the latest default session, and switches sessions'
 		'href',
 		'/settings'
 	);
-	expect(screen.getByText('haraldbregu')).toBeInTheDocument();
-	expect(screen.getByText('HA')).toBeInTheDocument();
+	expect(screen.getByText('settings.title')).toBeInTheDocument();
 
 	await user.click(screen.getByRole('button', { name: 'settings.modelServices.voiceName' }));
 	expect(onVoiceStart).toHaveBeenCalledTimes(1);

@@ -391,7 +391,6 @@ export interface ModelsApi {
 type ProviderStoreRecord = Provider | BotProvider;
 
 export interface AppApi {
-	getUserName: () => string;
 	getExtensionStoreValue<T extends ExtensionStoreValue = ExtensionStoreValue>(
 		key: string
 	): Promise<T | undefined>;
