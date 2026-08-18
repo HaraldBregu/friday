@@ -41,7 +41,7 @@ export interface TaskSchedule {
 
 export type TaskScheduleCreateRequest = Omit<
 	TaskSchedule,
-	'id' | 'createdAt' | 'updatedAt' | 'enabled'
+	'id' | 'createdAt' | 'updatedAt' | 'enabled' | 'sessionIds'
 > & {
 	enabled?: boolean;
 };
