@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
+import { CircleHelp, MessageSquare, Pencil, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -7,6 +7,7 @@ import {
 	SPLIT_ITEM_CLASS,
 } from '@/components/app/base/page';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
 import type { AgentSessionSummary } from '@/lib/compat';
@@ -22,6 +23,8 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
+	const [editingSessionId, setEditingSessionId] = useState<string>();
+	const [editingTitle, setEditingTitle] = useState('');
 
 	useEffect(() => {
 		let active = true;
@@ -108,17 +111,61 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 								const title = session.title.trim() || t('settings.chatHistory.untitled');
 								const isActive = session.id === currentSessionId;
 								return (
-									<li key={session.id}>
-										<button
-											type="button"
-											data-active={isActive ? '' : undefined}
-											aria-current={isActive ? 'page' : undefined}
-											className={cn(SPLIT_ITEM_CLASS, isActive && SPLIT_ITEM_ACTIVE_CLASS)}
-											onClick={() => setSessionId(session.id)}
-										>
-											<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
-											<span>{title}</span>
-										</button>
+									<li key={session.id} className="group flex min-w-0 items-center gap-1">
+										{editingSessionId === session.id ? (
+											<Input
+												autoFocus
+												maxLength={120}
+												value={editingTitle}
+												onChange={(event) => setEditingTitle(event.target.value)}
+												onKeyDown={(event) => {
+													if (event.key === 'Enter') event.currentTarget.blur();
+													if (event.key === 'Escape') {
+														event.currentTarget.value = title;
+														event.currentTarget.blur();
+													}
+												}}
+												onBlur={(event) => {
+													const nextTitle = event.currentTarget.value.trim();
+													setEditingSessionId(undefined);
+													if (!nextTitle || nextTitle === title) return;
+													void window.agent.renameSession(session.id, nextTitle).then(() => {
+														setSessions((current) =>
+															current.map((item) =>
+																item.id === session.id ? { ...item, title: nextTitle } : item
+															)
+														);
+													});
+												}}
+												aria-label={`Rename ${title}`}
+												className="h-8 min-w-0 flex-1"
+											/>
+										) : (
+											<>
+												<button
+													type="button"
+													data-active={isActive ? '' : undefined}
+													aria-current={isActive ? 'page' : undefined}
+													className={cn(SPLIT_ITEM_CLASS, 'min-w-0 flex-1', isActive && SPLIT_ITEM_ACTIVE_CLASS)}
+													onClick={() => setSessionId(session.id)}
+												>
+													<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
+													<span className="truncate">{title}</span>
+												</button>
+												<button
+													type="button"
+													aria-label={`Rename ${title}`}
+													title="Rename chat"
+													className="flex size-8 shrink-0 items-center justify-center rounded-lg opacity-0 hover:bg-sidebar-accent focus-visible:opacity-100 group-hover:opacity-100"
+													onClick={() => {
+														setEditingTitle(title);
+														setEditingSessionId(session.id);
+													}}
+												>
+													<Pencil className="size-3.5" />
+												</button>
+											</>
+										)}
 									</li>
 								);
 							})}

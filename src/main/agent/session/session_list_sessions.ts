@@ -16,7 +16,7 @@ function sessionTitle(sessionId: string, location: string): string {
 		) as { title?: unknown };
 		if (typeof info.title === 'string' && info.title.trim()) return info.title.trim();
 	} catch {
-		// Fall back to the first message for sessions without valid metadata.
+		void 0;
 	}
 	const firstUserMessage = loadMessagesBySessionId(sessionId, location).find(
 		(message) => message.role === 'user'
