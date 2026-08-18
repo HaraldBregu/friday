@@ -1,3 +1,4 @@
+const mockAssociateSession = jest.fn();
 const mockSetTaskRunner = jest.fn();
 const mockStartTask = jest.fn().mockResolvedValue(undefined);
 
@@ -5,6 +6,7 @@ jest.mock('../../../../src/main/shared/agent_location', () => ({
 	agentLocation: () => '/tmp/friday-agent-tasks',
 }));
 jest.mock('../../../../src/main/tasks', () => ({
+	associateSession: (...args: unknown[]) => mockAssociateSession(...args),
 	initTask: jest.fn(),
 	destroyTask: jest.fn(),
 	getRuntime: jest.fn(() => ({ providerId: 'task-provider', modelId: 'task-model' })),
@@ -51,12 +53,13 @@ it('prevents scheduled agents from mutating tasks while honoring saved tool rest
 	await runner(schedule([]));
 	await runner(schedule(['read', 'bash']));
 
-	for (const call of send.mock.calls.slice(0, 2)) {
+	for (const [index, call] of send.mock.calls.slice(0, 2).entries()) {
 		expect(call).toEqual([
 			'Do the work',
 			'tasks',
 			{
 				type: 'background',
+				sessionId: mockAssociateSession.mock.calls[index][1],
 				toolsDeny,
 				streaming: false,
 				contextMode: 'minimal',
@@ -71,6 +74,7 @@ it('prevents scheduled agents from mutating tasks while honoring saved tool rest
 		'tasks',
 		{
 			type: 'background',
+			sessionId: mockAssociateSession.mock.calls[2][1],
 			toolsAllow: ['read', 'bash'],
 			toolsDeny,
 			streaming: false,
@@ -80,6 +84,12 @@ it('prevents scheduled agents from mutating tasks while honoring saved tool rest
 			modelId: 'task-model',
 		},
 	]);
+	expect(mockAssociateSession.mock.calls).toHaveLength(3);
+	for (const [taskId, sessionId] of mockAssociateSession.mock.calls) {
+		expect(taskId).toBe('schedule-1');
+		expect(sessionId).toMatch(/^[0-9a-f-]{36}$/);
+	}
+	expect(new Set(mockAssociateSession.mock.calls.map((call) => call[1])).size).toBe(3);
 
 	agent.destroy();
 });
