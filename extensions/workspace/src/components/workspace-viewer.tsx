@@ -1,12 +1,11 @@
-import { AlertCircle, Check, FileCode2, FileText, LoaderCircle, Save } from 'lucide-react';
+import { AlertCircle, Check, FileText, LoaderCircle, Save } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@friday/sdk';
 
 import { FileViewer } from '@/components/viewer';
 import { FileInformation } from '@/components/information';
+import { FormatToggle } from '@/components/format-toggle';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { showNativeContextMenu } from '@/lib/menu';
 
 interface WorkspaceViewerProps {
@@ -76,14 +75,7 @@ export function WorkspaceViewer({
 		);
 	}
 	return (
-		<Tabs
-			value={kind === 'markdown' ? markdownMode : undefined}
-			onValueChange={(value) => {
-				if (value === 'source' || value === 'preview') onMarkdownModeChange(value);
-			}}
-			asChild
-		>
-			<section
+		<section
 				className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background"
 				aria-label="Workspace file"
 				onContextMenu={(event) => {
@@ -192,27 +184,16 @@ export function WorkspaceViewer({
 				>
 					<FileInformation file={file} />
 					{kind === 'markdown' && !loading ? (
-						<TabsList className="ml-auto h-6 rounded-md p-0.5" aria-label="Markdown view mode">
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<TabsTrigger value="source" className="h-5 w-6 p-0" aria-label="Source view">
-										<FileCode2 className="h-3 w-3" />
-									</TabsTrigger>
-								</TooltipTrigger>
-								<TooltipContent side="top">Source</TooltipContent>
-							</Tooltip>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<TabsTrigger value="preview" className="h-5 w-6 p-0" aria-label="Preview view">
-										<FileText className="h-3 w-3" />
-									</TabsTrigger>
-								</TooltipTrigger>
-								<TooltipContent side="top">Preview</TooltipContent>
-							</Tooltip>
-						</TabsList>
+						<div className="ml-auto">
+							<FormatToggle
+								formatted={markdownMode === 'preview'}
+								onFormattedChange={(formatted) =>
+									onMarkdownModeChange(formatted ? 'preview' : 'source')
+								}
+							/>
+						</div>
 					) : null}
 				</footer>
-			</section>
-		</Tabs>
+		</section>
 	);
 }
