@@ -6,6 +6,7 @@ import {
 	SPLIT_ITEM_ACTIVE_CLASS,
 	SPLIT_ITEM_CLASS,
 } from '@/components/app/base/page';
+import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,23 +29,27 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 
 	useEffect(() => {
 		let active = true;
-
-		void window.agent
-			.listSessions()
-			.then((nextSessions) => {
-				if (!active) return;
-				setError(false);
-				setSessions(nextSessions);
-				setLoading(false);
-			})
-			.catch(() => {
-				if (!active) return;
-				setError(true);
-				setLoading(false);
-			});
+		const load = (): void => {
+			void window.agent
+				.listSessions()
+				.then((nextSessions) => {
+					if (!active) return;
+					setError(false);
+					setSessions(nextSessions);
+					setLoading(false);
+				})
+				.catch(() => {
+					if (!active) return;
+					setError(true);
+					setLoading(false);
+				});
+		};
+		load();
+		const interval = window.setInterval(load, 1500);
 
 		return () => {
 			active = false;
+			window.clearInterval(interval);
 		};
 	}, [refreshKey, sessionId]);
 
@@ -168,7 +173,13 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 														});
 												}}
 											>
+												{session.runStatus ? (
+												<TextShimmer className="truncate" duration={2} data-run-status={session.runStatus}>
+													{title}
+												</TextShimmer>
+											) : (
 												<span className="truncate">{title}</span>
+											)}
 											</button>
 										)}
 									</li>

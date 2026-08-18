@@ -58,7 +58,7 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	const user = userEvent.setup();
 	const setSessionId = jest.fn();
 	listSessions.mockResolvedValue([
-		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 },
+		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2, runStatus: 'running' },
 		{ id: 'session-older', title: 'Older chat', createdAtMs: 1 },
 	]);
 
@@ -78,6 +78,7 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	const latest = within(navigation).getByRole('button', { name: 'Latest chat' });
 	const older = within(navigation).getByRole('button', { name: 'Older chat' });
 	expect(latest).toHaveAttribute('aria-current', 'page');
+	expect(within(latest).getByText('Latest chat')).toHaveAttribute('data-run-status', 'running');
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
