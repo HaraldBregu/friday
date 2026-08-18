@@ -711,8 +711,6 @@ function PageContent(): ReactElement {
 				sidebar={
 					<HomeSidebar
 						refreshKey={`${chatSessionId}:${visibleMessages.length}:${agent.isLoading}`}
-						onVoiceStart={() => void startVoiceConversation()}
-						voiceDisabled={voiceBusy || agent.isLoading || voiceMode !== null}
 					/>
 				}
 			>

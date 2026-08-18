@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { AudioLines, CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
+import { CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -14,15 +14,9 @@ import { cn } from '@/lib/utils';
 
 interface HomeSidebarProps {
 	readonly refreshKey: string;
-	readonly onVoiceStart: () => void;
-	readonly voiceDisabled: boolean;
 }
 
-export function HomeSidebar({
-	refreshKey,
-	onVoiceStart,
-	voiceDisabled,
-}: HomeSidebarProps): ReactElement {
+export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const { t } = useTranslation();
 	const { sessionId, setSessionId } = useChatSession();
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
@@ -148,15 +142,6 @@ export function HomeSidebar({
 						</span>
 						<span className="min-w-0 truncate text-sm font-medium">{t('settings.title')}</span>
 					</Link>
-					<button
-						type="button"
-						disabled={voiceDisabled}
-						onClick={onVoiceStart}
-						className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm text-sidebar-foreground/70 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:pointer-events-none disabled:opacity-50"
-					>
-						<AudioLines className="size-4" strokeWidth={1.8} aria-hidden="true" />
-						<span>{t('settings.modelServices.voiceName')}</span>
-					</button>
 					<button
 						type="button"
 						aria-label={t('menu.helpAndSupport')}
