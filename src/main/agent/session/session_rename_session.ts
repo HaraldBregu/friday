@@ -10,7 +10,7 @@ export function renameSession(sessionId: string, location: string, title: string
 	try {
 		info = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
 	} catch {
-		// Replace invalid metadata while preserving the session.
+		info = {};
 	}
 	atomicWriteFile(filePath, `${JSON.stringify({ ...info, title }, null, '\t')}\n`);
 }
