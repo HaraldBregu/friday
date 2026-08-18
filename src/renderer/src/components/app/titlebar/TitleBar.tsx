@@ -11,7 +11,6 @@ import { WindowControls } from './components/WindowControls';
 import { useWindowState } from './hooks/useWindowState';
 import { GradientSphere } from '@/components/ui/gradient-sphere';
 import { cn } from '@/lib/utils';
-import logo from '@resources/icons/icon.png';
 
 // Synchronous platform check — no hooks, no async, no state.
 // macOS uses native traffic-light buttons; every other OS needs custom controls.
@@ -73,13 +72,13 @@ export const TitleBar = React.memo(function TitleBar({
 		<Button
 			type="button"
 			variant="ghost"
-			size="icon"
-			className="size-8 rounded-full"
+			className="rounded-full"
 			onClick={() => navigate('/home')}
 			title={homeButtonLabel}
 			aria-label={homeButtonLabel}
 		>
 			<GradientSphere size={18} className="pointer-events-none" />
+			Friday
 		</Button>
 	) : !isStart ? (
 		<Button
@@ -132,13 +131,6 @@ export const TitleBar = React.memo(function TitleBar({
 							<Menu className="h-[15px] w-[15px]" strokeWidth={1.5} />
 						</button>
 					)}
-					{!isHome && (
-						<div className="flex items-center gap-2 px-2 text-sm font-medium">
-							<img src={logo} alt="" className="size-5 rounded-md object-contain" />
-							<span>Friday</span>
-						</div>
-					)}
-
 					{!isMac && searchButton}
 					{!isMac && routeButton}
 					{!isHome && !isStart && !isSettings && (

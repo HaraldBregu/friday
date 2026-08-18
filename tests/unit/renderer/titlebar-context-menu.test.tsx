@@ -9,10 +9,8 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/components/ui/gradient-sphere', () => ({
-	GradientSphere: (): null => null,
+	GradientSphere: () => <span data-testid="friday-logo" />,
 }));
-
-jest.mock('@resources/icons/icon.png', () => 'test-file-stub');
 
 const showContextMenu = jest.fn();
 const contextMenuItems = [
@@ -139,17 +137,26 @@ it('renders a transparent titlebar without visible title text', () => {
 	expect(within(titleBar as HTMLElement).queryByText('Friday')).not.toBeInTheDocument();
 });
 
-it.each(['/start', '/settings'])('shows the Friday identity while viewing %s', (path) => {
-	const { container } = render(
-		<MemoryRouter initialEntries={[path]}>
+it('shows the Friday logo and label inside the Home button on Settings', async () => {
+	const user = userEvent.setup();
+
+	render(
+		<MemoryRouter initialEntries={['/settings']}>
 			<TitleBar />
+			<Routes>
+				<Route path="/settings" element={null} />
+				<Route path="/home" element={<p>/home</p>} />
+			</Routes>
 		</MemoryRouter>
 	);
-	const titleBar = container.querySelector('[data-slot="titlebar"]');
-	const logo = within(titleBar as HTMLElement).getByRole('presentation');
+	const homeButton = screen.getByRole('button', { name: 'titleBar.home' });
 
-	expect(within(titleBar as HTMLElement).getByText('Friday')).toBeInTheDocument();
-	expect(logo).toHaveAttribute('src', 'test-file-stub');
+	expect(within(homeButton).getByTestId('friday-logo')).toBeInTheDocument();
+	expect(within(homeButton).getByText('Friday')).toBeInTheDocument();
+
+	await user.click(homeButton);
+
+	expect(screen.getByText('/home')).toBeInTheDocument();
 });
 
 it('does not render the sidebar toggle in the titlebar', () => {
