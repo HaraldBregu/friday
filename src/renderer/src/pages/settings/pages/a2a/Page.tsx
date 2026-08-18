@@ -22,7 +22,7 @@ export default function A2aPage(): React.JSX.Element {
 	const [busy, setBusy] = useState(false);
 	const [notice, setNotice] = useState<{ error?: boolean; text: string }>();
 	const load = useCallback(async () => setAgents(await window.a2a.list()), []);
-	useEffect(() => { void load(); }, [load]);
+	useEffect(() => { void Promise.resolve().then(load); }, [load]);
 	const submit = async (): Promise<void> => {
 		setBusy(true);
 		setNotice(undefined);
