@@ -135,10 +135,10 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 						className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
 					>
 						<span
-							className="flex size-7 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white"
+							className="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white"
 							aria-hidden="true"
 						>
-							<Settings2 className="size-3.5" strokeWidth={1.8} />
+							<Settings2 className="size-3" strokeWidth={1.8} />
 						</span>
 						<span className="min-w-0 truncate text-sm font-medium">{t('settings.title')}</span>
 					</Link>
