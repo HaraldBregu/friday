@@ -2,6 +2,7 @@ export type * from '../shared/api_types';
 
 import type {
 	AgentApi,
+	A2aApi,
 	AppApi,
 	RecorderApi,
 	TaskApi,
@@ -23,6 +24,7 @@ declare global {
 		win: WindowApi;
 		app: AppApi;
 		agent: AgentApi;
+		a2a: A2aApi;
 		recorder: RecorderApi;
 		tasks: TaskApi;
 		skills: SkillsApi;

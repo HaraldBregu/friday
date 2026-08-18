@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron';
 import { agent } from './agent';
+import { a2a } from './a2a';
 import { app } from './app';
 import { recorder } from './recorder';
 import { tasks } from './tasks';
@@ -16,6 +17,7 @@ import { win } from './win';
 import { data } from './data';
 
 export { agent } from './agent';
+export { a2a } from './a2a';
 export { app } from './app';
 export { recorder } from './recorder';
 export { tasks } from './tasks';
@@ -35,6 +37,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('app', app);
 		contextBridge.exposeInMainWorld('win', win);
 		contextBridge.exposeInMainWorld('agent', agent);
+		contextBridge.exposeInMainWorld('a2a', a2a);
 		contextBridge.exposeInMainWorld('recorder', recorder);
 		contextBridge.exposeInMainWorld('tasks', tasks);
 		contextBridge.exposeInMainWorld('skills', skills);
@@ -57,6 +60,8 @@ if (process.contextIsolated) {
 	globalThis.win = win;
 	// @ts-ignore (define in dts)
 	globalThis.agent = agent;
+	// @ts-ignore (define in dts)
+	globalThis.a2a = a2a;
 	// @ts-ignore (define in dts)
 	globalThis.recorder = recorder;
 	// @ts-ignore (define in dts)

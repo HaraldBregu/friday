@@ -3,6 +3,7 @@ import type { WindowFactory } from '../../window_factory';
 import type { ExecSandbox } from '../sandbox';
 import type { AgentInteractionMode } from '../../../shared/agent_types';
 import { completeBootstrapTool } from '../tools/assistant/complete_bootstrap';
+import { delegateA2aTool } from '../tools/a2a/delegate';
 import { applyPatchTool } from '../tools/core/patch';
 import { editTool } from '../tools/core/edit';
 import { execTool } from '../tools/core/bash';
@@ -50,6 +51,7 @@ export function builtinTools(
 	interactionMode: AgentInteractionMode = 'default'
 ): Tool[] {
 	return [
+		delegateA2aTool,
 		readTool,
 		...(interactionMode === 'plan' ? [requestUserInputTool] : []),
 		writeTool,

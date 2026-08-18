@@ -1,4 +1,5 @@
 import { AgentIpc } from '../agent';
+import { A2aIpc } from '../a2a';
 import { AppIpc } from '../app';
 import { RecorderIpc } from '../recorder';
 import { TaskIpc } from '../tasks';
@@ -48,6 +49,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
+	safeRegister('a2a', () => new A2aIpc().register(undefined, eventBus));
 	safeRegister('agent', () =>
 		new AgentIpc().register(
 			{ logger, agent: agentService, conversation: conversationService },

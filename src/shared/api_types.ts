@@ -107,6 +107,7 @@ import type { WorkspaceAsset } from './workspace';
 import type { ExtensionStoreValue } from './extension_store_types';
 import type { SandboxStatus } from './sandbox';
 export type { DataApi } from './data_types';
+export type { A2aApi } from './a2a_types';
 
 export interface WindowApi {
 	minimize: () => void;
