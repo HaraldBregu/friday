@@ -4,15 +4,16 @@ import { requireSchedule } from './tasks_require_schedule';
 import { runner } from './tasks_module_state';
 import { unscheduleJob } from './tasks_unschedule_job';
 import { trigger } from './tasks_trigger';
+import type { TaskScheduledTask } from './tasks_types';
 
-export function fire(scheduleId: string): void {
+export function fire(scheduleId: string): TaskScheduledTask | undefined {
 	if (!exists(scheduleId)) {
 		console.warn(
 			'[Task]',
 			`Orphaned tasks job removed: schedule ${scheduleId} no longer exists.`
 		);
 		unscheduleJob(scheduleId);
-		return;
+		return undefined;
 	}
 	const schedule = requireSchedule(scheduleId);
 	if (schedule.action.type === 'debug') {
@@ -36,5 +37,5 @@ export function fire(scheduleId: string): void {
 			);
 		}
 	}
-	trigger(scheduleId);
+	return trigger(scheduleId);
 }
