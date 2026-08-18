@@ -183,6 +183,7 @@ export interface AgentApi {
 export interface TaskApi {
 	list: () => Promise<TaskSchedule[]>;
 	runNow: (scheduleId: string) => Promise<TaskScheduledTask>;
+	delete: (scheduleId: string) => Promise<void>;
 	getRuntime: () => Promise<TaskRuntime | undefined>;
 	setRuntime: (providerId: string, modelId: string) => Promise<TaskRuntime>;
 	configureCapabilities: (
