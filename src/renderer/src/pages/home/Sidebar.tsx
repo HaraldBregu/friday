@@ -6,7 +6,6 @@ import {
 	SPLIT_ITEM_ACTIVE_CLASS,
 	SPLIT_ITEM_CLASS,
 } from '@/components/app/base/page';
-import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -151,6 +150,17 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 												data-active={isActive ? '' : undefined}
 												aria-current={isActive ? 'page' : undefined}
 												className={cn(SPLIT_ITEM_CLASS, 'min-w-0 flex-1', isActive && SPLIT_ITEM_ACTIVE_CLASS)}
+												data-run-status={session.runStatus}
+												style={
+													session.runStatus
+														? {
+															backgroundImage:
+																'linear-gradient(110deg, transparent 20%, color-mix(in oklch, var(--sidebar-foreground) 12%, transparent) 45%, transparent 70%)',
+															backgroundSize: '250% 100%',
+															animation: 'text-shimmer 2s linear infinite',
+														}
+														: undefined
+												}
 												onClick={() => setSessionId(session.id)}
 												onContextMenu={(event) => {
 													event.preventDefault();
@@ -173,13 +183,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 														});
 												}}
 											>
-												{session.runStatus ? (
-												<TextShimmer className="truncate" duration={2} data-run-status={session.runStatus}>
-													{title}
-												</TextShimmer>
-											) : (
 												<span className="truncate">{title}</span>
-											)}
 											</button>
 										)}
 									</li>

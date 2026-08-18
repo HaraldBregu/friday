@@ -78,7 +78,8 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	const latest = within(navigation).getByRole('button', { name: 'Latest chat' });
 	const older = within(navigation).getByRole('button', { name: 'Older chat' });
 	expect(latest).toHaveAttribute('aria-current', 'page');
-	expect(within(latest).getByText('Latest chat')).toHaveAttribute('data-run-status', 'running');
+	expect(latest).toHaveAttribute('data-run-status', 'running');
+	expect(within(latest).getByText('Latest chat')).toHaveClass('truncate');
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
