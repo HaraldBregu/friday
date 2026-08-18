@@ -31,6 +31,7 @@ it('generates the run id before send and reuses it for Stop', async () => {
 			send,
 			cancel,
 			getLastMessages: jest.fn().mockResolvedValue([]),
+			getSessionSnapshot: jest.fn().mockResolvedValue({ messages: [] }),
 		},
 	});
 
