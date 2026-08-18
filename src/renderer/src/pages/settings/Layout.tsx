@@ -8,7 +8,7 @@ export function Layout(): React.JSX.Element {
 		<PageContainer className="bg-muted/20">
 			<Split sidebar={<SettingsSidebar />}>
 				<div data-slot="settings-workspace" className="min-h-0 flex-1 overflow-y-auto">
-					<div className="py-6">
+					<div className="pb-6">
 						<Outlet />
 					</div>
 				</div>
