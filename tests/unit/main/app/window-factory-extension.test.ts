@@ -11,11 +11,17 @@ it('registers an extension view before loading and removes it when destroyed', a
 		once: jest.fn((event: string, handler: () => void) => handlers.set(event, handler)),
 		setWindowOpenHandler: jest.fn(),
 	};
-	(WebContentsView as unknown as jest.Mock).mockImplementation(() => ({ webContents: contents }));
+	const createView = WebContentsView as unknown as jest.Mock;
+	createView.mockImplementation(() => ({ webContents: contents }));
 	const registry = new ExtensionRegistry();
 	const factory = new WindowFactory(undefined, registry);
 
 	const extension = factory.createView('/extension/index.html', 'draw');
+	expect(createView).toHaveBeenCalledWith(
+		expect.objectContaining({
+			webPreferences: expect.objectContaining({ partition: 'persist:friday-extension-draw' }),
+		})
+	);
 	expect(registry.resolve(contents)).toBe('draw');
 	expect(contents.loadFile).not.toHaveBeenCalled();
 
