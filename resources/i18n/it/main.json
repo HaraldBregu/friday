@@ -639,6 +639,7 @@
 				"pause": "Pausa",
 				"resume": "Riprendi",
 				"run": "Esegui ora",
+				"running": "Esecuzione...",
 				"remove": "Elimina",
 				"removeLabel": "Elimina attivita programmata {{id}}",
 				"removeJobLabel": "Elimina job cron registrato {{id}}",
