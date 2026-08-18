@@ -143,15 +143,6 @@ const TaskDetailsPage: React.FC = () => {
 				}
 			/>
 
-			<div className="flex justify-end gap-2">
-				<Button size="sm" disabled={running || deleting} onClick={() => void runNow()}>
-					{running ? t('settings.cron.actions.running') : t('settings.cron.actions.run')}
-				</Button>
-				<Button variant="destructive" size="sm" disabled={running || deleting} onClick={() => void deleteTask()}>
-					{deleting ? t('settings.cron.actions.removing') : t('settings.cron.actions.remove')}
-				</Button>
-			</div>
-
 			{error && <SettingsNotice variant="destructive" icon={AlertTriangle}>{error}</SettingsNotice>}
 
 			<SettingsSection title={t('settings.cron.detailsTitle')}>
@@ -222,6 +213,15 @@ const TaskDetailsPage: React.FC = () => {
 					</Card>
 				</SettingsSection>
 			)}
+
+			<div className="flex justify-end gap-2">
+				<Button size="sm" disabled={running || deleting} onClick={() => void runNow()}>
+					{running ? t('settings.cron.actions.running') : t('settings.cron.actions.run')}
+				</Button>
+				<Button variant="destructive" size="sm" disabled={running || deleting} onClick={() => void deleteTask()}>
+					{deleting ? t('settings.cron.actions.removing') : t('settings.cron.actions.remove')}
+				</Button>
+			</div>
 		</SettingsPageShell>
 	);
 };
