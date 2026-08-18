@@ -11,7 +11,9 @@ export async function saveA2aAgent(input: A2aAgentInput): Promise<A2aAgent> {
 		id: existing?.id ?? randomUUID(),
 		name: input.name.trim() || card.name,
 		url: input.url.trim().replace(/\/$/, ''),
-		...(input.token?.trim() ? { token: input.token.trim() } : {}),
+		...(input.token?.trim() || existing?.token
+			? { token: input.token?.trim() || existing?.token }
+			: {}),
 		enabled: input.enabled ?? existing?.enabled ?? true,
 		cardName: card.name,
 		description: card.description,
