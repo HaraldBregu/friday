@@ -710,7 +710,9 @@ function PageContent(): ReactElement {
 			<Split
 				sidebar={
 					<HomeSidebar
-					refreshKey={`${chatSessionId}:${visibleMessages.length}:${agent.isLoading}`}
+						refreshKey={`${chatSessionId}:${visibleMessages.length}:${agent.isLoading}`}
+						onVoiceStart={() => void startVoiceConversation()}
+						voiceDisabled={voiceBusy || agent.isLoading || voiceMode !== null}
 					/>
 				}
 			>

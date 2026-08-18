@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { MessageSquare, Plus, Settings2 } from 'lucide-react';
+import { AudioLines, CircleHelp, MessageSquare, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -7,6 +7,7 @@ import {
 	SPLIT_ITEM_CLASS,
 } from '@/components/app/base/page';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
 import type { AgentSessionSummary } from '@/lib/compat';
@@ -14,11 +15,19 @@ import { cn } from '@/lib/utils';
 
 interface HomeSidebarProps {
 	readonly refreshKey: string;
+	readonly onVoiceStart: () => void;
+	readonly voiceDisabled: boolean;
 }
 
-export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
+export function HomeSidebar({
+	refreshKey,
+	onVoiceStart,
+	voiceDisabled,
+}: HomeSidebarProps): ReactElement {
 	const { t } = useTranslation();
 	const { sessionId, setSessionId } = useChatSession();
+	const userName = window.app.getUserName();
+	const userInitials = userName.trim().slice(0, 2).toLocaleUpperCase() || 'FR';
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -126,17 +135,40 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 					</nav>
 				)}
 			</section>
-			<footer className="border-t border-sidebar-border/50 p-2">
-				<nav aria-label={t('settings.title')}>
-					<ul>
-						<li>
-							<Link to="/settings" className={SPLIT_ITEM_CLASS}>
-								<Settings2 className="size-4 shrink-0" strokeWidth={1.8} />
-								<span>{t('settings.title')}</span>
-							</Link>
-						</li>
-					</ul>
-				</nav>
+			<footer className="shrink-0 border-t border-sidebar-border/50 p-2">
+				<div className="flex min-w-0 items-center gap-1">
+					<Link
+						to="/settings"
+						aria-label={t('settings.title')}
+						title={userName}
+						className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+					>
+						<Avatar className="size-8" aria-hidden="true">
+							<AvatarFallback className="bg-orange-600 text-xs font-medium text-white">
+								{userInitials}
+							</AvatarFallback>
+						</Avatar>
+						<span className="min-w-0 truncate text-sm font-medium">{userName}</span>
+					</Link>
+					<button
+						type="button"
+						disabled={voiceDisabled}
+						onClick={onVoiceStart}
+						className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2 text-sm text-sidebar-foreground/70 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:pointer-events-none disabled:opacity-50"
+					>
+						<AudioLines className="size-4" strokeWidth={1.8} aria-hidden="true" />
+						<span>{t('settings.modelServices.voiceName')}</span>
+					</button>
+					<button
+						type="button"
+						aria-label={t('menu.helpAndSupport')}
+						title={t('menu.helpAndSupport')}
+						onClick={() => void window.app.openExternalUrl(__APP_HOMEPAGE__)}
+						className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-sidebar-accent text-sidebar-foreground/70 outline-none transition-colors hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+					>
+						<CircleHelp className="size-4" strokeWidth={1.8} aria-hidden="true" />
+					</button>
+				</div>
 			</footer>
 		</div>
 	);

@@ -39,11 +39,19 @@ beforeEach(() => {
 		configurable: true,
 		value: { listSessions },
 	});
+	Object.defineProperty(window, 'app', {
+		configurable: true,
+		value: {
+			getUserName: jest.fn(() => 'haraldbregu'),
+			openExternalUrl: jest.fn().mockResolvedValue(undefined),
+		},
+	});
 });
 
 it('loads chat history, marks the latest default session, and switches sessions', async () => {
 	const user = userEvent.setup();
 	const setSessionId = jest.fn();
+	const onVoiceStart = jest.fn();
 	listSessions.mockResolvedValue([
 		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 },
 		{ id: 'session-older', title: 'Older chat', createdAtMs: 1 },
@@ -53,7 +61,11 @@ it('loads chat history, marks the latest default session, and switches sessions'
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
 				<PageContainer>
-					<HomeSidebar refreshKey="initial" />
+					<HomeSidebar
+						refreshKey="initial"
+						onVoiceStart={onVoiceStart}
+						voiceDisabled={false}
+					/>
 				</PageContainer>
 			</ChatSessionContext.Provider>
 		</MemoryRouter>
@@ -72,6 +84,11 @@ it('loads chat history, marks the latest default session, and switches sessions'
 		'href',
 		'/settings'
 	);
+	expect(screen.getByText('haraldbregu')).toBeInTheDocument();
+	expect(screen.getByText('HA')).toBeInTheDocument();
+
+	await user.click(screen.getByRole('button', { name: 'settings.modelServices.voiceName' }));
+	expect(onVoiceStart).toHaveBeenCalledTimes(1);
 });
 
 it('starts a new chat from the sidebar', async () => {
@@ -87,7 +104,7 @@ it('starts a new chat from the sidebar', async () => {
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId }}>
 				<PageContainer>
-					<HomeSidebar refreshKey="initial" />
+					<HomeSidebar refreshKey="initial" onVoiceStart={jest.fn()} voiceDisabled={false} />
 				</PageContainer>
 			</ChatSessionContext.Provider>
 		</MemoryRouter>
@@ -106,7 +123,7 @@ it('shows an empty state when there is no chat history', async () => {
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
 				<PageContainer>
-					<HomeSidebar refreshKey="initial" />
+					<HomeSidebar refreshKey="initial" onVoiceStart={jest.fn()} voiceDisabled={false} />
 				</PageContainer>
 			</ChatSessionContext.Provider>
 		</MemoryRouter>
@@ -123,7 +140,15 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
 				<PageContainer>
-					<Split sidebar={<HomeSidebar refreshKey="initial" />}>
+					<Split
+						sidebar={
+							<HomeSidebar
+								refreshKey="initial"
+								onVoiceStart={jest.fn()}
+								voiceDisabled={false}
+							/>
+						}
+					>
 						<div>Workspace</div>
 					</Split>
 				</PageContainer>

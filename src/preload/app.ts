@@ -1,4 +1,5 @@
 import { webUtils } from 'electron';
+import { userInfo } from 'node:os';
 import { typedInvokeUnwrap, typedOn } from '../shared/ipc_types';
 import { AppChannels } from '../shared/ipc_channels_definitions';
 import type { AppApi } from './index.d';
@@ -8,6 +9,7 @@ import { optionalTrimmedString } from './normalize';
 import type { ExtensionStoreValue } from '../shared/extension_store_types';
 
 export const app: AppApi = {
+	getUserName: () => userInfo().username,
 	getExtensionStoreValue: <T extends ExtensionStoreValue = ExtensionStoreValue>(
 		key: string
 	): Promise<T | undefined> => {
