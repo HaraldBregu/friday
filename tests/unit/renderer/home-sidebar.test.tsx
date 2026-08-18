@@ -14,6 +14,9 @@ jest.mock('react-i18next', () => ({
 }));
 
 const listSessions = jest.fn();
+const renameSession = jest.fn();
+const deleteSession = jest.fn();
+const showContextMenu = jest.fn();
 
 beforeEach(() => {
 	window.localStorage.clear();
@@ -37,7 +40,11 @@ beforeEach(() => {
 	});
 	Object.defineProperty(window, 'agent', {
 		configurable: true,
-		value: { listSessions },
+		value: { listSessions, renameSession, deleteSession },
+	});
+	Object.defineProperty(window, 'win', {
+		configurable: true,
+		value: { showContextMenu },
 	});
 	Object.defineProperty(window, 'app', {
 		configurable: true,
@@ -82,6 +89,37 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	expect(
 		screen.queryByRole('button', { name: 'settings.modelServices.voiceName' })
 	).not.toBeInTheDocument();
+});
+
+it('renames a chat from its context menu without item action buttons', async () => {
+	const user = userEvent.setup();
+	listSessions.mockResolvedValue([
+		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 },
+	]);
+	showContextMenu.mockResolvedValue('rename');
+	renameSession.mockResolvedValue(undefined);
+
+	render(
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'session-latest', setSessionId: jest.fn() }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
+	);
+
+	const chat = await screen.findByRole('button', { name: 'Latest chat' });
+	expect(screen.queryByRole('button', { name: 'Rename Latest chat' })).not.toBeInTheDocument();
+	fireEvent.contextMenu(chat);
+	expect(showContextMenu).toHaveBeenCalledWith([
+		{ id: 'rename', label: 'common.rename' },
+		{ id: 'delete', label: 'common.delete' },
+	]);
+	const input = await screen.findByRole('textbox', { name: 'Rename Latest chat' });
+	await user.clear(input);
+	await user.type(input, 'Named chat{Enter}');
+	await waitFor(() => expect(renameSession).toHaveBeenCalledWith('session-latest', 'Named chat'));
 });
 
 it('starts a new chat from the sidebar', async () => {
