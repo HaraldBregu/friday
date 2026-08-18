@@ -4,6 +4,7 @@ import {
 	configureScheduleCapabilities,
 	getRuntime,
 	listSchedules,
+	runScheduleNow,
 	setRuntime,
 } from '../tasks';
 import { registerCommand, registerQuery } from './core/gateway';
@@ -14,6 +15,10 @@ export class TaskIpc implements IpcModule {
 
 	register(_deps: void, _eventBus: EventBus): void {
 		registerQuery(TaskChannels.list, () => listSchedules());
+		registerCommand(TaskChannels.runNow, (scheduleId: string) => {
+			if (typeof scheduleId !== 'string') throw new Error('Invalid task schedule id.');
+			return runScheduleNow(scheduleId);
+		});
 		registerQuery(TaskChannels.getRuntime, () => getRuntime());
 		registerCommand(TaskChannels.setRuntime, (providerId: string, modelId: string) => {
 			return setRuntime(providerId, modelId);
