@@ -34,6 +34,7 @@ export interface TaskSchedule {
 	cronExpression?: string;
 	enabled: boolean;
 	action: TaskAction;
+	sessionIds: string[];
 	createdAt: string;
 	updatedAt: string;
 }
