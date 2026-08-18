@@ -221,6 +221,10 @@ export interface RecorderEventChannelMap {
 
 export interface TaskInvokeChannelMap {
 	[TaskChannels.list]: { args: []; result: import('../main/tasks').TaskSchedule[] };
+	[TaskChannels.runNow]: {
+		args: [scheduleId: string];
+		result: import('../main/tasks').TaskScheduledTask;
+	};
 	[TaskChannels.getRuntime]: {
 		args: [];
 		result: import('../main/tasks').TaskRuntime | undefined;
