@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, ListChecks } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ type Task = Awaited<ReturnType<typeof window.tasks.list>>[number];
 
 const TaskDetailsPage: React.FC = () => {
 	const { t } = useTranslation();
+	const navigate = useNavigate();
 	const { taskId } = useParams<{ taskId: string }>();
 	const decodedTaskId = decodeURIComponent(taskId ?? '');
 	const [task, setTask] = useState<Task | null>(null);
@@ -29,6 +30,7 @@ const TaskDetailsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [running, setRunning] = useState(false);
+	const [deleting, setDeleting] = useState(false);
 	const [toolsAllow, setToolsAllow] = useState('');
 
 	useEffect(() => {
@@ -98,6 +100,18 @@ const TaskDetailsPage: React.FC = () => {
 			setRunning(false);
 		}
 	};
+	const deleteTask = async (): Promise<void> => {
+		if (!window.confirm(t('settings.cron.actions.confirmRemove', { id: task.id }))) return;
+		setDeleting(true);
+		setError(null);
+		try {
+			await window.tasks.delete(task.id);
+			navigate('/settings/tasks');
+		} catch (caught) {
+			setError(caught instanceof Error ? caught.message : String(caught));
+			setDeleting(false);
+		}
+	};
 	const saveCapabilities = async (): Promise<void> => {
 		if (task.action.type !== 'agent') return;
 		setSaving(true);
@@ -123,16 +137,20 @@ const TaskDetailsPage: React.FC = () => {
 				title={task.name}
 				description={task.description ?? t('settings.cron.detail.noDescription')}
 				action={
-					<div className="flex items-center gap-2">
-						<Button size="sm" disabled={running} onClick={() => void runNow()}>
-							{running ? t('settings.cron.actions.running') : t('settings.cron.actions.run')}
-						</Button>
-						<Badge variant={task.enabled ? 'default' : 'secondary'}>
-							{task.enabled ? t('settings.cron.enabled') : t('settings.cron.disabled')}
-						</Badge>
-					</div>
+					<Badge variant={task.enabled ? 'default' : 'secondary'}>
+						{task.enabled ? t('settings.cron.enabled') : t('settings.cron.disabled')}
+					</Badge>
 				}
 			/>
+
+			<div className="flex justify-end gap-2">
+				<Button size="sm" disabled={running || deleting} onClick={() => void runNow()}>
+					{running ? t('settings.cron.actions.running') : t('settings.cron.actions.run')}
+				</Button>
+				<Button variant="destructive" size="sm" disabled={running || deleting} onClick={() => void deleteTask()}>
+					{deleting ? t('settings.cron.actions.removing') : t('settings.cron.actions.remove')}
+				</Button>
+			</div>
 
 			{error && <SettingsNotice variant="destructive" icon={AlertTriangle}>{error}</SettingsNotice>}
 
