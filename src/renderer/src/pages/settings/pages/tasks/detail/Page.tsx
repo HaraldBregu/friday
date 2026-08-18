@@ -177,6 +177,19 @@ const TaskDetailsPage: React.FC = () => {
 
 			{task.action.type === 'agent' && (
 				<SettingsSection
+					title={t('settings.cron.detail.promptInput')}
+					description={t('settings.cron.detail.promptInputDescription')}
+				>
+					<Card size="sm" className="p-3!">
+						<pre className="whitespace-pre-wrap break-words font-sans text-xs leading-5 text-foreground">
+							{task.action.prompt}
+						</pre>
+					</Card>
+				</SettingsSection>
+			)}
+
+			{task.action.type === 'agent' && (
+				<SettingsSection
 					title={t('settings.cron.detail.capabilities')}
 					description={t('settings.cron.detail.capabilitiesDescription')}
 				>
