@@ -233,7 +233,7 @@ describe('provider manifest validation', () => {
 				}));
 		});
 
-		expect(promptModels).toHaveLength(39);
+		expect(promptModels).toHaveLength(40);
 		for (const { providerId, service } of promptModels) {
 			expect(service.metadata.promptAttachments).toEqual(
 				expectedPromptAttachments(providerId, service.id)

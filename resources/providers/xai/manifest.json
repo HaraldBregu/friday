@@ -51,6 +51,50 @@
 			}
 		},
 		{
+			"id": "grok-4.6",
+			"name": "Grok 4.6",
+			"type": "large-language-model",
+			"url": "https://api.x.ai/v1",
+			"metadata": {
+				"promptAttachments": [
+					{
+						"kind": "image",
+						"mimeTypes": ["image/jpeg", "image/png", "image/webp"],
+						"extensions": [".jpg", ".jpeg", ".png", ".webp"]
+					}
+				],
+				"documentationUrl": "https://docs.x.ai/developers/models/grok-4.6",
+				"documentationStatus": "verified",
+				"inputs": {
+					"reasoning_effort": {
+						"type": "string",
+						"enum": ["none", "low", "medium", "high"]
+					},
+					"temperature": {
+						"type": "number"
+					},
+					"top_p": {
+						"type": "number"
+					},
+					"max_tokens": {
+						"type": "integer"
+					},
+					"stop": {
+						"type": "array"
+					},
+					"response_format": {
+						"type": "object"
+					},
+					"tools": {
+						"type": "array"
+					},
+					"tool_choice": {
+						"type": "object"
+					}
+				}
+			}
+		},
+		{
 			"id": "grok-build-0.1",
 			"name": "Grok Build 0.1",
 			"type": "large-language-model",
@@ -200,6 +244,36 @@
 			"url": "https://api.x.ai/v1",
 			"metadata": {
 				"documentationUrl": "https://docs.x.ai/developers/models",
+				"documentationStatus": "verified",
+				"inputs": {
+					"n": {
+						"type": "integer",
+						"maximum": 10
+					},
+					"aspect_ratio": {
+						"type": "string"
+					},
+					"resolution": {
+						"type": "string"
+					},
+					"response_format": {
+						"type": "string",
+						"default": "url",
+						"enum": ["url", "b64_json"]
+					},
+					"storage_options": {
+						"type": "object"
+					}
+				}
+			}
+		},
+		{
+			"id": "grok-imagine-image-2.0",
+			"name": "Grok Imagine Image 2.0",
+			"type": "text-to-image-model",
+			"url": "https://api.x.ai/v1",
+			"metadata": {
+				"documentationUrl": "https://docs.x.ai/developers/models/grok-imagine-image-2.0",
 				"documentationStatus": "verified",
 				"inputs": {
 					"n": {
