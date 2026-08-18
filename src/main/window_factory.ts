@@ -148,7 +148,12 @@ export class WindowFactory {
 	}
 
 	createView(file: string, extensionId: string): LoadableView {
-		const view = new WebContentsView({ webPreferences: this.getBaseWebPreferences() });
+		const view = new WebContentsView({
+			webPreferences: {
+				...this.getBaseWebPreferences(),
+				partition: `persist:friday-extension-${extensionId}`,
+			},
+		});
 		const viewContents = view.webContents;
 		this.extensionRegistry.register(viewContents, extensionId);
 		this.secureNavigation(viewContents, path.dirname(file));
