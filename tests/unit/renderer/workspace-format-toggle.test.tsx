@@ -4,12 +4,19 @@ import { FormatToggle } from '../../../extensions/workspace/src/components/forma
 
 jest.mock('../../../extensions/workspace/src/components/ui/toggle-group', () => {
 	const React = jest.requireActual<typeof import('react')>('react');
+	type ToggleGroupProps = {
+		'aria-label'?: string;
+		children: import('react').ReactElement<{ value: string }>;
+		onValueChange: (value: string) => void;
+		type: 'single';
+		value: string;
+	};
 
 	return {
-		ToggleGroup: ({ children, onValueChange, value, ...props }: any) =>
+		ToggleGroup: ({ children, onValueChange, value, ...props }: ToggleGroupProps) =>
 			React.createElement(
 				'div',
-				props,
+				{ 'aria-label': props['aria-label'] },
 				React.cloneElement(children, {
 					'data-state': value === children.props.value ? 'on' : 'off',
 					onClick: () => onValueChange(value ? '' : children.props.value),
@@ -19,7 +26,9 @@ jest.mock('../../../extensions/workspace/src/components/ui/toggle-group', () => 
 });
 
 jest.mock('../../../extensions/workspace/src/components/ui/toggle-item', () => ({
-	ToggleGroupItem: (props: any) => <button type="button" {...props} />,
+	ToggleGroupItem: (
+		props: import('react').ButtonHTMLAttributes<HTMLButtonElement> & { value: string }
+	) => <button type="button" {...props} />,
 }));
 
 it('toggles the formatted Markdown view on and off', async () => {
