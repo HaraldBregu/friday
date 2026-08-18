@@ -640,6 +640,7 @@
 				"pause": "Pause",
 				"resume": "Resume",
 				"run": "Run now",
+				"running": "Running...",
 				"remove": "Delete",
 				"removeLabel": "Delete scheduled task {{id}}",
 				"removeJobLabel": "Delete registered cron job {{id}}",
