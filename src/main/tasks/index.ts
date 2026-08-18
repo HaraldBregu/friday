@@ -1,4 +1,5 @@
 export { clone } from './tasks_clone';
+export { associateSession } from './tasks_associate_session';
 export { taskEvents } from './tasks_events';
 export { destroyTask } from './tasks_destroy';
 export { initTask } from './tasks_init';
