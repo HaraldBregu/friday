@@ -3,11 +3,11 @@ import type { ReactNode } from 'react';
 import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@friday/sdk';
 
 import { FileViewer } from '@/components/viewer';
+import { FileInformation } from '@/components/information';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { showNativeContextMenu } from '@/lib/menu';
-import { formatFileSize } from '@/lib/size';
 
 interface WorkspaceViewerProps {
 	content: string;
@@ -75,18 +75,6 @@ export function WorkspaceViewer({
 			</section>
 		);
 	}
-	const createdAt = file?.createdAt
-		? new Date(file.createdAt).toLocaleString(undefined, {
-				dateStyle: 'medium',
-				timeStyle: 'short',
-			})
-		: '';
-	const updatedAt = file?.updatedAt
-		? new Date(file.updatedAt).toLocaleString(undefined, {
-				dateStyle: 'medium',
-				timeStyle: 'short',
-			})
-		: '';
 	return (
 		<Tabs
 			value={kind === 'markdown' ? markdownMode : undefined}
@@ -202,19 +190,7 @@ export function WorkspaceViewer({
 					aria-label="File information"
 					className="flex min-h-8 shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t bg-muted/20 px-2 py-1 sm:px-3"
 				>
-					<div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-						{typeof file?.size === 'number' ? <span>{formatFileSize(file.size)}</span> : null}
-						{file?.createdAt ? (
-							<time dateTime={file.createdAt} title={createdAt}>
-								Created {createdAt}
-							</time>
-						) : null}
-						{file?.updatedAt ? (
-							<time dateTime={file.updatedAt} title={updatedAt}>
-								Updated {updatedAt}
-							</time>
-						) : null}
-					</div>
+					<FileInformation file={file} />
 					{kind === 'markdown' && !loading ? (
 						<TabsList className="ml-auto h-6 rounded-md p-0.5" aria-label="Markdown view mode">
 							<Tooltip>
