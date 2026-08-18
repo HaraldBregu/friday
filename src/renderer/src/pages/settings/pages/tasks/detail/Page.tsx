@@ -28,6 +28,7 @@ const TaskDetailsPage: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [running, setRunning] = useState(false);
 	const [toolsAllow, setToolsAllow] = useState('');
 
 	useEffect(() => {
@@ -86,6 +87,17 @@ const TaskDetailsPage: React.FC = () => {
 	const actionType = task.action.type === 'agent'
 		? t('settings.cron.detail.agent')
 		: t('settings.cron.detail.debug');
+	const runNow = async (): Promise<void> => {
+		setRunning(true);
+		setError(null);
+		try {
+			await window.tasks.runNow(task.id);
+		} catch (caught) {
+			setError(caught instanceof Error ? caught.message : String(caught));
+		} finally {
+			setRunning(false);
+		}
+	};
 	const saveCapabilities = async (): Promise<void> => {
 		if (task.action.type !== 'agent') return;
 		setSaving(true);
@@ -111,11 +123,18 @@ const TaskDetailsPage: React.FC = () => {
 				title={task.name}
 				description={task.description ?? t('settings.cron.detail.noDescription')}
 				action={
-					<Badge variant={task.enabled ? 'default' : 'secondary'}>
-						{task.enabled ? t('settings.cron.enabled') : t('settings.cron.disabled')}
-					</Badge>
+					<div className="flex items-center gap-2">
+						<Button size="sm" disabled={running} onClick={() => void runNow()}>
+							{running ? t('settings.cron.actions.running') : t('settings.cron.actions.run')}
+						</Button>
+						<Badge variant={task.enabled ? 'default' : 'secondary'}>
+							{task.enabled ? t('settings.cron.enabled') : t('settings.cron.disabled')}
+						</Badge>
+					</div>
 				}
 			/>
+
+			{error && <SettingsNotice variant="destructive" icon={AlertTriangle}>{error}</SettingsNotice>}
 
 			<SettingsSection title={t('settings.cron.detailsTitle')}>
 				<Card size="sm" className="gap-0! p-0!">
