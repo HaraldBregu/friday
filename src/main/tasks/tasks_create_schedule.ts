@@ -14,6 +14,7 @@ export function createSchedule(request: TaskScheduleCreateRequest): TaskSchedule
 		cronExpression: request.cronExpression?.trim().replace(/\s+/g, ' '),
 		enabled: request.enabled ?? true,
 		action: request.action,
+		sessionIds: [],
 		createdAt: nowIso,
 		updatedAt: nowIso,
 	};
