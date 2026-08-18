@@ -12,14 +12,14 @@ jest.mock('../../../extensions/workspace/src/components/ui/toggle-group', () => 
 				props,
 				React.cloneElement(children, {
 					'data-state': value === children.props.value ? 'on' : 'off',
-					onClick: () => onValueChange(value ? '' : children.props.value)
+					onClick: () => onValueChange(value ? '' : children.props.value),
 				})
-			)
+			),
 	};
 });
 
 jest.mock('../../../extensions/workspace/src/components/ui/toggle-item', () => ({
-	ToggleGroupItem: (props: any) => <button type="button" {...props} />
+	ToggleGroupItem: (props: any) => <button type="button" {...props} />,
 }));
 
 it('toggles the formatted Markdown view on and off', async () => {
