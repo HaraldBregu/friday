@@ -134,6 +134,20 @@ it('renders a transparent titlebar without visible title text', () => {
 	expect(titleBar).toHaveClass('bg-transparent');
 	expect(titleBar).not.toHaveClass('app-translucent-surface');
 	expect(within(titleBar as HTMLElement).queryByText('Application Name')).not.toBeInTheDocument();
+	expect(within(titleBar as HTMLElement).queryByText('Friday')).not.toBeInTheDocument();
+});
+
+it.each(['/start', '/settings'])('shows the Friday identity while viewing %s', (path) => {
+	const { container } = render(
+		<MemoryRouter initialEntries={[path]}>
+			<TitleBar />
+		</MemoryRouter>
+	);
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
+	const logo = within(titleBar as HTMLElement).getByRole('presentation');
+
+	expect(within(titleBar as HTMLElement).getByText('Friday')).toBeInTheDocument();
+	expect(logo).toHaveAttribute('src', 'test-file-stub');
 });
 
 it('does not render the sidebar toggle in the titlebar', () => {
