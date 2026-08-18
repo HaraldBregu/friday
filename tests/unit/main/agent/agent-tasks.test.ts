@@ -24,12 +24,20 @@ import type { ExecSandbox } from '../../../../src/main/agent/sandbox';
 import type { TaskRunner, TaskSchedule } from '../../../../src/main/tasks';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 
-it('gives scheduled agents the full tool catalog unless a non-empty restriction is saved', async () => {
+it('prevents scheduled agents from mutating tasks while honoring saved tool restrictions', async () => {
 	const sandbox = { reset: jest.fn() } as unknown as ExecSandbox;
 	const agent = new Agent({} as WindowFactory, sandbox);
 	const send = jest.spyOn(agent, 'send').mockResolvedValue('done');
 	agent.start({ info: jest.fn(), error: jest.fn() });
 	const runner = mockSetTaskRunner.mock.calls[0][0] as TaskRunner;
+	const toolsDeny = [
+		'create_task',
+		'update_task',
+		'pause_task',
+		'resume_task',
+		'delete_task',
+		'run_task_now',
+	];
 	const schedule = (toolsAllow?: string[]): TaskSchedule => ({
 		id: 'schedule-1',
 		name: 'Daily task',
@@ -49,6 +57,7 @@ it('gives scheduled agents the full tool catalog unless a non-empty restriction 
 			'tasks',
 			{
 				type: 'background',
+				toolsDeny,
 				streaming: false,
 				contextMode: 'minimal',
 				effort: 'low',
@@ -63,6 +72,7 @@ it('gives scheduled agents the full tool catalog unless a non-empty restriction 
 		{
 			type: 'background',
 			toolsAllow: ['read', 'bash'],
+			toolsDeny,
 			streaming: false,
 			contextMode: 'minimal',
 			effort: 'low',
