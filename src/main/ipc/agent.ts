@@ -67,6 +67,7 @@ import { deleteWorkspaceDirectory } from './directory';
 import { writeWorkspaceMarkdown } from './markdown';
 import { moveWorkspaceEntry } from './move';
 import { renameWorkspaceEntry } from './rename';
+import { readWorkspaceTree } from './tree';
 import { resolveWorkspaceFile } from './workspace';
 import { respondUserInput } from '../agent/user_input/user_input_pending';
 
@@ -186,31 +187,6 @@ function toPublicProvider(providerId: string): PublicProvider | undefined {
 
 function normalizeHealthSettingsPatch(value: Partial<HealthSettings>): Partial<HealthSettings> {
 	return { ...value };
-}
-
-async function readWorkspaceTree(root: string, directory = root): Promise<WorkspaceTreeEntry[]> {
-	const entries = await fs.readdir(directory, { withFileTypes: true });
-	const result: WorkspaceTreeEntry[] = [];
-
-	for (const entry of entries) {
-		const absolutePath = path.join(directory, entry.name);
-		const relativePath = path.relative(root, absolutePath) || entry.name;
-		if (entry.isDirectory()) {
-			result.push({
-				name: entry.name,
-				path: relativePath,
-				type: 'directory',
-				children: await readWorkspaceTree(root, absolutePath),
-			});
-			continue;
-		}
-		if (entry.isFile()) result.push({ name: entry.name, path: relativePath, type: 'file' });
-	}
-
-	return result.sort((left, right) => {
-		if (left.type !== right.type) return left.type === 'directory' ? -1 : 1;
-		return left.name.localeCompare(right.name);
-	});
 }
 
 export function normalizeAgentSendRuntimeOptions(options: unknown): AgentRunOptions {

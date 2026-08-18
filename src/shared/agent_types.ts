@@ -134,6 +134,9 @@ export interface WorkspaceTreeEntry {
 	path: string;
 	type: 'file' | 'directory';
 	children?: WorkspaceTreeEntry[];
+	size?: number;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface AgentTokenUsage {

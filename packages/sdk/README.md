@@ -42,6 +42,9 @@ await friday.agent.deleteWorkspaceFile('old.md');
 await friday.agent.deleteWorkspaceDirectory('archive');
 ```
 
+File entries returned by `listWorkspaceFiles()` include their byte size and ISO creation and
+update timestamps. Directory entries contain their recursive `children` instead.
+
 Streaming callbacks (for `app` events) use the SSE stream opened on first use; call
 `friday.close()` when finished.
 

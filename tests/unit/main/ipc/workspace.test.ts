@@ -9,6 +9,7 @@ import { deleteWorkspaceDirectory } from '../../../../src/main/ipc/directory';
 import { writeWorkspaceMarkdown } from '../../../../src/main/ipc/markdown';
 import { moveWorkspaceEntry } from '../../../../src/main/ipc/move';
 import { renameWorkspaceEntry } from '../../../../src/main/ipc/rename';
+import { readWorkspaceTree } from '../../../../src/main/ipc/tree';
 import { resolveWorkspaceFile } from '../../../../src/main/ipc/workspace';
 import { workspaceFileType } from '../../../../src/shared/workspace';
 
@@ -52,6 +53,36 @@ describe('workspace files', () => {
 		await expect(resolveWorkspaceFile(root, '..notes.md')).resolves.toBe(
 			await fs.realpath(dottedFile)
 		);
+		await fs.rm(root, { recursive: true });
+	});
+
+	it('lists file size and creation and update dates', async () => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const directory = path.join(root, 'notes');
+		const file = path.join(directory, 'idea.md');
+		await fs.mkdir(directory);
+		await fs.writeFile(file, '# Idea');
+		const stats = await fs.stat(file);
+
+		await expect(readWorkspaceTree(root)).resolves.toEqual([
+			{
+				name: 'notes',
+				path: 'notes',
+				type: 'directory',
+				children: [
+					{
+						name: 'idea.md',
+						path: path.join('notes', 'idea.md'),
+						type: 'file',
+						size: 6,
+						createdAt: (
+							stats.birthtimeMs > 0 ? stats.birthtime : stats.mtime
+						).toISOString(),
+						updatedAt: stats.mtime.toISOString(),
+					},
+				],
+			},
+		]);
 		await fs.rm(root, { recursive: true });
 	});
 

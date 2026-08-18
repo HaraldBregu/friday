@@ -1,17 +1,19 @@
 import { AlertCircle, Check, FileCode2, FileText, LoaderCircle, Save } from 'lucide-react';
 import type { ReactNode } from 'react';
-import type { WorkspaceFileKind } from '@friday/sdk';
+import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@friday/sdk';
 
 import { FileViewer } from '@/components/viewer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { showNativeContextMenu } from '@/lib/menu';
+import { formatFileSize } from '@/lib/size';
 
 interface WorkspaceViewerProps {
 	content: string;
 	dirty: boolean;
 	error: string;
+	file: WorkspaceTreeEntry | null;
 	kind: WorkspaceFileKind | null;
 	loading: boolean;
 	mediaUrl: string;
@@ -30,6 +32,7 @@ export function WorkspaceViewer({
 	content,
 	dirty,
 	error,
+	file,
 	kind,
 	loading,
 	mediaUrl,
@@ -72,6 +75,18 @@ export function WorkspaceViewer({
 			</section>
 		);
 	}
+	const createdAt = file?.createdAt
+		? new Date(file.createdAt).toLocaleString(undefined, {
+				dateStyle: 'medium',
+				timeStyle: 'short',
+			})
+		: '';
+	const updatedAt = file?.updatedAt
+		? new Date(file.updatedAt).toLocaleString(undefined, {
+				dateStyle: 'medium',
+				timeStyle: 'short',
+			})
+		: '';
 	return (
 		<Tabs
 			value={kind === 'markdown' ? markdownMode : undefined}
@@ -183,9 +198,25 @@ export function WorkspaceViewer({
 						)}
 				</div>
 
-				{kind === 'markdown' && !loading ? (
-					<footer className="flex h-8 shrink-0 items-center justify-end border-t bg-muted/20 px-2 sm:px-3">
-						<TabsList className="h-6 rounded-md p-0.5" aria-label="Markdown view mode">
+				<footer
+					aria-label="File information"
+					className="flex min-h-8 shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t bg-muted/20 px-2 py-1 sm:px-3"
+				>
+					<div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+						{typeof file?.size === 'number' ? <span>{formatFileSize(file.size)}</span> : null}
+						{file?.createdAt ? (
+							<time dateTime={file.createdAt} title={createdAt}>
+								Created {createdAt}
+							</time>
+						) : null}
+						{file?.updatedAt ? (
+							<time dateTime={file.updatedAt} title={updatedAt}>
+								Updated {updatedAt}
+							</time>
+						) : null}
+					</div>
+					{kind === 'markdown' && !loading ? (
+						<TabsList className="ml-auto h-6 rounded-md p-0.5" aria-label="Markdown view mode">
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<TabsTrigger value="source" className="h-5 w-6 p-0" aria-label="Source view">
@@ -203,8 +234,8 @@ export function WorkspaceViewer({
 								<TooltipContent side="top">Preview</TooltipContent>
 							</Tooltip>
 						</TabsList>
-					</footer>
-				) : null}
+					) : null}
+				</footer>
 			</section>
 		</Tabs>
 	);

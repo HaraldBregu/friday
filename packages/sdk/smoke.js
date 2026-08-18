@@ -11,6 +11,14 @@ assert.throws(() => win.showContextMenu, /unavailable/);
 
 const extensionValues = new Map();
 const extensionFiles = new Map();
+const workspaceFile = {
+	name: 'USER.md',
+	path: 'USER.md',
+	type: 'file',
+	size: 128,
+	createdAt: '2026-08-17T10:00:00.000Z',
+	updatedAt: '2026-08-18T10:00:00.000Z',
+};
 globalThis.app = {
 	getExtensionStoreValue: async (key) => extensionValues.get(key),
 	setExtensionStoreValue: async (key, value) => extensionValues.set(key, value),
@@ -35,7 +43,7 @@ globalThis.app = {
 };
 globalThis.agent = {
 	getWorkspaceLocation: async () => '/tmp/friday-workspace',
-	listWorkspaceFiles: async () => [{ name: 'USER.md', path: 'USER.md', type: 'file' }],
+	listWorkspaceFiles: async () => [workspaceFile],
 	readWorkspaceFile: async (filePath) => `content:${filePath}`,
 	readWorkspaceAsset: async () => ({ mimeType: 'image/png', data: new Uint8Array([1, 2, 3]) }),
 	writeWorkspaceMarkdown: async () => undefined,
@@ -76,9 +84,7 @@ assert.deepEqual(await app.readExtensionStoreFile('assets/data.bin'), new Uint8A
 await app.deleteExtensionStoreFile('assets/data.bin');
 await assert.rejects(app.readExtensionStoreFile('assets/data.bin'), /not found/);
 assert.equal(await agent.getWorkspaceLocation(), '/tmp/friday-workspace');
-assert.deepEqual(await agent.listWorkspaceFiles(), [
-	{ name: 'USER.md', path: 'USER.md', type: 'file' },
-]);
+assert.deepEqual(await agent.listWorkspaceFiles(), [workspaceFile]);
 assert.equal(await agent.readWorkspaceFile('USER.md'), 'content:USER.md');
 assert.deepEqual(await agent.readWorkspaceAsset('photo.png'), {
 	mimeType: 'image/png',
@@ -124,7 +130,7 @@ const server = createServer(async (req, res) => {
 				channel === 'agent:workspace:location:get'
 					? '/tmp/friday-workspace'
 					: channel === 'agent:workspace:files:list'
-						? [{ name: 'USER.md', path: 'USER.md', type: 'file' }]
+						? [workspaceFile]
 						: channel === 'agent:workspace:file:read'
 							? `content:${args[0]}`
 							: channel === 'agent:workspace:asset:read'
@@ -141,9 +147,7 @@ assert.deepEqual(await friday.ping(), { name: 'friday', version: '1.0.0' });
 assert.throws(() => friday.app.getExtensionStoreValue, /not available over the API/);
 await friday.app.getThemeData();
 assert.equal(await friday.agent.getWorkspaceLocation(), '/tmp/friday-workspace');
-assert.deepEqual(await friday.agent.listWorkspaceFiles(), [
-	{ name: 'USER.md', path: 'USER.md', type: 'file' },
-]);
+assert.deepEqual(await friday.agent.listWorkspaceFiles(), [workspaceFile]);
 assert.equal(await friday.agent.readWorkspaceFile('USER.md'), 'content:USER.md');
 assert.deepEqual(await friday.agent.readWorkspaceAsset('photo.png'), {
 	mimeType: 'image/png',

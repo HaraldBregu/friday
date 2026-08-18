@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
 
 import {
 	agent,
@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { showNativeContextMenu } from '@/lib/menu';
+import { findWorkspaceEntry } from '@/lib/find';
 import { removeWorkspaceEntry } from '@/lib/remove';
 import { rebaseWorkspacePath } from '@/lib/rebase';
 import { isWorkspacePathWithin } from '@/lib/within';
@@ -86,6 +87,10 @@ export default function App() {
 	const deletingScopeRef = useRef<string | null>(null);
 	const selectionRequestRef = useRef(0);
 	const selectedDirty = selectedKind === 'markdown' && selectedContent !== selectedSavedContent;
+	const selectedWorkspaceEntry = useMemo(
+		() => findWorkspaceEntry(workspaceFiles, selectedWorkspacePath),
+		[workspaceFiles, selectedWorkspacePath]
+	);
 	useEffect(() => {
 		if (!isFriday()) return;
 
@@ -622,6 +627,7 @@ export default function App() {
 						content={selectedContent}
 						dirty={selectedDirty}
 						error={selectedError}
+						file={selectedWorkspaceEntry?.type === 'file' ? selectedWorkspaceEntry : null}
 						kind={selectedKind}
 						loading={selectedLoading}
 						markdownMode={markdownMode}
