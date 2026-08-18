@@ -12,6 +12,8 @@ jest.mock('@/components/ui/gradient-sphere', () => ({
 	GradientSphere: (): null => null,
 }));
 
+jest.mock('@resources/icons/icon.png', () => 'test-file-stub');
+
 const showContextMenu = jest.fn();
 const contextMenuItems = [
 	{ id: '/settings/general', label: 'settings.tabs.general' },
