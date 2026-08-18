@@ -44,6 +44,7 @@ import type {
 	AgentRunOptions,
 	AgentResponseEvent,
 	AgentSessionSummary,
+	AgentSessionSnapshot,
 	AgentToolPermissionDecision,
 	AgentToolPermissionScope,
 	AgentUserInputAnswer,
@@ -140,6 +141,7 @@ export interface AgentApi {
 	listSessions: () => Promise<AgentSessionSummary[]>;
 	renameSession: (sessionId: string, title: string) => Promise<void>;
 	getLastMessages: (sessionId: string) => Promise<AgentHistoryMessage[]>;
+	getSessionSnapshot: (sessionId: string) => Promise<AgentSessionSnapshot>;
 	editUserMessage: (
 		sessionId: string,
 		userOffsetFromEnd: number,

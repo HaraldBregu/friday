@@ -8,6 +8,7 @@ export const AgentChannels = {
 	listSessions: 'agent:list-sessions',
 	renameSession: 'agent:rename-session',
 	lastMessages: 'agent:last-messages',
+	sessionSnapshot: 'agent:session-snapshot',
 	editUserMessage: 'agent:edit-user-message',
 	clearMessages: 'agent:clear-messages',
 	deleteSession: 'agent:delete-session',

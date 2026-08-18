@@ -337,6 +337,13 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		);
 
 		ipcMain.handle(
+			AgentChannels.sessionSnapshot,
+			wrapSimpleHandler((sessionId: unknown) => {
+				return agent.getSessionSnapshot(requireUuidSessionId(sessionId));
+			}, AgentChannels.sessionSnapshot)
+		);
+
+		ipcMain.handle(
 			AgentChannels.editUserMessage,
 			wrapSimpleHandler(
 				(sessionId: unknown, userOffsetFromEnd: unknown, content: unknown): Promise<boolean> => {
