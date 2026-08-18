@@ -834,9 +834,7 @@ export default function App() {
 							<Button
 								type="submit"
 								disabled={
-									renaming ||
-									!renameName.trim() ||
-									renameName.trim() === renameTarget?.name
+									renaming || !renameName.trim() || renameName.trim() === renameTarget?.name
 								}
 							>
 								{renaming

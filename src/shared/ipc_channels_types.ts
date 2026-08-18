@@ -225,6 +225,7 @@ export interface TaskInvokeChannelMap {
 		args: [scheduleId: string];
 		result: import('../main/tasks').TaskScheduledTask;
 	};
+	[TaskChannels.delete]: { args: [scheduleId: string]; result: void };
 	[TaskChannels.getRuntime]: {
 		args: [];
 		result: import('../main/tasks').TaskRuntime | undefined;

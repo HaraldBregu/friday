@@ -75,9 +75,7 @@ describe('workspace files', () => {
 						path: path.join('notes', 'idea.md'),
 						type: 'file',
 						size: 6,
-						createdAt: (
-							stats.birthtimeMs > 0 ? stats.birthtime : stats.mtime
-						).toISOString(),
+						createdAt: (stats.birthtimeMs > 0 ? stats.birthtime : stats.mtime).toISOString(),
 						updatedAt: stats.mtime.toISOString(),
 					},
 				],
@@ -211,9 +209,7 @@ describe('workspace files', () => {
 		await expect(renameWorkspaceEntry(root, 'folder/note.md', 'idea.md')).resolves.toBe(
 			'folder/idea.md'
 		);
-		await expect(fs.readFile(path.join(root, 'folder', 'idea.md'), 'utf8')).resolves.toBe(
-			'# Note'
-		);
+		await expect(fs.readFile(path.join(root, 'folder', 'idea.md'), 'utf8')).resolves.toBe('# Note');
 		await expect(renameWorkspaceEntry(root, 'folder/idea.md', 'Idea.md')).resolves.toBe(
 			'folder/Idea.md'
 		);

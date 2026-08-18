@@ -105,8 +105,8 @@ export function WorkspaceViewer({
 							...(kind === 'markdown'
 								? [
 										{
-										id: markdownMode === 'source' ? 'show-preview' : 'show-source',
-										label: markdownMode === 'source' ? 'Show Preview' : 'Show Source',
+											id: markdownMode === 'source' ? 'show-preview' : 'show-source',
+											label: markdownMode === 'source' ? 'Show Preview' : 'Show Source',
 										} as const,
 										{ type: 'separator' } as const,
 									]
@@ -195,7 +195,7 @@ export function WorkspaceViewer({
 							path={path}
 							url={mediaUrl}
 						/>
-						)}
+					)}
 				</div>
 
 				<footer
