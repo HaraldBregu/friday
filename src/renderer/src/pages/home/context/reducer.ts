@@ -99,6 +99,14 @@ function isTerminalRunState(state: AgentMessage['state']): boolean {
 	return state === 'completed' || state === 'cancelled' || state === 'error';
 }
 
+function settleRunningTools(tools: readonly AgentToolPart[]): AgentToolPart[] {
+	return tools.map((tool) =>
+		tool.state === 'input-streaming' || tool.state === 'input-available'
+			? { ...tool, state: 'output-available' as const }
+			: tool
+	);
+}
+
 function applyResponseEvent(
 	state: AgentChatState,
 	event: AgentResponseEvent,
@@ -449,6 +457,7 @@ export function agentChatReducer(state: AgentChatState, action: AgentChatAction)
 					message.state === 'error' || message.state === 'cancelled' ? message.state : 'completed',
 				pendingPermission: undefined,
 				pendingUserInput: undefined,
+				tools: settleRunningTools(message.tools),
 				startedAtMs: message.startedAtMs ?? action.completedAtMs,
 				completedAtMs: action.completedAtMs ?? message.completedAtMs,
 			}));
