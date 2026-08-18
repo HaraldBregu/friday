@@ -179,6 +179,7 @@ export interface AgentSessionSummary {
 	id: string;
 	createdAtMs: number;
 	title: string;
+	runStatus?: 'queued' | 'running' | 'cancelling';
 }
 
 export interface AgentSessionSnapshot {

@@ -366,7 +366,19 @@ export class Agent {
 	}
 
 	listSessions(): AgentSessionSummary[] {
-		return listSessions(this.config.location);
+		const sessions = listSessions(this.config.location);
+		const byId = new Map(sessions.map((session) => [session.id, session]));
+		for (const record of this.runs.values()) {
+			if (record.request.category !== 'main') continue;
+			const stored = byId.get(record.request.sessionId);
+			byId.set(record.request.sessionId, {
+				id: record.request.sessionId,
+				createdAtMs: stored?.createdAtMs ?? record.request.queuedAt,
+				title: stored?.title ?? record.request.message.slice(0, 80),
+				runStatus: record.lifecycle.status,
+			});
+		}
+		return [...byId.values()].sort((left, right) => right.createdAtMs - left.createdAtMs);
 	}
 
 	renameSession(sessionId: string, title: string): Promise<void> {
