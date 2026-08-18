@@ -292,7 +292,7 @@ export function CommandMenu({
 		};
 		window.addEventListener('keydown', handler);
 		return () => window.removeEventListener('keydown', handler);
-	}, [navigateTo, searchEnabled]);
+	}, [navigateTo, searchEnabled, setOpen]);
 
 	return (
 		<CommandDialog
