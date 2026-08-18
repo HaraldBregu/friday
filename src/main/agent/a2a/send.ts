@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { ClientFactory } from '@a2a-js/sdk/client';
 import type { Message, Task } from '@a2a-js/sdk';
 import { discoverA2aAgent } from './discover';
 import { getA2aAgents } from './store';
 import { a2aText } from './text';
 
 export async function sendA2aMessage(agentId: string, prompt: string, signal?: AbortSignal): Promise<string> {
+	const { ClientFactory } = await import('@a2a-js/sdk/client');
 	const remote = getA2aAgents().find(
 		(agent) => (agent.id === agentId || agent.name === agentId) && agent.enabled
 	);

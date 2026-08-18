@@ -1,7 +1,7 @@
-import { DefaultAgentCardResolver } from '@a2a-js/sdk/client';
 import type { AgentCard } from '@a2a-js/sdk';
 
 export async function discoverA2aAgent(url: string, token?: string): Promise<AgentCard> {
+	const { DefaultAgentCardResolver } = await import('@a2a-js/sdk/client');
 	const base = url.trim().replace(/\/$/, '');
 	if (!base) throw new Error('A2A agent URL is required.');
 	if (!token?.trim()) return new DefaultAgentCardResolver().resolve(base);
