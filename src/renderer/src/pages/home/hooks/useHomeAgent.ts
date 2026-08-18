@@ -161,29 +161,37 @@ export function useHomeAgent({ setMode }: { readonly setMode: (mode: ChatMode) =
 					...(inputFiles.length > 0 ? { files: inputFiles } : {}),
 				};
 				let response = '';
+				let resolvedSessionId = sessionId;
 				const onEvent = (event: AgentResponseEvent): void => {
-					if (requestIdRef.current !== requestId || event.agentId !== HOME_AGENT_ID) return;
-					if (event.type === 'run_started' && event.sessionId !== sessionId) {
-						migrateInteractionMode(event.sessionId);
-						resolvedSessionRef.current = { requestId, sessionId: event.sessionId };
+					if (event.agentId !== HOME_AGENT_ID) return;
+					if (event.type === 'run_started') {
+						resolvedSessionId = event.sessionId;
+						if (event.sessionId !== sessionId) {
+							migrateInteractionMode(event.sessionId);
+							resolvedSessionRef.current = { requestId, sessionId: event.sessionId };
+						}
 					}
 					if (event.type === 'text_delta') response += event.delta;
-					dispatchChat({ type: 'apply_response_event', event, receivedAtMs: Date.now() });
+					if (currentSessionIdRef.current === resolvedSessionId) {
+						dispatchChat({ type: 'apply_response_event', event, receivedAtMs: Date.now() });
+					}
 				};
 				response = await agent.send(trimmed, runtimeOptions, onEvent);
-				if (requestIdRef.current !== requestId) return false;
-				activeRunIdRef.current = undefined;
+				if (activeRunIdRef.current === runId) activeRunIdRef.current = undefined;
 				requestActiveRef.current = false;
-				setIsLoading(false);
-				dispatchChat({ type: 'complete_active', response, completedAtMs: Date.now() });
+				if (currentSessionIdRef.current === resolvedSessionId) {
+					setIsLoading(false);
+					dispatchChat({ type: 'complete_active', response, completedAtMs: Date.now() });
+				}
 				return true;
 			} catch (error) {
-				if (requestIdRef.current !== requestId) return false;
-				activeRunIdRef.current = undefined;
+				if (activeRunIdRef.current === runId) activeRunIdRef.current = undefined;
 				requestActiveRef.current = false;
-				setIsLoading(false);
-				const message = error instanceof Error ? error.message : 'Agent request failed.';
-				dispatchChat({ type: 'error_active', errorText: message, completedAtMs: Date.now() });
+				if (currentSessionIdRef.current === sessionId) {
+					setIsLoading(false);
+					const message = error instanceof Error ? error.message : 'Agent request failed.';
+					dispatchChat({ type: 'error_active', errorText: message, completedAtMs: Date.now() });
+				}
 				return false;
 			} finally {
 				const resolved = resolvedSessionRef.current;
@@ -268,7 +276,6 @@ export function useHomeAgent({ setMode }: { readonly setMode: (mode: ChatMode) =
 		const agent = getAgentApi();
 		if (!agent) return;
 
-		requestIdRef.current += 1;
 		resolvedSessionRef.current = undefined;
 		requestActiveRef.current = false;
 		localInteractionRef.current = false;
@@ -278,10 +285,26 @@ export function useHomeAgent({ setMode }: { readonly setMode: (mode: ChatMode) =
 			setHistoryLoading(true);
 		});
 		agent
-			.getLastMessages(sessionId)
-			.then((history) => {
+			.getSessionSnapshot(sessionId)
+			.then((snapshot) => {
 				if (cancelled || localInteractionRef.current) return;
-				dispatchChat({ type: 'restore_history', history });
+				dispatchChat({ type: 'restore_history', history: snapshot.messages });
+				const active = snapshot.activeRun;
+				if (!active) return;
+				activeRunIdRef.current = active.runId;
+				setIsLoading(true);
+				if (active.status === 'queued') {
+					dispatchChat({
+						type: 'submit_user_message',
+						userMessageId: messageId('user'),
+						agentMessageId: messageId('agent'),
+						content: active.message,
+						submittedAtMs: Date.now(),
+					});
+				}
+				for (const event of active.events) {
+					dispatchChat({ type: 'apply_response_event', event, receivedAtMs: Date.now() });
+				}
 			})
 			.catch(() => undefined)
 			.finally(() => {
@@ -291,11 +314,6 @@ export function useHomeAgent({ setMode }: { readonly setMode: (mode: ChatMode) =
 		return () => {
 			cancelled = true;
 			resolvedSessionRef.current = undefined;
-			const runId = activeRunIdRef.current;
-			if (runId)
-				void getAgentApi()
-					?.cancel(runId)
-					.catch(() => undefined);
 		};
 	}, [dispatchChat, sessionId]);
 
