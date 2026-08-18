@@ -14,7 +14,11 @@ export async function sendA2aMessage(agentId: string, prompt: string, signal?: A
 	const request = {
 		tenant: '',
 		message: { messageId: randomUUID(), contextId: '', taskId: '', role: 1, parts: [{ content: { $case: 'text' as const, value: prompt }, metadata: undefined, filename: '', mediaType: 'text/plain' }], metadata: undefined, extensions: [], referenceTaskIds: [] },
-		configuration: { acceptedOutputModes: ['text/plain'], blocking: true },
+		configuration: {
+			acceptedOutputModes: ['text/plain'],
+			taskPushNotificationConfig: undefined,
+			returnImmediately: false,
+		},
 		metadata: undefined,
 	};
 	const options = { signal, ...(remote.token ? { serviceParameters: { authorization: `Bearer ${remote.token}` } } : {}) };
