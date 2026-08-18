@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { CircleHelp, MessageSquare, Pencil, Plus, Settings2 } from 'lucide-react';
+import { CircleHelp, MessageSquare, Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -111,7 +111,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 								const title = session.title.trim() || t('settings.chatHistory.untitled');
 								const isActive = session.id === currentSessionId;
 								return (
-									<li key={session.id} className="group flex min-w-0 items-center gap-1">
+									<li key={session.id} className="flex min-w-0 items-center">
 										{editingSessionId === session.id ? (
 											<Input
 												autoFocus
@@ -141,30 +141,36 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 												className="h-8 min-w-0 flex-1"
 											/>
 										) : (
-											<>
-												<button
-													type="button"
-													data-active={isActive ? '' : undefined}
-													aria-current={isActive ? 'page' : undefined}
-													className={cn(SPLIT_ITEM_CLASS, 'min-w-0 flex-1', isActive && SPLIT_ITEM_ACTIVE_CLASS)}
-													onClick={() => setSessionId(session.id)}
-												>
-													<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
-													<span className="truncate">{title}</span>
-												</button>
-												<button
-													type="button"
-													aria-label={`Rename ${title}`}
-													title="Rename chat"
-													className="flex size-8 shrink-0 items-center justify-center rounded-lg opacity-0 hover:bg-sidebar-accent focus-visible:opacity-100 group-hover:opacity-100"
-													onClick={() => {
-														setEditingTitle(title);
-														setEditingSessionId(session.id);
-													}}
-												>
-													<Pencil className="size-3.5" />
-												</button>
-											</>
+											<button
+												type="button"
+												data-active={isActive ? '' : undefined}
+												aria-current={isActive ? 'page' : undefined}
+												className={cn(SPLIT_ITEM_CLASS, 'min-w-0 flex-1', isActive && SPLIT_ITEM_ACTIVE_CLASS)}
+												onClick={() => setSessionId(session.id)}
+												onContextMenu={(event) => {
+													event.preventDefault();
+													void window.win
+														.showContextMenu([
+															{ id: 'rename', label: t('common.rename', 'Rename') },
+															{ id: 'delete', label: t('common.delete', 'Delete') },
+														])
+														.then((action) => {
+															if (action === 'rename') {
+																setEditingTitle(title);
+																setEditingSessionId(session.id);
+															}
+															if (action === 'delete') {
+																void window.agent.deleteSession(session.id).then(() => {
+																	setSessions((current) => current.filter((item) => item.id !== session.id));
+																	if (isActive) setSessionId(crypto.randomUUID());
+																});
+															}
+														});
+												}}
+											>
+												<MessageSquare className="size-4 shrink-0" strokeWidth={1.8} />
+												<span className="truncate">{title}</span>
+											</button>
 										)}
 									</li>
 								);
