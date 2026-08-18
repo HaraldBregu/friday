@@ -21,7 +21,14 @@ import { applyGoalCommand } from './goal/apply';
 import { parseGoalCommand } from './goal/parse';
 import { stream } from './runner/run_stream';
 import { agentLocation } from '../shared/agent_location';
-import { destroyTask, getRuntime, initTask, setTaskRunner, startTask } from '../tasks';
+import {
+	associateSession,
+	destroyTask,
+	getRuntime,
+	initTask,
+	setTaskRunner,
+	startTask,
+} from '../tasks';
 import { startHealth, stopHealth } from './health';
 import { rejectPendingToolPermissions } from './permissions';
 import { interruptPendingUserInput } from './user_input/user_input_pending';
@@ -120,8 +127,11 @@ export class Agent {
 			if (schedule.action.type !== 'agent') return Promise.resolve('');
 			const runtime = getRuntime();
 			const toolsAllow = schedule.action.toolsAllow;
+			const sessionId = randomUUID();
+			associateSession(schedule.id, sessionId);
 			return this.send(schedule.action.prompt, 'tasks', {
 				type: 'background',
+				sessionId,
 				...(toolsAllow?.length ? { toolsAllow } : {}),
 				toolsDeny: SCHEDULED_TASK_TOOLS_DENY,
 				streaming: false,
