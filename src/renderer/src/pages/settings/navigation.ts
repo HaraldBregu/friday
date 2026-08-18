@@ -3,6 +3,7 @@ import {
 	BookOpenText,
 	Bot,
 	Blocks,
+	BotMessageSquare,
 	Cloud,
 	Database,
 	Folder,
@@ -427,6 +428,12 @@ export const SETTINGS_NAVIGATION: readonly SettingsNavigationItem[] = [
 		labelKey: 'settings.tabs.channels',
 		descriptionKey: 'settings.overview.descriptions.channels',
 		icon: RadioTower,
+	},
+	{
+		path: '/settings/a2a',
+		labelKey: 'settings.tabs.a2a',
+		descriptionKey: 'settings.overview.descriptions.a2a',
+		icon: BotMessageSquare,
 	},
 	{
 		path: '/settings/extensions',

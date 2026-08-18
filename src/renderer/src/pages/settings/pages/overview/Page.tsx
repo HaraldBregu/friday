@@ -48,7 +48,7 @@ const SETTINGS_OVERVIEW_GROUPS = [
 	},
 	{
 		id: 'integrations',
-		paths: ['/settings/extensions'],
+		paths: ['/settings/a2a', '/settings/extensions'],
 	},
 ] as const;
 
