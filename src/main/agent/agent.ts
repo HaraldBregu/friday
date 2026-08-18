@@ -69,6 +69,15 @@ const AGENT_CATEGORIES: Record<string, SessionCategory> = {
 	health: 'health',
 };
 
+const SCHEDULED_TASK_TOOLS_DENY = [
+	'create_task',
+	'update_task',
+	'pause_task',
+	'resume_task',
+	'delete_task',
+	'run_task_now',
+];
+
 type AgentSendBaseOptions = Omit<AgentRunOptions, 'toolsAllow'> & {
 	streaming?: boolean;
 	modelId?: string;
@@ -113,6 +122,7 @@ export class Agent {
 			return this.send(schedule.action.prompt, 'tasks', {
 				type: 'background',
 				...(toolsAllow?.length ? { toolsAllow } : {}),
+				toolsDeny: SCHEDULED_TASK_TOOLS_DENY,
 				streaming: false,
 				contextMode: 'minimal',
 				effort: schedule.action.effort,
