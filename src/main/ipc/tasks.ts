@@ -2,6 +2,7 @@ import type { EventBus } from '../event_bus';
 import { TaskChannels } from '../../shared/ipc_channels_definitions';
 import {
 	configureScheduleCapabilities,
+	deleteSchedule,
 	getRuntime,
 	listSchedules,
 	runScheduleNow,
@@ -18,6 +19,10 @@ export class TaskIpc implements IpcModule {
 		registerCommand(TaskChannels.runNow, (scheduleId: string) => {
 			if (typeof scheduleId !== 'string') throw new Error('Invalid task schedule id.');
 			return runScheduleNow(scheduleId);
+		});
+		registerCommand(TaskChannels.delete, (scheduleId: string) => {
+			if (typeof scheduleId !== 'string') throw new Error('Invalid task schedule id.');
+			return deleteSchedule(scheduleId);
 		});
 		registerQuery(TaskChannels.getRuntime, () => getRuntime());
 		registerCommand(TaskChannels.setRuntime, (providerId: string, modelId: string) => {
