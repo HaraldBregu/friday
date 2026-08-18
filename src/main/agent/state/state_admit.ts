@@ -8,6 +8,7 @@ export function admitRun<TOptions>(
 	const record: AgentRunRecord<TOptions> = {
 		request: Object.freeze({ ...request }),
 		controller: new AbortController(),
+		responseEvents: [],
 		lifecycle: { status: 'queued' },
 	};
 	registry.set(request.id, record);

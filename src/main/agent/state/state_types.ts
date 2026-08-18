@@ -1,4 +1,4 @@
-import type { AgentRunStopReason } from '../../../shared/agent_types';
+import type { AgentResponseEvent, AgentRunStopReason } from '../../../shared/agent_types';
 import type { SessionCategory, SessionResult, SessionState } from '../session';
 
 export interface AgentRunOutcome {
@@ -26,6 +26,7 @@ export type AgentRunLifecycle =
 export interface AgentRunRecord<TOptions = unknown> {
 	readonly request: Readonly<AgentRunRequest<TOptions>>;
 	readonly controller: AbortController;
+	readonly responseEvents: AgentResponseEvent[];
 	lifecycle: AgentRunLifecycle;
 	completion?: Promise<AgentRunOutcome>;
 }

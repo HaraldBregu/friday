@@ -37,6 +37,7 @@ import type { Config, Message, RuntimeEvent, RuntimeInput } from './types';
 import type {
 	AgentRunOptions,
 	AgentHistoryContentBlock,
+	AgentSessionSnapshot,
 	AgentHistoryMessage,
 	AgentPromptInputCapabilities,
 	AgentResponseEvent,
@@ -272,8 +273,8 @@ export class Agent {
 					response = reply;
 				} else {
 					addAssistantMessage(session, reply, []);
-				options.streamEvent?.({ type: 'text_delta', delta: reply, agentId: request.agentId, runId: request.id });
-				options.streamEvent?.({
+				this.emit(record, { type: 'text_delta', delta: reply, agentId: request.agentId, runId: request.id });
+				this.emit(record, {
 					type: 'run_finished',
 					stopReason: 'end_turn',
 					outputChars: reply.length,
@@ -313,7 +314,7 @@ export class Agent {
 					request.id,
 					streamingToolArgs
 				)) {
-					options.streamEvent?.(responseEvent);
+					this.emit(record, responseEvent);
 				}
 			}
 			if (result && request.category === 'main' && session.folderName !== '') {
@@ -335,6 +336,33 @@ export class Agent {
 			const cause = toError(error, 'Agent request failed.');
 			throw cause;
 		}
+	}
+
+	private emit(
+		record: AgentRunRecord<InternalAgentSendOptions>,
+		event: AgentResponseEvent
+	): void {
+		record.responseEvents.push(event);
+		record.request.options.streamEvent?.(event);
+	}
+
+	getSessionSnapshot(sessionId: string): AgentSessionSnapshot {
+		const active = [...this.runs.values()].find(
+			(record) => record.request.category === 'main' && record.request.sessionId === sessionId
+		);
+		return {
+			messages: this.getLastMessages(sessionId),
+			...(active
+				? {
+						activeRun: {
+							runId: active.request.id,
+							message: active.request.message,
+							status: active.lifecycle.status,
+							events: [...active.responseEvents],
+						},
+					}
+				: {}),
+		};
 	}
 
 	listSessions(): AgentSessionSummary[] {
