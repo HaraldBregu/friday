@@ -7,6 +7,7 @@ import {
 	init,
 	listSessions,
 	loadMessages,
+	renameSession as renameStoredSession,
 	resolveSessionId,
 	resolveStoredSessionId,
 	tryAppendRun,
@@ -328,6 +329,14 @@ export class Agent {
 
 	listSessions(): AgentSessionSummary[] {
 		return listSessions(this.config.location);
+	}
+
+	renameSession(sessionId: string, title: string): Promise<void> {
+		return this.scheduler.run(
+			sessionId,
+			async () => renameStoredSession(sessionId, this.config.location, title),
+			{ priority: 'high' }
+		);
 	}
 
 	getLastMessages(sessionId: string): AgentHistoryMessage[] {

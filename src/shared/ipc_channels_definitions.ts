@@ -6,6 +6,7 @@ export const AgentChannels = {
 	respondUserInput: 'agent:respond-user-input',
 	getPromptInputCapabilities: 'agent:prompt-input-capabilities:get',
 	listSessions: 'agent:list-sessions',
+	renameSession: 'agent:rename-session',
 	lastMessages: 'agent:last-messages',
 	editUserMessage: 'agent:edit-user-message',
 	clearMessages: 'agent:clear-messages',

@@ -320,6 +320,16 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		);
 
 		ipcMain.handle(
+			AgentChannels.renameSession,
+			wrapSimpleHandler((sessionId: unknown, title: unknown): Promise<void> => {
+				const normalizedTitle = optionalTrimmedString(title);
+				if (!normalizedTitle || normalizedTitle.length > 120)
+					throw new Error('Chat title must be between 1 and 120 characters.');
+				return agent.renameSession(requireUuidSessionId(sessionId), normalizedTitle);
+			}, AgentChannels.renameSession)
+		);
+
+		ipcMain.handle(
 			AgentChannels.lastMessages,
 			wrapSimpleHandler((sessionId: unknown) => {
 				return agent.getLastMessages(requireUuidSessionId(sessionId));

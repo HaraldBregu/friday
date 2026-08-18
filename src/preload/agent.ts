@@ -120,6 +120,14 @@ export const agent: AgentApi = {
 	listSessions: (): Promise<AgentSessionSummary[]> => {
 		return typedInvokeUnwrap(AgentChannels.listSessions);
 	},
+	renameSession: (sessionId: string, title: string): Promise<void> => {
+		const normalizedSessionId = optionalTrimmedString(sessionId);
+		const normalizedTitle = optionalTrimmedString(title);
+		if (!normalizedSessionId) throw new Error('Invalid assistant session id.');
+		if (!normalizedTitle || normalizedTitle.length > 120)
+			throw new Error('Chat title must be between 1 and 120 characters.');
+		return typedInvokeUnwrap(AgentChannels.renameSession, normalizedSessionId, normalizedTitle);
+	},
 	getLastMessages: (sessionId: string): Promise<AgentHistoryMessage[]> => {
 		const normalizedSessionId = optionalTrimmedString(sessionId);
 		if (!normalizedSessionId) throw new Error('Invalid assistant session id.');

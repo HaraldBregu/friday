@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import type { AgentSessionSummary } from '../../../shared/agent_types';
 import type { SessionCategory } from './session_types';
 import { DEFAULT_CATEGORY } from './session_types';
+import { infoFile } from './session_info_file';
 import { isUuid } from './session_is_uuid';
 import { loadMessagesBySessionId } from './session_load_messages_by_session_id';
 import { sessionPath } from './session_session_path';
@@ -9,6 +10,14 @@ import { sessionType } from './session_session_type';
 import { sessionsRoot } from './session_sessions_root';
 
 function sessionTitle(sessionId: string, location: string): string {
+	try {
+		const info = JSON.parse(
+			readFileSync(infoFile(sessionsRoot(location), sessionId), 'utf8')
+		) as { title?: unknown };
+		if (typeof info.title === 'string' && info.title.trim()) return info.title.trim();
+	} catch {
+		// Fall back to the first message for sessions without valid metadata.
+	}
 	const firstUserMessage = loadMessagesBySessionId(sessionId, location).find(
 		(message) => message.role === 'user'
 	);

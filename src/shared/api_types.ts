@@ -138,6 +138,7 @@ export interface AgentApi {
 	) => Promise<boolean>;
 	getPromptInputCapabilities: () => Promise<AgentPromptInputCapabilities | null>;
 	listSessions: () => Promise<AgentSessionSummary[]>;
+	renameSession: (sessionId: string, title: string) => Promise<void>;
 	getLastMessages: (sessionId: string) => Promise<AgentHistoryMessage[]>;
 	editUserMessage: (
 		sessionId: string,
