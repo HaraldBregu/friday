@@ -9,6 +9,9 @@ export const tasks: TaskApi = {
 	runNow: (scheduleId: string) => {
 		return typedInvokeUnwrap(TaskChannels.runNow, scheduleId);
 	},
+	delete: (scheduleId: string) => {
+		return typedInvokeUnwrap(TaskChannels.delete, scheduleId);
+	},
 	getRuntime: () => {
 		return typedInvokeUnwrap(TaskChannels.getRuntime);
 	},
