@@ -181,6 +181,16 @@ export interface AgentSessionSummary {
 	title: string;
 }
 
+export interface AgentSessionSnapshot {
+	messages: AgentHistoryMessage[];
+	activeRun?: {
+		runId: string;
+		message: string;
+		status: 'queued' | 'running' | 'cancelling';
+		events: AgentResponseEvent[];
+	};
+}
+
 export type AgentCapabilityServiceKind = 'tool' | 'connector' | 'mcp';
 
 export interface AgentToolCapabilitySummary {
