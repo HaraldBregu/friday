@@ -9,10 +9,11 @@ import type {
 import type {
 	StorageConfig,
 	StorageConfiguration,
-	StorageSyncSettings,
 } from '../shared/storage_types';
 import { userDataLocation } from './shared/user_data_location';
 import { DEFAULT_SYNC_CRON_EXPRESSION } from './storage/storage_sync_types';
+import { normalizeStorageConfig } from './storage/storage_config';
+import { normalizeStoragePaths } from './storage/storage_paths';
 import { loadStorages } from './models';
 import { migrateMcpStoreFromProviders } from './mcp/mcp_store_state';
 import type { PersistedTaskState } from './tasks/tasks_types';
@@ -283,14 +284,10 @@ export function getStorage(id: string): StorageConfig | undefined {
 }
 
 export function saveStorageConfig(config: StorageConfig): StorageConfig {
-	if (config.syncEnabled && !cron.validate(config.syncCronExpression)) {
-		throw new Error('Storage sync schedule must be a valid cron expression.');
-	}
+	const normalized = normalizeStorageConfig(config);
 	const saved = toStoredStorage({
-		...config,
-		id: config.id || crypto.randomUUID(),
-		paths: normalizeStoragePaths(config.paths),
-		syncCronExpression: config.syncCronExpression.trim().replace(/\s+/g, ' '),
+		...normalized,
+		id: normalized.id || crypto.randomUUID(),
 	});
 	const storages = getStoredStorages();
 	const index = storages.findIndex((storage) => storage.id === saved.id);
@@ -367,16 +364,6 @@ export function saveStorageConfiguration(
 	};
 	store.set('cloud', saved);
 	return saved;
-}
-
-function normalizeStoragePaths(paths: StorageSyncSettings['paths']): string[] {
-	return [
-		...new Set(
-			paths
-				.filter((entry) => typeof entry === 'string' && path.isAbsolute(entry))
-				.map((entry) => path.resolve(entry))
-		),
-	];
 }
 
 function getStoredStorages(): StoredStorage[] {

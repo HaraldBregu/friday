@@ -1,4 +1,5 @@
 import type { StorageConfig } from '../../shared/storage_types';
+import { withStorageLock } from './storage_lock';
 import { pushFiles } from './storage_push';
 import type { StorageSyncLogger } from './storage_sync_types';
 
@@ -17,7 +18,7 @@ export async function runProviderSync(
 	logger: StorageSyncLogger
 ): Promise<void> {
 	try {
-		const result = await pushFiles(storage.id);
+		const result = await withStorageLock(storage.id, () => pushFiles(storage.id));
 		const failedSuffix = result.failed.length ? `, ${result.failed.length} failed` : '';
 		logger.info(
 			'Storage',

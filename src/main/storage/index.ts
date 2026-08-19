@@ -19,3 +19,4 @@ export { isAutoSyncable, runProviderSync } from './storage_auto_sync';
 export { startStorageSync, stopStorageSync, rescheduleStorageSync } from './storage_sync_schedule';
 export { DEFAULT_SYNC_CRON_EXPRESSION, type StorageSyncLogger } from './storage_sync_types';
 export { testConnection } from './storage_test';
+export { withStorageLock } from './storage_lock';
