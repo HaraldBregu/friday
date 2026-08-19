@@ -13,9 +13,11 @@ jest.mock('react-i18next', () => ({
 				'settings.storage.description': 'Configure S3-compatible storage providers.',
 				'settings.storage.empty': 'No storage providers configured.',
 				'settings.storage.configureProvider': 'Configure storage provider',
+				'settings.storage.manageProviders': 'Manage providers',
 				'settings.storage.cardTitle': 'Object Storage',
 				'settings.storage.sync.description': 'Configure folder sync.',
 				'settings.storage.profile.label': 'Storage to use',
+				'settings.storage.profile.help': 'Choose the storage profile for this backup.',
 			})[key] ?? key,
 	}),
 }));
@@ -67,6 +69,9 @@ it('shows storage controls without the provider CTA when a provider exists', asy
 			secretAccessKey: 'secret',
 			bucket: 'friday',
 			forcePathStyle: false,
+			paths: [],
+			syncEnabled: false,
+			syncCronExpression: '0 3 * * *',
 		},
 	]);
 	storageApi.getStorageConfiguration.mockResolvedValue({
@@ -84,7 +89,7 @@ it('shows storage controls without the provider CTA when a provider exists', asy
 
 	expect(await screen.findByText('Object Storage')).toBeInTheDocument();
 	expect(screen.getByText('Storage to use')).toBeVisible();
-	expect(screen.queryByRole('button', { name: /Object Storage/ })).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Manage providers' })).toBeVisible();
 	expect(
 		screen.queryByRole('button', { name: 'Configure storage provider' })
 	).not.toBeInTheDocument();
