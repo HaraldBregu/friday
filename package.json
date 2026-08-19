@@ -78,6 +78,7 @@
 		"build": "cross-env NODE_ENV=production npm run typecheck && electron-vite build",
 		"build:mermaid": "npm ci --prefix extensions/mermaid && npm run build --prefix extensions/mermaid",
 		"build:tldraw": "npm ci --prefix extensions/tldraw && npm run build --prefix extensions/tldraw",
+		"build:demo": "npm run build --prefix extensions/demo",
 		"build:packages": "npm run build --workspaces --if-present",
 		"build:all": "npm run build && npm run build:packages",
 		"install:mermaid": "npm run install:friday --prefix extensions/mermaid",

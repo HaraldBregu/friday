@@ -33,7 +33,16 @@
 		"themeSet": "theme set to",
 		"languageSet": "language set to",
 		"themeChanged": "theme changed",
-		"loadFailed": "failed to load app data"
+		"loadFailed": "failed to load app data",
+		"storage": "Extension storage",
+		"storageValue": "Value lifecycle",
+		"storageFile": "File lifecycle",
+		"storageEmpty": "not tested",
+		"testStorageValue": "Test value storage",
+		"testStorageFile": "Test file storage",
+		"storageValuePassed": "Value set, read, and delete passed.",
+		"storageFilePassed": "File write, overwrite, read, and delete passed.",
+		"storageTestFailed": "Storage test failed"
 	},
 	"it": {
 		"title": "Demo IPC app Friday",
@@ -69,6 +78,15 @@
 		"themeSet": "tema impostato a",
 		"languageSet": "lingua impostata a",
 		"themeChanged": "tema cambiato",
-		"loadFailed": "caricamento dati app non riuscito"
+		"loadFailed": "caricamento dati app non riuscito",
+		"storage": "Archiviazione dell'estensione",
+		"storageValue": "Ciclo del valore",
+		"storageFile": "Ciclo del file",
+		"storageEmpty": "non testato",
+		"testStorageValue": "Testa valori",
+		"testStorageFile": "Testa file",
+		"storageValuePassed": "Impostazione, lettura ed eliminazione del valore riuscite.",
+		"storageFilePassed": "Scrittura, sovrascrittura, lettura ed eliminazione del file riuscite.",
+		"storageTestFailed": "Test di archiviazione non riuscito"
 	}
 }

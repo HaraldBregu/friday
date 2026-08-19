@@ -51,8 +51,9 @@ const fallbackColors: AppThemeColors = {
 };
 const fallbackTheme: AppThemeData = { themeMode: 'light', isDark: false, colors: fallbackColors };
 const fallbackLanguage: AppLanguage = 'en';
+type DemoStorageValue = { label: string; count: number };
 const demoStorageKey = 'demo';
-const demoStorageValue = 'demo';
+const demoStorageFile = 'demo/message.txt';
 const themeBadgeClass = cva('inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold', {
 	variants: {
 		variant: {
@@ -70,6 +71,8 @@ export default function App() {
 	const [language, setLanguage] = useState<AppLanguage>(fallbackLanguage);
 	const [status, setStatus] = useState(translations.en.waiting);
 	const [extensionStoreValue, setExtensionStoreValue] = useState('');
+	const [extensionFileValue, setExtensionFileValue] = useState('');
+	const [storageBusy, setStorageBusy] = useState(false);
 	const inFridayApp = isFriday();
 	const text = translations[language] ?? translations.en;
 	const themeStyle = Object.fromEntries(
@@ -144,16 +147,61 @@ export default function App() {
 		}
 	};
 
-	const setDemoExtensionStore = async () => {
+	const testExtensionValueStorage = async () => {
 		if (!ensureFridayApp()) return;
-		await app.setExtensionStoreValue(demoStorageKey, demoStorageValue);
-		setStatus('Set isolated extension store value.');
+		setStorageBusy(true);
+		try {
+			const expected: DemoStorageValue = { label: 'Friday demo', count: 1 };
+			await app.setExtensionStoreValue(demoStorageKey, expected);
+			const stored = await app.getExtensionStoreValue<DemoStorageValue>(demoStorageKey);
+			if (stored?.label !== expected.label || stored.count !== expected.count) {
+				throw new Error('Stored value did not round-trip.');
+			}
+			await app.deleteExtensionStoreValue(demoStorageKey);
+			if ((await app.getExtensionStoreValue(demoStorageKey)) !== undefined) {
+				throw new Error('Deleted value is still available.');
+			}
+			setExtensionStoreValue(JSON.stringify(stored));
+			setStatus(text.storageValuePassed);
+		} catch (error) {
+			setStatus(
+				`${text.storageTestFailed}: ${error instanceof Error ? error.message : String(error)}`
+			);
+		} finally {
+			setStorageBusy(false);
+		}
 	};
 
-	const getDemoExtensionStore = async () => {
+	const testExtensionFileStorage = async () => {
 		if (!ensureFridayApp()) return;
-		setExtensionStoreValue((await app.getExtensionStoreValue<string>(demoStorageKey)) ?? '');
-		setStatus('Got isolated extension store value.');
+		setStorageBusy(true);
+		try {
+			const encoder = new TextEncoder();
+			const decoder = new TextDecoder();
+			await app.writeExtensionStoreFile(demoStorageFile, encoder.encode('first'));
+			if (decoder.decode(await app.readExtensionStoreFile(demoStorageFile)) !== 'first') {
+				throw new Error('Stored file did not round-trip.');
+			}
+			await app.writeExtensionStoreFile(demoStorageFile, encoder.encode('overwritten'));
+			const stored = decoder.decode(await app.readExtensionStoreFile(demoStorageFile));
+			if (stored !== 'overwritten') throw new Error('Stored file was not overwritten.');
+			await app.deleteExtensionStoreFile(demoStorageFile);
+			let missingReadRejected = false;
+			try {
+				await app.readExtensionStoreFile(demoStorageFile);
+			} catch {
+				missingReadRejected = true;
+			}
+			if (!missingReadRejected) throw new Error('Deleted file is still available.');
+			setExtensionFileValue(stored);
+			setStatus(text.storageFilePassed);
+		} catch (error) {
+			setStatus(
+				`${text.storageTestFailed}: ${error instanceof Error ? error.message : String(error)}`
+			);
+		} finally {
+			setStorageBusy(false);
+		}
 	};
 
 	useEffect(() => {
@@ -185,8 +233,8 @@ export default function App() {
 	}, []);
 
 	return (
-		<main className={cn('app-demo', theme.isDark && 'dark')} style={themeStyle}>
-			<div className="flex h-full items-center justify-center p-8">
+		<main className={cn('app-demo overflow-y-auto', theme.isDark && 'dark')} style={themeStyle}>
+			<div className="flex min-h-full items-center justify-center p-8">
 				<div className="w-full max-w-md space-y-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
 					<p className="text-lg font-semibold">{text.title}</p>
 					<p className="text-sm text-muted-foreground">{inFridayApp ? text.connected : text.disconnected}</p>
@@ -226,14 +274,27 @@ export default function App() {
 						</div>
 					</div>
 					<div className="space-y-2">
-						<p className="text-sm font-semibold">Extension store</p>
-						<p className="text-sm">Value: {extensionStoreValue || 'empty'}</p>
+						<p className="text-sm font-semibold">{text.storage}</p>
+						<p className="break-all text-sm">
+							{text.storageValue}: {extensionStoreValue || text.storageEmpty}
+						</p>
+						<p className="break-all text-sm">
+							{text.storageFile}: {extensionFileValue || text.storageEmpty}
+						</p>
 						<div className="mt-2 flex flex-wrap gap-2">
-							<Button variant="outline" onClick={setDemoExtensionStore}>
-								Set demo
+							<Button
+								variant="outline"
+								disabled={storageBusy}
+								onClick={testExtensionValueStorage}
+							>
+								{text.testStorageValue}
 							</Button>
-							<Button variant="secondary" onClick={getDemoExtensionStore}>
-								Get demo
+							<Button
+								variant="secondary"
+								disabled={storageBusy}
+								onClick={testExtensionFileStorage}
+							>
+								{text.testStorageFile}
 							</Button>
 						</div>
 					</div>
