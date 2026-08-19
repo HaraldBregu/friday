@@ -8,7 +8,6 @@ import { storagePrefix } from './storage_prefix';
 import { getStorage } from './storage_store';
 import { storageTarget } from './storage_target';
 
-// ponytail: full replace mirror — downloads everything, deletes local extras; diff-only if bandwidth matters
 export async function pullFiles(id: string): Promise<StoragePullResult> {
 	const storage = getStorage(id);
 	if (!storage) throw new Error('Storage is not configured.');

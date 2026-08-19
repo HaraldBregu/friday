@@ -2,6 +2,9 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 export async function storageTarget(root: string, key: string, prefix: string): Promise<string> {
+	if (!key.startsWith(prefix)) {
+		throw new Error(`Storage object is outside the selected folder: ${key}`);
+	}
 	const relativeKey = key.slice(prefix.length);
 	const segments = relativeKey.split('/');
 	if (!relativeKey || segments.some((segment) => !segment || segment === '.' || segment === '..')) {

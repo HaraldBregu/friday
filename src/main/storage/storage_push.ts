@@ -7,7 +7,6 @@ import { storagePrefix } from './storage_prefix';
 import { getStorage } from './storage_store';
 import { walkFiles } from './storage_walk';
 
-// ponytail: full replace mirror — uploads everything, deletes remote extras; diff-only if bandwidth matters
 export async function pushFiles(id: string): Promise<StoragePushResult> {
 	const storage = getStorage(id);
 	if (!storage) throw new Error('Storage is not configured.');
