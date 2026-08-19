@@ -13,6 +13,10 @@ const storageApi = {
 };
 
 beforeEach(() => {
+	Object.defineProperty(window, 'PointerEvent', {
+		configurable: true,
+		value: MouseEvent,
+	});
 	Object.defineProperty(window, 'storage', { configurable: true, value: storageApi });
 });
 

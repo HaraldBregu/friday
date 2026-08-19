@@ -78,13 +78,13 @@ beforeAll(() => {
 		configurable: true,
 		value: () => 'storage-draft',
 	});
+});
+
+beforeEach(() => {
 	Object.defineProperty(window, 'PointerEvent', {
 		configurable: true,
 		value: MouseEvent,
 	});
-});
-
-beforeEach(() => {
 	Object.defineProperty(window, 'storage', { configurable: true, value: storageApi });
 	storageApi.getStorages.mockResolvedValue([]);
 	storageApi.syncFolders.mockResolvedValue([]);
@@ -144,7 +144,7 @@ it('saves folders and a custom schedule on the selected profile', async () => {
 
 	await user.click(await screen.findByRole('switch', { name: 'Agent' }));
 	await user.click(screen.getByRole('combobox', { name: 'Sync interval' }));
-	await user.click(screen.getByRole('option', { name: 'Every day' }));
+	await user.click(await screen.findByRole('option', { name: 'Every day' }));
 	await user.clear(screen.getByLabelText('Cron expression'));
 	await user.type(screen.getByLabelText('Cron expression'), '0 4 * * *');
 	await user.click(screen.getByRole('button', { name: 'Save schedule' }));
