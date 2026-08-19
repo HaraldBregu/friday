@@ -514,6 +514,7 @@ export class AppIpc implements IpcModule {
 			wrapSimpleHandler((enabled: boolean) => {
 				setStoredTrayEnabled(enabled);
 				eventBus.emit('tray:set-enabled', { enabled });
+				eventBus.broadcast(AppChannels.trayEnabledChanged, enabled);
 			}, AppChannels.setTrayEnabled)
 		);
 
@@ -529,6 +530,7 @@ export class AppIpc implements IpcModule {
 			wrapSimpleHandler((enabled: boolean) => {
 				setStoredKeepAwake(enabled);
 				applyKeepAwake(enabled);
+				eventBus.broadcast(AppChannels.keepAwakeChanged, enabled);
 			}, AppChannels.setKeepAwake)
 		);
 
