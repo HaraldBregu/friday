@@ -86,11 +86,17 @@ export const app: AppApi = {
 	getTrayEnabled: (): Promise<boolean> => {
 		return typedInvokeUnwrap(AppChannels.getTrayEnabled);
 	},
+	onTrayEnabledChanged: (callback: (enabled: boolean) => void): (() => void) => {
+		return typedOn(AppChannels.trayEnabledChanged, callback);
+	},
 	setKeepAwake: (enabled: boolean): Promise<void> => {
 		return typedInvokeUnwrap(AppChannels.setKeepAwake, enabled);
 	},
 	getKeepAwake: (): Promise<boolean> => {
 		return typedInvokeUnwrap(AppChannels.getKeepAwake);
+	},
+	onKeepAwakeChanged: (callback: (enabled: boolean) => void): (() => void) => {
+		return typedOn(AppChannels.keepAwakeChanged, callback);
 	},
 	setLanguage: (language) => {
 		return typedInvokeUnwrap(AppChannels.setLanguage, language);
