@@ -37,7 +37,8 @@ import { setupMemoryMonitor } from './shared/metrics';
 import { bootstrapServices, cleanup } from './bootstrap';
 import { startStorageSync, stopStorageSync } from './storage';
 import { startRagSchedule, stopRagSchedule } from './agent/knowledge/rag';
-import { AppChannels, CHANNEL_PROVIDER_IDS } from '../shared';
+import { CHANNEL_PROVIDER_IDS } from '../shared';
+import { AppChannels } from '../shared/ipc_channels_definitions';
 import { startWiki, stopWiki } from './agent/knowledge/wiki';
 
 // // DIAG: bump V8 old-space heap to confirm whether crashes (Chromium OOM,
