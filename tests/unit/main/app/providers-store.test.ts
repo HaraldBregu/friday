@@ -139,12 +139,24 @@ describe('storages in app settings', () => {
 
 	it('persists the selected storage and falls back after deletion', () => {
 		saveStorageConfig(storage('first'));
-		saveStorageConfig(storage('second'));
+		saveStorageConfig({
+			...storage('second'),
+			paths: ['/data/second'],
+			syncCronExpression: '0 4 * * *',
+		});
 		setSelectedStorageId('second');
 
 		expect(getSelectedStorageId()).toBe('second');
+		expect(getStorageConfiguration()).toMatchObject({
+			paths: ['/data/second'],
+			syncCronExpression: '0 4 * * *',
+		});
 		deleteStorageConfig('second');
 		expect(getSelectedStorageId()).toBe('first');
+		expect(getStorageConfiguration()).toMatchObject({
+			paths: ['/data/agent'],
+			syncCronExpression: '0 3 * * *',
+		});
 	});
 
 	it('rejects an invalid enabled cron schedule', () => {

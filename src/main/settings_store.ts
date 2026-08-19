@@ -310,7 +310,16 @@ export function deleteStorageConfig(id: string): void {
 	const storages = getStoredStorages().filter((storage) => storage.id !== id);
 	setStorageProvidersState(storages);
 	if (configuration.providerId === id) {
-		saveStorageConfiguration({ ...configuration, providerId: storages[0]?.id });
+		const next = storages[0]
+			? toStorageConfig(storages[0], DEFAULT_STORAGE_CONFIGURATION)
+			: undefined;
+		saveStorageConfiguration({
+			providerId: next?.id,
+			storageId: undefined,
+			paths: next?.paths ?? [],
+			syncEnabled: next?.syncEnabled ?? false,
+			syncCronExpression: next?.syncCronExpression ?? DEFAULT_SYNC_CRON_EXPRESSION,
+		});
 	}
 }
 
@@ -319,7 +328,15 @@ export function getSelectedStorageId(): string | undefined {
 }
 
 export function setSelectedStorageId(id: string): void {
-	saveStorageConfiguration({ ...getStorageConfiguration(), providerId: id });
+	const storage = getStorage(id);
+	if (!storage) throw new Error(`Storage not found: ${id}`);
+	saveStorageConfiguration({
+		providerId: storage.id,
+		storageId: undefined,
+		paths: storage.paths,
+		syncEnabled: storage.syncEnabled,
+		syncCronExpression: storage.syncCronExpression,
+	});
 }
 
 export function getStorageConfiguration(): StorageConfiguration {

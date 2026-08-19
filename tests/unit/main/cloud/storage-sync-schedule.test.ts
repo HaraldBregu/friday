@@ -70,6 +70,23 @@ describe('storage sync scheduling', () => {
 		expect(schedule).toHaveBeenCalledTimes(2);
 	});
 
+	it('schedules every enabled storage profile independently', () => {
+		getStorages.mockReturnValue([
+			storage,
+			{ ...storage, id: 'archive', name: 'Archive', syncCronExpression: '0 4 * * *' },
+		]);
+
+		startStorageSync(logger);
+
+		expect(schedule).toHaveBeenCalledTimes(2);
+		expect(schedule).toHaveBeenNthCalledWith(1, '0 3 * * *', expect.any(Function), {
+			noOverlap: true,
+		});
+		expect(schedule).toHaveBeenNthCalledWith(2, '0 4 * * *', expect.any(Function), {
+			noOverlap: true,
+		});
+	});
+
 	it('does not schedule an invalid cron expression', () => {
 		validate.mockReturnValue(false);
 		startStorageSync(logger);
