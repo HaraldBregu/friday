@@ -886,7 +886,10 @@
 					"title": "Write",
 					"description": "Paths the agent may create, edit, or delete."
 				},
-				"exec": { "title": "Execute", "description": "Folders where sandboxed commands may run and access files." }
+				"exec": {
+					"title": "Execute",
+					"description": "Folders where sandboxed commands may run and access files."
+				}
 			},
 			"reset": "Reset",
 			"saveFailed": "Could not save the permissions."

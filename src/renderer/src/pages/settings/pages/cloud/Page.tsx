@@ -15,7 +15,11 @@ const CloudPage: React.FC = () => {
 				title={t('settings.tabs.cloud')}
 				description={t('settings.overview.descriptions.cloud')}
 				action={
-					<Button variant="outline" size="sm" onClick={() => navigate('/settings/providers/storage')}>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => navigate('/settings/providers/storage')}
+					>
 						{t('settings.storage.manageProviders')}
 					</Button>
 				}

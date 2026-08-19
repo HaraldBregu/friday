@@ -446,11 +446,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 										title={t('settings.storage.autoSync.interval')}
 										description={t('settings.storage.autoSync.description')}
 										actions={
-											<Select
-												value={intervalValue}
-												onValueChange={selectInterval}
-												disabled={busy}
-											>
+											<Select value={intervalValue} onValueChange={selectInterval} disabled={busy}>
 												<SelectTrigger
 													size="sm"
 													className="w-56 max-w-full text-xs"
@@ -459,9 +455,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 													<SelectValue />
 												</SelectTrigger>
 												<SelectContent>
-													<SelectItem value="off">
-														{t('settings.storage.autoSync.off')}
-													</SelectItem>
+													<SelectItem value="off">{t('settings.storage.autoSync.off')}</SelectItem>
 													{SYNC_INTERVALS.map((interval) => (
 														<SelectItem key={interval.key} value={interval.key}>
 															{t(`settings.storage.autoSync.${interval.key}`)}

@@ -467,7 +467,7 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 			{!embedded && (
 				<SettingsPageHeader
 					title={t(section ? SECTION_HEADERS[section].titleKey : 'settings.tabs.providers')}
-						description={t(
+					description={t(
 						section
 							? SECTION_HEADERS[section].descriptionKey
 							: 'settings.overview.descriptions.providers'

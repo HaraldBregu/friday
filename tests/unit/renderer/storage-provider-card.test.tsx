@@ -48,10 +48,9 @@ it('uses the catalog provider icon for a built-in storage provider', () => {
 		/>
 	);
 
-	expect(Array.from(container.querySelectorAll('img')).map((image) => image.getAttribute('src'))).toEqual([
-		'local-resource://cloudflare-light.png',
-		'local-resource://cloudflare-dark.png',
-	]);
+	expect(
+		Array.from(container.querySelectorAll('img')).map((image) => image.getAttribute('src'))
+	).toEqual(['local-resource://cloudflare-light.png', 'local-resource://cloudflare-dark.png']);
 });
 
 it('tests the draft connection with S3 path-style settings', async () => {
@@ -110,9 +109,7 @@ it('confirms before removing a saved provider', async () => {
 
 	await user.click(screen.getByRole('button', { name: 'settings.storage.removeProvider' }));
 	expect(storageApi.deleteStorageConfig).not.toHaveBeenCalled();
-	expect(screen.getByRole('dialog')).toHaveTextContent(
-		'settings.storage.removeDialog.description'
-	);
+	expect(screen.getByRole('dialog')).toHaveTextContent('settings.storage.removeDialog.description');
 	await user.click(screen.getByRole('button', { name: 'settings.storage.removeDialog.confirm' }));
 
 	await waitFor(() => expect(storageApi.deleteStorageConfig).toHaveBeenCalledWith('backup'));

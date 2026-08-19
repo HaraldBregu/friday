@@ -885,7 +885,10 @@
 					"title": "Scrittura",
 					"description": "Percorsi che l'agente può creare, modificare o eliminare."
 				},
-				"exec": { "title": "Esecuzione", "description": "Cartelle in cui i comandi in sandbox possono essere eseguiti e accedere ai file." }
+				"exec": {
+					"title": "Esecuzione",
+					"description": "Cartelle in cui i comandi in sandbox possono essere eseguiti e accedere ai file."
+				}
 			},
 			"reset": "Ripristina",
 			"saveFailed": "Impossibile salvare i permessi."

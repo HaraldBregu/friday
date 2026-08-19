@@ -399,28 +399,24 @@ export function ProviderCard({
 					</CardContent>
 
 					{(editing || isConfigured(canonical)) && (
-							<CardFooter className="flex-wrap justify-end gap-2">
-								{editing && (
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => void test()}
-										disabled={testing || saving}
-									>
-										{testing && <Loader2 className="size-3 animate-spin" />}
-										{testing ? t('settings.storage.testing') : t('settings.storage.test')}
-									</Button>
-								)}
+						<CardFooter className="flex-wrap justify-end gap-2">
+							{editing && (
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => void test()}
+									disabled={testing || saving}
+								>
+									{testing && <Loader2 className="size-3 animate-spin" />}
+									{testing ? t('settings.storage.testing') : t('settings.storage.test')}
+								</Button>
+							)}
 							{canonical.id && (
 								<Button variant="ghost" size="sm" onClick={cancelEditing} disabled={saving}>
 									{t('settings.storage.cancel')}
 								</Button>
 							)}
-								<Button
-									size="sm"
-									onClick={() => void save()}
-									disabled={saving || testing}
-								>
+							<Button size="sm" onClick={() => void save()} disabled={saving || testing}>
 								{saving ? t('settings.storage.saving') : t('settings.storage.save')}
 							</Button>
 						</CardFooter>
@@ -432,9 +428,7 @@ export function ProviderCard({
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>{t('settings.storage.removeDialog.title')}</DialogTitle>
-						<DialogDescription>
-							{t('settings.storage.removeDialog.description')}
-						</DialogDescription>
+						<DialogDescription>{t('settings.storage.removeDialog.description')}</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
 						<Button variant="outline" onClick={() => setRemoveOpen(false)}>
