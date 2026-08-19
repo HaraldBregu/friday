@@ -13,7 +13,7 @@ describe('storageTarget', () => {
 		['an empty path segment', 'friday/v1/agent/notes//today.md'],
 	])('rejects %s', async (_name, key) => {
 		await expect(storageTarget('/data/friday', key, 'friday/v1/agent/')).rejects.toThrow(
-			/Storage object/
+			/[Ss]torage object/
 		);
 	});
 });
