@@ -45,6 +45,12 @@ const GeneralPage: React.FC = () => {
 	useEffect(() => {
 		void window.app.getTrayEnabled().then(setTrayEnabled);
 		void window.app.getKeepAwake().then(setKeepAwake);
+		const offTrayEnabled = window.app.onTrayEnabledChanged(setTrayEnabled);
+		const offKeepAwake = window.app.onKeepAwakeChanged(setKeepAwake);
+		return () => {
+			offTrayEnabled();
+			offKeepAwake();
+		};
 	}, []);
 
 	const handleTrayToggle = useCallback((checked: boolean) => {
