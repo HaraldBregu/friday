@@ -197,7 +197,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 	};
 
 	return (
-		<SettingsPageShell className={embedded || inline ? 'max-w-none p-0' : undefined}>
+		<SettingsPageShell className={embedded || inline ? 'max-w-none p-0 sm:p-0' : undefined}>
 			{!embedded && !inline && (
 				<SettingsPageHeader
 					title={t('settings.storage.configurationTitle')}
