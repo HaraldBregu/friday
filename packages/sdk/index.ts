@@ -1,5 +1,4 @@
 import type { AgentApi, AppApi, WindowApi } from '../../src/shared/api_types';
-import type { AppLanguage, AppTheme, AppThemeColors, AppThemeData } from '../../src/shared/app_types';
 
 export {
 	connect,
