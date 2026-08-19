@@ -3,7 +3,9 @@
 	"private": true,
 	"version": "1.0.0",
 	"description": "Minimal Friday app-data demo extension.",
-	"keywords": ["utility"],
+	"keywords": [
+		"utility"
+	],
 	"main": "dist/index.html",
 	"type": "module",
 	"scripts": {

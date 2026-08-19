@@ -14,7 +14,7 @@ import { Button } from './components/ui/button';
 import translations from './i18n.json';
 
 const fallbackColors: AppThemeColors = {
-	'radius': '0.625rem',
+	radius: '0.625rem',
 	'app-window-radius': '16px',
 	'app-bg-opacity': '1',
 	'app-surface-opacity': '1',
@@ -33,38 +33,41 @@ const fallbackColors: AppThemeColors = {
 		'color-mix(in oklch, var(--app-popover-background-base) calc(var(--app-popover-opacity) * 100%), transparent)',
 	'app-sidebar-background':
 		'color-mix(in oklch, var(--app-sidebar-background-base) calc(var(--app-sidebar-opacity) * 100%), transparent)',
-	'background': 'var(--app-window-background)',
-	'foreground': '#0e0e0e',
-	'card': 'var(--app-surface-background)',
+	background: 'var(--app-window-background)',
+	foreground: '#0e0e0e',
+	card: 'var(--app-surface-background)',
 	'card-foreground': '#0e0e0e',
-	'primary': '#0e0e0e',
+	primary: '#0e0e0e',
 	'primary-foreground': '#fbfbfa',
-	'secondary': '#eeede9',
+	secondary: '#eeede9',
 	'secondary-foreground': '#0e0e0e',
-	'muted': '#eeede9',
+	muted: '#eeede9',
 	'muted-foreground': '#a3a7a7',
-	'accent': '#eae9e5',
+	accent: '#eae9e5',
 	'accent-foreground': '#0e0e0e',
-	'border': 'color-mix(in oklch, #a3a7a7 45%, transparent)',
-	'input': 'color-mix(in oklch, #a3a7a7 45%, transparent)',
-	'ring': '#2b5fb1',
+	border: 'color-mix(in oklch, #a3a7a7 45%, transparent)',
+	input: 'color-mix(in oklch, #a3a7a7 45%, transparent)',
+	ring: '#2b5fb1',
 };
 const fallbackTheme: AppThemeData = { themeMode: 'light', isDark: false, colors: fallbackColors };
 const fallbackLanguage: AppLanguage = 'en';
 type DemoStorageValue = { label: string; count: number };
 const demoStorageKey = 'demo';
 const demoStorageFile = 'demo/message.txt';
-const themeBadgeClass = cva('inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold', {
-	variants: {
-		variant: {
-			light: 'border-border bg-secondary text-secondary-foreground',
-			dark: 'border-border bg-secondary text-secondary-foreground',
+const themeBadgeClass = cva(
+	'inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold',
+	{
+		variants: {
+			variant: {
+				light: 'border-border bg-secondary text-secondary-foreground',
+				dark: 'border-border bg-secondary text-secondary-foreground',
+			},
 		},
-	},
-	defaultVariants: {
-		variant: 'light',
-	},
-});
+		defaultVariants: {
+			variant: 'light',
+		},
+	}
+);
 
 export default function App() {
 	const [theme, setTheme] = useState<AppThemeData>(fallbackTheme);
@@ -76,7 +79,7 @@ export default function App() {
 	const inFridayApp = isFriday();
 	const text = translations[language] ?? translations.en;
 	const themeStyle = Object.fromEntries(
-		Object.entries(theme.colors).map(([name, value]) => [`--${name}`, value]),
+		Object.entries(theme.colors).map(([name, value]) => [`--${name}`, value])
 	) as CSSProperties;
 
 	const ensureFridayApp = () => {
@@ -107,7 +110,9 @@ export default function App() {
 		try {
 			const appLanguage = await app.getLanguage();
 			setLanguage(appLanguage);
-			setStatus(`${translations[appLanguage].languageRefreshed} (${getStatusText(theme, appLanguage)})`);
+			setStatus(
+				`${translations[appLanguage].languageRefreshed} (${getStatusText(theme, appLanguage)})`
+			);
 		} catch {
 			setStatus(text.languageRefreshFailed);
 		}
@@ -237,11 +242,17 @@ export default function App() {
 			<div className="flex min-h-full items-center justify-center p-8">
 				<div className="w-full max-w-md space-y-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
 					<p className="text-lg font-semibold">{text.title}</p>
-					<p className="text-sm text-muted-foreground">{inFridayApp ? text.connected : text.disconnected}</p>
+					<p className="text-sm text-muted-foreground">
+						{inFridayApp ? text.connected : text.disconnected}
+					</p>
 					<div className="space-y-2">
 						<p className="text-sm font-semibold">{text.theme}</p>
-						<p className="text-sm">{text.themeMode}: {theme.themeMode}</p>
-						<p className="text-sm">{text.resolvedDarkMode}: {theme.isDark ? 'true' : 'false'}</p>
+						<p className="text-sm">
+							{text.themeMode}: {theme.themeMode}
+						</p>
+						<p className="text-sm">
+							{text.resolvedDarkMode}: {theme.isDark ? 'true' : 'false'}
+						</p>
 						<div className="mt-2 flex flex-wrap gap-2">
 							<Button variant="outline" onClick={() => setAppTheme('light')}>
 								{text.setLight}
@@ -260,7 +271,9 @@ export default function App() {
 					</div>
 					<div className="space-y-2">
 						<p className="text-sm font-semibold">{text.language}</p>
-						<p className="text-sm">{text.currentLanguage}: {language}</p>
+						<p className="text-sm">
+							{text.currentLanguage}: {language}
+						</p>
 						<div className="mt-2 flex flex-wrap gap-2">
 							<Button variant="outline" onClick={() => setAppLanguage('en')}>
 								{text.setEnglish}
@@ -282,23 +295,17 @@ export default function App() {
 							{text.storageFile}: {extensionFileValue || text.storageEmpty}
 						</p>
 						<div className="mt-2 flex flex-wrap gap-2">
-							<Button
-								variant="outline"
-								disabled={storageBusy}
-								onClick={testExtensionValueStorage}
-							>
+							<Button variant="outline" disabled={storageBusy} onClick={testExtensionValueStorage}>
 								{text.testStorageValue}
 							</Button>
-							<Button
-								variant="secondary"
-								disabled={storageBusy}
-								onClick={testExtensionFileStorage}
-							>
+							<Button variant="secondary" disabled={storageBusy} onClick={testExtensionFileStorage}>
 								{text.testStorageFile}
 							</Button>
 						</div>
 					</div>
-					<p className="text-sm text-muted-foreground">{text.status}: {status}</p>
+					<p className="text-sm text-muted-foreground">
+						{text.status}: {status}
+					</p>
 					<span className={themeBadgeClass({ variant: theme.isDark ? 'dark' : 'light' })}>
 						{theme.isDark ? text.dark : text.light}
 					</span>

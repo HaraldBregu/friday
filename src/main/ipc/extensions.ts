@@ -62,11 +62,11 @@ export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
 					? dialog.showOpenDialog(window, {
 							title: 'Select extension folder(s)',
 							properties: ['openDirectory', 'multiSelections'],
-					})
+						})
 					: dialog.showOpenDialog({
 							title: 'Select extension folder(s)',
 							properties: ['openDirectory', 'multiSelections'],
-					}));
+						}));
 
 				if (result.canceled || result.filePaths.length === 0) return undefined;
 				return importExtensions(result.filePaths);

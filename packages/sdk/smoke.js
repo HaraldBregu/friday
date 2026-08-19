@@ -94,7 +94,10 @@ await app.deleteExtensionStoreFile('assets/data.bin');
 await assert.rejects(app.readExtensionStoreFile('assets/data.bin'), /not found/);
 const writeExtensionStoreFile = globalThis.app.writeExtensionStoreFile;
 delete globalThis.app.writeExtensionStoreFile;
-assert.throws(() => app.writeExtensionStoreFile, /app\.writeExtensionStoreFile.*update the Friday host/);
+assert.throws(
+	() => app.writeExtensionStoreFile,
+	/app\.writeExtensionStoreFile.*update the Friday host/
+);
 globalThis.app.writeExtensionStoreFile = writeExtensionStoreFile;
 assert.equal(await agent.getWorkspaceLocation(), '/tmp/friday-workspace');
 assert.deepEqual(await agent.listWorkspaceFiles(), [workspaceFile]);
