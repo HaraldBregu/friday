@@ -21,6 +21,14 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -109,6 +117,7 @@ export function ProviderCard({
 	const [saving, setSaving] = useState(false);
 	const [testing, setTesting] = useState(false);
 	const [removing, setRemoving] = useState(false);
+	const [removeOpen, setRemoveOpen] = useState(false);
 	const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
@@ -174,11 +183,8 @@ export function ProviderCard({
 	};
 
 	const remove = async (): Promise<void> => {
-		if (!canonical.id) {
-			onRemoved();
-			return;
-		}
 		setRemoving(true);
+		setRemoveOpen(false);
 		setError(null);
 		try {
 			await window.storage.deleteStorageConfig(canonical.id);
@@ -187,6 +193,14 @@ export function ProviderCard({
 			setError(getErrorMessage(err, t('settings.storage.errors.delete')));
 			setRemoving(false);
 		}
+	};
+
+	const requestRemove = (): void => {
+		if (!canonical.id) {
+			onRemoved();
+			return;
+		}
+		setRemoveOpen(true);
 	};
 
 	const renderField = (field: FieldDef, value: string): React.JSX.Element => (
@@ -218,7 +232,7 @@ export function ProviderCard({
 	];
 
 	return (
-		<Card size="sm">
+		<Card size="sm" aria-busy={saving || testing || removing}>
 			<Collapsible open={expanded} onOpenChange={setExpanded} className="flex flex-col gap-3">
 				<CardHeader className={cn('select-none items-center', expanded && 'border-b')}>
 					<div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -245,7 +259,9 @@ export function ProviderCard({
 										variant="ghost"
 										size="icon-xs"
 										className="size-5 text-muted-foreground hover:text-foreground"
-										aria-label={`Open ${canonical.name} setup`}
+										aria-label={t('settings.storage.openProviderSetup', {
+											name: canonical.name,
+										})}
 										onClick={(event) => {
 											event.stopPropagation();
 											openExternalUrl(linkUrl);
@@ -301,7 +317,7 @@ export function ProviderCard({
 								variant="ghost"
 								size="icon-sm"
 								aria-label={t('settings.storage.removeProvider')}
-								onClick={() => void remove()}
+								onClick={requestRemove}
 								disabled={removing || saving}
 							>
 								<Trash2 className="size-3" />
@@ -313,17 +329,21 @@ export function ProviderCard({
 				<CollapsibleContent className="flex flex-col gap-3">
 					<CardContent className="space-y-4">
 						{error && (
-							<SettingsNotice variant="destructive" icon={AlertTriangle}>
-								{error}
-							</SettingsNotice>
+							<div role="alert">
+								<SettingsNotice variant="destructive" icon={AlertTriangle}>
+									{error}
+								</SettingsNotice>
+							</div>
 						)}
 						{status && (
-							<SettingsNotice
-								variant={status.ok ? 'default' : 'destructive'}
-								icon={status.ok ? CheckCircle2 : AlertTriangle}
-							>
-								{status.message}
-							</SettingsNotice>
+							<div role="status" aria-live="polite">
+								<SettingsNotice
+									variant={status.ok ? 'default' : 'destructive'}
+									icon={status.ok ? CheckCircle2 : AlertTriangle}
+								>
+									{status.message}
+								</SettingsNotice>
+							</div>
 						)}
 
 						{editing ? (
@@ -407,6 +427,25 @@ export function ProviderCard({
 					)}
 				</CollapsibleContent>
 			</Collapsible>
+
+			<Dialog open={removeOpen} onOpenChange={setRemoveOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>{t('settings.storage.removeDialog.title')}</DialogTitle>
+						<DialogDescription>
+							{t('settings.storage.removeDialog.description')}
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setRemoveOpen(false)}>
+							{t('settings.storage.cancel')}
+						</Button>
+						<Button variant="destructive" onClick={() => void remove()} disabled={removing}>
+							{t('settings.storage.removeDialog.confirm')}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</Card>
 	);
 }

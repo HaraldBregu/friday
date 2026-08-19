@@ -1028,6 +1028,12 @@
 			"addCustomProvider": "Aggiungi provider compatibile con S3",
 			"customProviderName": "Storage S3 personalizzato",
 			"removeProvider": "Rimuovi provider",
+			"openProviderSetup": "Apri configurazione {{name}}",
+			"removeDialog": {
+				"title": "Rimuovere il provider di archiviazione?",
+				"description": "Questa operazione rimuove la connessione e la pianificazione da Friday. I file già archiviati nel bucket vengono conservati.",
+				"confirm": "Rimuovi provider"
+			},
 			"newProviderTitle": "Nuovo storage",
 			"empty": "Nessun provider di archiviazione configurato.",
 			"name": "Nome",

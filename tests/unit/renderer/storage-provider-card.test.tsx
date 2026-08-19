@@ -83,3 +83,38 @@ it('tests the draft connection with S3 path-style settings', async () => {
 	);
 	expect(screen.getByText('settings.storage.testOk')).toBeVisible();
 });
+
+it('confirms before removing a saved provider', async () => {
+	const user = userEvent.setup();
+	storageApi.deleteStorageConfig.mockResolvedValue(undefined);
+	const onRemoved = jest.fn();
+	render(
+		<ProviderCard
+			storage={{
+				id: 'backup',
+				name: 'Friday backup',
+				endpoint: 'https://storage.example.com',
+				region: 'us-east-1',
+				accessKeyId: 'access',
+				secretAccessKey: 'secret',
+				bucket: 'friday',
+				forcePathStyle: false,
+				paths: [],
+				syncEnabled: false,
+				syncCronExpression: '0 3 * * *',
+			}}
+			onSaved={() => {}}
+			onRemoved={onRemoved}
+		/>
+	);
+
+	await user.click(screen.getByRole('button', { name: 'settings.storage.removeProvider' }));
+	expect(storageApi.deleteStorageConfig).not.toHaveBeenCalled();
+	expect(screen.getByRole('dialog')).toHaveTextContent(
+		'settings.storage.removeDialog.description'
+	);
+	await user.click(screen.getByRole('button', { name: 'settings.storage.removeDialog.confirm' }));
+
+	await waitFor(() => expect(storageApi.deleteStorageConfig).toHaveBeenCalledWith('backup'));
+	expect(onRemoved).toHaveBeenCalledTimes(1);
+});

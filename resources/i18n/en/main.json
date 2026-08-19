@@ -1029,6 +1029,12 @@
 			"addCustomProvider": "Add S3-compatible provider",
 			"customProviderName": "Custom S3 storage",
 			"removeProvider": "Remove provider",
+			"openProviderSetup": "Open {{name}} setup",
+			"removeDialog": {
+				"title": "Remove storage provider?",
+				"description": "This removes the connection and its schedule from Friday. Files already stored in the bucket are kept.",
+				"confirm": "Remove provider"
+			},
 			"newProviderTitle": "New storage",
 			"empty": "No storage providers configured yet.",
 			"name": "Name",
