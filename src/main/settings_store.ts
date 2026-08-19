@@ -1,6 +1,5 @@
 import path from 'node:path';
 import Store from 'electron-store';
-import cron from 'node-cron';
 import type {
 	ResolvedProvider,
 	StoredProvider,
@@ -13,7 +12,7 @@ import type {
 import { userDataLocation } from './shared/user_data_location';
 import { DEFAULT_SYNC_CRON_EXPRESSION } from './storage/storage_sync_types';
 import { normalizeStorageConfig } from './storage/storage_config';
-import { normalizeStoragePaths } from './storage/storage_paths';
+import { normalizeStorageConfiguration } from './storage/storage_configuration';
 import { loadStorages } from './models';
 import { migrateMcpStoreFromProviders } from './mcp/mcp_store_state';
 import type { PersistedTaskState } from './tasks/tasks_types';
@@ -344,23 +343,21 @@ export function getStorageConfiguration(): StorageConfiguration {
 export function saveStorageConfiguration(
 	configuration: StorageConfiguration
 ): StorageConfiguration {
-	if (configuration.syncEnabled && !cron.validate(configuration.syncCronExpression)) {
-		throw new Error('Storage sync schedule must be a valid cron expression.');
-	}
+	const normalized = normalizeStorageConfiguration(configuration);
 	if (
-		configuration.providerId &&
-		!getStoredStorages().some((storage) => storage.id === configuration.providerId)
+		normalized.providerId &&
+		!getStoredStorages().some((storage) => storage.id === normalized.providerId)
 	) {
-		throw new Error(`Storage not found: ${configuration.providerId}`);
+		throw new Error(`Storage not found: ${normalized.providerId}`);
 	}
 	const saved: StorageConfiguration = {
-		providerId: configuration.providerId,
-		storageId: configuration.providerId
-			? loadStorages().find((entry) => entry.provider.id === configuration.providerId)?.id
+		providerId: normalized.providerId,
+		storageId: normalized.providerId
+			? loadStorages().find((entry) => entry.provider.id === normalized.providerId)?.id
 			: undefined,
-		paths: normalizeStoragePaths(configuration.paths),
-		syncEnabled: configuration.syncEnabled,
-		syncCronExpression: configuration.syncCronExpression.trim().replace(/\s+/g, ' '),
+		paths: normalized.paths,
+		syncEnabled: normalized.syncEnabled,
+		syncCronExpression: normalized.syncCronExpression,
 	};
 	store.set('cloud', saved);
 	return saved;

@@ -4,6 +4,7 @@ import type { StoragePullResult } from '../../shared/storage_types';
 import { describeStorageError } from './storage_error';
 import { getObject } from './storage_get';
 import { listObjects } from './storage_list';
+import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
 import { getStorage } from './storage_store';
 import { storageTarget } from './storage_target';
@@ -11,7 +12,7 @@ import { storageTarget } from './storage_target';
 export async function pullFiles(id: string): Promise<StoragePullResult> {
 	const storage = getStorage(id);
 	if (!storage) throw new Error('Storage is not configured.');
-	const paths = storage.paths;
+	const paths = normalizeStoragePaths(storage.paths);
 	const downloaded: string[] = [];
 	const failed: StoragePullResult['failed'] = [];
 

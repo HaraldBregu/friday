@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { StoragePushResult } from '../../shared/storage_types';
 import { describeStorageError } from './storage_error';
 import { putObject } from './storage_put';
+import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
 import { getStorage } from './storage_store';
 import { walkFiles } from './storage_walk';
@@ -10,7 +11,7 @@ import { walkFiles } from './storage_walk';
 export async function pushFiles(id: string): Promise<StoragePushResult> {
 	const storage = getStorage(id);
 	if (!storage) throw new Error('Storage is not configured.');
-	const paths = storage.paths;
+	const paths = normalizeStoragePaths(storage.paths);
 	const uploaded: string[] = [];
 	const failed: StoragePushResult['failed'] = [];
 

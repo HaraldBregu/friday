@@ -39,11 +39,6 @@ export interface StorageTestResult {
 	error?: string;
 }
 
-export interface StorageSyncResult {
-	uploaded: string[];
-	skipped: string[];
-}
-
 export interface StoragePushFailure {
 	path: string;
 	error: string;
