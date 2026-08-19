@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { getA2aAgents } from '../../a2a';
+import { publicA2aAgent } from '../../a2a/public';
 import { tool } from '../tool';
 
 export const listA2aAgentsTool = tool({
@@ -8,5 +9,5 @@ export const listA2aAgentsTool = tool({
 	description: 'List configured and enabled remote A2A agents and their advertised skills.',
 	planSafe: true,
 	inputSchema: z.object({}),
-	execute: () => getA2aAgents().filter((agent) => agent.enabled).map(({ token: _token, ...agent }) => agent),
+	execute: () => getA2aAgents().filter((agent) => agent.enabled).map(publicA2aAgent),
 });

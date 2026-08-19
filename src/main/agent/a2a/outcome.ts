@@ -1,0 +1,28 @@
+import { TaskState, taskStateToJSON } from '@a2a-js/sdk';
+
+export function a2aTaskOutcome(
+	taskId: string,
+	contextId: string,
+	state: TaskState | undefined,
+	text: string
+): string {
+	const reference = `${taskId || 'unknown'}${contextId ? ` (context ${contextId})` : ''}`;
+	const label = state === undefined
+		? 'unknown'
+		: taskStateToJSON(state).replace(/^TASK_STATE_/, '').toLowerCase().replaceAll('_', ' ');
+	const content = text.trim();
+	if (
+		state === TaskState.TASK_STATE_FAILED ||
+		state === TaskState.TASK_STATE_CANCELED ||
+		state === TaskState.TASK_STATE_REJECTED
+	) {
+		throw new Error(`Remote task ${reference} ${label}${content ? `: ${content}` : '.'}`);
+	}
+	if (state === TaskState.TASK_STATE_INPUT_REQUIRED) {
+		return `Remote task ${reference} requires input${content ? `: ${content}` : '.'}`;
+	}
+	if (state === TaskState.TASK_STATE_AUTH_REQUIRED) {
+		return `Remote task ${reference} requires authentication${content ? `: ${content}` : '.'}`;
+	}
+	return content || `Remote task ${reference} is ${label}.`;
+}

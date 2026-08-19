@@ -1,3 +1,4 @@
+export { createA2aClient } from './client';
 export { discoverA2aAgent } from './discover';
 export { getA2aAgents } from './store';
 export { removeA2aAgent } from './remove';

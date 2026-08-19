@@ -49,7 +49,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('a2a', () => new A2aIpc().register(undefined, eventBus));
+	safeRegister('a2a', () => new A2aIpc().register({ extensionRegistry }, eventBus));
 	safeRegister('agent', () =>
 		new AgentIpc().register(
 			{ logger, agent: agentService, conversation: conversationService },

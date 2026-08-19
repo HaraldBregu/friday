@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Bot, Pencil, Plus, Trash2 } from 'lucide-react';
-import type { A2aAgent, A2aAgentInput } from '@shared/a2a_types';
+import type { A2aAgentInput, A2aAgentSummary } from '@shared/a2a_types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +16,7 @@ import {
 const empty: A2aAgentInput = { name: '', url: '', token: '', enabled: true };
 
 export default function A2aPage(): React.JSX.Element {
-	const [agents, setAgents] = useState<A2aAgent[]>([]);
+	const [agents, setAgents] = useState<A2aAgentSummary[]>([]);
 	const [form, setForm] = useState<A2aAgentInput>(empty);
 	const [adding, setAdding] = useState(false);
 	const [busy, setBusy] = useState(false);

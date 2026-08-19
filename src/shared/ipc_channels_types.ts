@@ -31,6 +31,7 @@ import type {
 import type { ChannelModelKind, ChannelModelSelection, StoredBotProvider } from './channels_types';
 import {
 	AgentChannels,
+	A2aChannels,
 	AppChannels,
 	RecorderChannels,
 	TaskChannels,
@@ -260,6 +261,19 @@ export interface SkillsInvokeChannelMap {
 	};
 	[SkillsChannels.openRoot]: { args: []; result: void };
 	[SkillsChannels.getRoot]: { args: []; result: string };
+}
+
+export interface A2aInvokeChannelMap {
+	[A2aChannels.list]: { args: []; result: import('./a2a_types').A2aAgentSummary[] };
+	[A2aChannels.save]: {
+		args: [input: import('./a2a_types').A2aAgentInput];
+		result: import('./a2a_types').A2aAgentSummary;
+	};
+	[A2aChannels.delete]: { args: [id: string]; result: void };
+	[A2aChannels.test]: {
+		args: [input: import('./a2a_types').A2aAgentInput];
+		result: import('./a2a_types').A2aTestResult;
+	};
 }
 
 export interface McpInvokeChannelMap {
@@ -936,6 +950,7 @@ export interface InvokeChannelMap
 		RecorderInvokeChannelMap,
 		TaskInvokeChannelMap,
 		SkillsInvokeChannelMap,
+		A2aInvokeChannelMap,
 		McpInvokeChannelMap,
 		ProviderStoreInvokeChannelMap,
 		SearchInvokeChannelMap,

@@ -17,6 +17,8 @@ export interface A2aAgent {
 	skills: string[];
 }
 
+export type A2aAgentSummary = Omit<A2aAgent, 'token'>;
+
 export interface A2aTestResult {
 	name: string;
 	description?: string;
@@ -25,8 +27,8 @@ export interface A2aTestResult {
 }
 
 export interface A2aApi {
-	list: () => Promise<A2aAgent[]>;
-	save: (input: A2aAgentInput) => Promise<A2aAgent>;
+	list: () => Promise<A2aAgentSummary[]>;
+	save: (input: A2aAgentInput) => Promise<A2aAgentSummary>;
 	delete: (id: string) => Promise<void>;
 	test: (input: A2aAgentInput) => Promise<A2aTestResult>;
 }
