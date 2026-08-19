@@ -27,7 +27,9 @@ export function isExtensionStoreValue(value: unknown): value is ExtensionStoreVa
 		const keys = Object.keys(input);
 		if (Object.getOwnPropertySymbols(input).length > 0) return false;
 		if (Array.isArray(input)) {
-			if (keys.length !== input.length) return false;
+			if (keys.length !== input.length || keys.some((key, index) => key !== String(index))) {
+				return false;
+			}
 		} else {
 			const prototype = Object.getPrototypeOf(input);
 			if (prototype !== Object.prototype && prototype !== null) return false;

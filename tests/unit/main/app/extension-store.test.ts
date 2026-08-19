@@ -37,6 +37,9 @@ describe('extension storage', () => {
 		expect(() => storage.set('draw', 'value', Number.NaN)).toThrow('store value');
 		const sparse = new Array(1) as never;
 		expect(() => storage.set('draw', 'value', sparse)).toThrow('store value');
+		const disguisedSparse = new Array(1) as unknown[] & { extra: boolean };
+		disguisedSparse.extra = true;
+		expect(() => storage.set('draw', 'value', disguisedSparse as never)).toThrow('store value');
 		expect(() => storage.set('../draw', 'value', true)).toThrow('Invalid extension ID');
 	});
 
@@ -115,5 +118,20 @@ describe('extension storage', () => {
 		expect(() => storage.set('draw', 'config', { ready: true })).toThrow(
 			'Invalid extension store file'
 		);
+	});
+
+	it('revalidates a cached value store namespace', () => {
+		if (process.platform === 'win32') return;
+		const storage = new ExtensionStorage(root);
+		storage.set('draw', 'config', { ready: true });
+		const namespace = path.join(root, 'draw');
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-values-'));
+		try {
+			fs.rmSync(namespace, { recursive: true });
+			fs.symlinkSync(outside, namespace);
+			expect(() => storage.get('draw', 'config')).toThrow('Invalid extension storage directory');
+		} finally {
+			fs.rmSync(outside, { recursive: true, force: true });
+		}
 	});
 });

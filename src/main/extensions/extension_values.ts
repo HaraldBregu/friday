@@ -34,6 +34,8 @@ export class ExtensionValueStorage {
 	private store(extensionId: string): Store<ExtensionStoreState> {
 		const existing = this.stores.get(extensionId);
 		if (existing) {
+			this.assertDirectory(this.root);
+			this.assertDirectory(this.namespace(extensionId));
 			this.assertStoreFile(existing.path);
 			return existing;
 		}
