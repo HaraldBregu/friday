@@ -7,6 +7,14 @@ interface MenuManagerCallbacks {
 	onNewWindow: () => void;
 	getExtensions: () => Extension[];
 	onOpenExtension: (extension: Extension) => void;
+	onOpenAppDataFolder?: () => void;
+	onOpenDataFolder?: () => void;
+	getTrayEnabled?: () => boolean;
+	onTrayEnabledChange?: (enabled: boolean) => void;
+	getKeepAwake?: () => boolean;
+	onKeepAwakeChange?: (enabled: boolean) => void;
+	getTheme?: () => 'light' | 'dark' | 'system';
+	onThemeChange?: (theme: 'light' | 'dark' | 'system') => void;
 }
 
 export class Menu {
@@ -43,6 +51,18 @@ export class Menu {
 			this.currentLanguage = lng;
 			this.buildMenu();
 			this.callbacks.onLanguageChange(lng);
+		};
+		const switchTray = (): void => {
+			this.callbacks.onTrayEnabledChange?.(!(this.callbacks.getTrayEnabled?.() ?? true));
+			this.buildMenu();
+		};
+		const switchKeepAwake = (): void => {
+			this.callbacks.onKeepAwakeChange?.(!(this.callbacks.getKeepAwake?.() ?? false));
+			this.buildMenu();
+		};
+		const switchTheme = (theme: 'light' | 'dark' | 'system'): void => {
+			this.callbacks.onThemeChange?.(theme);
+			this.buildMenu();
 		};
 
 		const template: Electron.MenuItemConstructorOptions[] = [
@@ -96,6 +116,60 @@ export class Menu {
 				submenu: [
 					{ label: m.reload, role: 'reload' as const },
 					{ label: m.forceReload, role: 'forceReload' as const },
+				],
+			},
+			{
+				label: m.settings,
+				submenu: [
+					{
+						label: m.openAppData,
+						click: (): void => this.callbacks.onOpenAppDataFolder?.(),
+					},
+					{
+						label: m.openData,
+						click: (): void => this.callbacks.onOpenDataFolder?.(),
+					},
+					{ type: 'separator' as const },
+					{
+						label: m.menuBar,
+						type: 'checkbox' as const,
+						checked: this.callbacks.getTrayEnabled?.() ?? true,
+						click: switchTray,
+					},
+					{
+						label: m.keepAwake,
+						type: 'checkbox' as const,
+						checked: this.callbacks.getKeepAwake?.() ?? false,
+						click: switchKeepAwake,
+					},
+					{
+						label: m.theme,
+						submenu: [
+							...(['system', 'light', 'dark'] as const).map((theme) => ({
+								label: m[`${theme}Theme`],
+								type: 'radio' as const,
+								checked: (this.callbacks.getTheme?.() ?? 'system') === theme,
+								click: (): void => switchTheme(theme),
+							})),
+						],
+					},
+					{
+						label: m.language,
+						submenu: [
+							{
+								label: 'English',
+								type: 'radio' as const,
+								checked: this.currentLanguage === 'en',
+								click: (): void => switchLanguage('en'),
+							},
+							{
+								label: 'Italiano',
+								type: 'radio' as const,
+								checked: this.currentLanguage === 'it',
+								click: (): void => switchLanguage('it'),
+							},
+						],
+					},
 				],
 			},
 			{
