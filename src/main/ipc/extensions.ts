@@ -1,7 +1,9 @@
 import { BrowserWindow, dialog } from 'electron';
 import type { EventBus } from '../event_bus';
 import type { WindowFactory } from '../window_factory';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
 import {
+	closeExtension,
 	deleteExtension,
 	importExtensions,
 	listExtensions,
@@ -15,12 +17,13 @@ import type { IpcModule } from './core/module';
 
 export interface ExtensionsIpcDeps {
 	windowFactory: WindowFactory;
+	extensionRegistry: ExtensionRegistry;
 }
 
 export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
 	readonly name = 'extensions';
 
-	register({ windowFactory }: ExtensionsIpcDeps, _eventBus: EventBus): void {
+	register({ windowFactory, extensionRegistry }: ExtensionsIpcDeps, _eventBus: EventBus): void {
 		registerQuery(ExtensionChannels.list, () => listExtensions());
 		registerCommand(ExtensionChannels.open, (extensionId: string) => {
 			const extension = listExtensions().find((item) => item.id === extensionId);
@@ -46,6 +49,8 @@ export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
 				? dialog.showMessageBox(window, options)
 				: dialog.showMessageBox(options));
 			if (result.response !== 1) return false;
+			extensionRegistry.revoke(extensionId);
+			closeExtension(extensionId);
 			deleteExtension(extensionId);
 			return true;
 		});

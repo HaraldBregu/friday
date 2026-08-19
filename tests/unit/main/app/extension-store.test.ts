@@ -102,4 +102,18 @@ describe('extension storage', () => {
 			fs.rmSync(outside, { recursive: true, force: true });
 		}
 	});
+
+	it('rejects a symlinked value store file', () => {
+		if (process.platform === 'win32') return;
+		const storage = new ExtensionStorage(root);
+		const namespace = path.join(root, 'draw');
+		const outside = path.join(root, 'outside.json');
+		fs.mkdirSync(namespace, { recursive: true });
+		fs.writeFileSync(outside, '{}');
+		fs.symlinkSync(outside, path.join(namespace, 'store.json'));
+
+		expect(() => storage.set('draw', 'config', { ready: true })).toThrow(
+			'Invalid extension store file'
+		);
+	});
 });

@@ -3,6 +3,7 @@ const loadExtension = jest.fn();
 const importExtensions = jest.fn();
 const openRoot = jest.fn();
 const deleteExtension = jest.fn();
+const closeExtension = jest.fn();
 const extension = {
 	id: 'demo-extension',
 	title: 'Demo Extension',
@@ -16,6 +17,7 @@ jest.mock('../../../../src/main/extensions/extension_index', () => ({
 	importExtensions,
 	openRoot,
 	deleteExtension,
+	closeExtension,
 }));
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
 	registerQuery: jest.fn(),
@@ -36,8 +38,13 @@ beforeEach(() => {
 	(dialog.showMessageBox as jest.Mock).mockResolvedValue({ response: 0, checkboxChecked: false });
 });
 
+const extensionRegistry = { revoke: jest.fn() };
+
 it('opens the extensions directory in the system file explorer', () => {
-	new ExtensionsIpc().register({ windowFactory: {} as WindowFactory }, {} as EventBus);
+	new ExtensionsIpc().register(
+		{ windowFactory: {} as WindowFactory, extensionRegistry: extensionRegistry as never },
+		{} as EventBus
+	);
 
 	const handler = (registerCommand as jest.Mock).mock.calls.find(
 		([channel]) => channel === ExtensionChannels.openRoot
@@ -48,7 +55,10 @@ it('opens the extensions directory in the system file explorer', () => {
 });
 
 it('uses a native confirmation before deleting an extension', async () => {
-	new ExtensionsIpc().register({ windowFactory: {} as WindowFactory }, {} as EventBus);
+	new ExtensionsIpc().register(
+		{ windowFactory: {} as WindowFactory, extensionRegistry: extensionRegistry as never },
+		{} as EventBus
+	);
 	const owner = {};
 	const event = { sender: {} };
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
@@ -77,6 +87,8 @@ it('uses a native confirmation before deleting an extension', async () => {
 	await expect(deleteHandler(event, extension.id)).resolves.toBe(true);
 	expect(deleteExtension).toHaveBeenCalledTimes(1);
 	expect(deleteExtension).toHaveBeenCalledWith(extension.id);
+	expect(extensionRegistry.revoke).toHaveBeenCalledWith(extension.id);
+	expect(closeExtension).toHaveBeenCalledWith(extension.id);
 
 	await expect(deleteHandler(event, 'missing-extension')).rejects.toThrow(
 		'Extension not found: missing-extension'

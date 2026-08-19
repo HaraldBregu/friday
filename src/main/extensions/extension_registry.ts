@@ -38,6 +38,13 @@ export class ExtensionRegistry {
 		return this.extensions.get(webContents.id)?.webContents === webContents;
 	}
 
+	revoke(extensionId: string): void {
+		if (!isExtensionId(extensionId)) throw new Error('Invalid extension ID.');
+		for (const [webContentsId, registration] of this.extensions) {
+			if (registration.extensionId === extensionId) this.extensions.delete(webContentsId);
+		}
+	}
+
 	resolve(webContents: Pick<WebContents, 'id'>): string {
 		const registered = this.extensions.get(webContents.id);
 		if (!registered || registered.webContents !== webContents) {
