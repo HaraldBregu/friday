@@ -21,6 +21,7 @@ const card = {
 };
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	setA2aAgents([]);
 	mockDiscover.mockResolvedValue(card);
 	mockClientFactory.mockImplementation(() => ({ createFromAgentCard: mockCreateFromAgentCard }));

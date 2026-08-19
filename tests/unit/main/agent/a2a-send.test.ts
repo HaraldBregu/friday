@@ -4,6 +4,32 @@ const mockClientFactory = jest.fn();
 
 jest.mock('../../../../src/main/agent/a2a/discover', () => ({ discoverA2aAgent: mockDiscover }));
 jest.mock('@a2a-js/sdk/client', () => ({ ClientFactory: mockClientFactory }));
+jest.mock('@a2a-js/sdk', () => ({
+	Role: { ROLE_USER: 1 },
+	TaskState: {
+		TASK_STATE_UNSPECIFIED: 0,
+		TASK_STATE_SUBMITTED: 1,
+		TASK_STATE_WORKING: 2,
+		TASK_STATE_COMPLETED: 3,
+		TASK_STATE_FAILED: 4,
+		TASK_STATE_CANCELED: 5,
+		TASK_STATE_INPUT_REQUIRED: 6,
+		TASK_STATE_REJECTED: 7,
+		TASK_STATE_AUTH_REQUIRED: 8,
+	},
+	taskStateToJSON: (state: number) =>
+		[
+			'TASK_STATE_UNSPECIFIED',
+			'TASK_STATE_SUBMITTED',
+			'TASK_STATE_WORKING',
+			'TASK_STATE_COMPLETED',
+			'TASK_STATE_FAILED',
+			'TASK_STATE_CANCELED',
+			'TASK_STATE_INPUT_REQUIRED',
+			'TASK_STATE_REJECTED',
+			'TASK_STATE_AUTH_REQUIRED',
+		][state] ?? 'UNRECOGNIZED',
+}));
 
 import { TaskState } from '@a2a-js/sdk';
 import { sendA2aMessage } from '../../../../src/main/agent/a2a/send';
@@ -16,6 +42,7 @@ const card = {
 };
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	setA2aAgents([{ id: 'target', name: 'Remote', url: 'https://remote.example', token: 'secret', enabled: true, skills: [] }]);
 	mockDiscover.mockResolvedValue(card);
 	mockClientFactory.mockImplementation(() => ({ createFromAgentCard: mockCreateFromAgentCard }));

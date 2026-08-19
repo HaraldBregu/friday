@@ -23,6 +23,7 @@ function query(channel: string): (...args: unknown[]) => unknown {
 }
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	extensionRegistry.has.mockReturnValue(false);
 	new A2aIpc().register({ extensionRegistry: extensionRegistry as never }, {} as never);
 });

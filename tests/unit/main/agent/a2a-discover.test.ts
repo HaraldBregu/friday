@@ -11,6 +11,7 @@ import { discoverA2aAgent } from '../../../../src/main/agent/a2a/discover';
 const originalFetch = global.fetch;
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	mockDefaultAgentCardResolver.mockImplementation((options) => {
 		mockResolverOptions = options;
 		return { resolve: mockResolver };
