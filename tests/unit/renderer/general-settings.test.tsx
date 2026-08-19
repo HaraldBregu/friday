@@ -4,6 +4,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import GeneralPage from '../../../src/renderer/src/pages/settings/pages/general/Page';
 
 const mockSetTheme = jest.fn();
+let notifyTrayEnabled: (enabled: boolean) => void;
+let notifyKeepAwake: (enabled: boolean) => void;
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -29,9 +31,32 @@ beforeEach(() => {
 		configurable: true,
 		value: {
 			getTrayEnabled: jest.fn().mockResolvedValue(true),
+			onTrayEnabledChanged: jest.fn((callback) => {
+				notifyTrayEnabled = callback;
+				return jest.fn();
+			}),
 			getKeepAwake: jest.fn().mockResolvedValue(false),
-		},
+			onKeepAwakeChanged: jest.fn((callback) => {
+				notifyKeepAwake = callback;
+				return jest.fn();
+			}),
+		}, 
 	});
+});
+
+it('refreshes toggles changed from the native application menu', async () => {
+	render(
+		<MemoryRouter>
+			<GeneralPage />
+		</MemoryRouter>
+	);
+
+	await screen.findByRole('switch', { name: 'settings.application.menuBar', checked: true });
+	notifyTrayEnabled(false);
+	notifyKeepAwake(true);
+
+	expect(await screen.findByRole('switch', { name: 'settings.application.menuBar' })).not.toBeChecked();
+	expect(screen.getByRole('switch', { name: 'settings.application.keepAwake' })).toBeChecked();
 });
 
 it('changes the application theme from General settings', async () => {
