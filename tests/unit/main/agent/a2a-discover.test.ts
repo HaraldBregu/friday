@@ -23,7 +23,9 @@ beforeEach(() => {
 		);
 		return response?.json();
 	});
-	global.fetch = jest.fn().mockResolvedValue({ json: jest.fn().mockResolvedValue({ name: 'Agent' }) });
+	global.fetch = jest
+		.fn()
+		.mockResolvedValue({ json: jest.fn().mockResolvedValue({ name: 'Agent' }) });
 });
 
 afterAll(() => {
@@ -37,15 +39,16 @@ it('preserves resolver headers and uses the root well-known path with bearer aut
 	expect(mockResolver).toHaveBeenCalledWith('https://agent.example/a2a');
 	const [url, init] = (global.fetch as jest.Mock).mock.calls[0] as [URL, RequestInit];
 	expect(url.toString()).toBe('https://agent.example/.well-known/agent-card.json');
-	expect(new Headers(init.headers)).toEqual(
-		expect.objectContaining({})
-	);
+	expect(new Headers(init.headers)).toEqual(expect.objectContaining({}));
 	expect(new Headers(init.headers).get('A2A-Version')).toBe('1.0');
 	expect(new Headers(init.headers).get('Authorization')).toBe('Bearer secret');
 	expect(init.signal).toBe(controller.signal);
 });
 
-it.each(['file:///tmp/agent', 'relative-agent', 'https://user:pass@agent.example'])('rejects unsafe base URL %s', async (url) => {
-	await expect(discoverA2aAgent(url)).rejects.toThrow();
-	expect(mockDefaultAgentCardResolver).not.toHaveBeenCalled();
-});
+it.each(['file:///tmp/agent', 'relative-agent', 'https://user:pass@agent.example'])(
+	'rejects unsafe base URL %s',
+	async (url) => {
+		await expect(discoverA2aAgent(url)).rejects.toThrow();
+		expect(mockDefaultAgentCardResolver).not.toHaveBeenCalled();
+	}
+);

@@ -10,7 +10,9 @@ export async function createA2aClient(card: AgentCard): Promise<Client> {
 	if (!Array.isArray(card.skills) || !Array.isArray(card.supportedInterfaces)) {
 		throw new Error('Invalid A2A Agent Card: skills and supported interfaces are required.');
 	}
-	const requiredExtensions = card.capabilities?.extensions?.filter((extension) => extension.required);
+	const requiredExtensions = card.capabilities?.extensions?.filter(
+		(extension) => extension.required
+	);
 	if (requiredExtensions?.length) {
 		throw new Error(
 			`A2A agent requires unsupported extension(s): ${requiredExtensions.map((extension) => extension.uri).join(', ')}.`

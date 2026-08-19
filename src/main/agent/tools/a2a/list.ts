@@ -9,5 +9,8 @@ export const listA2aAgentsTool = tool({
 	description: 'List configured and enabled remote A2A agents and their advertised skills.',
 	planSafe: true,
 	inputSchema: z.object({}),
-	execute: () => getA2aAgents().filter((agent) => agent.enabled).map(publicA2aAgent),
+	execute: () =>
+		getA2aAgents()
+			.filter((agent) => agent.enabled)
+			.map(publicA2aAgent),
 });

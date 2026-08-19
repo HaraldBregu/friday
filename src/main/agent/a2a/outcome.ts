@@ -7,9 +7,13 @@ export function a2aTaskOutcome(
 	text: string
 ): string {
 	const reference = `${taskId || 'unknown'}${contextId ? ` (context ${contextId})` : ''}`;
-	const label = state === undefined
-		? 'unknown'
-		: taskStateToJSON(state).replace(/^TASK_STATE_/, '').toLowerCase().replaceAll('_', ' ');
+	const label =
+		state === undefined
+			? 'unknown'
+			: taskStateToJSON(state)
+					.replace(/^TASK_STATE_/, '')
+					.toLowerCase()
+					.replaceAll('_', ' ');
 	const content = text.trim();
 	if (
 		state === TaskState.TASK_STATE_FAILED ||

@@ -25,6 +25,8 @@ export async function saveA2aAgent(input: A2aAgentInput): Promise<A2aAgent> {
 		description: card.description,
 		skills: card.skills.map((skill) => skill.name),
 	};
-	setA2aAgents(existing ? agents.map((item) => (item.id === agent.id ? agent : item)) : [...agents, agent]);
+	setA2aAgents(
+		existing ? agents.map((item) => (item.id === agent.id ? agent : item)) : [...agents, agent]
+	);
 	return agent;
 }
