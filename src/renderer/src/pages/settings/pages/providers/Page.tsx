@@ -145,6 +145,7 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	const [error, setError] = useState<string | null>(null);
 	const [storageEntries, setStorageEntries] = useState<StorageEntry[] | null>(null);
 	const [storageError, setStorageError] = useState<string | null>(null);
+	const [addingCustomStorage, setAddingCustomStorage] = useState(false);
 	const [searchSettings, setSearchSettings] = useState<SearchSettings | null>(null);
 	const [addingCustomMcp, setAddingCustomMcp] = useState(false);
 	const { servers: mcpServers, load: loadMcpServers } = useMcpServers();
@@ -581,7 +582,20 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 
 			{(section === undefined || section === 'storage') &&
 				(!embedded || storageEntries === null || storageCatalog.length > 0) && (
-					<SettingsSection title={t('settings.tabs.storage')}>
+					<SettingsSection
+						title={t('settings.tabs.storage')}
+						action={
+							<Button
+								variant="outline"
+								size="sm"
+								disabled={addingCustomStorage}
+								onClick={() => setAddingCustomStorage(true)}
+							>
+								<Plus className="size-3.5" />
+								{t('settings.storage.addCustomProvider')}
+							</Button>
+						}
+					>
 						{storageError && (
 							<SettingsNotice variant="destructive" icon={AlertTriangle}>
 								{storageError}
@@ -592,6 +606,23 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 							<SettingsLoadingRows rows={4} />
 						) : (
 							<div className="space-y-3 pb-4">
+								{addingCustomStorage && (
+									<ProviderCard
+										storage={blankStorage({
+											id: '',
+											name: t('settings.storage.customProviderName'),
+											baseUrl: '',
+										})}
+										onSaved={(saved) => {
+											setStorageEntries((current) => [
+												...(current ?? []),
+												{ key: saved.id, storage: saved },
+											]);
+											setAddingCustomStorage(false);
+										}}
+										onRemoved={() => setAddingCustomStorage(false)}
+									/>
+								)}
 								{storageCatalog.length === 0 && (
 									<SettingsNotice>{t('settings.storage.empty')}</SettingsNotice>
 								)}
@@ -621,8 +652,16 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 														: [...list, { key: saved.id, storage: saved }];
 												})
 											}
-											onRemoved={() => {}}
-											hideDelete={true}
+											onRemoved={() =>
+												setStorageEntries(
+													(current) =>
+														current?.filter((item) => item.storage.id !== entry.storage.id) ??
+														current
+												)
+											}
+											hideDelete={
+												!storageEntries.some((item) => item.storage.id === entry.storage.id)
+											}
 											hideDropdown={true}
 										/>
 									);

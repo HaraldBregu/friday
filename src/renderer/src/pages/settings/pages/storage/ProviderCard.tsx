@@ -5,6 +5,7 @@ import {
 	ChevronDown,
 	ExternalLink,
 	HardDrive,
+	Loader2,
 	Pencil,
 	Trash2,
 } from 'lucide-react';
@@ -21,12 +22,13 @@ import {
 } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { openExternalUrl } from '@/lib/external-links';
 import type { PublicProvider } from '@shared/provider_types';
 import type { StorageConfig } from '../../../../../../shared/storage_types';
 import { getErrorMessage, MASKED_API_KEY_LABEL } from '../../../start/constants';
-import { SettingsField, SettingsNotice } from '../../components';
+import { SettingsField, SettingsNotice, SettingsRow } from '../../components';
 
 type StringConfigKey =
 	| 'name'
@@ -105,6 +107,7 @@ export function ProviderCard({
 	const [editing, setEditing] = useState(!storage.id);
 	const [expanded, setExpanded] = useState(!storage.id);
 	const [saving, setSaving] = useState(false);
+	const [testing, setTesting] = useState(false);
 	const [removing, setRemoving] = useState(false);
 	const [status, setStatus] = useState<{ ok: boolean; message: string } | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -148,6 +151,25 @@ export function ProviderCard({
 			setError(getErrorMessage(err, t('settings.storage.errors.save')));
 		} finally {
 			setSaving(false);
+		}
+	};
+
+	const test = async (): Promise<void> => {
+		setTesting(true);
+		setError(null);
+		setStatus(null);
+		try {
+			const result = await window.storage.testConnection(draft);
+			setStatus({
+				ok: result.ok,
+				message: result.ok
+					? t('settings.storage.testOk')
+					: (result.error ?? t('settings.storage.errors.test')),
+			});
+		} catch (err) {
+			setError(getErrorMessage(err, t('settings.storage.errors.test')));
+		} finally {
+			setTesting(false);
 		}
 	};
 
@@ -320,6 +342,25 @@ export function ProviderCard({
 									<GroupHeading>{t('settings.storage.credentialsTitle')}</GroupHeading>
 									{CREDENTIAL_FIELDS.map((field) => renderField(field, draft[field.key]))}
 								</section>
+
+								<section className="space-y-3">
+									<GroupHeading>{t('settings.storage.optionsTitle')}</GroupHeading>
+									<SettingsRow
+										title={t('settings.storage.forcePathStyle')}
+										description={t('settings.storage.forcePathStyleDescription')}
+										className="px-0"
+										actions={
+											<Switch
+												checked={draft.forcePathStyle}
+												aria-label={t('settings.storage.forcePathStyle')}
+												onCheckedChange={(checked) => {
+													setDraft((current) => ({ ...current, forcePathStyle: checked }));
+													setStatus(null);
+												}}
+											/>
+										}
+									/>
+								</section>
 							</div>
 						) : (
 							<div className="space-y-5">
@@ -338,13 +379,28 @@ export function ProviderCard({
 					</CardContent>
 
 					{(editing || isConfigured(canonical)) && (
-						<CardFooter className="justify-end gap-2">
+							<CardFooter className="flex-wrap justify-end gap-2">
+								{editing && (
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => void test()}
+										disabled={testing || saving}
+									>
+										{testing && <Loader2 className="size-3 animate-spin" />}
+										{testing ? t('settings.storage.testing') : t('settings.storage.test')}
+									</Button>
+								)}
 							{canonical.id && (
 								<Button variant="ghost" size="sm" onClick={cancelEditing} disabled={saving}>
 									{t('settings.storage.cancel')}
 								</Button>
 							)}
-							<Button size="sm" onClick={() => void save()} disabled={saving}>
+								<Button
+									size="sm"
+									onClick={() => void save()}
+									disabled={saving || testing}
+								>
 								{saving ? t('settings.storage.saving') : t('settings.storage.save')}
 							</Button>
 						</CardFooter>

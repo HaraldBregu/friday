@@ -1025,6 +1025,8 @@
 				"custom": "Pianificazione personalizzata"
 			},
 			"addProvider": "Aggiungi provider",
+			"addCustomProvider": "Aggiungi provider compatibile con S3",
+			"customProviderName": "Storage S3 personalizzato",
 			"removeProvider": "Rimuovi provider",
 			"newProviderTitle": "Nuovo storage",
 			"empty": "Nessun provider di archiviazione configurato.",

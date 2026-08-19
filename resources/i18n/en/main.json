@@ -1026,6 +1026,8 @@
 				"custom": "Custom schedule"
 			},
 			"addProvider": "Add provider",
+			"addCustomProvider": "Add S3-compatible provider",
+			"customProviderName": "Custom S3 storage",
 			"removeProvider": "Remove provider",
 			"newProviderTitle": "New storage",
 			"empty": "No storage providers configured yet.",
