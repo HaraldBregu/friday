@@ -210,14 +210,12 @@ it('turns terminal failures into tool errors and preserves interrupted task refe
 });
 
 it('uses readable state fallback text instead of numeric enum values', async () => {
-	const sendMessage = jest
-		.fn()
-		.mockResolvedValue({
-			id: 'task-1',
-			contextId: 'ctx',
-			status: { state: TaskState.TASK_STATE_COMPLETED },
-			artifacts: [],
-		});
+	const sendMessage = jest.fn().mockResolvedValue({
+		id: 'task-1',
+		contextId: 'ctx',
+		status: { state: TaskState.TASK_STATE_COMPLETED },
+		artifacts: [],
+	});
 	mockCreateFromAgentCard.mockResolvedValue({ sendMessage });
 	await expect(sendA2aMessage('target', 'work')).resolves.toBe(
 		'Remote task task-1 (context ctx) is completed.'
