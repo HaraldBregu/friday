@@ -151,11 +151,13 @@ const menuManager = new Menu({
 	onTrayEnabledChange: (enabled) => {
 		setStoredTrayEnabled(enabled);
 		setTrayEnabled(trayManager, enabled);
+		eventBus.broadcast(AppChannels.trayEnabledChanged, enabled);
 	},
 	getKeepAwake,
 	onKeepAwakeChange: (enabled) => {
 		setStoredKeepAwake(enabled);
 		setKeepAwake(enabled);
+		eventBus.broadcast(AppChannels.keepAwakeChanged, enabled);
 	},
 	getTheme,
 	onThemeChange: (theme) => {
