@@ -32,7 +32,7 @@ import {
 	SettingsRow,
 } from '../../components';
 import { ProviderCard } from './ProviderCard';
-import { SYNC_INTERVALS } from './constants';
+import { DEFAULT_SYNC_CRON_EXPRESSION, SYNC_INTERVALS } from './constants';
 
 const BLANK_STORAGE: StorageConfig = {
 	id: '',
@@ -43,6 +43,9 @@ const BLANK_STORAGE: StorageConfig = {
 	secretAccessKey: '',
 	bucket: '',
 	forcePathStyle: false,
+	paths: [],
+	syncEnabled: false,
+	syncCronExpression: DEFAULT_SYNC_CRON_EXPRESSION,
 };
 
 interface StorageEntry {

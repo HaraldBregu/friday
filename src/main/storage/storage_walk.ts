@@ -6,7 +6,9 @@ export async function walkFiles(dir: string): Promise<string[]> {
 	const nested = await Promise.all(
 		entries.map((entry) => {
 			const full = path.join(dir, entry.name);
-			return entry.isDirectory() ? walkFiles(full) : Promise.resolve([full]);
+			if (entry.isSymbolicLink()) return Promise.resolve([]);
+			if (entry.isDirectory()) return walkFiles(full);
+			return Promise.resolve(entry.isFile() ? [full] : []);
 		})
 	);
 	return nested.flat();

@@ -1,4 +1,10 @@
-export interface StorageConfig {
+export interface StorageSyncSettings {
+	paths: string[];
+	syncEnabled: boolean;
+	syncCronExpression: string;
+}
+
+export interface StorageConfig extends StorageSyncSettings {
 	id: string;
 	name: string;
 	endpoint: string;
@@ -12,13 +18,13 @@ export interface StorageConfig {
 export interface StorageConfiguration {
 	providerId: string | undefined;
 	storageId: string | undefined;
-	paths: string[];
-	syncEnabled: boolean;
-	syncCronExpression: string;
+	paths: StorageSyncSettings['paths'];
+	syncEnabled: StorageSyncSettings['syncEnabled'];
+	syncCronExpression: StorageSyncSettings['syncCronExpression'];
 }
 
 export interface StorageSyncFolder {
-	key: 'agent';
+	key: 'agent' | 'sessions' | 'library' | 'wiki' | 'skills';
 	path: string;
 }
 

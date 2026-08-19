@@ -1,17 +1,23 @@
-import { app, BrowserWindow, crashReporter, nativeTheme } from 'electron';
-import { existsSync, readFileSync } from 'node:fs';
+import { app, BrowserWindow, crashReporter, nativeTheme, shell } from 'electron';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Main } from './create_window';
 import { Tray } from './tray';
 import { setTrayEnabled } from './set_tray_enabled';
 import {
 	getTrayEnabled,
+	setTrayEnabled as setStoredTrayEnabled,
+	getKeepAwake,
+	setKeepAwake as setStoredKeepAwake,
 	getLanguage,
 	setLanguage as setStoredLanguage,
 	getTheme,
+	setTheme as setStoredTheme,
 } from './settings_store';
 import type { AppLanguage } from '../shared/app_types';
 import { Menu } from './menu';
+import { setKeepAwake } from './keep_awake';
+import { userDataLocation } from './shared/user_data_location';
 import {
 	ensureExtensions,
 	listExtensions,
@@ -134,6 +140,28 @@ const menuManager = new Menu({
 	},
 	getExtensions: () => listExtensions(),
 	onOpenExtension: (extension) => loadExtension(windowFactory, extension),
+	onOpenAppDataFolder: () => {
+		void shell.openPath(app.getPath('userData'));
+	},
+	onOpenDataFolder: () => {
+		mkdirSync(userDataLocation(), { recursive: true });
+		void shell.openPath(userDataLocation());
+	},
+	getTrayEnabled,
+	onTrayEnabledChange: (enabled) => {
+		setStoredTrayEnabled(enabled);
+		setTrayEnabled(trayManager, enabled);
+	},
+	getKeepAwake,
+	onKeepAwakeChange: (enabled) => {
+		setStoredKeepAwake(enabled);
+		setKeepAwake(enabled);
+	},
+	getTheme,
+	onThemeChange: (theme) => {
+		setStoredTheme(theme);
+		nativeTheme.themeSource = theme;
+	},
 });
 
 app.whenReady().then(async () => {

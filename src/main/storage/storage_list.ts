@@ -5,12 +5,27 @@ import { storageClient } from './storage_client';
 // ponytail: returns first page only (up to 1000 keys); add ContinuationToken paging if buckets grow larger
 export async function listObjects(id: string, prefix?: string): Promise<StorageObjectInfo[]> {
 	const { client, bucket } = storageClient(id);
-	const response = await client.send(
-		new ListObjectsV2Command({ Bucket: bucket, ...(prefix ? { Prefix: prefix } : {}) })
-	);
-	return (response.Contents ?? []).map((item) => ({
-		key: item.Key ?? '',
-		size: item.Size ?? 0,
-		lastModified: item.LastModified?.toISOString(),
-	}));
+	const objects: StorageObjectInfo[] = [];
+	let continuationToken: string | undefined;
+	do {
+		const response = await client.send(
+			new ListObjectsV2Command({
+				Bucket: bucket,
+				...(prefix ? { Prefix: prefix } : {}),
+				...(continuationToken ? { ContinuationToken: continuationToken } : {}),
+			})
+		);
+		objects.push(
+			...(response.Contents ?? []).map((item) => ({
+				key: item.Key ?? '',
+				size: item.Size ?? 0,
+				lastModified: item.LastModified?.toISOString(),
+			}))
+		);
+		continuationToken = response.NextContinuationToken;
+		if (response.IsTruncated && !continuationToken) {
+			throw new Error('Storage returned an incomplete object listing.');
+		}
+	} while (continuationToken);
+	return objects;
 }

@@ -6,7 +6,11 @@ import type {
 	StoredProvider,
 	StoredProviderKind,
 } from '../shared/provider_types';
-import type { StorageConfig, StorageConfiguration } from '../shared/storage_types';
+import type {
+	StorageConfig,
+	StorageConfiguration,
+	StorageSyncSettings,
+} from '../shared/storage_types';
 import { userDataLocation } from './shared/user_data_location';
 import { DEFAULT_SYNC_CRON_EXPRESSION } from './storage/storage_sync_types';
 import { loadStorages } from './models';
@@ -227,7 +231,11 @@ export function getResolvedProvider(providerId: string | undefined): ResolvedPro
 	};
 }
 
-function toStorageConfig(stored: StoredStorage): StorageConfig {
+function toStorageConfig(
+	stored: StoredStorage,
+	legacy: StorageConfiguration = getStorageConfiguration()
+): StorageConfig {
+	const fallback = legacy.providerId === stored.id ? legacy : DEFAULT_STORAGE_CONFIGURATION;
 	return {
 		id: stored.id,
 		name: stored.name,
@@ -237,6 +245,13 @@ function toStorageConfig(stored: StoredStorage): StorageConfig {
 		secretAccessKey: stored.secretAccessKey,
 		bucket: stored.bucket,
 		forcePathStyle: stored.forcePathStyle === true,
+		paths: Array.isArray(stored.paths) ? stored.paths : fallback.paths,
+		syncEnabled:
+			typeof stored.syncEnabled === 'boolean' ? stored.syncEnabled : fallback.syncEnabled,
+		syncCronExpression:
+			typeof stored.syncCronExpression === 'string'
+				? stored.syncCronExpression
+				: fallback.syncCronExpression,
 	};
 }
 
@@ -250,18 +265,16 @@ function toStoredStorage(config: StorageConfig): StoredStorage {
 		secretAccessKey: config.secretAccessKey,
 		bucket: config.bucket,
 		forcePathStyle: config.forcePathStyle,
+		paths: config.paths,
+		syncEnabled: config.syncEnabled,
+		syncCronExpression: config.syncCronExpression,
 		baseUrl: loadStorages().find((entry) => entry.provider.id === config.id)?.url ?? '',
 	};
 }
 
 export function getStorages(): StorageConfig[] {
 	const configuration = getStorageConfiguration();
-	return getStoredStorages().map((storage) => ({
-		...toStorageConfig(storage),
-		paths: configuration.paths,
-		syncEnabled: configuration.syncEnabled,
-		syncCronExpression: configuration.syncCronExpression,
-	}));
+	return getStoredStorages().map((storage) => toStorageConfig(storage, configuration));
 }
 
 export function getStorage(id: string): StorageConfig | undefined {
@@ -270,11 +283,15 @@ export function getStorage(id: string): StorageConfig | undefined {
 }
 
 export function saveStorageConfig(config: StorageConfig): StorageConfig {
-	const configuration = config as StorageConfig & Partial<StorageConfiguration>;
-	if (configuration.syncEnabled && !cron.validate(configuration.syncCronExpression ?? '')) {
+	if (config.syncEnabled && !cron.validate(config.syncCronExpression)) {
 		throw new Error('Storage sync schedule must be a valid cron expression.');
 	}
-	const saved = toStoredStorage({ ...config, id: config.id || crypto.randomUUID() });
+	const saved = toStoredStorage({
+		...config,
+		id: config.id || crypto.randomUUID(),
+		paths: normalizeStoragePaths(config.paths),
+		syncCronExpression: config.syncCronExpression.trim().replace(/\s+/g, ' '),
+	});
 	const storages = getStoredStorages();
 	const index = storages.findIndex((storage) => storage.id === saved.id);
 	setStorageProvidersState(
@@ -283,22 +300,16 @@ export function saveStorageConfig(config: StorageConfig): StorageConfig {
 			: [...storages, saved]
 	);
 	const current = getStorageConfiguration();
-	if (
-		configuration.paths ||
-		configuration.syncEnabled !== undefined ||
-		configuration.syncCronExpression
-	) {
+	if (!current.providerId || current.providerId === saved.id) {
 		saveStorageConfiguration({
 			...current,
-			providerId: current.providerId ?? saved.id,
-			paths: configuration.paths ?? current.paths,
-			syncEnabled: configuration.syncEnabled ?? current.syncEnabled,
-			syncCronExpression: configuration.syncCronExpression ?? current.syncCronExpression,
+			providerId: saved.id,
+			paths: saved.paths ?? [],
+			syncEnabled: saved.syncEnabled ?? false,
+			syncCronExpression: saved.syncCronExpression ?? DEFAULT_SYNC_CRON_EXPRESSION,
 		});
-	} else if (!current.providerId) {
-		saveStorageConfiguration({ ...current, providerId: saved.id });
 	}
-	return toStorageConfig(saved);
+	return toStorageConfig(saved, getStorageConfiguration());
 }
 
 export function deleteStorageConfig(id: string): void {
@@ -350,12 +361,22 @@ export function saveStorageConfiguration(
 		storageId: configuration.providerId
 			? loadStorages().find((entry) => entry.provider.id === configuration.providerId)?.id
 			: undefined,
-		paths: configuration.paths.filter((entry) => typeof entry === 'string'),
+		paths: normalizeStoragePaths(configuration.paths),
 		syncEnabled: configuration.syncEnabled,
 		syncCronExpression: configuration.syncCronExpression.trim().replace(/\s+/g, ' '),
 	};
 	store.set('cloud', saved);
 	return saved;
+}
+
+function normalizeStoragePaths(paths: StorageSyncSettings['paths']): string[] {
+	return [
+		...new Set(
+			paths
+				.filter((entry) => typeof entry === 'string' && path.isAbsolute(entry))
+				.map((entry) => path.resolve(entry))
+		),
+	];
 }
 
 function getStoredStorages(): StoredStorage[] {

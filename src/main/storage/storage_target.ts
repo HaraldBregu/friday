@@ -1,0 +1,28 @@
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+
+export async function storageTarget(root: string, key: string, prefix: string): Promise<string> {
+	const relativeKey = key.slice(prefix.length);
+	const segments = relativeKey.split('/');
+	if (!relativeKey || segments.some((segment) => !segment || segment === '.' || segment === '..')) {
+		throw new Error(`Unsafe storage object key: ${key}`);
+	}
+	const resolvedRoot = path.resolve(root);
+	const target = path.resolve(resolvedRoot, ...segments);
+	const relative = path.relative(resolvedRoot, target);
+	if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+		throw new Error(`Storage object escapes the selected folder: ${key}`);
+	}
+	let current = resolvedRoot;
+	for (const segment of segments.slice(0, -1)) {
+		current = path.join(current, segment);
+		try {
+			if ((await fs.lstat(current)).isSymbolicLink()) {
+				throw new Error(`Storage object crosses a symbolic link: ${key}`);
+			}
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+		}
+	}
+	return target;
+}

@@ -106,6 +106,9 @@ function blankStorage(provider: PublicProvider): StorageConfig {
 		secretAccessKey: '',
 		bucket: '',
 		forcePathStyle: false,
+		paths: [],
+		syncEnabled: false,
+		syncCronExpression: '0 3 * * *',
 	};
 }
 
