@@ -431,8 +431,10 @@ export interface AppApi {
 	unfurlUrl: (url: string) => Promise<import('./app_types').UrlMetadata>;
 	setTrayEnabled: (enabled: boolean) => Promise<void>;
 	getTrayEnabled: () => Promise<boolean>;
+	onTrayEnabledChanged: (callback: (enabled: boolean) => void) => () => void;
 	setKeepAwake: (enabled: boolean) => Promise<void>;
 	getKeepAwake: () => Promise<boolean>;
+	onKeepAwakeChanged: (callback: (enabled: boolean) => void) => () => void;
 	setLanguage: (language: AppLanguage) => Promise<void>;
 	getLanguage: () => Promise<AppLanguage>;
 	setTheme: (theme: AppTheme) => Promise<void>;
