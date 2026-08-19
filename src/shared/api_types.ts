@@ -10,11 +10,9 @@ import type { SearchEngineId, SearchEngineInput, SearchSettings } from './search
 import type {
 	StorageConfig,
 	StorageConfiguration,
-	StorageObjectInfo,
 	StoragePullResult,
 	StoragePushResult,
 	StorageSyncFolder,
-	StorageSyncResult,
 	StorageTestResult,
 } from './storage_types';
 import type { DatabaseConfiguration } from './database_types';
@@ -239,15 +237,10 @@ export interface StorageApi {
 	saveStorageConfig: (config: StorageConfig) => Promise<StorageConfig>;
 	deleteStorageConfig: (id: string) => Promise<void>;
 	testConnection: (config: StorageConfig) => Promise<StorageTestResult>;
-	listObjects: (id: string, prefix?: string) => Promise<StorageObjectInfo[]>;
-	putObject: (id: string, key: string, data: Uint8Array, contentType?: string) => Promise<void>;
-	getObject: (id: string, key: string) => Promise<Uint8Array>;
-	deleteObject: (id: string, key: string) => Promise<void>;
-	sync: (id: string, localDir: string, prefix?: string) => Promise<StorageSyncResult>;
 	syncFolders: () => Promise<StorageSyncFolder[]>;
 	pickFolders: () => Promise<string[]>;
-	push: (id: string) => Promise<StoragePushResult>;
-	pull: (id: string) => Promise<StoragePullResult>;
+	backup: (id: string) => Promise<StoragePushResult>;
+	restore: (id: string) => Promise<StoragePullResult>;
 }
 
 export interface DatabaseApi {

@@ -164,7 +164,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 		try {
 			const saved = await saveSync();
 			if (!saved?.providerId) return;
-			const result = await window.storage.push(saved.providerId);
+			const result = await window.storage.backup(saved.providerId);
 			setSyncStatus(
 				result.failed.length > 0
 					? t('settings.storage.pushPartial', {

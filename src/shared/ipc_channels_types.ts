@@ -604,26 +604,6 @@ export interface StorageInvokeChannelMap {
 		args: [config: import('./storage_types').StorageConfig];
 		result: import('./storage_types').StorageTestResult;
 	};
-	[StorageChannels.listObjects]: {
-		args: [id: string, prefix?: string];
-		result: import('./storage_types').StorageObjectInfo[];
-	};
-	[StorageChannels.putObject]: {
-		args: [id: string, key: string, data: Uint8Array, contentType?: string];
-		result: void;
-	};
-	[StorageChannels.getObject]: {
-		args: [id: string, key: string];
-		result: Uint8Array;
-	};
-	[StorageChannels.deleteObject]: {
-		args: [id: string, key: string];
-		result: void;
-	};
-	[StorageChannels.sync]: {
-		args: [id: string, localDir: string, prefix?: string];
-		result: import('./storage_types').StorageSyncResult;
-	};
 	[StorageChannels.syncFolders]: {
 		args: [];
 		result: import('./storage_types').StorageSyncFolder[];
@@ -632,11 +612,11 @@ export interface StorageInvokeChannelMap {
 		args: [];
 		result: string[];
 	};
-	[StorageChannels.push]: {
+	[StorageChannels.backup]: {
 		args: [id: string];
 		result: import('./storage_types').StoragePushResult;
 	};
-	[StorageChannels.pull]: {
+	[StorageChannels.restore]: {
 		args: [id: string];
 		result: import('./storage_types').StoragePullResult;
 	};

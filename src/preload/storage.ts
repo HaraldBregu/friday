@@ -10,14 +10,8 @@ export const storage: StorageApi = {
 	saveStorageConfig: (config) => typedInvokeUnwrap(StorageChannels.saveStorageConfig, config),
 	deleteStorageConfig: (id) => typedInvokeUnwrap(StorageChannels.deleteStorageConfig, id),
 	testConnection: (config) => typedInvokeUnwrap(StorageChannels.testConnection, config),
-	listObjects: (id, prefix) => typedInvokeUnwrap(StorageChannels.listObjects, id, prefix),
-	putObject: (id, key, data, contentType) =>
-		typedInvokeUnwrap(StorageChannels.putObject, id, key, data, contentType),
-	getObject: (id, key) => typedInvokeUnwrap(StorageChannels.getObject, id, key),
-	deleteObject: (id, key) => typedInvokeUnwrap(StorageChannels.deleteObject, id, key),
-	sync: (id, localDir, prefix) => typedInvokeUnwrap(StorageChannels.sync, id, localDir, prefix),
 	syncFolders: () => typedInvokeUnwrap(StorageChannels.syncFolders),
 	pickFolders: () => typedInvokeUnwrap(StorageChannels.pickFolders),
-	push: (id) => typedInvokeUnwrap(StorageChannels.push, id),
-	pull: (id) => typedInvokeUnwrap(StorageChannels.pull, id),
+	backup: (id) => typedInvokeUnwrap(StorageChannels.backup, id),
+	restore: (id) => typedInvokeUnwrap(StorageChannels.restore, id),
 };

@@ -217,15 +217,10 @@ export const StorageChannels = {
 	saveStorageConfig: 'storage:save',
 	deleteStorageConfig: 'storage:delete',
 	testConnection: 'storage:test-connection',
-	listObjects: 'storage:list-objects',
-	putObject: 'storage:put-object',
-	getObject: 'storage:get-object',
-	deleteObject: 'storage:delete-object',
-	sync: 'storage:sync',
 	syncFolders: 'storage:sync-folders',
 	pickFolders: 'storage:pick-folders',
-	push: 'storage:push',
-	pull: 'storage:pull',
+	backup: 'storage:backup',
+	restore: 'storage:restore',
 } as const;
 
 export const DatabaseChannels = {

@@ -66,7 +66,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('skills', () => new SkillsIpc().register(undefined, eventBus));
 	safeRegister('provider-store', () => new ProviderStoreIpc().register(undefined, eventBus));
 	safeRegister('search', () => new SearchIpc().register(undefined, eventBus));
-	safeRegister('storage', () => new StorageIpc().register(undefined, eventBus));
+	safeRegister('storage', () => new StorageIpc().register({ extensionRegistry }, eventBus));
 	safeRegister('database', () => new DatabaseIpc().register(undefined, eventBus));
 	safeRegister('extensions', () => new ExtensionsIpc().register({ windowFactory }, eventBus));
 	safeRegister('wiki', () => new WikiIpc().register(undefined, eventBus));
