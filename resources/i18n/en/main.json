@@ -986,6 +986,7 @@
 		"storage": {
 			"configurationTitle": "Object Storage Configuration",
 			"configureProvider": "Configure storage provider",
+			"manageProviders": "Manage providers",
 			"description": "Configure one or more S3-compatible storage providers for your files.",
 			"profile": {
 				"title": "Storage profile",
@@ -1021,7 +1022,8 @@
 				"every12h": "Every 12 hours",
 				"every1d": "Every day",
 				"every2d": "Every 2 days",
-				"every7d": "Every 7 days"
+				"every7d": "Every 7 days",
+				"custom": "Custom schedule"
 			},
 			"addProvider": "Add provider",
 			"removeProvider": "Remove provider",
@@ -1058,7 +1060,18 @@
 			"pathsTitle": "Folders to sync",
 			"pathsSubtitle": "Choose which folders sync with this bucket.",
 			"folders": {
-				"agent": "Assistant workspace"
+				"agent": "Assistant workspace",
+				"sessions": "Assistant conversations",
+				"library": "Media library",
+				"wiki": "Wiki data",
+				"skills": "Installed skills"
+			},
+			"backup": "Back up now",
+			"restore": "Restore from cloud",
+			"restoreDialog": {
+				"title": "Restore from cloud?",
+				"description": "Cloud files replace matching local files in the selected folders. Other local files are kept.",
+				"confirm": "Restore files"
 			},
 			"push": "Push to bucket",
 			"pushing": "Pushing…",

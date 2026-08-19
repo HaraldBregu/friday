@@ -985,6 +985,7 @@
 		"storage": {
 			"configurationTitle": "Configurazione archiviazione oggetti",
 			"configureProvider": "Configura provider di archiviazione",
+			"manageProviders": "Gestisci provider",
 			"description": "Configura uno o più provider di archiviazione compatibili con S3 per i tuoi file.",
 			"profile": {
 				"title": "Profilo di archiviazione",
@@ -1020,7 +1021,8 @@
 				"every12h": "Ogni 12 ore",
 				"every1d": "Ogni giorno",
 				"every2d": "Ogni 2 giorni",
-				"every7d": "Ogni 7 giorni"
+				"every7d": "Ogni 7 giorni",
+				"custom": "Pianificazione personalizzata"
 			},
 			"addProvider": "Aggiungi provider",
 			"removeProvider": "Rimuovi provider",
@@ -1057,7 +1059,18 @@
 			"pathsTitle": "Cartelle da sincronizzare",
 			"pathsSubtitle": "Scegli quali cartelle sincronizzare con questo bucket.",
 			"folders": {
-				"agent": "Area di lavoro dell'assistente"
+				"agent": "Area di lavoro dell'assistente",
+				"sessions": "Conversazioni dell'assistente",
+				"library": "Libreria multimediale",
+				"wiki": "Dati wiki",
+				"skills": "Skill installate"
+			},
+			"backup": "Esegui backup ora",
+			"restore": "Ripristina dal cloud",
+			"restoreDialog": {
+				"title": "Ripristinare dal cloud?",
+				"description": "I file cloud sostituiscono i file locali corrispondenti nelle cartelle selezionate. Gli altri file locali vengono conservati.",
+				"confirm": "Ripristina file"
 			},
 			"push": "Carica sul bucket",
 			"pushing": "Caricamento…",
