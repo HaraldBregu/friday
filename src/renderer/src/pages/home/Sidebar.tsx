@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { CircleHelp, Plus, Settings2 } from 'lucide-react';
+import { Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -209,15 +209,6 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 						</span>
 						<span className="min-w-0 truncate text-sm font-medium">{t('settings.title')}</span>
 					</Link>
-					<button
-						type="button"
-						aria-label={t('menu.helpAndSupport')}
-						title={t('menu.helpAndSupport')}
-						onClick={() => void window.app.openExternalUrl(__APP_HOMEPAGE__)}
-						className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-sidebar-accent text-sidebar-foreground/70 outline-none transition-colors hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
-					>
-						<CircleHelp className="size-4" strokeWidth={1.8} aria-hidden="true" />
-					</button>
 				</div>
 			</footer>
 		</div>
