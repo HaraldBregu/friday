@@ -19,7 +19,11 @@ export {
 	type WorkspaceFileType,
 } from '../../src/shared/workspace';
 export type { ContextMenuDescriptor, ContextMenuRole } from '../../src/shared/window_types';
-export type { ExtensionStoreValue } from '../../src/shared/extension_store_types';
+export type {
+	ExtensionStorageApi,
+	ExtensionStoreValue,
+} from '../../src/shared/extension_store_types';
+export { isExtensionStoreValue } from '../../src/shared/extension_store_value';
 
 // Typed lazy views over the host preload globals.
 function bridge<T extends object>(name: string): T {
@@ -32,6 +36,11 @@ function bridge<T extends object>(name: string): T {
 				throw new Error(
 					`@friday/sdk: "${name}" is unavailable — this code must run inside the Friday app.`
 				);
+			if (!(key in api)) {
+				throw new Error(
+					`@friday/sdk: "${name}.${String(key)}" is unavailable — update the Friday host.`
+				);
+			}
 			const value = api[key];
 			return typeof value === 'function' ? value.bind(api) : value;
 		},

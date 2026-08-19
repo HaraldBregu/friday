@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { agent, app, connect, isFriday, win } from './dist/packages/sdk/index.js';
+import {
+	agent,
+	app,
+	connect,
+	isExtensionStoreValue,
+	isFriday,
+	win,
+} from './dist/packages/sdk/index.js';
 
 // --- embedded mode: bound to the app's preload globals ----------------------
 
@@ -70,6 +77,8 @@ globalThis.win = {
 };
 
 assert.equal(isFriday(), true);
+assert.equal(isExtensionStoreValue({ color: 'blue', sizes: [1, 2] }), true);
+assert.equal(isExtensionStoreValue({ invalid: Number.NaN }), false);
 assert.deepEqual(await app.getThemeData(), {
 	themeMode: 'system',
 	isDark: false,
@@ -83,6 +92,10 @@ await app.writeExtensionStoreFile('assets/data.bin', new Uint8Array([4, 5, 6]));
 assert.deepEqual(await app.readExtensionStoreFile('assets/data.bin'), new Uint8Array([4, 5, 6]));
 await app.deleteExtensionStoreFile('assets/data.bin');
 await assert.rejects(app.readExtensionStoreFile('assets/data.bin'), /not found/);
+const writeExtensionStoreFile = globalThis.app.writeExtensionStoreFile;
+delete globalThis.app.writeExtensionStoreFile;
+assert.throws(() => app.writeExtensionStoreFile, /app\.writeExtensionStoreFile.*update the Friday host/);
+globalThis.app.writeExtensionStoreFile = writeExtensionStoreFile;
 assert.equal(await agent.getWorkspaceLocation(), '/tmp/friday-workspace');
 assert.deepEqual(await agent.listWorkspaceFiles(), [workspaceFile]);
 assert.equal(await agent.readWorkspaceFile('USER.md'), 'content:USER.md');

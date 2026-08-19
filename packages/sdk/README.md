@@ -100,6 +100,17 @@ extension namespace from the calling view, so extensions never pass or select an
 Values are JSON state stored in plaintext and should not contain passwords or API keys. File paths
 are relative to the extension's isolated files directory, and file data uses `Uint8Array`.
 
+Value keys must be non-empty strings; prototype-related and internal keys are reserved. A missing
+value returns `undefined`. Values must contain only finite numbers, strings, booleans, null, dense
+arrays, and plain objects. The generic parameter on `getExtensionStoreValue()` is a TypeScript
+assertion, not runtime schema validation; `isExtensionStoreValue()` validates only this JSON-safe
+shape.
+
+File paths use forward slashes and cannot be absolute, empty, or contain `.` / `..` segments. Writes
+atomically replace an existing file, missing-file reads reject, and both delete methods are
+idempotent. Stored data is retained when an extension is removed, so reinstalling the same
+extension ID restores its state.
+
 ## Development
 
 Run these commands from the repository root:

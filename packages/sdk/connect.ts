@@ -3,6 +3,7 @@ import { AgentChannels, AppChannels } from '../../src/shared/ipc_channels_defini
 import type { AgentApi, AppApi } from '../../src/shared/api_types';
 import type { ChannelStatusEvent } from '../../src/shared/channels_types';
 import type { AppThemeData } from '../../src/shared/app_types';
+import type { ExtensionStorageApi } from '../../src/shared/extension_store_types';
 import type { WorkspaceChangeEvent } from '../../src/shared/agent_types';
 
 export type WorkspaceAgentApi = Pick<
@@ -21,22 +22,20 @@ export type WorkspaceAgentApi = Pick<
 	| 'deleteWorkspaceDirectory'
 >;
 
-const extensionStoreAppMethods = [
-	'getExtensionStoreValue',
-	'setExtensionStoreValue',
-	'deleteExtensionStoreValue',
-	'readExtensionStoreFile',
-	'writeExtensionStoreFile',
-	'deleteExtensionStoreFile',
-] as const;
+const extensionStoreAppMethods = {
+	getExtensionStoreValue: true,
+	setExtensionStoreValue: true,
+	deleteExtensionStoreValue: true,
+	readExtensionStoreFile: true,
+	writeExtensionStoreFile: true,
+	deleteExtensionStoreFile: true,
+} satisfies Record<keyof ExtensionStorageApi, true>;
 
-type ExtensionStoreAppMethod = (typeof extensionStoreAppMethods)[number];
+type ExtensionStoreAppMethod = keyof typeof extensionStoreAppMethods;
 export type RemoteAppApi = Omit<AppApi, ExtensionStoreAppMethod>;
 
 const RemoteAppChannels = Object.fromEntries(
-	Object.entries(AppChannels).filter(
-		([method]) => !extensionStoreAppMethods.includes(method as ExtensionStoreAppMethod)
-	)
+	Object.entries(AppChannels).filter(([method]) => !Object.hasOwn(extensionStoreAppMethods, method))
 ) as Omit<typeof AppChannels, ExtensionStoreAppMethod>;
 
 export interface ConnectOptions {
