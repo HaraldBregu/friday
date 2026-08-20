@@ -13,10 +13,18 @@ interface PreviewProps {
 
 export const Preview = memo(function Preview({ inputProps, playerRef }: PreviewProps) {
 	const { project } = inputProps;
+	const portrait = project.height > project.width;
 	return (
 		<section className="preview-panel" aria-label="Video preview">
 			<div className="preview-stage">
-				<div className="player-shell" style={{ aspectRatio: `${project.width} / ${project.height}` }}>
+				<div
+					className="player-shell"
+					style={{
+						aspectRatio: `${project.width} / ${project.height}`,
+						width: portrait ? 'auto' : 'min(100%, 760px)',
+						height: portrait ? '100%' : 'auto',
+					}}
+				>
 					<Player<AnyZodObject, CompositionProps>
 						ref={playerRef}
 						component={VideoComposition}
