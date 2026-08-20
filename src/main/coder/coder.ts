@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, statSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import {
 	createAgentSession,
@@ -7,34 +7,46 @@ import {
 	SessionManager,
 	SettingsManager,
 	type AgentSessionEvent,
+	type SessionInfo,
 } from '@earendil-works/pi-coding-agent';
 import type { StoredProvider } from '../../shared/provider_types';
 import type {
 	CoderAuthEvent,
 	CoderAuthStatus,
 	CoderCatalog,
+	CoderProject,
 	CoderProvider,
 	CoderProviderId,
 	CoderResponseEvent,
+	CoderRunRequest,
+	CoderRunResult,
+	CoderSessionBlock,
+	CoderSessionSnapshot,
+	CoderSessionSummary,
 	CoderSettings,
 } from '../../shared/coder_types';
-import { coderLocation } from './location';
+import { coderLocation, coderSessionsLocation } from './location';
+import { CoderProjectStore } from './projects';
 import { CoderStore } from './store';
 
 const SUPPORTED_PROVIDERS: readonly CoderProviderId[] = ['openai-codex', 'openai', 'anthropic'];
 const READ_ONLY_TOOLS = ['read', 'grep', 'find', 'ls'];
 const CODING_TOOLS = ['read', 'bash', 'edit', 'write', 'grep', 'find', 'ls'];
-const RUN_TIMEOUT_MS = 10 * 60 * 1000;
+const RUN_TIMEOUT_MS = 30 * 60 * 1000;
 const AUTH_TIMEOUT_MS = 10 * 60 * 1000;
 
 interface ActiveRun {
-	readonly windowId: number;
+	readonly ownerId: number;
+	readonly projectId: string;
+	readonly sessionId: string;
+	readonly sessionKey: string;
 	readonly controller: AbortController;
 	abortSession?: () => Promise<void>;
 }
 
 interface CoderDependencies {
 	readonly store: CoderStore;
+	readonly projects: CoderProjectStore;
 	readonly getProvider: (providerId: string) => StoredProvider | undefined;
 }
 
@@ -45,6 +57,7 @@ export class Coder {
 
 	constructor(private readonly dependencies: CoderDependencies) {
 		mkdirSync(coderLocation(), { recursive: true });
+		mkdirSync(coderSessionsLocation(), { recursive: true });
 	}
 
 	getSettings(): CoderSettings {
@@ -53,6 +66,43 @@ export class Coder {
 
 	saveSettings(settings: CoderSettings): CoderSettings {
 		return this.dependencies.store.set(settings);
+	}
+
+	listProjects(): CoderProject[] {
+		return this.dependencies.projects.list();
+	}
+
+	addProject(directory: string): CoderProject {
+		return this.dependencies.projects.add(directory);
+	}
+
+	removeProject(projectId: string): boolean {
+		if ([...this.runs.values()].some((run) => run.projectId === projectId)) {
+			throw new Error('Stop the active project run before removing it from Coder.');
+		}
+		return this.dependencies.projects.remove(projectId);
+	}
+
+	async listSessions(projectId: string): Promise<CoderSessionSummary[]> {
+		const project = this.requireProject(projectId);
+		const sessions = await SessionManager.list(project.directory, coderSessionsLocation());
+		return sessions.map((session) => this.sessionSummary(project.id, session));
+	}
+
+	async getSession(projectId: string, sessionId: string): Promise<CoderSessionSnapshot> {
+		const project = this.requireProject(projectId);
+		const sessionInfo = await this.requireSession(project, sessionId);
+		const manager = SessionManager.open(
+			sessionInfo.path,
+			coderSessionsLocation(),
+			project.directory
+		);
+		const blocks = manager
+			.buildSessionContext()
+			.messages.map((message, index) => this.sessionBlock(message, index))
+			.filter((block): block is CoderSessionBlock => Boolean(block));
+		this.dependencies.projects.touch(project.id);
+		return { session: this.sessionSummary(project.id, sessionInfo), blocks };
 	}
 
 	async listModels(): Promise<CoderCatalog> {
