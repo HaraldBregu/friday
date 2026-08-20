@@ -1,4 +1,4 @@
-import { Braces, Code2, FolderGit2, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Braces, Code2, FolderGit2, PanelLeftClose, RotateCcw, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import type { CoderController } from '@/controller';
@@ -8,7 +8,16 @@ export function Sidebar({ coder }: { coder: CoderController }) {
 		<div className="coder-sidebar-inner">
 			<div className="coder-brand">
 				<div className="coder-brand-mark"><Code2 /></div>
-				<div><strong>Coder</strong><span>Pi coding agent</span></div>
+				<div className="coder-brand-copy"><strong>Coder</strong><span>Pi coding agent</span></div>
+				<Button
+					className="coder-sidebar-close"
+					variant="ghost"
+					size="icon"
+					aria-label="Hide left sidebar"
+					onClick={() => coder.setLeftOpen(false)}
+				>
+					<PanelLeftClose />
+				</Button>
 			</div>
 			<Button
 				className="coder-new-task"
