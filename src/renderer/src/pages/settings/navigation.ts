@@ -5,6 +5,7 @@ import {
 	Blocks,
 	BotMessageSquare,
 	Cloud,
+	Code2,
 	Database,
 	Folder,
 	HeartPulse,
@@ -61,6 +62,14 @@ export const SETTINGS_MODEL_SERVICE_ITEMS: readonly SettingsModelServiceItem[] =
 		descriptionKey: 'settings.modelServices.fridayDescription',
 		keywords: 'friday service default provider model',
 		icon: Bot,
+	},
+	{
+		id: AGENTS.coder,
+		path: '/settings/coder',
+		labelKey: 'settings.coder.title',
+		descriptionKey: 'settings.coder.description',
+		keywords: 'coder coding pi codex anthropic claude openai agent harness runtime',
+		icon: Code2,
 	},
 	{
 		id: AGENTS.speechToText,

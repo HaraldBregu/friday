@@ -9,42 +9,42 @@ import {
 } from '@/components/app/base/page';
 import { cn } from '@/lib/utils';
 import { SETTINGS_MODEL_SERVICE_ITEMS, SETTINGS_NAVIGATION } from './navigation';
-
-const SETTINGS_SIDEBAR_ITEMS = [
-	...SETTINGS_NAVIGATION.slice(0, 3),
-	SETTINGS_MODEL_SERVICE_ITEMS[0],
-	SETTINGS_NAVIGATION[12],
-	SETTINGS_NAVIGATION[3],
-	...SETTINGS_NAVIGATION.slice(8, 12),
-	...SETTINGS_NAVIGATION.slice(13, 15),
-	...SETTINGS_NAVIGATION.slice(4, 8),
-	...SETTINGS_NAVIGATION.slice(15),
-] as const;
+import { AGENTS } from '@/lib/compat';
 
 const SETTINGS_SIDEBAR_GROUPS = [
 	{
 		id: 'general',
-		items: SETTINGS_SIDEBAR_ITEMS.slice(0, 3),
+		items: SETTINGS_NAVIGATION.slice(0, 3),
 	},
 	{
 		id: 'assistant',
 		titleKey: 'settings.overview.groups.assistant',
-		items: SETTINGS_SIDEBAR_ITEMS.slice(3, 12),
+		items: [
+			...SETTINGS_MODEL_SERVICE_ITEMS.filter(
+				(item) => item.id === AGENTS.assistant || item.id === AGENTS.coder
+			),
+			...SETTINGS_NAVIGATION.slice(12, 13),
+			...SETTINGS_NAVIGATION.slice(3, 4),
+			...SETTINGS_NAVIGATION.slice(8, 12),
+			...SETTINGS_NAVIGATION.slice(13, 15),
+		],
 	},
 	{
 		id: 'providers',
 		titleKey: 'settings.tabs.providers',
-		items: SETTINGS_SIDEBAR_ITEMS.slice(12, 16),
+		items: SETTINGS_NAVIGATION.slice(4, 8),
 	},
 	{
 		id: 'channels',
-		items: SETTINGS_SIDEBAR_ITEMS.slice(16, 17),
+		items: SETTINGS_NAVIGATION.slice(15, 16),
 	},
 	{
 		id: 'integrations',
-		items: SETTINGS_SIDEBAR_ITEMS.slice(17),
+		items: SETTINGS_NAVIGATION.slice(16),
 	},
 ] as const;
+
+const SETTINGS_SIDEBAR_ITEMS = SETTINGS_SIDEBAR_GROUPS.flatMap((group) => group.items);
 
 export function SettingsSidebar(): React.JSX.Element {
 	const { t } = useTranslation();

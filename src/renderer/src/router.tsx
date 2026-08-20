@@ -57,6 +57,7 @@ const WikiPage = lazy(() => import('./pages/settings/pages/wiki/Page'));
 const PermissionsPage = lazy(() => import('./pages/settings/pages/permissions/Page'));
 const HealthPage = lazy(() => import('./pages/settings/pages/tasks/health/Page'));
 const AssistantPage = lazy(() => import('./pages/settings/pages/assistant/Page'));
+const CoderPage = lazy(() => import('./pages/settings/pages/coder/Page'));
 const ChatHistoryPage = lazy(() => import('./pages/settings/pages/assistant/chathistory/Page'));
 const DataPage = lazy(() => import('./pages/settings/pages/assistant/data/Page'));
 const TranscribePage = lazy(() => import('./pages/settings/pages/transcribe/Page'));
@@ -486,6 +487,14 @@ const routes: RouteObject[] = [
 					{
 						path: 'llm-wiki',
 						element: <Navigate to="/settings/assistant/llm-wiki" replace />,
+					},
+					{
+						path: 'coder',
+						element: (
+							<SettingsRouteWrapper>
+								<CoderPage />
+							</SettingsRouteWrapper>
+						),
 					},
 					{
 						path: 'assistant',

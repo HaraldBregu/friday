@@ -27,6 +27,7 @@ const SETTINGS_OVERVIEW_GROUPS = [
 		titleKey: 'settings.overview.groups.assistant',
 		paths: [
 			'/settings/assistant',
+			'/settings/coder',
 			'/settings/skills',
 			'/settings/tasks',
 			'/settings/providers/mcp',
