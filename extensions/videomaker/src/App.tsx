@@ -164,8 +164,8 @@ export default function App() {
 				if (!kind) continue;
 				const id = makeId();
 				const src = URL.createObjectURL(file);
-				const sourceDuration = await readMediaDuration(file, src);
 				try {
+					const sourceDuration = await readMediaDuration(file);
 					const assetPath = await storeMedia(id, file);
 					clips.push({
 						id,
