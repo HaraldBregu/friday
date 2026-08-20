@@ -5,6 +5,7 @@ import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Bre
 import { SettingsPageHeader } from '../../../src/renderer/src/pages/settings/components';
 import {
 	SETTINGS_DETAIL_ITEMS,
+	SETTINGS_MODEL_SERVICE_ITEMS,
 	SETTINGS_NAVIGATION,
 } from '../../../src/renderer/src/pages/settings/navigation';
 
@@ -33,6 +34,7 @@ it.each([
 	['/settings/general/persona', 'settings.persona.title'],
 	['/settings/assistant/llm-wiki', 'settings.wiki.title'],
 	['/settings/tasks', 'settings.tabs.taskScheduler'],
+	['/settings/coder', 'settings.coder.title'],
 	['/settings/assistant/permissions', 'settings.tabs.permissions'],
 	['/settings/assistant/data', 'settings.dataControls.title'],
 	['/settings/tasks/permissions', 'settings.permissions.scopes.tasksTitle'],
@@ -41,6 +43,8 @@ it.each([
 ])('uses the canonical %s route and breadcrumb', (path, labelKey) => {
 	if (path === '/settings/assistant/data' || path === '/settings/general/persona') {
 		expect(SETTINGS_DETAIL_ITEMS).toContainEqual(expect.objectContaining({ path, labelKey }));
+	} else if (path === '/settings/coder') {
+		expect(SETTINGS_MODEL_SERVICE_ITEMS).toContainEqual(expect.objectContaining({ path, labelKey }));
 	} else if (!path.endsWith('/permissions') || path === '/settings/assistant/permissions') {
 		expect(SETTINGS_NAVIGATION).toContainEqual(expect.objectContaining({ path, labelKey }));
 	}
@@ -103,6 +107,7 @@ it('renders settings navigation beside the workspace and marks the current secti
 	expect(assistantGroup).not.toBeNull();
 	expect(providersGroup).not.toBeNull();
 	expect(within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.tabs.skills' })).toBeInTheDocument();
+	expect(within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.coder.title' })).toBeInTheDocument();
 	expect(within(providersGroup as HTMLElement).getByRole('link', { name: 'settings.overview.groups.mlModels' })).toBeInTheDocument();
 	expect(currentSection).toHaveAttribute('data-active');
 });

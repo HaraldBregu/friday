@@ -45,6 +45,7 @@ const routes = [
 	'/settings/tasks/permissions',
 	'/settings/tasks/health',
 	'/settings/assistant',
+	'/settings/coder',
 	'/settings/assistant/chathistory',
 	'/settings/assistant/health/permissions',
 ];

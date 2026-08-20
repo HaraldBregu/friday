@@ -19,6 +19,20 @@ it('lists MCP once under the assistant group', () => {
 	expect(screen.getAllByText('settings.tabs.mcp')).toHaveLength(1);
 });
 
+it('lists Coder under the assistant group', () => {
+	render(
+		<MemoryRouter initialEntries={['/settings']}>
+			<OverviewPage />
+		</MemoryRouter>
+	);
+
+	const assistantGroup = screen.getByText('settings.overview.groups.assistant').closest('section');
+	expect(assistantGroup).not.toBeNull();
+	expect(
+		within(assistantGroup as HTMLElement).getByRole('button', { name: /settings\.coder\.title/ })
+	).toBeInTheDocument();
+});
+
 it('uses the assistant title UI for the providers title', () => {
 	render(
 		<MemoryRouter initialEntries={['/settings']}>

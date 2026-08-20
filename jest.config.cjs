@@ -36,6 +36,7 @@ module.exports = {
 			},
 			moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 			moduleNameMapper: {
+				'^@earendil-works/pi-coding-agent$': '<rootDir>/tests/mocks/pi-coding-agent.ts',
 				'^electron$': '<rootDir>/tests/mocks/electron.ts',
 				'^electron-store$': '<rootDir>/tests/mocks/electron-store.ts',
 				// chokidar v5 is pure ESM; substitute a CJS-compatible mock so that
