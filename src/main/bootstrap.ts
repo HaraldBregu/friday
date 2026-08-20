@@ -12,12 +12,15 @@ import { ExecSandbox } from './agent/sandbox';
 import { createRealtimeVoiceManager } from './agent/realtime_voice';
 import { StorageOperations } from './storage';
 import { StorageChannels } from '../shared/ipc_channels_definitions';
+import { Coder, CoderStore } from './coder';
+import { getProvider } from './settings_store';
 
 export interface MainServices {
 	appState: AppState;
 	eventBus: EventBus;
 	logger: LoggerService;
 	agentService: Agent;
+	coderService: Coder;
 	conversationService: Conversation;
 	channelRegistry: ChannelRegistry;
 	windowFactory: WindowFactory;
@@ -37,6 +40,7 @@ export function bootstrapServices(): BootstrapResult {
 	const extensionStorage = new ExtensionStorage();
 	const windowFactory = new WindowFactory(logger, extensionRegistry);
 	const agentService = new Agent(windowFactory, new ExecSandbox());
+	const coderService = new Coder({ store: new CoderStore(), getProvider });
 	const channelRegistry = createChannelRegistry({ logger, eventBus, agentService });
 	const windowContextManager = new WindowContextManager(logger, eventBus);
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
@@ -46,6 +50,7 @@ export function bootstrapServices(): BootstrapResult {
 	});
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
+		coderService.cancelWindow((event.payload as { windowId: number }).windowId);
 		void conversationService.execute({
 			type: 'voice',
 			action: 'stop-window',
@@ -60,6 +65,7 @@ export function bootstrapServices(): BootstrapResult {
 		eventBus,
 		logger,
 		agentService,
+		coderService,
 		conversationService,
 		channelRegistry,
 		windowFactory,

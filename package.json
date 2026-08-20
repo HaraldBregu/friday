@@ -16,7 +16,7 @@
 	],
 	"packageManager": "npm@11.13.0",
 	"engines": {
-		"node": ">=22.14",
+		"node": ">=22.19",
 		"npm": ">=11.5.1"
 	},
 	"copyright": "© 2026 Friday Project. All rights reserved.",

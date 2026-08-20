@@ -47,6 +47,20 @@ export const AgentChannels = {
 	ragPickFolder: 'agent:rag:folder:pick',
 } as const;
 
+export const CoderChannels = {
+	getSettings: 'coder:settings:get',
+	saveSettings: 'coder:settings:save',
+	listModels: 'coder:models:list',
+	pickDirectory: 'coder:directory:pick',
+	send: 'coder:send',
+	response: 'coder:response',
+	cancel: 'coder:cancel',
+	connectCodex: 'coder:codex:connect',
+	cancelCodexLogin: 'coder:codex:connect:cancel',
+	disconnectCodex: 'coder:codex:disconnect',
+	authEvent: 'coder:auth:event',
+} as const;
+
 export const RecorderChannels = {
 	microphone: {
 		start: 'recorder:microphone:start',

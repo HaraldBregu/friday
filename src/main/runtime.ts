@@ -236,5 +236,6 @@ app.on('quit', () => {
 	stopRagSchedule();
 	stopWiki();
 	agentService.destroy();
+	services.coderService.destroy();
 	cleanup(services);
 });

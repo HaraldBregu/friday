@@ -23,7 +23,10 @@
 	],
 	"publish": null,
 	"asar": true,
-	"asarUnpack": ["node_modules/@anthropic-ai/sandbox-runtime/vendor/**/*"],
+	"asarUnpack": [
+		"node_modules/@anthropic-ai/sandbox-runtime/vendor/**/*",
+		"node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/**/*"
+	],
 	"nodeGypRebuild": false,
 	"buildDependenciesFromSource": false,
 	"npmRebuild": false,

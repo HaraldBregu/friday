@@ -15,6 +15,7 @@ import { WikiIpc } from '../wiki';
 import { WindowIpc } from '../window';
 import { DataIpc } from '../data';
 import { RealtimeVoiceIpc } from '../realtime_voice';
+import { CoderIpc } from '../coder';
 import type { EventBus } from '../../event_bus';
 import type { MainServices } from '../../bootstrap';
 
@@ -22,6 +23,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	const {
 		logger,
 		agentService,
+		coderService,
 		conversationService,
 		channelRegistry,
 		windowFactory,
@@ -57,6 +59,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
+	safeRegister('coder', () => new CoderIpc().register({ coder: coderService }, eventBus));
 	safeRegister('recorder', () => new RecorderIpc().register(undefined, eventBus));
 	safeRegister('tasks', () => new TaskIpc().register(undefined, eventBus));
 	safeRegister('mcp', () => new McpIpc().register(undefined, eventBus));

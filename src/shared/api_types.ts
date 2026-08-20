@@ -100,6 +100,13 @@ import type { ContextMenuDescriptor } from './window_types';
 import type { WorkspaceAsset } from './workspace';
 import type { ExtensionStorageApi } from './extension_store_types';
 import type { SandboxStatus } from './sandbox';
+import type {
+	CoderAuthEvent,
+	CoderAuthStatus,
+	CoderCatalog,
+	CoderResponseEvent,
+	CoderSettings,
+} from './coder_types';
 export type { DataApi } from './data_types';
 export type { A2aApi } from './a2a_types';
 
@@ -175,6 +182,18 @@ export interface AgentApi {
 	ragSaveConfiguration: (configuration: RagConfiguration) => Promise<RagConfiguration>;
 	ragSearch: (query: string, topK?: number) => Promise<RagMatch[]>;
 	ragPickFolder: () => Promise<string | undefined>;
+}
+
+export interface CoderApi {
+	getSettings: () => Promise<CoderSettings>;
+	saveSettings: (settings: CoderSettings) => Promise<CoderSettings>;
+	listModels: () => Promise<CoderCatalog>;
+	pickDirectory: () => Promise<string | undefined>;
+	send: (prompt: string, onEvent?: (event: CoderResponseEvent) => void) => Promise<string>;
+	cancel: (runId: string) => Promise<boolean>;
+	connectCodex: (onEvent?: (event: CoderAuthEvent) => void) => Promise<CoderAuthStatus>;
+	cancelCodexLogin: () => Promise<boolean>;
+	disconnectCodex: () => Promise<void>;
 }
 
 export interface TaskApi {

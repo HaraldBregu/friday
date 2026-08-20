@@ -1,5 +1,6 @@
 export * from './app_types';
 export * from './channels_types';
+export * from './coder_types';
 export * from './channels_definitions';
 export * from './mcp_types';
 export * from './mcp_definitions';

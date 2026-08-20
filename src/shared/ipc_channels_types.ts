@@ -31,6 +31,7 @@ import type {
 import type { ChannelModelKind, ChannelModelSelection, StoredBotProvider } from './channels_types';
 import {
 	AgentChannels,
+	CoderChannels,
 	A2aChannels,
 	AppChannels,
 	RecorderChannels,
@@ -55,6 +56,26 @@ import {
 	WindowChannels,
 } from './ipc_channels_definitions';
 type ProviderStoreRecord = StoredProvider | StoredBotProvider;
+
+export interface CoderInvokeChannelMap {
+	[CoderChannels.getSettings]: { args: []; result: import('./coder_types').CoderSettings };
+	[CoderChannels.saveSettings]: {
+		args: [settings: import('./coder_types').CoderSettings];
+		result: import('./coder_types').CoderSettings;
+	};
+	[CoderChannels.listModels]: { args: []; result: import('./coder_types').CoderCatalog };
+	[CoderChannels.pickDirectory]: { args: []; result: string | undefined };
+	[CoderChannels.send]: { args: [prompt: string, runId: string]; result: string };
+	[CoderChannels.cancel]: { args: [runId: string]; result: boolean };
+	[CoderChannels.connectCodex]: { args: []; result: import('./coder_types').CoderAuthStatus };
+	[CoderChannels.cancelCodexLogin]: { args: []; result: boolean };
+	[CoderChannels.disconnectCodex]: { args: []; result: void };
+}
+
+export interface CoderEventChannelMap {
+	[CoderChannels.response]: { data: import('./coder_types').CoderResponseEvent };
+	[CoderChannels.authEvent]: { data: import('./coder_types').CoderAuthEvent };
+}
 
 export interface AgentInvokeChannelMap {
 	[AgentChannels.send]: {
@@ -931,6 +952,7 @@ export interface InvokeChannelMap
 	extends
 		AppInvokeChannelMap,
 		AgentInvokeChannelMap,
+		CoderInvokeChannelMap,
 		RecorderInvokeChannelMap,
 		TaskInvokeChannelMap,
 		SkillsInvokeChannelMap,
@@ -973,6 +995,7 @@ export interface EventChannelMap
 	extends
 		AppEventChannelMap,
 		AgentEventChannelMap,
+		CoderEventChannelMap,
 		RecorderEventChannelMap,
 		StorageEventChannelMap,
 		WindowEventChannelMap,
