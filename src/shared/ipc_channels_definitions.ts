@@ -219,6 +219,8 @@ export const StorageChannels = {
 	testConnection: 'storage:test-connection',
 	syncFolders: 'storage:sync-folders',
 	pickFolders: 'storage:pick-folders',
+	getOperationStatuses: 'storage:operation-status:get-all',
+	operationStatusChanged: 'storage:operation-status:changed',
 	backup: 'storage:backup',
 	restore: 'storage:restore',
 } as const;

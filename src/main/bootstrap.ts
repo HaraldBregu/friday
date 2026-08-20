@@ -10,6 +10,8 @@ import { Agent } from './agent/agent';
 import { Conversation } from './agent/conversation';
 import { ExecSandbox } from './agent/sandbox';
 import { createRealtimeVoiceManager } from './agent/realtime_voice';
+import { StorageOperations } from './storage';
+import { StorageChannels } from '../shared/ipc_channels_definitions';
 
 export interface MainServices {
 	appState: AppState;
@@ -22,6 +24,7 @@ export interface MainServices {
 	windowContextManager: WindowContextManager;
 	extensionRegistry: ExtensionRegistry;
 	extensionStorage: ExtensionStorage;
+	storageOperations: StorageOperations;
 }
 
 export interface BootstrapResult extends MainServices {}
@@ -38,6 +41,9 @@ export function bootstrapServices(): BootstrapResult {
 	const windowContextManager = new WindowContextManager(logger, eventBus);
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
 	const conversationService = new Conversation(agentService, realtimeVoiceManager);
+	const storageOperations = new StorageOperations((status) => {
+		eventBus.broadcastToWindows(StorageChannels.operationStatusChanged, status);
+	});
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
 		void conversationService.execute({
@@ -60,6 +66,7 @@ export function bootstrapServices(): BootstrapResult {
 		windowContextManager,
 		extensionRegistry,
 		extensionStorage,
+		storageOperations,
 	};
 }
 

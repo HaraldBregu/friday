@@ -27,6 +27,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		windowFactory,
 		extensionRegistry,
 		extensionStorage,
+		storageOperations,
 	} = services;
 
 	const safeRegister = (name: string, register: () => void): void => {
@@ -66,7 +67,9 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('skills', () => new SkillsIpc().register(undefined, eventBus));
 	safeRegister('provider-store', () => new ProviderStoreIpc().register(undefined, eventBus));
 	safeRegister('search', () => new SearchIpc().register(undefined, eventBus));
-	safeRegister('storage', () => new StorageIpc().register({ extensionRegistry }, eventBus));
+	safeRegister('storage', () =>
+		new StorageIpc().register({ extensionRegistry, storageOperations }, eventBus)
+	);
 	safeRegister('database', () => new DatabaseIpc().register(undefined, eventBus));
 	safeRegister('extensions', () =>
 		new ExtensionsIpc().register({ windowFactory, extensionRegistry }, eventBus)

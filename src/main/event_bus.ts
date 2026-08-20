@@ -43,6 +43,12 @@ export class EventBus {
 		});
 	}
 
+	broadcastToWindows(channel: string, ...args: unknown[]): void {
+		BrowserWindow.getAllWindows().forEach((win) => {
+			if (!win.isDestroyed()) win.webContents.send(channel, ...args);
+		});
+	}
+
 	/**
 	 * Send a message to a specific window.
 	 */

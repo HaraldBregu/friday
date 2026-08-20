@@ -8,25 +8,24 @@ import {
 	getStorageConfiguration,
 	getStorages,
 	pickFolders,
-	pullFiles,
-	pushFiles,
 	rescheduleStorageSync,
 	saveStorageConfig,
 	saveStorageConfiguration,
 	syncFolders,
 	testConnection,
-	withStorageLock,
 } from '../storage';
+import type { StorageOperations } from '../storage';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
 
 export interface StorageIpcDeps {
 	extensionRegistry: ExtensionRegistry;
+	storageOperations: StorageOperations;
 }
 
 export class StorageIpc implements IpcModule<StorageIpcDeps> {
 	readonly name = 'storage';
 
-	register({ extensionRegistry }: StorageIpcDeps, _eventBus: EventBus): void {
+	register({ extensionRegistry, storageOperations }: StorageIpcDeps, _eventBus: EventBus): void {
 		const assertAppRenderer = (event: IpcMainInvokeEvent): void => {
 			if (extensionRegistry.has(event.sender)) {
 				throw new Error('Cloud storage is unavailable to extension views.');
@@ -48,12 +47,18 @@ export class StorageIpc implements IpcModule<StorageIpcDeps> {
 		});
 		registerCommandWithEvent(StorageChannels.saveStorageConfig, (event, config) => {
 			assertAppRenderer(event);
+			if (config.id && storageOperations.isRunning(config.id)) {
+				throw new Error('Storage settings cannot change while a cloud operation is running.');
+			}
 			const saved = saveStorageConfig(config);
 			rescheduleStorageSync();
 			return saved;
 		});
 		registerCommandWithEvent(StorageChannels.deleteStorageConfig, (event, id) => {
 			assertAppRenderer(event);
+			if (storageOperations.isRunning(id)) {
+				throw new Error('Storage settings cannot change while a cloud operation is running.');
+			}
 			deleteStorageConfig(id);
 			rescheduleStorageSync();
 		});
@@ -69,13 +74,17 @@ export class StorageIpc implements IpcModule<StorageIpcDeps> {
 			assertAppRenderer(event);
 			return pickFolders();
 		});
+		registerQueryWithEvent(StorageChannels.getOperationStatuses, (event) => {
+			assertAppRenderer(event);
+			return storageOperations.getStatuses();
+		});
 		registerCommandWithEvent(StorageChannels.backup, (event, id) => {
 			assertAppRenderer(event);
-			return withStorageLock(id, () => pushFiles(id));
+			return storageOperations.backup(id, 'manual');
 		});
 		registerCommandWithEvent(StorageChannels.restore, (event, id) => {
 			assertAppRenderer(event);
-			return withStorageLock(id, () => pullFiles(id));
+			return storageOperations.restore(id);
 		});
 	}
 }

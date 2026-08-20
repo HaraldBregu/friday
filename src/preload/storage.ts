@@ -1,4 +1,4 @@
-import { typedInvokeUnwrap } from '../shared/ipc_types';
+import { typedInvokeUnwrap, typedOn } from '../shared/ipc_types';
 import { StorageChannels } from '../shared/ipc_channels_definitions';
 import type { StorageApi } from './index.d';
 
@@ -12,6 +12,9 @@ export const storage: StorageApi = {
 	testConnection: (config) => typedInvokeUnwrap(StorageChannels.testConnection, config),
 	syncFolders: () => typedInvokeUnwrap(StorageChannels.syncFolders),
 	pickFolders: () => typedInvokeUnwrap(StorageChannels.pickFolders),
+	getOperationStatuses: () => typedInvokeUnwrap(StorageChannels.getOperationStatuses),
+	onOperationStatusChanged: (callback) =>
+		typedOn(StorageChannels.operationStatusChanged, callback),
 	backup: (id) => typedInvokeUnwrap(StorageChannels.backup, id),
 	restore: (id) => typedInvokeUnwrap(StorageChannels.restore, id),
 };

@@ -10,6 +10,7 @@ import type { SearchEngineId, SearchEngineInput, SearchSettings } from './search
 import type {
 	StorageConfig,
 	StorageConfiguration,
+	StorageOperationStatus,
 	StoragePullResult,
 	StoragePushResult,
 	StorageSyncFolder,
@@ -235,8 +236,12 @@ export interface StorageApi {
 	testConnection: (config: StorageConfig) => Promise<StorageTestResult>;
 	syncFolders: () => Promise<StorageSyncFolder[]>;
 	pickFolders: () => Promise<string[]>;
-	backup: (id: string) => Promise<StoragePushResult>;
-	restore: (id: string) => Promise<StoragePullResult>;
+	getOperationStatuses: () => Promise<StorageOperationStatus[]>;
+	onOperationStatusChanged: (
+		callback: (status: StorageOperationStatus) => void
+	) => () => void;
+	backup: (id: string) => Promise<StorageOperationStatus>;
+	restore: (id: string) => Promise<StorageOperationStatus>;
 }
 
 export interface DatabaseApi {

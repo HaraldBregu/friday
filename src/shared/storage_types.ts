@@ -54,3 +54,22 @@ export interface StoragePullResult {
 	skipped: string[];
 	failed: StoragePushFailure[];
 }
+
+export type StorageOperation = 'backup' | 'restore';
+export type StorageOperationTrigger = 'manual' | 'scheduled';
+export type StorageOperationState = 'running' | 'succeeded' | 'partial' | 'failed';
+
+export interface StorageOperationStatus {
+	operationId: string;
+	storageId: string;
+	operation: StorageOperation;
+	trigger: StorageOperationTrigger;
+	state: StorageOperationState;
+	startedAt: string;
+	finishedAt?: string;
+	transferred: number;
+	skipped: number;
+	failed: number;
+	error?: string;
+	revision: number;
+}

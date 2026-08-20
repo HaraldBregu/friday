@@ -612,13 +612,17 @@ export interface StorageInvokeChannelMap {
 		args: [];
 		result: string[];
 	};
+	[StorageChannels.getOperationStatuses]: {
+		args: [];
+		result: import('./storage_types').StorageOperationStatus[];
+	};
 	[StorageChannels.backup]: {
 		args: [id: string];
-		result: import('./storage_types').StoragePushResult;
+		result: import('./storage_types').StorageOperationStatus;
 	};
 	[StorageChannels.restore]: {
 		args: [id: string];
-		result: import('./storage_types').StoragePullResult;
+		result: import('./storage_types').StorageOperationStatus;
 	};
 }
 
@@ -959,11 +963,18 @@ export interface AppEventChannelMap {
 	[AppChannels.channelsStatusChanged]: { data: import('./channels_types').ChannelStatusEvent };
 }
 
+export interface StorageEventChannelMap {
+	[StorageChannels.operationStatusChanged]: {
+		data: import('./storage_types').StorageOperationStatus;
+	};
+}
+
 export interface EventChannelMap
 	extends
 		AppEventChannelMap,
 		AgentEventChannelMap,
 		RecorderEventChannelMap,
+		StorageEventChannelMap,
 		WindowEventChannelMap,
 		RealtimeVoiceEventChannelMap,
 		SttEventChannelMap {}
