@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import StoragePage from '../../../src/renderer/src/pages/settings/pages/storage/Page';
+import type { StorageOperationStatus } from '../../../src/shared/storage_types';
 
 jest.mock('react-i18next', () => {
 	const translations: Record<string, string> = {
@@ -63,7 +64,7 @@ const storageApi = {
 	restore: jest.fn(),
 };
 
-let operationListener: ((status: any) => void) | undefined;
+let operationListener: ((status: StorageOperationStatus) => void) | undefined;
 const unsubscribeOperationStatus = jest.fn();
 
 const storage = {
@@ -214,7 +215,6 @@ it('backs up directly and confirms before restoring matching local files', async
 	await waitFor(() => expect(storageApi.backup).toHaveBeenCalledWith('backup'));
 	act(() => {
 		operationListener?.({
-			...(storageApi.backup.mock.results[0].value as object),
 			operationId: 'backup-1',
 			storageId: 'backup',
 			operation: 'backup',
@@ -273,7 +273,7 @@ it('rehydrates a running backup after the page remounts', async () => {
 
 it('keeps a newer completion event when the initial status snapshot resolves late', async () => {
 	const configured = { ...storage, paths: ['/data/agent'] };
-	let resolveStatuses: ((statuses: any[]) => void) | undefined;
+	let resolveStatuses: ((statuses: StorageOperationStatus[]) => void) | undefined;
 	storageApi.getStorages.mockResolvedValue([configured]);
 	storageApi.getStorageConfiguration.mockResolvedValue({
 		providerId: 'backup',
