@@ -62,8 +62,8 @@ export default function App() {
 
 	useEffect(() => {
 		if (!hydrated) return;
-		setSaveStatus('saving');
 		const timeout = window.setTimeout(() => {
+			setSaveStatus('saving');
 			saveProject(project).then(() => setSaveStatus('saved')).catch(() => setSaveStatus('error'));
 		}, 450);
 		return () => window.clearTimeout(timeout);
@@ -86,7 +86,6 @@ export default function App() {
 		const finalFrame = Math.max(0, Math.ceil(duration * project.fps) - 1);
 		if (currentFrame <= finalFrame) return;
 		playerRef.current?.seekTo(finalFrame);
-		setCurrentFrame(finalFrame);
 	}, [currentFrame, duration, project.fps]);
 
 	const updateProject = useCallback((patch: Partial<Project>) => {
