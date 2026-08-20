@@ -1,5 +1,8 @@
 export const createAgentSession = jest.fn();
 export const modelRuntimeCreate = jest.fn();
+export const sessionManagerCreate = jest.fn();
+export const sessionManagerList = jest.fn();
+export const sessionManagerOpen = jest.fn();
 
 export const ModelRuntime = {
 	create: modelRuntimeCreate,
@@ -17,7 +20,10 @@ export class DefaultResourceLoader {
 }
 
 export const SessionManager = {
+	create: sessionManagerCreate,
 	inMemory: jest.fn((cwd: string) => ({ cwd })),
+	list: sessionManagerList,
+	open: sessionManagerOpen,
 };
 
 export const SettingsManager = {
