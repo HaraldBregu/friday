@@ -83,6 +83,7 @@ it('starts Codex device authentication and displays the projected code', async (
 	await user.click(await screen.findByRole('button', { name: 'settings.coder.connect' }));
 	await waitFor(() => expect(openExternalUrl).toHaveBeenCalledWith('https://example.com/device'));
 	expect(screen.getByText('ABCD-EFGH')).toBeInTheDocument();
+	expect(screen.getByText('settings.coder.deviceCodeHelp')).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'settings.coder.copyCode' })).toBeInTheDocument();
 	expect(screen.getByText('settings.coder.waitingForAuthorization')).toBeInTheDocument();
 });
