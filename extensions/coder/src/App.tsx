@@ -1,9 +1,9 @@
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
-import { LeftSidebar } from '@/components/left-sidebar';
-import { Terminal } from '@/components/terminal';
+import { Console } from '@/components/console';
+import { Sidebar } from '@/components/sidebar';
 import { Button } from '@/components/ui/button';
-import { useCoder } from '@/hooks/use-coder';
+import { useCoder } from '@/hooks/coder';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function App() {
@@ -16,8 +16,8 @@ export default function App() {
 			data-left-open={coder.leftOpen}
 			style={{ gridTemplateColumns: `${coder.leftOpen ? '248px' : '0px'} minmax(320px, 1fr)` }}
 		>
-			<aside className="coder-left" aria-label="Tasks and projects">
-				<LeftSidebar coder={coder} />
+			<aside className="coder-left" aria-label="Coder configuration">
+				<Sidebar coder={coder} />
 			</aside>
 
 			<section className="coder-main">
@@ -33,12 +33,12 @@ export default function App() {
 						</Button>
 						<span className="terminal-window-dots" aria-hidden="true"><i /><i /><i /></span>
 					</div>
-					<strong>{coder.workspaceName} — {coder.activeSessionTitle}</strong>
+					<strong>{coder.workspaceName} — Pi Coder</strong>
 					<span className={`coder-run-state coder-run-state--${coder.runState}`}>
 						<i aria-hidden="true" /> {coder.runLabel}
 					</span>
 				</header>
-				<Terminal coder={coder} />
+				<Console coder={coder} />
 			</section>
 		</main>
 	);
