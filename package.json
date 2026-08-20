@@ -79,6 +79,7 @@
 		"build:mermaid": "npm ci --prefix extensions/mermaid && npm run build --prefix extensions/mermaid",
 		"build:videomaker": "npm ci --prefix extensions/videomaker && npm run build --prefix extensions/videomaker",
 		"build:tldraw": "npm ci --prefix extensions/tldraw && npm run build --prefix extensions/tldraw",
+		"build:coder": "npm ci --prefix extensions/coder && npm run build --prefix extensions/coder",
 		"build:demo": "npm run build --prefix extensions/demo",
 		"build:packages": "npm run build --workspaces --if-present",
 		"build:all": "npm run build && npm run build:packages",

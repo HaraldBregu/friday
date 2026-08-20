@@ -1,6 +1,6 @@
 {
 	"title": "Coder",
-	"description": "A terminal-first coding agent with task sessions, project navigation, live commands, and workspace context.",
+	"description": "A terminal-first Pi coding agent with streamed tool activity and workspace context.",
 	"metadata": {
 		"version": "1.0.0",
 		"category": "utility",

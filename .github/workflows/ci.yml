@@ -28,6 +28,7 @@ jobs:
       - run: npm pack --dry-run --workspace @friday/cli
       - run: npm install --prefix extensions/demo
       - run: npm run build:demo
+      - run: npm run build:coder
       - run: npm ci --prefix extensions/mermaid
       - run: npm run build --prefix extensions/mermaid
       - run: npm pack ./extensions/mermaid --dry-run
