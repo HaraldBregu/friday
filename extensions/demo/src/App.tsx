@@ -235,7 +235,7 @@ export default function App() {
 			mounted = false;
 			unsubscribe();
 		};
-	}, []);
+	}, [language, text.loadFailed, text.themeChanged]);
 
 	return (
 		<main className={cn('app-demo overflow-y-auto', theme.isDark && 'dark')} style={themeStyle}>
