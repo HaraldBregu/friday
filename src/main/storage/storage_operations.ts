@@ -95,11 +95,14 @@ export class StorageOperations {
 	private async execute(running: StorageOperationStatus): Promise<StorageOperationStatus> {
 		const allowSuspension = this.dependencies.preventSuspension();
 		try {
-			const result = await this.dependencies.lock(running.storageId, () =>
+			const result: StorageTransferResult =
 				running.operation === 'backup'
-					? this.dependencies.backup(running.storageId)
-					: this.dependencies.restore(running.storageId)
-			);
+					? await this.dependencies.lock(running.storageId, () =>
+							this.dependencies.backup(running.storageId)
+						)
+					: await this.dependencies.lock(running.storageId, () =>
+							this.dependencies.restore(running.storageId)
+						);
 			const transferred =
 				'uploaded' in result ? result.uploaded.length : result.downloaded.length;
 			return this.finish(running, result, transferred);

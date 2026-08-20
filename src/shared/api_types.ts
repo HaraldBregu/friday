@@ -11,8 +11,6 @@ import type {
 	StorageConfig,
 	StorageConfiguration,
 	StorageOperationStatus,
-	StoragePullResult,
-	StoragePushResult,
 	StorageSyncFolder,
 	StorageTestResult,
 } from './storage_types';
