@@ -51,7 +51,7 @@ Streaming callbacks (for `app` events) use the SSE stream opened on first use; c
 ## Usage inside Friday
 
 ```ts
-import { agent, app, isFriday, win, type AppThemeData } from '@friday/sdk';
+import { agent, app, coder, isFriday, win, type AppThemeData } from '@friday/sdk';
 
 if (!isFriday()) throw new Error('Not running inside Friday');
 
@@ -76,6 +76,11 @@ await agent.moveWorkspaceEntry('draft.md', 'notes');
 await agent.renameWorkspaceEntry('notes/draft.md', 'idea.md');
 await agent.deleteWorkspaceFile('old.md');
 await agent.deleteWorkspaceDirectory('archive');
+
+const settings = await coder.getSettings();
+const answer = await coder.send('Add focused tests for the current change.', (event) => {
+	if (event.type === 'text-delta') console.log(event.delta);
+});
 const action = await win.showContextMenu([
 	{ type: 'role', role: 'copy' },
 	{ type: 'separator' },
@@ -90,10 +95,15 @@ const maximized = await win.isMaximized();
 
 - `app`: app data + settings APIs exposed by preload (`setTheme`, `getThemeData`, `getLanguage`, etc.)
 - `agent`: workspace APIs exposed by preload, including text reads, typed asset reads, and Markdown writes.
+- `coder`: embedded Pi coding-agent settings, model catalog, authentication, streaming runs, and cancellation.
 - `win`: embedded-only window APIs, including native context menus and window controls.
 - `connect()`: remote client for the app API and workspace agent APIs.
 - `isFriday()`: host check for in-app mode.
 - `ping()`: validate API reachability in remote mode.
+
+`coder` is intentionally embedded-only. It is not exposed by `connect()` because coding runs can
+execute tools with the desktop user's authority. Extensions receive redacted streaming events and
+never receive provider credentials.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.

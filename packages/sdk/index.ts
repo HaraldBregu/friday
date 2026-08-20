@@ -1,4 +1,4 @@
-import type { AgentApi, AppApi, WindowApi } from '../../src/shared/api_types';
+import type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
 
 export {
 	connect,
@@ -7,7 +7,7 @@ export {
 	type RemoteAppApi,
 	type WorkspaceAgentApi,
 } from './connect';
-export type { AgentApi, AppApi, WindowApi } from '../../src/shared/api_types';
+export type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
 export type {
 	AppLanguage,
 	AppTheme,
@@ -23,6 +23,22 @@ export {
 	type WorkspaceFileType,
 } from '../../src/shared/workspace';
 export type { ContextMenuDescriptor, ContextMenuRole } from '../../src/shared/window_types';
+export {
+	CODER_PROVIDER_IDS,
+	CODER_THINKING_LEVELS,
+	CODER_TOOL_MODES,
+	isCoderSettings,
+	type CoderAuthEvent,
+	type CoderAuthStatus,
+	type CoderCatalog,
+	type CoderModel,
+	type CoderProvider,
+	type CoderProviderId,
+	type CoderResponseEvent,
+	type CoderSettings,
+	type CoderThinkingLevel,
+	type CoderToolMode,
+} from '../../src/shared/coder_types';
 export type {
 	ExtensionStorageApi,
 	ExtensionStoreValue,
@@ -53,6 +69,7 @@ function bridge<T extends object>(name: string): T {
 
 export const app = bridge<AppApi>('app');
 export const agent = bridge<AgentApi>('agent');
+export const coder = bridge<CoderApi>('coder');
 export const win = bridge<WindowApi>('win');
 
 const requiredMethods = [

@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import {
 	agent,
 	app,
+	coder,
 	connect,
 	isExtensionStoreValue,
 	isFriday,
@@ -14,6 +15,7 @@ import {
 assert.equal(isFriday(), false);
 assert.throws(() => app.getTheme, /unavailable/);
 assert.throws(() => agent.getWorkspaceLocation, /unavailable/);
+assert.throws(() => coder.getSettings, /unavailable/);
 assert.throws(() => win.showContextMenu, /unavailable/);
 
 const extensionValues = new Map();
@@ -64,6 +66,29 @@ globalThis.agent = {
 	deleteWorkspaceFile: async () => undefined,
 	deleteWorkspaceDirectory: async () => undefined,
 };
+const coderSettings = {
+	runtime: 'pi',
+	providerId: 'openai-codex',
+	modelId: 'gpt-5.4',
+	thinkingLevel: 'high',
+	toolMode: 'coding',
+	workingDirectory: '/tmp/friday-workspace',
+};
+globalThis.coder = {
+	getSettings: async () => coderSettings,
+	saveSettings: async (settings) => settings,
+	listModels: async () => ({ providers: [] }),
+	pickDirectory: async () => '/tmp/friday-workspace',
+	send: async (_prompt, onEvent) => {
+		onEvent?.({ type: 'status', runId: 'coder-run', status: 'started' });
+		onEvent?.({ type: 'text-delta', runId: 'coder-run', delta: 'done' });
+		return 'done';
+	},
+	cancel: async (runId) => runId === 'coder-run',
+	connectCodex: async () => ({ configured: true, type: 'oauth' }),
+	cancelCodexLogin: async () => false,
+	disconnectCodex: async () => undefined,
+};
 globalThis.win = {
 	minimize: () => undefined,
 	maximize: () => undefined,
@@ -113,6 +138,14 @@ assert.equal(await agent.moveWorkspaceEntry('draft.md', 'notes'), 'notes/draft.m
 assert.equal(await agent.renameWorkspaceEntry('notes/draft.md', 'idea.md'), 'notes/idea.md');
 await agent.deleteWorkspaceFile('old.md');
 await agent.deleteWorkspaceDirectory('archive');
+assert.deepEqual(await coder.getSettings(), coderSettings);
+const coderEvents = [];
+assert.equal(await coder.send('Fix the tests', (event) => coderEvents.push(event)), 'done');
+assert.deepEqual(coderEvents, [
+	{ type: 'status', runId: 'coder-run', status: 'started' },
+	{ type: 'text-delta', runId: 'coder-run', delta: 'done' },
+]);
+assert.equal(await coder.cancel('coder-run'), true);
 assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open');
 assert.equal(await win.isMaximized(), true);
 
