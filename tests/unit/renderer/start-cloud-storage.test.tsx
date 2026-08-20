@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import StoragePage from '../../../src/renderer/src/pages/settings/pages/storage/Page';
 
@@ -41,6 +41,8 @@ jest.mock('react-i18next', () => {
 		'settings.storage.restoreDialog.title': 'Restore selected data?',
 		'settings.storage.restoreDialog.description': 'Matching local files will be overwritten.',
 		'settings.storage.restoreDialog.confirm': 'Restore selected data',
+		'settings.storage.operation.backup.running': 'Backup is running in the background…',
+		'settings.storage.operation.backup.succeeded': 'Backup completed',
 	};
 	const t = (key: string): string => translations[key] ?? key;
 	return { useTranslation: () => ({ t }) };
@@ -55,9 +57,14 @@ const storageApi = {
 	testConnection: jest.fn(),
 	syncFolders: jest.fn(),
 	pickFolders: jest.fn(),
+	getOperationStatuses: jest.fn(),
+	onOperationStatusChanged: jest.fn(),
 	backup: jest.fn(),
 	restore: jest.fn(),
 };
+
+let operationListener: ((status: any) => void) | undefined;
+const unsubscribeOperationStatus = jest.fn();
 
 const storage = {
 	id: 'backup',
@@ -81,6 +88,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
+	operationListener = undefined;
 	Object.defineProperty(window, 'PointerEvent', {
 		configurable: true,
 		value: MouseEvent,
@@ -89,6 +97,11 @@ beforeEach(() => {
 	storageApi.getStorages.mockResolvedValue([]);
 	storageApi.syncFolders.mockResolvedValue([]);
 	storageApi.pickFolders.mockResolvedValue([]);
+	storageApi.getOperationStatuses.mockResolvedValue([]);
+	storageApi.onOperationStatusChanged.mockImplementation((listener) => {
+		operationListener = listener;
+		return unsubscribeOperationStatus;
+	});
 	storageApi.getStorageConfiguration.mockResolvedValue({
 		providerId: undefined,
 		storageId: undefined,
@@ -101,8 +114,30 @@ beforeEach(() => {
 		id: config.id || 'storage-1',
 	}));
 	storageApi.saveStorageConfiguration.mockImplementation(async (configuration) => configuration);
-	storageApi.backup.mockResolvedValue({ uploaded: [], failed: [] });
-	storageApi.restore.mockResolvedValue({ downloaded: [], skipped: [], failed: [] });
+	storageApi.backup.mockResolvedValue({
+		operationId: 'backup-1',
+		storageId: 'backup',
+		operation: 'backup',
+		trigger: 'manual',
+		state: 'running',
+		startedAt: '2026-08-20T10:00:00.000Z',
+		transferred: 0,
+		skipped: 0,
+		failed: 0,
+		revision: 1,
+	});
+	storageApi.restore.mockResolvedValue({
+		operationId: 'restore-1',
+		storageId: 'backup',
+		operation: 'restore',
+		trigger: 'manual',
+		state: 'running',
+		startedAt: '2026-08-20T10:00:00.000Z',
+		transferred: 0,
+		skipped: 0,
+		failed: 0,
+		revision: 3,
+	});
 });
 
 it('embeds the provider configurator and saves a storage profile', async () => {
@@ -177,9 +212,115 @@ it('backs up directly and confirms before restoring matching local files', async
 
 	await user.click(await screen.findByRole('button', { name: 'Back up now' }));
 	await waitFor(() => expect(storageApi.backup).toHaveBeenCalledWith('backup'));
+	act(() => {
+		operationListener?.({
+			...(storageApi.backup.mock.results[0].value as object),
+			operationId: 'backup-1',
+			storageId: 'backup',
+			operation: 'backup',
+			trigger: 'manual',
+			state: 'succeeded',
+			startedAt: '2026-08-20T10:00:00.000Z',
+			finishedAt: '2026-08-20T10:01:00.000Z',
+			transferred: 1,
+			skipped: 0,
+			failed: 0,
+			revision: 2,
+		});
+	});
 
 	await user.click(screen.getByRole('button', { name: 'Restore from cloud' }));
 	expect(screen.getByRole('dialog')).toHaveTextContent('Matching local files will be overwritten.');
 	await user.click(screen.getByRole('button', { name: 'Restore selected data' }));
 	await waitFor(() => expect(storageApi.restore).toHaveBeenCalledWith('backup'));
+});
+
+it('rehydrates a running backup after the page remounts', async () => {
+	const configured = { ...storage, paths: ['/data/agent'] };
+	const running = {
+		operationId: 'backup-1',
+		storageId: 'backup',
+		operation: 'backup',
+		trigger: 'manual',
+		state: 'running',
+		startedAt: '2026-08-20T10:00:00.000Z',
+		transferred: 0,
+		skipped: 0,
+		failed: 0,
+		revision: 1,
+	};
+	storageApi.getStorages.mockResolvedValue([configured]);
+	storageApi.getStorageConfiguration.mockResolvedValue({
+		providerId: 'backup',
+		storageId: undefined,
+		paths: configured.paths,
+		syncEnabled: false,
+		syncCronExpression: configured.syncCronExpression,
+	});
+	storageApi.getOperationStatuses.mockResolvedValue([running]);
+
+	const first = render(<StoragePage />);
+	expect(await screen.findByText('Backup is running in the background…')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.storage.pushing' })).toBeDisabled();
+	first.unmount();
+	expect(unsubscribeOperationStatus).toHaveBeenCalledTimes(1);
+
+	render(<StoragePage />);
+	expect(await screen.findByText('Backup is running in the background…')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.storage.pushing' })).toBeDisabled();
+});
+
+it('keeps a newer completion event when the initial status snapshot resolves late', async () => {
+	const configured = { ...storage, paths: ['/data/agent'] };
+	let resolveStatuses: ((statuses: any[]) => void) | undefined;
+	storageApi.getStorages.mockResolvedValue([configured]);
+	storageApi.getStorageConfiguration.mockResolvedValue({
+		providerId: 'backup',
+		storageId: undefined,
+		paths: configured.paths,
+		syncEnabled: false,
+		syncCronExpression: configured.syncCronExpression,
+	});
+	storageApi.getOperationStatuses.mockReturnValue(
+		new Promise((resolve) => {
+			resolveStatuses = resolve;
+		})
+	);
+
+	render(<StoragePage />);
+	await waitFor(() => expect(storageApi.onOperationStatusChanged).toHaveBeenCalled());
+	act(() => {
+		operationListener?.({
+			operationId: 'backup-1',
+			storageId: 'backup',
+			operation: 'backup',
+			trigger: 'manual',
+			state: 'succeeded',
+			startedAt: '2026-08-20T10:00:00.000Z',
+			finishedAt: '2026-08-20T10:01:00.000Z',
+			transferred: 2,
+			skipped: 0,
+			failed: 0,
+			revision: 2,
+		});
+	});
+	await act(async () => {
+		resolveStatuses?.([
+			{
+				operationId: 'backup-1',
+				storageId: 'backup',
+				operation: 'backup',
+				trigger: 'manual',
+				state: 'running',
+				startedAt: '2026-08-20T10:00:00.000Z',
+				transferred: 0,
+				skipped: 0,
+				failed: 0,
+				revision: 1,
+			},
+		]);
+	});
+
+	expect(await screen.findByText('Backup completed')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Back up now' })).toBeEnabled();
 });

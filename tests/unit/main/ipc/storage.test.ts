@@ -26,12 +26,41 @@ import { StorageIpc } from '../../../../src/main/ipc/storage';
 import { StorageChannels } from '../../../../src/shared/ipc_channels_definitions';
 
 const extensionRegistry = { has: jest.fn() };
+const storageOperations = {
+	getStatuses: jest.fn(),
+	isRunning: jest.fn(),
+	backup: jest.fn(),
+	restore: jest.fn(),
+};
 const event = { sender: { id: 1 } };
 
 beforeEach(() => {
 	jest.clearAllMocks();
 	extensionRegistry.has.mockReturnValue(false);
-	new StorageIpc().register({ extensionRegistry: extensionRegistry as never }, {} as never);
+	storageOperations.getStatuses.mockReturnValue([]);
+	storageOperations.isRunning.mockReturnValue(false);
+	new StorageIpc().register(
+		{
+			extensionRegistry: extensionRegistry as never,
+			storageOperations: storageOperations as never,
+		},
+		{} as never
+	);
+});
+
+it('reads authoritative operation status and starts manual backups in main', () => {
+	storageOperations.getStatuses.mockReturnValue([{ storageId: 'backup', state: 'running' }]);
+	storageOperations.backup.mockReturnValue({ storageId: 'backup', state: 'running' });
+	const query = registerQueryWithEvent.mock.calls.find(
+		([channel]) => channel === StorageChannels.getOperationStatuses
+	)?.[1];
+	const command = registerCommandWithEvent.mock.calls.find(
+		([channel]) => channel === StorageChannels.backup
+	)?.[1];
+
+	expect(query(event)).toEqual([{ storageId: 'backup', state: 'running' }]);
+	expect(command(event, 'backup')).toEqual({ storageId: 'backup', state: 'running' });
+	expect(storageOperations.backup).toHaveBeenCalledWith('backup', 'manual');
 });
 
 it('allows the app renderer to read storage profiles', () => {

@@ -27,6 +27,7 @@ import {
 
 describe('storage sync scheduling', () => {
 	const logger = { info: jest.fn(), error: jest.fn() };
+	const operations = {} as never;
 	const storage = {
 		id: 'backup',
 		name: 'Backup',
@@ -53,17 +54,17 @@ describe('storage sync scheduling', () => {
 	afterEach(() => stopStorageSync());
 
 	it('schedules a no-overlap cron task and runs the provider sync', async () => {
-		startStorageSync(logger);
+		startStorageSync(logger, operations);
 
 		expect(schedule).toHaveBeenCalledWith('0 3 * * *', expect.any(Function), {
 			noOverlap: true,
 		});
 		await schedule.mock.calls[0][1]();
-		expect(runProviderSync).toHaveBeenCalledWith(storage, logger);
+		expect(runProviderSync).toHaveBeenCalledWith(storage, logger, operations);
 	});
 
 	it('destroys prior tasks when storage settings change', () => {
-		startStorageSync(logger);
+		startStorageSync(logger, operations);
 		rescheduleStorageSync();
 
 		expect(destroy).toHaveBeenCalledTimes(1);
@@ -76,7 +77,7 @@ describe('storage sync scheduling', () => {
 			{ ...storage, id: 'archive', name: 'Archive', syncCronExpression: '0 4 * * *' },
 		]);
 
-		startStorageSync(logger);
+		startStorageSync(logger, operations);
 
 		expect(schedule).toHaveBeenCalledTimes(2);
 		expect(schedule).toHaveBeenNthCalledWith(1, '0 3 * * *', expect.any(Function), {
@@ -89,7 +90,7 @@ describe('storage sync scheduling', () => {
 
 	it('does not schedule an invalid cron expression', () => {
 		validate.mockReturnValue(false);
-		startStorageSync(logger);
+		startStorageSync(logger, operations);
 
 		expect(schedule).not.toHaveBeenCalled();
 		expect(logger.error).toHaveBeenCalledWith('Storage', 'Invalid sync schedule for "Backup"');
