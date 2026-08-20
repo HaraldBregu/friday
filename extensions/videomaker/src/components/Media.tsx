@@ -54,7 +54,9 @@ export function Media({ clips, selectedId, onSelect, onImport, onFiles }: MediaP
 							</span>
 							<span>
 								<strong>{clip.name}</strong>
-								<small>{clip.kind} · {clip.duration.toFixed(1)}s</small>
+								<small>
+									{clip.kind} · {clip.duration.toFixed(1)}s
+								</small>
 							</span>
 						</button>
 					))

@@ -64,7 +64,9 @@ export default function App() {
 		if (!hydrated) return;
 		const timeout = window.setTimeout(() => {
 			setSaveStatus('saving');
-			saveProject(project).then(() => setSaveStatus('saved')).catch(() => setSaveStatus('error'));
+			saveProject(project)
+				.then(() => setSaveStatus('saved'))
+				.catch(() => setSaveStatus('error'));
 		}, 450);
 		return () => window.clearTimeout(timeout);
 	}, [hydrated, project]);
@@ -127,66 +129,80 @@ export default function App() {
 		setSelectedId(id);
 	}, [currentFrame, project.fps]);
 
-	const importFiles = useCallback(async (files: File[]) => {
-		const supported = files.filter((file) => getFileKind(file));
-		if (supported.length === 0) {
-			setNotice('Choose a video, image, or audio file.');
-			return;
-		}
-		setNotice('Importing media…');
-		let cursor = getProjectDuration(project);
-		const clips: Clip[] = [];
-		for (const file of supported) {
-			const kind = getFileKind(file);
-			if (!kind) continue;
-			const id = makeId();
-			const src = URL.createObjectURL(file);
-			const sourceDuration = await readMediaDuration(file, src);
-			try {
-				const assetPath = await storeMedia(id, file);
-				clips.push({
-					id,
-					kind,
-					name: file.name,
-					src,
-					assetPath,
-					mime: file.type,
-					start: cursor,
-					duration: sourceDuration,
-					sourceDuration,
-					text: '',
-					color: '#f8fafc',
-					fontSize: 96,
-					volume: 1,
-					muted: false,
-					fit: 'cover',
-				});
-				cursor += sourceDuration;
-			} catch (reason) {
-				URL.revokeObjectURL(src);
-				setNotice(reason instanceof Error ? reason.message : `Could not import ${file.name}.`);
+	const importFiles = useCallback(
+		async (files: File[]) => {
+			const supported = files.filter((file) => getFileKind(file));
+			if (supported.length === 0) {
+				setNotice('Choose a video, image, or audio file.');
+				return;
 			}
-		}
-		if (clips.length > 0) {
-			setProject((current) => ({ ...current, clips: [...current.clips, ...clips] }));
-			setSelectedId(clips[0].id);
-			setNotice(`${clips.length} ${clips.length === 1 ? 'asset' : 'assets'} imported.`);
-		}
-	}, [project]);
+			setNotice('Importing media…');
+			let cursor = getProjectDuration(project);
+			const clips: Clip[] = [];
+			for (const file of supported) {
+				const kind = getFileKind(file);
+				if (!kind) continue;
+				const id = makeId();
+				const src = URL.createObjectURL(file);
+				const sourceDuration = await readMediaDuration(file, src);
+				try {
+					const assetPath = await storeMedia(id, file);
+					clips.push({
+						id,
+						kind,
+						name: file.name,
+						src,
+						assetPath,
+						mime: file.type,
+						start: cursor,
+						duration: sourceDuration,
+						sourceDuration,
+						text: '',
+						color: '#f8fafc',
+						fontSize: 96,
+						volume: 1,
+						muted: false,
+						fit: 'cover',
+					});
+					cursor += sourceDuration;
+				} catch (reason) {
+					URL.revokeObjectURL(src);
+					setNotice(reason instanceof Error ? reason.message : `Could not import ${file.name}.`);
+				}
+			}
+			if (clips.length > 0) {
+				setProject((current) => ({ ...current, clips: [...current.clips, ...clips] }));
+				setSelectedId(clips[0].id);
+				setNotice(`${clips.length} ${clips.length === 1 ? 'asset' : 'assets'} imported.`);
+			}
+		},
+		[project]
+	);
 
 	const removeSelected = useCallback(() => {
 		if (!selectedClip) return;
 		if (selectedClip.src.startsWith('blob:')) URL.revokeObjectURL(selectedClip.src);
-		void removeMedia(selectedClip.assetPath).catch(() => setNotice('The layer was removed, but its saved media could not be deleted.'));
-		setProject((current) => ({ ...current, clips: current.clips.filter((clip) => clip.id !== selectedClip.id) }));
+		void removeMedia(selectedClip.assetPath).catch(() =>
+			setNotice('The layer was removed, but its saved media could not be deleted.')
+		);
+		setProject((current) => ({
+			...current,
+			clips: current.clips.filter((clip) => clip.id !== selectedClip.id),
+		}));
 		setSelectedId(project.clips.find((clip) => clip.id !== selectedClip.id)?.id ?? null);
 	}, [project.clips, selectedClip]);
 
-	const seek = useCallback((seconds: number) => {
-		const frame = Math.max(0, Math.min(Math.ceil(duration * project.fps) - 1, Math.round(seconds * project.fps)));
-		playerRef.current?.seekTo(frame);
-		setCurrentFrame(frame);
-	}, [duration, project.fps]);
+	const seek = useCallback(
+		(seconds: number) => {
+			const frame = Math.max(
+				0,
+				Math.min(Math.ceil(duration * project.fps) - 1, Math.round(seconds * project.fps))
+			);
+			playerRef.current?.seekTo(frame);
+			setCurrentFrame(frame);
+		},
+		[duration, project.fps]
+	);
 
 	const openDocs = useCallback(() => {
 		const url = 'https://www.remotion.dev/docs/';
@@ -211,7 +227,9 @@ export default function App() {
 				setExporting(false);
 				setNotice('Export cancelled.');
 			} else {
-				setExportError(reason instanceof Error ? reason.message : 'The video could not be rendered.');
+				setExportError(
+					reason instanceof Error ? reason.message : 'The video could not be rendered.'
+				);
 			}
 		} finally {
 			abortRef.current = null;
@@ -244,18 +262,47 @@ export default function App() {
 			{notice ? (
 				<div className="notice" role="status">
 					<span>{notice}</span>
-					<button className="icon-button" onClick={() => setNotice('')} aria-label="Dismiss message">×</button>
+					<button
+						className="icon-button"
+						onClick={() => setNotice('')}
+						aria-label="Dismiss message"
+					>
+						×
+					</button>
 				</div>
 			) : null}
 			<div className="editor-body">
 				<div className="workspace">
-					<Media clips={project.clips} selectedId={selectedId} onSelect={setSelectedId} onImport={() => fileInputRef.current?.click()} onFiles={(files) => void importFiles(files)} />
+					<Media
+						clips={project.clips}
+						selectedId={selectedId}
+						onSelect={setSelectedId}
+						onImport={() => fileInputRef.current?.click()}
+						onFiles={(files) => void importFiles(files)}
+					/>
 					<Preview inputProps={inputProps} playerRef={playerRef} />
-					<Inspector project={project} clip={selectedClip} onProject={updateProject} onClip={updateClip} onRemove={removeSelected} />
+					<Inspector
+						project={project}
+						clip={selectedClip}
+						onProject={updateProject}
+						onClip={updateClip}
+						onRemove={removeSelected}
+					/>
 				</div>
-				<Timeline project={project} duration={duration} currentTime={currentFrame / project.fps} selectedId={selectedId} onSelect={setSelectedId} onSeek={seek} />
+				<Timeline
+					project={project}
+					duration={duration}
+					currentTime={currentFrame / project.fps}
+					selectedId={selectedId}
+					onSelect={setSelectedId}
+					onSeek={seek}
+				/>
 			</div>
-			<Status status={saveStatus} dimensions={`${project.width}×${project.height}`} fps={project.fps} />
+			<Status
+				status={saveStatus}
+				dimensions={`${project.width}×${project.height}`}
+				fps={project.fps}
+			/>
 			{exporting || exportError ? (
 				<Export
 					progress={exportProgress}

@@ -3,7 +3,14 @@
 }
 
 :root {
-	font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-family:
+		Inter,
+		ui-sans-serif,
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		sans-serif;
 	color-scheme: light;
 	--background: #f6f6f3;
 	--surface: #ffffff;
@@ -352,9 +359,15 @@ textarea {
 	background: var(--surface-alt);
 }
 
-.asset-icon.video { color: var(--video); }
-.asset-icon.image { color: var(--image); }
-.asset-icon.audio { color: var(--audio); }
+.asset-icon.video {
+	color: var(--video);
+}
+.asset-icon.image {
+	color: var(--image);
+}
+.asset-icon.audio {
+	color: var(--audio);
+}
 
 .empty-copy {
 	margin: 12px 6px;
@@ -365,8 +378,16 @@ textarea {
 	display: grid;
 	place-items: stretch;
 	background-color: #0b0d0c;
-	background-image: linear-gradient(45deg, #141715 25%, transparent 25%), linear-gradient(-45deg, #141715 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #141715 75%), linear-gradient(-45deg, transparent 75%, #141715 75%);
-	background-position: 0 0, 0 7px, 7px -7px, -7px 0;
+	background-image:
+		linear-gradient(45deg, #141715 25%, transparent 25%),
+		linear-gradient(-45deg, #141715 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #141715 75%),
+		linear-gradient(-45deg, transparent 75%, #141715 75%);
+	background-position:
+		0 0,
+		0 7px,
+		7px -7px,
+		-7px 0;
 	background-size: 14px 14px;
 }
 
@@ -424,12 +445,12 @@ textarea {
 	font-size: 11px;
 }
 
-.property-section input[type="color"] {
+.property-section input[type='color'] {
 	width: 34px;
 	padding: 3px;
 }
 
-.property-section input[type="range"] {
+.property-section input[type='range'] {
 	padding: 0;
 	accent-color: var(--accent);
 }
@@ -598,7 +619,11 @@ textarea {
 .track-row {
 	position: relative;
 	border-bottom: 1px solid var(--border);
-	background-image: linear-gradient(to right, color-mix(in srgb, var(--border) 45%, transparent) 1px, transparent 1px);
+	background-image: linear-gradient(
+		to right,
+		color-mix(in srgb, var(--border) 45%, transparent) 1px,
+		transparent 1px
+	);
 	background-size: 10% 100%;
 }
 
@@ -616,13 +641,23 @@ textarea {
 	white-space: nowrap;
 }
 
-.clip-bar.video { color: var(--video); }
-.clip-bar.image { color: var(--image); }
-.clip-bar.audio { color: var(--audio); }
-.clip-bar.text { color: var(--text-layer); }
+.clip-bar.video {
+	color: var(--video);
+}
+.clip-bar.image {
+	color: var(--image);
+}
+.clip-bar.audio {
+	color: var(--audio);
+}
+.clip-bar.text {
+	color: var(--text-layer);
+}
 
 .clip-bar.selected {
-	box-shadow: inset 0 0 0 1px currentColor, 0 0 0 1px var(--surface);
+	box-shadow:
+		inset 0 0 0 1px currentColor,
+		0 0 0 1px var(--surface);
 }
 
 .clip-bar span {
@@ -761,7 +796,9 @@ textarea {
 }
 
 @keyframes spin {
-	to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 @media (max-width: 720px) {

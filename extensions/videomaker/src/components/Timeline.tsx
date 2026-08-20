@@ -12,7 +12,14 @@ interface TimelineProps {
 	onSeek: (seconds: number) => void;
 }
 
-export function Timeline({ project, duration, currentTime, selectedId, onSelect, onSeek }: TimelineProps) {
+export function Timeline({
+	project,
+	duration,
+	currentTime,
+	selectedId,
+	onSelect,
+	onSeek,
+}: TimelineProps) {
 	const marks = Array.from({ length: Math.ceil(duration) + 1 }, (_, index) => index);
 	return (
 		<section className="timeline-panel" aria-label="Timeline">
@@ -20,14 +27,28 @@ export function Timeline({ project, duration, currentTime, selectedId, onSelect,
 				<strong>Timeline</strong>
 				<span>{project.clips.length} layers</span>
 				<div className="timeline-spacer" />
-				<output>{formatTime(currentTime)} / {formatTime(duration)}</output>
+				<output>
+					{formatTime(currentTime)} / {formatTime(duration)}
+				</output>
 			</div>
 			<div className="timeline-grid">
 				<div className="timeline-labels">
 					<div className="ruler-label">Layer</div>
 					{project.clips.map((clip) => (
-						<button key={clip.id} className={selectedId === clip.id ? 'selected' : ''} onClick={() => onSelect(clip.id)}>
-							{clip.kind === 'video' ? <Video size={14} /> : clip.kind === 'image' ? <Image size={14} /> : clip.kind === 'audio' ? <Music2 size={14} /> : <Captions size={14} />}
+						<button
+							key={clip.id}
+							className={selectedId === clip.id ? 'selected' : ''}
+							onClick={() => onSelect(clip.id)}
+						>
+							{clip.kind === 'video' ? (
+								<Video size={14} />
+							) : clip.kind === 'image' ? (
+								<Image size={14} />
+							) : clip.kind === 'audio' ? (
+								<Music2 size={14} />
+							) : (
+								<Captions size={14} />
+							)}
 							<span>{clip.name}</span>
 						</button>
 					))}
@@ -43,7 +64,8 @@ export function Timeline({ project, duration, currentTime, selectedId, onSelect,
 					<div className="ruler">
 						{marks.map((mark) => (
 							<span key={mark} style={{ left: `${(mark / duration) * 100}%` }}>
-								<i />{mark}s
+								<i />
+								{mark}s
 							</span>
 						))}
 					</div>
@@ -51,7 +73,10 @@ export function Timeline({ project, duration, currentTime, selectedId, onSelect,
 						<div key={clip.id} className="track-row">
 							<button
 								className={`clip-bar ${clip.kind} ${selectedId === clip.id ? 'selected' : ''}`}
-								style={{ left: `${(clip.start / duration) * 100}%`, width: `${Math.max(1.5, (clip.duration / duration) * 100)}%` }}
+								style={{
+									left: `${(clip.start / duration) * 100}%`,
+									width: `${Math.max(1.5, (clip.duration / duration) * 100)}%`,
+								}}
 								onPointerDown={(event) => event.stopPropagation()}
 								onClick={() => onSelect(clip.id)}
 								title={`${clip.name} · ${clip.start.toFixed(1)}s–${(clip.start + clip.duration).toFixed(1)}s`}
@@ -60,7 +85,11 @@ export function Timeline({ project, duration, currentTime, selectedId, onSelect,
 							</button>
 						</div>
 					))}
-					<div className="playhead" style={{ left: `${Math.min(100, (currentTime / duration) * 100)}%` }} aria-hidden="true">
+					<div
+						className="playhead"
+						style={{ left: `${Math.min(100, (currentTime / duration) * 100)}%` }}
+						aria-hidden="true"
+					>
 						<i />
 					</div>
 				</div>

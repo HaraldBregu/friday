@@ -55,7 +55,12 @@ export function Header({
 				))}
 			</select>
 			<div className="header-spacer" />
-			<button className="icon-button help-button" onClick={onDocs} aria-label="Open Remotion docs" title="Remotion docs">
+			<button
+				className="icon-button help-button"
+				onClick={onDocs}
+				aria-label="Open Remotion docs"
+				title="Remotion docs"
+			>
 				<HelpCircle size={16} />
 			</button>
 			<button onClick={onImport}>

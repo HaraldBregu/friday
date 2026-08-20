@@ -33,13 +33,20 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 							<code>{project.background}</code>
 						</span>
 					</label>
-					<div className="dimension-readout">{project.width} × {project.height} · {project.fps} fps</div>
+					<div className="dimension-readout">
+						{project.width} × {project.height} · {project.fps} fps
+					</div>
 				</section>
 				{clip ? (
 					<section className="property-section">
 						<div className="section-title">
 							<h2>Layer</h2>
-							<button className="icon-button danger" onClick={onRemove} aria-label="Delete selected layer" title="Delete layer">
+							<button
+								className="icon-button danger"
+								onClick={onRemove}
+								aria-label="Delete selected layer"
+								title="Delete layer"
+							>
 								<Trash2 size={15} />
 							</button>
 						</div>
@@ -65,7 +72,9 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 									min="0.5"
 									step="0.1"
 									value={clip.duration}
-									onChange={(event) => onClip({ duration: Math.max(0.5, Number(event.target.value)) })}
+									onChange={(event) =>
+										onClip({ duration: Math.max(0.5, Number(event.target.value)) })
+									}
 								/>
 							</label>
 						</div>
@@ -73,7 +82,11 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 							<>
 								<label>
 									Text
-									<textarea rows={4} value={clip.text} onChange={(event) => onClip({ text: event.target.value })} />
+									<textarea
+										rows={4}
+										value={clip.text}
+										onChange={(event) => onClip({ text: event.target.value })}
+									/>
 								</label>
 								<div className="field-row">
 									<label>
@@ -88,7 +101,11 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 									</label>
 									<label>
 										Color
-										<input type="color" value={clip.color} onChange={(event) => onClip({ color: event.target.value })} />
+										<input
+											type="color"
+											value={clip.color}
+											onChange={(event) => onClip({ color: event.target.value })}
+										/>
 									</label>
 								</div>
 							</>
@@ -96,7 +113,10 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 						{clip.kind === 'video' || clip.kind === 'image' ? (
 							<label>
 								Fit
-								<select value={clip.fit} onChange={(event) => onClip({ fit: event.target.value as Clip['fit'] })}>
+								<select
+									value={clip.fit}
+									onChange={(event) => onClip({ fit: event.target.value as Clip['fit'] })}
+								>
 									<option value="cover">Fill canvas</option>
 									<option value="contain">Fit inside</option>
 								</select>
@@ -116,7 +136,11 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 									/>
 								</label>
 								<label className="checkbox-field">
-									<input type="checkbox" checked={clip.muted} onChange={(event) => onClip({ muted: event.target.checked })} />
+									<input
+										type="checkbox"
+										checked={clip.muted}
+										onChange={(event) => onClip({ muted: event.target.checked })}
+									/>
 									Mute layer
 								</label>
 							</>

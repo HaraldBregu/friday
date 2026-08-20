@@ -1,5 +1,8 @@
 export function downloadVideo(blob: Blob, projectName: string): void {
-	const name = projectName.trim().replace(/[^a-z0-9-_]+/gi, '-').replace(/^-+|-+$/g, '');
+	const name = projectName
+		.trim()
+		.replace(/[^a-z0-9-_]+/gi, '-')
+		.replace(/^-+|-+$/g, '');
 	const url = URL.createObjectURL(blob);
 	const anchor = document.createElement('a');
 	anchor.href = url;
