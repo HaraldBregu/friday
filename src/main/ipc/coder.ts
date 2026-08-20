@@ -76,9 +76,16 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 		});
 		registerCommandWithEvent(CoderChannels.connectCodex, (event) => {
 			assertHostCaller(event);
-			return coder.connectCodex(event.sender.id, (authEvent) => {
-				event.sender.send(CoderChannels.authEvent, authEvent);
-			});
+			const callerId = event.sender.id;
+			const cancel = (): void => {
+				coder.cancelCodexLogin(callerId);
+			};
+			event.sender.once('destroyed', cancel);
+			return coder
+				.connectCodex(callerId, (authEvent) => {
+					event.sender.send(CoderChannels.authEvent, authEvent);
+				})
+				.finally(() => event.sender.removeListener('destroyed', cancel));
 		});
 		registerCommandWithEvent(CoderChannels.cancelCodexLogin, (event) => {
 			assertHostCaller(event);

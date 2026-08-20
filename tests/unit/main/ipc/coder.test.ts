@@ -101,7 +101,7 @@ it('keeps configuration and authentication host-only', async () => {
 		disconnectCodex: jest.fn().mockResolvedValue(undefined),
 	} as unknown as Coder;
 	const extensionRegistry = { has: jest.fn().mockReturnValue(false) };
-	const sender = { id: 8, send: jest.fn() };
+	const sender = { id: 8, send: jest.fn(), once: jest.fn(), removeListener: jest.fn() };
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 8 });
 	(dialog.showOpenDialog as jest.Mock).mockResolvedValue({
 		canceled: false,
@@ -127,6 +127,8 @@ it('keeps configuration and authentication host-only', async () => {
 		type: 'progress',
 		message: 'Waiting',
 	});
+	expect(sender.once).toHaveBeenCalledWith('destroyed', expect.any(Function));
+	expect(sender.removeListener).toHaveBeenCalledWith('destroyed', expect.any(Function));
 
 	extensionRegistry.has.mockReturnValue(true);
 	await expect(handler(CoderChannels.listModels)({ sender })).resolves.toEqual(
