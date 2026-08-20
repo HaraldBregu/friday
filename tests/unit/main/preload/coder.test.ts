@@ -76,14 +76,31 @@ it('normalizes run requests, filters events, and removes the exact event listene
 });
 
 it('normalizes project and session identifiers before forwarding them', async () => {
+	await coder.openProject(' project-1 ');
+	expect(invoke).toHaveBeenCalledWith(CoderChannels.openProject, 'project-1');
+
 	await coder.listSessions(' project-1 ');
 	expect(invoke).toHaveBeenCalledWith(CoderChannels.listSessions, 'project-1');
 
 	await coder.getSession(' project-1 ', ' session-1 ');
 	expect(invoke).toHaveBeenCalledWith(CoderChannels.getSession, 'project-1', 'session-1');
 
+	await coder.renameSession(' project-1 ', ' session-1 ', ' Focused tests ');
+	expect(invoke).toHaveBeenCalledWith(
+		CoderChannels.renameSession,
+		'project-1',
+		'session-1',
+		'Focused tests'
+	);
+
+	await coder.deleteSession(' project-1 ', ' session-1 ');
+	expect(invoke).toHaveBeenCalledWith(CoderChannels.deleteSession, 'project-1', 'session-1');
+
 	expect(() => coder.removeProject(' ')).toThrow('Invalid coder project id.');
 	expect(() => coder.getSession('project-1', ' ')).toThrow('Invalid coder session.');
+	expect(() => coder.renameSession('project-1', 'session-1', ' ')).toThrow(
+		'Invalid coder session title.'
+	);
 });
 
 it('validates settings before forwarding them to main', () => {

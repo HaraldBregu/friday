@@ -17,6 +17,7 @@ jest.mock('@friday/sdk', () => ({
 		send: jest.fn(),
 		cancel: jest.fn(),
 		addProject: jest.fn(),
+		openProject: jest.fn(),
 		removeProject: jest.fn(),
 	},
 }));
@@ -31,6 +32,14 @@ const project = {
 	available: true,
 };
 
+const otherProject = {
+	...project,
+	id: 'project-2',
+	name: 'website',
+	directory: '/workspace/website',
+	kind: 'external' as const,
+};
+
 const session = {
 	id: 'session-1',
 	projectId: project.id,
@@ -40,7 +49,15 @@ const session = {
 	messageCount: 2,
 };
 
+const otherSession = {
+	...session,
+	id: 'session-2',
+	projectId: otherProject.id,
+	title: 'Website session',
+};
+
 beforeEach(() => {
+	jest.clearAllMocks();
 	(app.getExtensionStoreValue as jest.Mock).mockResolvedValue(project.id);
 	(app.setExtensionStoreValue as jest.Mock).mockResolvedValue(undefined);
 	(coderApi.getSettings as jest.Mock).mockResolvedValue({
@@ -118,4 +135,37 @@ it('restores the active project session and starts a new persistent Agent run', 
 			expect.objectContaining({ role: 'assistant', content: 'Done', status: 'complete' }),
 		])
 	);
+});
+
+it('groups sessions by workspace and opens an inactive workspace session', async () => {
+	(coderApi.listProjects as jest.Mock).mockResolvedValue([project, otherProject]);
+	(coderApi.listSessions as jest.Mock).mockImplementation(async (projectId) =>
+		projectId === otherProject.id ? [otherSession] : [session]
+	);
+	(coderApi.getSession as jest.Mock).mockImplementation(async (projectId, sessionId) => ({
+		session: projectId === otherProject.id ? otherSession : session,
+		blocks: [
+			{
+				id: sessionId,
+				type: 'message',
+				role: 'assistant',
+				content: projectId === otherProject.id ? 'Website response' : 'Restored response',
+				timestamp: '2026-08-20T10:01:00.000Z',
+			},
+		],
+	}));
+	const { result } = renderHook(() => useCoderWorkspace());
+
+	await waitFor(() => expect(result.current.loading).toBe(false));
+	expect(result.current.sessionsByProject).toEqual({
+		[project.id]: [session],
+		[otherProject.id]: [otherSession],
+	});
+
+	await act(async () => result.current.selectSession(otherProject.id, otherSession.id));
+	expect(result.current.activeProjectId).toBe(otherProject.id);
+	expect(result.current.activeSessionId).toBe(otherSession.id);
+	expect(result.current.blocks).toEqual([
+		expect.objectContaining({ content: 'Website response' }),
+	]);
 });

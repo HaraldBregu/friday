@@ -251,3 +251,36 @@ it('uses Codex device OAuth and projects only the device code event', async () =
 		},
 	]);
 });
+
+it('renames only a session resolved inside its project', async () => {
+	const appendSessionInfo = jest.fn();
+	const original = {
+		id: 'session-1',
+		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		cwd: project.directory,
+		name: undefined,
+		created: new Date('2026-08-20T10:00:00.000Z'),
+		modified: new Date('2026-08-20T10:01:00.000Z'),
+		messageCount: 2,
+		firstMessage: 'Inspect this project',
+	};
+	sessionManagerList
+		.mockResolvedValueOnce([original])
+		.mockResolvedValueOnce([{ ...original, name: 'Focused tests' }]);
+	sessionManagerOpen.mockReturnValue({ appendSessionInfo });
+	const coder = new Coder({
+		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
+		getProvider: () => undefined,
+	});
+
+	await expect(coder.renameSession(project.id, original.id, ' Focused tests ')).resolves.toEqual(
+		expect.objectContaining({ title: 'Focused tests' })
+	);
+	expect(sessionManagerOpen).toHaveBeenCalledWith(
+		original.path,
+		'/tmp/friday-coder-test/sessions',
+		project.directory
+	);
+	expect(appendSessionInfo).toHaveBeenCalledWith('Focused tests');
+});

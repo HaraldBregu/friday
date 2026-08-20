@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import { CoderIpc } from '../../../../src/main/ipc/coder';
 import { CoderChannels } from '../../../../src/shared/ipc_channels_definitions';
 import type { Coder } from '../../../../src/main/coder';
@@ -80,6 +80,8 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		listProjects: jest.fn().mockReturnValue([selectedProject]),
 		addProject: jest.fn().mockReturnValue(selectedProject),
 		listSessions: jest.fn().mockResolvedValue([]),
+		renameSession: jest.fn().mockResolvedValue({ id: 'session-1', title: 'Renamed' }),
+		deleteSession: jest.fn().mockResolvedValue(true),
 	} as unknown as Coder;
 	const extensionRegistry = {
 		has: jest.fn().mockReturnValue(true),
@@ -109,6 +111,19 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		data: [],
 	});
 	expect(coder.listSessions).toHaveBeenCalledWith('project-1');
+	await expect(handler(CoderChannels.openProject)({ sender }, ' project-1 ')).resolves.toEqual({
+		success: true,
+		data: undefined,
+	});
+	expect(shell.openPath).toHaveBeenCalledWith('/project');
+	await expect(
+		handler(CoderChannels.renameSession)({ sender }, ' project-1 ', ' session-1 ', ' Renamed ')
+	).resolves.toEqual({ success: true, data: { id: 'session-1', title: 'Renamed' } });
+	expect(coder.renameSession).toHaveBeenCalledWith('project-1', 'session-1', 'Renamed');
+	await expect(
+		handler(CoderChannels.deleteSession)({ sender }, ' project-1 ', ' session-1 ')
+	).resolves.toEqual({ success: true, data: true });
+	expect(coder.deleteSession).toHaveBeenCalledWith('project-1', 'session-1');
 });
 
 it('rejects Coder access from other extensions', async () => {
