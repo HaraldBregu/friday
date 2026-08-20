@@ -383,6 +383,79 @@ export class Coder {
 		this.authControllers.clear();
 	}
 
+	private requireProject(projectId: string): CoderProject {
+		const project = this.dependencies.projects.get(projectId);
+		if (!project) throw new Error('Coder project was not found.');
+		if (!project.available) throw new Error('Coder project directory is unavailable.');
+		return project;
+	}
+
+	private async requireSession(project: CoderProject, sessionId: string): Promise<SessionInfo> {
+		const sessions = await SessionManager.list(project.directory, coderSessionsLocation());
+		const session = sessions.find((item) => item.id === sessionId);
+		if (!session) throw new Error('Coder session was not found for this project.');
+		return session;
+	}
+
+	private sessionSummary(projectId: string, session: SessionInfo): CoderSessionSummary {
+		const firstMessage = session.firstMessage.trim();
+		return {
+			id: session.id,
+			projectId,
+			title: session.name?.trim() || firstMessage.slice(0, 80) || 'New session',
+			createdAt: session.created.toISOString(),
+			updatedAt: session.modified.toISOString(),
+			messageCount: session.messageCount,
+		};
+	}
+
+	private sessionBlock(message: unknown, index: number): CoderSessionBlock | undefined {
+		if (!message || typeof message !== 'object') return undefined;
+		const value = message as Record<string, unknown>;
+		const timestamp =
+			typeof value.timestamp === 'number'
+				? new Date(value.timestamp).toISOString()
+				: new Date(0).toISOString();
+		const id = `${value.timestamp ?? 0}-${index}`;
+		if (value.role === 'user' || value.role === 'assistant') {
+			const content = this.messageText(value.content);
+			if (!content) return undefined;
+			return { id, type: 'message', role: value.role, content, timestamp };
+		}
+		if (value.role === 'bashExecution') {
+			const exitCode = typeof value.exitCode === 'number' ? value.exitCode : undefined;
+			const cancelled = value.cancelled === true;
+			return {
+				id,
+				type: 'command',
+				command: typeof value.command === 'string' ? value.command : '',
+				output: typeof value.output === 'string' ? value.output : '',
+				status: cancelled ? 'cancelled' : exitCode === 0 ? 'succeeded' : 'failed',
+				...(exitCode === undefined ? {} : { exitCode }),
+				truncated: value.truncated === true,
+				timestamp,
+			};
+		}
+		return undefined;
+	}
+
+	private messageText(content: unknown): string {
+		if (typeof content === 'string') return content;
+		if (!Array.isArray(content)) return '';
+		return content
+			.filter(
+				(item): item is { type: 'text'; text: string } =>
+					Boolean(
+						item &&
+							typeof item === 'object' &&
+							(item as Record<string, unknown>).type === 'text' &&
+							typeof (item as Record<string, unknown>).text === 'string'
+					)
+			)
+			.map((item) => item.text)
+			.join('');
+	}
+
 	private getRuntime(): Promise<ModelRuntime> {
 		this.runtimePromise ??= ModelRuntime.create({
 			authPath: path.join(coderLocation(), 'auth.json'),
