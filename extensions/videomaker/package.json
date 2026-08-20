@@ -25,6 +25,7 @@
 		"@remotion/player": "4.0.513",
 		"@remotion/web-renderer": "4.0.513",
 		"lucide-react": "^1.31.0",
+		"mediabunny": "1.50.8",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"remotion": "4.0.513"
