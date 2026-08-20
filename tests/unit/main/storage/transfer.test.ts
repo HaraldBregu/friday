@@ -74,9 +74,6 @@ it('restores cloud files without deleting unmatched local files', async () => {
 		skipped: [],
 		failed: [],
 	});
-	expect(writeFile).toHaveBeenCalledWith(
-		'/data/agent/notes/today.md',
-		Buffer.from('cloud')
-	);
+	expect(writeFile).toHaveBeenCalledWith('/data/agent/notes/today.md', Buffer.from('cloud'));
 	expect(rm).not.toHaveBeenCalled();
 });
