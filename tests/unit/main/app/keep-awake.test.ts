@@ -7,6 +7,7 @@ const isStarted = jest.mocked(powerSaveBlocker.isStarted);
 
 describe('keep awake', () => {
 	beforeEach(() => {
+		jest.clearAllMocks();
 		start.mockReturnValue(17);
 		stop.mockReturnValue(true);
 		isStarted.mockReturnValue(true);

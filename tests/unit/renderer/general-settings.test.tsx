@@ -27,8 +27,12 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-	mockSetTheme.mockClear();
+	jest.clearAllMocks();
 	mockSetKeepAwake.mockResolvedValue(undefined);
+	Object.defineProperty(window, 'PointerEvent', {
+		configurable: true,
+		value: MouseEvent,
+	});
 	Object.defineProperty(window, 'app', {
 		configurable: true,
 		value: {
