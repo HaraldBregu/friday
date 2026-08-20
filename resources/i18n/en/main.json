@@ -1194,6 +1194,7 @@
 			"saving": "Saving…",
 			"saved": "Saved",
 			"deviceCode": "Use this device code to authorize Codex:",
+			"deviceCodeHelp": "OpenAI may say the code came from a terminal; Friday is displaying that same code here. Copy it into the sign-in page.",
 			"copyCode": "Copy code",
 			"waitingForAuthorization": "Waiting for authorization…",
 			"completeLogin": "Complete the sign-in in your browser.",

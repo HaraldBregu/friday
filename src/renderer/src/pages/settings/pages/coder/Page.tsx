@@ -356,6 +356,9 @@ const CoderPage: React.FC = () => {
 						<span>{authMessage}</span>
 						{deviceCode && (
 							<>
+								<span className="basis-full text-muted-foreground">
+									{t('settings.coder.deviceCodeHelp')}
+								</span>
 								<code className="select-all rounded-md border bg-muted px-2 py-1 font-mono text-sm font-semibold tracking-widest text-foreground">
 									{deviceCode.userCode}
 								</code>

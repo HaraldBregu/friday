@@ -1193,6 +1193,7 @@
 			"saving": "Salvataggio…",
 			"saved": "Salvato",
 			"deviceCode": "Usa questo codice dispositivo per autorizzare Codex:",
+			"deviceCodeHelp": "OpenAI può indicare che il codice proviene dal terminale; Friday mostra qui lo stesso codice. Copialo nella pagina di accesso.",
 			"copyCode": "Copia codice",
 			"waitingForAuthorization": "In attesa dell'autorizzazione…",
 			"completeLogin": "Completa l'accesso nel browser.",
