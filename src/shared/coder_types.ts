@@ -13,6 +13,7 @@ export const CODER_TOOL_MODES = ['read-only', 'coding'] as const;
 export type CoderProviderId = (typeof CODER_PROVIDER_IDS)[number];
 export type CoderThinkingLevel = (typeof CODER_THINKING_LEVELS)[number];
 export type CoderToolMode = (typeof CODER_TOOL_MODES)[number];
+export type CoderRunMode = 'agent' | 'shell';
 
 export interface CoderSettings {
 	readonly runtime: 'pi';
@@ -44,28 +45,98 @@ export interface CoderCatalog {
 	readonly providers: readonly CoderProvider[];
 }
 
-export type CoderResponseEvent =
+export interface CoderProject {
+	readonly id: string;
+	readonly name: string;
+	readonly directory: string;
+	readonly kind: 'agent-workspace' | 'external';
+	readonly createdAt: string;
+	readonly lastOpenedAt: string;
+	readonly available: boolean;
+}
+
+export interface CoderSessionSummary {
+	readonly id: string;
+	readonly projectId: string;
+	readonly title: string;
+	readonly createdAt: string;
+	readonly updatedAt: string;
+	readonly messageCount: number;
+}
+
+export type CoderSessionBlock =
 	| {
-			readonly type: 'status';
-			readonly runId: string;
-			readonly status: 'started' | 'completed' | 'cancelled';
+			readonly id: string;
+			readonly type: 'message';
+			readonly role: 'user' | 'assistant';
+			readonly content: string;
+			readonly timestamp: string;
 	  }
-	| { readonly type: 'text-delta'; readonly runId: string; readonly delta: string }
-	| { readonly type: 'thinking-delta'; readonly runId: string; readonly delta: string }
 	| {
+			readonly id: string;
+			readonly type: 'command';
+			readonly command: string;
+			readonly output: string;
+			readonly status: 'succeeded' | 'failed' | 'cancelled';
+			readonly exitCode?: number;
+			readonly truncated: boolean;
+			readonly timestamp: string;
+	  };
+
+export interface CoderSessionSnapshot {
+	readonly session: CoderSessionSummary;
+	readonly blocks: readonly CoderSessionBlock[];
+}
+
+export interface CoderRunRequest {
+	readonly projectId: string;
+	readonly sessionId?: string;
+	readonly mode: CoderRunMode;
+	readonly input: string;
+}
+
+export interface CoderRunResult {
+	readonly projectId: string;
+	readonly sessionId: string;
+	readonly output: string;
+}
+
+interface CoderResponseEventBase {
+	readonly runId: string;
+	readonly projectId: string;
+	readonly sessionId: string;
+}
+
+export type CoderResponseEvent =
+	| (CoderResponseEventBase & {
+			readonly type: 'status';
+			readonly status: 'started' | 'completed' | 'cancelled';
+	  })
+	| (CoderResponseEventBase & { readonly type: 'text-delta'; readonly delta: string })
+	| (CoderResponseEventBase & { readonly type: 'thinking-delta'; readonly delta: string })
+	| (CoderResponseEventBase & {
 			readonly type: 'tool-start';
-			readonly runId: string;
 			readonly toolCallId: string;
 			readonly toolName: string;
-	  }
-	| {
+	  })
+	| (CoderResponseEventBase & {
 			readonly type: 'tool-end';
-			readonly runId: string;
 			readonly toolCallId: string;
 			readonly toolName: string;
 			readonly isError: boolean;
-	  }
-	| { readonly type: 'error'; readonly runId: string; readonly message: string };
+	  })
+	| (CoderResponseEventBase & {
+			readonly type: 'command-start';
+			readonly command: string;
+	  })
+	| (CoderResponseEventBase & { readonly type: 'command-output'; readonly delta: string })
+	| (CoderResponseEventBase & {
+			readonly type: 'command-end';
+			readonly exitCode?: number;
+			readonly cancelled: boolean;
+			readonly truncated: boolean;
+	  })
+	| (CoderResponseEventBase & { readonly type: 'error'; readonly message: string });
 
 export type CoderAuthEvent =
 	| { readonly type: 'progress'; readonly message: string }
@@ -98,5 +169,19 @@ export function isCoderSettings(value: unknown): value is CoderSettings {
 		CODER_TOOL_MODES.includes(settings.toolMode as CoderToolMode) &&
 		typeof settings.workingDirectory === 'string' &&
 		settings.workingDirectory.trim().length > 0
+	);
+}
+
+export function isCoderRunRequest(value: unknown): value is CoderRunRequest {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+	const request = value as Partial<CoderRunRequest>;
+	return (
+		typeof request.projectId === 'string' &&
+		request.projectId.trim().length > 0 &&
+		(request.sessionId === undefined ||
+			(typeof request.sessionId === 'string' && request.sessionId.trim().length > 0)) &&
+		(request.mode === 'agent' || request.mode === 'shell') &&
+		typeof request.input === 'string' &&
+		request.input.trim().length > 0
 	);
 }

@@ -65,7 +65,24 @@ export interface CoderInvokeChannelMap {
 	};
 	[CoderChannels.listModels]: { args: []; result: import('./coder_types').CoderCatalog };
 	[CoderChannels.pickDirectory]: { args: []; result: string | undefined };
-	[CoderChannels.send]: { args: [prompt: string, runId: string]; result: string };
+	[CoderChannels.listProjects]: { args: []; result: import('./coder_types').CoderProject[] };
+	[CoderChannels.addProject]: {
+		args: [];
+		result: import('./coder_types').CoderProject | undefined;
+	};
+	[CoderChannels.removeProject]: { args: [projectId: string]; result: boolean };
+	[CoderChannels.listSessions]: {
+		args: [projectId: string];
+		result: import('./coder_types').CoderSessionSummary[];
+	};
+	[CoderChannels.getSession]: {
+		args: [projectId: string, sessionId: string];
+		result: import('./coder_types').CoderSessionSnapshot;
+	};
+	[CoderChannels.send]: {
+		args: [request: import('./coder_types').CoderRunRequest, runId: string];
+		result: import('./coder_types').CoderRunResult;
+	};
 	[CoderChannels.cancel]: { args: [runId: string]; result: boolean };
 	[CoderChannels.connectCodex]: { args: []; result: import('./coder_types').CoderAuthStatus };
 	[CoderChannels.cancelCodexLogin]: { args: []; result: boolean };

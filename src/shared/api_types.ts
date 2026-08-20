@@ -104,7 +104,12 @@ import type {
 	CoderAuthEvent,
 	CoderAuthStatus,
 	CoderCatalog,
+	CoderProject,
 	CoderResponseEvent,
+	CoderRunRequest,
+	CoderRunResult,
+	CoderSessionSnapshot,
+	CoderSessionSummary,
 	CoderSettings,
 } from './coder_types';
 export type { DataApi } from './data_types';
@@ -189,7 +194,15 @@ export interface CoderApi {
 	saveSettings: (settings: CoderSettings) => Promise<CoderSettings>;
 	listModels: () => Promise<CoderCatalog>;
 	pickDirectory: () => Promise<string | undefined>;
-	send: (prompt: string, onEvent?: (event: CoderResponseEvent) => void) => Promise<string>;
+	listProjects: () => Promise<CoderProject[]>;
+	addProject: () => Promise<CoderProject | undefined>;
+	removeProject: (projectId: string) => Promise<boolean>;
+	listSessions: (projectId: string) => Promise<CoderSessionSummary[]>;
+	getSession: (projectId: string, sessionId: string) => Promise<CoderSessionSnapshot>;
+	send: (
+		request: CoderRunRequest,
+		onEvent?: (event: CoderResponseEvent) => void
+	) => Promise<CoderRunResult>;
 	cancel: (runId: string) => Promise<boolean>;
 	connectCodex: (onEvent?: (event: CoderAuthEvent) => void) => Promise<CoderAuthStatus>;
 	cancelCodexLogin: () => Promise<boolean>;
