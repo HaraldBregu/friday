@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import GeneralPage from '../../../src/renderer/src/pages/settings/pages/general/Page';
 
 const mockSetTheme = jest.fn();
+const mockSetKeepAwake = jest.fn();
 let notifyTrayEnabled: (enabled: boolean) => void;
 let notifyKeepAwake: (enabled: boolean) => void;
 
@@ -27,21 +28,42 @@ beforeAll(() => {
 
 beforeEach(() => {
 	mockSetTheme.mockClear();
+	mockSetKeepAwake.mockResolvedValue(undefined);
 	Object.defineProperty(window, 'app', {
 		configurable: true,
 		value: {
 			getTrayEnabled: jest.fn().mockResolvedValue(true),
+			setTrayEnabled: jest.fn().mockResolvedValue(undefined),
 			onTrayEnabledChanged: jest.fn((callback) => {
 				notifyTrayEnabled = callback;
 				return jest.fn();
 			}),
 			getKeepAwake: jest.fn().mockResolvedValue(false),
+			setKeepAwake: mockSetKeepAwake,
 			onKeepAwakeChanged: jest.fn((callback) => {
 				notifyKeepAwake = callback;
 				return jest.fn();
 			}),
 		}, 
 	});
+});
+
+it('enables keep awake from General settings', async () => {
+	const user = userEvent.setup();
+	render(
+		<MemoryRouter>
+			<GeneralPage />
+		</MemoryRouter>
+	);
+	const keepAwake = await screen.findByRole('switch', {
+		name: 'settings.application.keepAwake',
+		checked: false,
+	});
+
+	await user.click(keepAwake);
+
+	expect(mockSetKeepAwake).toHaveBeenCalledWith(true);
+	expect(keepAwake).toBeChecked();
 });
 
 it('refreshes toggles changed from the native application menu', async () => {

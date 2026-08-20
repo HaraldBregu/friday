@@ -60,7 +60,7 @@ const GeneralPage: React.FC = () => {
 
 	const handleKeepAwakeToggle = useCallback((checked: boolean) => {
 		setKeepAwake(checked);
-		void window.app.setKeepAwake(checked);
+		void window.app.setKeepAwake(checked).catch(() => setKeepAwake(!checked));
 	}, []);
 
 	const handleOpenAppDataFolder = useCallback(() => {

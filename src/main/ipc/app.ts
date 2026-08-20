@@ -526,8 +526,8 @@ export class AppIpc implements IpcModule {
 		ipcMain.handle(
 			AppChannels.setKeepAwake,
 			wrapSimpleHandler((enabled: boolean) => {
-				setStoredKeepAwake(enabled);
 				applyKeepAwake(enabled);
+				setStoredKeepAwake(enabled);
 				eventBus.broadcast(AppChannels.keepAwakeChanged, enabled);
 			}, AppChannels.setKeepAwake)
 		);

@@ -156,8 +156,8 @@ const menuManager = new Menu({
 	},
 	getKeepAwake,
 	onKeepAwakeChange: (enabled) => {
-		setStoredKeepAwake(enabled);
 		setKeepAwake(enabled);
+		setStoredKeepAwake(enabled);
 		eventBus.broadcast(AppChannels.keepAwakeChanged, enabled);
 	},
 	getTheme,
@@ -227,8 +227,11 @@ app.whenReady().then(async () => {
 
 // Core window and quit-state handlers are managed by setupAppLifecycle.
 
-app.on('quit', () => {
+app.on('will-quit', () => {
 	setKeepAwake(false);
+});
+
+app.on('quit', () => {
 	stopStorageSync();
 	stopRagSchedule();
 	stopWiki();
