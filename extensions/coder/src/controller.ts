@@ -59,17 +59,22 @@ export interface CoderController {
 	runLabel: string;
 	runState: RunState;
 	sessions: CoderSessionSummary[];
+	sessionsByProject: Readonly<Record<string, readonly CoderSessionSummary[]>>;
+	expandedProjectIds: readonly string[];
 	thinkingLevel: CoderThinkingLevel;
 	toolMode: CoderToolMode;
 	addProject: () => Promise<void>;
 	cancelRun: () => void;
-	newSession: () => void;
+	newSession: (projectId?: string) => void;
+	openProject: (projectId: string) => Promise<void>;
+	refresh: () => Promise<void>;
 	removeProject: (projectId: string) => Promise<void>;
 	selectProject: (projectId: string) => Promise<void>;
-	selectSession: (sessionId: string) => Promise<void>;
+	selectSession: (projectId: string, sessionId: string) => Promise<void>;
 	send: () => Promise<void>;
 	setInput: Dispatch<SetStateAction<string>>;
 	setLeftOpen: Dispatch<SetStateAction<boolean>>;
 	setMode: Dispatch<SetStateAction<CoderRunMode>>;
 	setQuery: Dispatch<SetStateAction<string>>;
+	toggleProject: (projectId: string) => void;
 }
