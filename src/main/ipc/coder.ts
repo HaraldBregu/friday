@@ -3,29 +3,49 @@ import { CoderChannels } from '../../shared/ipc_channels_definitions';
 import { isCoderSettings } from '../../shared/coder_types';
 import type { Coder } from '../coder';
 import type { EventBus } from '../event_bus';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
 import {
-	registerCommand,
 	registerCommandWithEvent,
-	registerQuery,
 	registerQueryWithEvent,
 } from './core/gateway';
 import type { IpcModule } from './core/module';
 
 interface CoderIpcDependencies {
 	readonly coder: Coder;
+	readonly extensionRegistry: ExtensionRegistry;
 }
 
 export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 	readonly name = 'coder';
 
-	register({ coder }: CoderIpcDependencies, eventBus: EventBus): void {
-		registerQuery(CoderChannels.getSettings, () => coder.getSettings());
-		registerCommand(CoderChannels.saveSettings, (settings) => {
+	register({ coder, extensionRegistry }: CoderIpcDependencies, _eventBus: EventBus): void {
+		const assertCoderCaller = (event: Electron.IpcMainInvokeEvent): void => {
+			if (!extensionRegistry.has(event.sender)) return;
+			if (extensionRegistry.resolve(event.sender) !== 'coder') {
+				throw new Error('Coder is only available to the Coder extension.');
+			}
+		};
+		const assertHostCaller = (event: Electron.IpcMainInvokeEvent): void => {
+			if (extensionRegistry.has(event.sender)) {
+				throw new Error('Coder configuration is unavailable to extension views.');
+			}
+		};
+
+		registerQueryWithEvent(CoderChannels.getSettings, (event) => {
+			assertCoderCaller(event);
+			return coder.getSettings();
+		});
+		registerCommandWithEvent(CoderChannels.saveSettings, (event, settings) => {
+			assertHostCaller(event);
 			if (!isCoderSettings(settings)) throw new Error('Invalid coder settings.');
 			return coder.saveSettings(settings);
 		});
-		registerQuery(CoderChannels.listModels, () => coder.listModels());
+		registerQueryWithEvent(CoderChannels.listModels, (event) => {
+			assertHostCaller(event);
+			return coder.listModels();
+		});
 		registerQueryWithEvent(CoderChannels.pickDirectory, async (event) => {
+			assertHostCaller(event);
 			const window = BrowserWindow.fromWebContents(event.sender);
 			if (!window) throw new Error('Directory selection requires an originating window.');
 			const result = await dialog.showOpenDialog(window, {
@@ -34,31 +54,39 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			return result.canceled ? undefined : result.filePaths[0];
 		});
 		registerCommandWithEvent(CoderChannels.send, (event, prompt, runId) => {
-			const window = BrowserWindow.fromWebContents(event.sender);
-			if (!window) throw new Error('Coder request requires an originating window.');
+			assertCoderCaller(event);
 			if (typeof prompt !== 'string' || !prompt.trim()) throw new Error('Invalid coder prompt.');
 			if (typeof runId !== 'string' || !runId.trim()) throw new Error('Invalid coder run id.');
-			return coder.send(window.id, runId.trim(), prompt.trim(), (responseEvent) => {
-				eventBus.sendTo(window.id, CoderChannels.response, responseEvent);
-			});
+			const callerId = event.sender.id;
+			const normalizedRunId = runId.trim();
+			const cancel = (): void => {
+				coder.cancel(normalizedRunId, callerId);
+			};
+			event.sender.once('destroyed', cancel);
+			return coder
+				.send(callerId, normalizedRunId, prompt.trim(), (responseEvent) => {
+					event.sender.send(CoderChannels.response, responseEvent);
+				})
+				.finally(() => event.sender.removeListener('destroyed', cancel));
 		});
 		registerCommandWithEvent(CoderChannels.cancel, (event, runId) => {
-			const window = BrowserWindow.fromWebContents(event.sender);
-			if (!window) return false;
+			assertCoderCaller(event);
 			if (typeof runId !== 'string' || !runId.trim()) throw new Error('Invalid coder run id.');
-			return coder.cancel(runId.trim(), window.id);
+			return coder.cancel(runId.trim(), event.sender.id);
 		});
 		registerCommandWithEvent(CoderChannels.connectCodex, (event) => {
-			const window = BrowserWindow.fromWebContents(event.sender);
-			if (!window) throw new Error('Codex login requires an originating window.');
-			return coder.connectCodex(window.id, (authEvent) => {
-				eventBus.sendTo(window.id, CoderChannels.authEvent, authEvent);
+			assertHostCaller(event);
+			return coder.connectCodex(event.sender.id, (authEvent) => {
+				event.sender.send(CoderChannels.authEvent, authEvent);
 			});
 		});
 		registerCommandWithEvent(CoderChannels.cancelCodexLogin, (event) => {
-			const window = BrowserWindow.fromWebContents(event.sender);
-			return window ? coder.cancelCodexLogin(window.id) : false;
+			assertHostCaller(event);
+			return coder.cancelCodexLogin(event.sender.id);
 		});
-		registerCommand(CoderChannels.disconnectCodex, () => coder.disconnectCodex());
+		registerCommandWithEvent(CoderChannels.disconnectCodex, (event) => {
+			assertHostCaller(event);
+			return coder.disconnectCodex();
+		});
 	}
 }

@@ -59,7 +59,9 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('coder', () => new CoderIpc().register({ coder: coderService }, eventBus));
+	safeRegister('coder', () =>
+		new CoderIpc().register({ coder: coderService, extensionRegistry }, eventBus)
+	);
 	safeRegister('recorder', () => new RecorderIpc().register(undefined, eventBus));
 	safeRegister('tasks', () => new TaskIpc().register(undefined, eventBus));
 	safeRegister('mcp', () => new McpIpc().register(undefined, eventBus));
