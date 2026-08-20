@@ -66,7 +66,9 @@ it('enables keep awake from General settings', async () => {
 		checked: false,
 	});
 
-	await user.click(keepAwake);
+	await act(async () => {
+		await user.click(keepAwake);
+	});
 
 	expect(mockSetKeepAwake).toHaveBeenCalledWith(true);
 	expect(keepAwake).toBeChecked();
