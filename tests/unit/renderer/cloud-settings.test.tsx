@@ -94,3 +94,16 @@ it('shows storage controls without the provider CTA when a provider exists', asy
 		screen.queryByRole('button', { name: 'Configure storage provider' })
 	).not.toBeInTheDocument();
 });
+
+it('shows a recoverable error state instead of an endless loading skeleton', async () => {
+	storageApi.getStorages.mockRejectedValue(new Error('Storage is offline'));
+	const { container } = render(
+		<MemoryRouter>
+			<CloudPage />
+		</MemoryRouter>
+	);
+
+	expect(await screen.findByRole('alert')).toHaveTextContent('Storage is offline');
+	expect(container.querySelector('[aria-busy="true"]')).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'Manage providers' })).toBeVisible();
+});
