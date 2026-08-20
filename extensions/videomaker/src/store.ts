@@ -1,6 +1,5 @@
 import { app, isFriday } from '@friday/sdk';
 
-
 import { openDatabase } from './database';
 
 export async function storeMedia(id: string, file: File): Promise<string> {

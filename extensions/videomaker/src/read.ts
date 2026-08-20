@@ -11,7 +11,9 @@ export async function readMedia(assetPath: string, mime: string): Promise<string
 	const request = database.transaction('media', 'readonly').objectStore('media').get(assetPath);
 	const blob = await new Promise<Blob>((resolve, reject) => {
 		request.onsuccess = () =>
-			request.result instanceof Blob ? resolve(request.result) : reject(new Error('Media not found.'));
+			request.result instanceof Blob
+				? resolve(request.result)
+				: reject(new Error('Media not found.'));
 		request.onerror = () => reject(request.error);
 	});
 	database.close();

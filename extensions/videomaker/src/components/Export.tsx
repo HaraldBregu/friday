@@ -12,7 +12,8 @@ export function Export({ progress, error, onCancel, onClose }: ExportProps) {
 	const dialogRef = useRef<HTMLElement>(null);
 
 	useEffect(() => {
-		const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		const previouslyFocused =
+			document.activeElement instanceof HTMLElement ? document.activeElement : null;
 		return () => {
 			window.setTimeout(() => previouslyFocused?.focus());
 		};

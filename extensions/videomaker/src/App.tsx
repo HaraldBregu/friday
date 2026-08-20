@@ -51,7 +51,9 @@ export default function App() {
 				setCanSave(true);
 				setSaveStatus('saved');
 				if (loaded.clips.some((clip) => !clip.available)) {
-					setNotice('Some saved media is unavailable. Its layers were kept so the project can recover.');
+					setNotice(
+						'Some saved media is unavailable. Its layers were kept so the project can recover.'
+					);
 				}
 			})
 			.catch((reason) => {
