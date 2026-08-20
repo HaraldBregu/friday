@@ -205,23 +205,39 @@ export class Coder {
 	}
 
 	async send(
-		windowId: number,
+		ownerId: number,
 		runId: string,
-		prompt: string,
+		request: CoderRunRequest,
 		emit: (event: CoderResponseEvent) => void
-	): Promise<string> {
+	): Promise<CoderRunResult> {
 		if (this.runs.has(runId)) throw new Error('Coder run id is already active.');
+		const project = this.requireProject(request.projectId);
+		const sessionManager = request.sessionId
+			? SessionManager.open(
+					(await this.requireSession(project, request.sessionId)).path,
+					coderSessionsLocation(),
+					project.directory
+				)
+			: SessionManager.create(project.directory, coderSessionsLocation());
+		const sessionId = sessionManager.getSessionId();
+		const sessionKey = `${project.id}:${sessionId}`;
+		if ([...this.runs.values()].some((run) => run.sessionKey === sessionKey)) {
+			throw new Error('This Coder session already has an active run.');
+		}
 		const controller = new AbortController();
-		const run: ActiveRun = { windowId, controller };
+		const run: ActiveRun = {
+			ownerId,
+			projectId: project.id,
+			sessionId,
+			sessionKey,
+			controller,
+		};
+		const eventContext = { runId, projectId: project.id, sessionId };
 		this.runs.set(runId, run);
-		emit({ type: 'status', runId, status: 'started' });
+		emit({ ...eventContext, type: 'status', status: 'started' });
 		const timeout = setTimeout(() => controller.abort(), RUN_TIMEOUT_MS);
 		try {
 			const settings = this.getSettings();
-			const cwd = path.resolve(settings.workingDirectory);
-			if (!existsSync(cwd) || !statSync(cwd).isDirectory()) {
-				throw new Error('The configured coder working directory is unavailable.');
-			}
 			const runtime = await this.getRuntime();
 			await this.syncApiKeys(runtime);
 			const model = runtime.getModel(settings.providerId, settings.modelId);
@@ -240,7 +256,7 @@ export class Coder {
 				{ projectTrusted: true }
 			);
 			const resourceLoader = new DefaultResourceLoader({
-				cwd,
+				cwd: project.directory,
 				agentDir: coderLocation(),
 				settingsManager,
 				noExtensions: true,
@@ -250,17 +266,20 @@ export class Coder {
 			});
 			await resourceLoader.reload();
 			const { session } = await createAgentSession({
-				cwd,
+				cwd: project.directory,
 				agentDir: coderLocation(),
 				modelRuntime: runtime,
 				model,
 				thinkingLevel: settings.thinkingLevel,
 				tools: settings.toolMode === 'coding' ? CODING_TOOLS : READ_ONLY_TOOLS,
 				resourceLoader,
-				sessionManager: SessionManager.inMemory(cwd),
+				sessionManager,
 				settingsManager,
 			});
-			run.abortSession = () => session.abort();
+			run.abortSession = async () => {
+				session.abortBash();
+				await session.abort();
+			};
 			let output = '';
 			let finalError: string | undefined;
 			const unsubscribe = session.subscribe((event: AgentSessionEvent) => {
@@ -268,23 +287,23 @@ export class Coder {
 					const update = event.assistantMessageEvent;
 					if (update.type === 'text_delta') {
 						output += update.delta;
-						emit({ type: 'text-delta', runId, delta: update.delta });
+						emit({ ...eventContext, type: 'text-delta', delta: update.delta });
 					} else if (update.type === 'thinking_delta') {
-						emit({ type: 'thinking-delta', runId, delta: update.delta });
+						emit({ ...eventContext, type: 'thinking-delta', delta: update.delta });
 					} else if (update.type === 'error') {
 						finalError = update.error.errorMessage || 'Pi stopped with an error.';
 					}
 				} else if (event.type === 'tool_execution_start') {
 					emit({
+						...eventContext,
 						type: 'tool-start',
-						runId,
 						toolCallId: event.toolCallId,
 						toolName: event.toolName,
 					});
 				} else if (event.type === 'tool_execution_end') {
 					emit({
+						...eventContext,
 						type: 'tool-end',
-						runId,
 						toolCallId: event.toolCallId,
 						toolName: event.toolName,
 						isError: event.isError,
@@ -292,16 +311,34 @@ export class Coder {
 				}
 			});
 			const abortSession = (): void => {
+				session.abortBash();
 				void session.abort();
 			};
 			controller.signal.addEventListener('abort', abortSession, { once: true });
 			try {
-				if (controller.signal.aborted) await session.abort();
-				else await session.prompt(prompt, { expandPromptTemplates: false, source: 'rpc' });
 				if (controller.signal.aborted) throw new Error('Coder run cancelled.');
-				if (finalError) throw new Error(finalError);
-				emit({ type: 'status', runId, status: 'completed' });
-				return output;
+				if (request.mode === 'shell') {
+					emit({ ...eventContext, type: 'command-start', command: request.input });
+					const result = await session.executeBash(request.input, (delta) => {
+						output += delta;
+						emit({ ...eventContext, type: 'command-output', delta });
+					});
+					emit({
+						...eventContext,
+						type: 'command-end',
+						...(result.exitCode === undefined ? {} : { exitCode: result.exitCode }),
+						cancelled: result.cancelled,
+						truncated: result.truncated,
+					});
+					if (controller.signal.aborted || result.cancelled) throw new Error('Coder run cancelled.');
+				} else {
+					await session.prompt(request.input, { expandPromptTemplates: false, source: 'rpc' });
+					if (controller.signal.aborted) throw new Error('Coder run cancelled.');
+					if (finalError) throw new Error(finalError);
+				}
+				emit({ ...eventContext, type: 'status', status: 'completed' });
+				this.dependencies.projects.touch(project.id);
+				return { projectId: project.id, sessionId, output };
 			} finally {
 				controller.signal.removeEventListener('abort', abortSession);
 				unsubscribe();
@@ -309,8 +346,11 @@ export class Coder {
 			}
 		} catch (error) {
 			const message = error instanceof Error ? error.message : 'Coder run failed.';
-			if (controller.signal.aborted) emit({ type: 'status', runId, status: 'cancelled' });
-			else emit({ type: 'error', runId, message });
+			if (controller.signal.aborted) {
+				emit({ ...eventContext, type: 'status', status: 'cancelled' });
+			} else {
+				emit({ ...eventContext, type: 'error', message });
+			}
 			throw error;
 		} finally {
 			clearTimeout(timeout);
@@ -318,19 +358,19 @@ export class Coder {
 		}
 	}
 
-	cancel(runId: string, windowId: number): boolean {
+	cancel(runId: string, ownerId: number): boolean {
 		const run = this.runs.get(runId);
-		if (!run || run.windowId !== windowId) return false;
+		if (!run || run.ownerId !== ownerId) return false;
 		run.controller.abort();
 		void run.abortSession?.();
 		return true;
 	}
 
-	cancelWindow(windowId: number): void {
+	cancelWindow(ownerId: number): void {
 		for (const [runId, run] of this.runs) {
-			if (run.windowId === windowId) this.cancel(runId, windowId);
+			if (run.ownerId === ownerId) this.cancel(runId, ownerId);
 		}
-		this.cancelCodexLogin(windowId);
+		this.cancelCodexLogin(ownerId);
 	}
 
 	destroy(): void {
