@@ -117,6 +117,11 @@ textarea:focus-visible {
 	outline-offset: 1px;
 }
 
+.timeline-canvas:focus-visible {
+	outline: 2px solid var(--focus);
+	outline-offset: -2px;
+}
+
 input,
 select,
 textarea {
@@ -293,6 +298,17 @@ textarea {
 .drop-zone button,
 .empty-copy {
 	font-size: 10px;
+}
+
+.media-warning {
+	margin: 0;
+	padding: 8px;
+	border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+	color: var(--text);
+	font-size: 11px;
+	line-height: 1.4;
 }
 
 .drop-zone span,
@@ -821,7 +837,6 @@ textarea {
 }
 
 @media (max-width: 650px) {
-	.preset-select,
 	.status-bar span:nth-last-child(1),
 	.status-bar span:nth-last-child(2) {
 		display: none;
@@ -836,7 +851,7 @@ textarea {
 
 @media (prefers-reduced-motion: reduce) {
 	.spin {
-		animation-duration: 2s;
+		animation: none;
 	}
 
 	.progress-track span {

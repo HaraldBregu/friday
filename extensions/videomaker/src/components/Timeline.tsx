@@ -39,6 +39,7 @@ export function Timeline({
 							key={clip.id}
 							className={selectedId === clip.id ? 'selected' : ''}
 							onClick={() => onSelect(clip.id)}
+							aria-pressed={selectedId === clip.id}
 						>
 							{clip.kind === 'video' ? (
 								<Video size={14} />
@@ -55,6 +56,22 @@ export function Timeline({
 				</div>
 				<div
 					className="timeline-canvas"
+					role="slider"
+					tabIndex={0}
+					aria-label="Timeline playhead"
+					aria-valuemin={0}
+					aria-valuemax={duration}
+					aria-valuenow={Number(currentTime.toFixed(2))}
+					aria-valuetext={formatTime(currentTime)}
+					onKeyDown={(event) => {
+						const step = event.shiftKey ? 1 : 0.1;
+						if (event.key === 'ArrowLeft') onSeek(currentTime - step);
+						else if (event.key === 'ArrowRight') onSeek(currentTime + step);
+						else if (event.key === 'Home') onSeek(0);
+						else if (event.key === 'End') onSeek(duration);
+						else return;
+						event.preventDefault();
+					}}
 					onPointerDown={(event) => {
 						if ((event.target as HTMLElement).closest('.clip-bar')) return;
 						const bounds = event.currentTarget.getBoundingClientRect();
@@ -79,6 +96,7 @@ export function Timeline({
 								}}
 								onPointerDown={(event) => event.stopPropagation()}
 								onClick={() => onSelect(clip.id)}
+								aria-pressed={selectedId === clip.id}
 								title={`${clip.name} · ${clip.start.toFixed(1)}s–${(clip.start + clip.duration).toFixed(1)}s`}
 							>
 								<span>{clip.name}</span>

@@ -252,6 +252,12 @@ export default function App() {
 		}
 	}, [project]);
 
+	const cancelExport = useCallback(() => abortRef.current?.abort(), []);
+	const closeExport = useCallback(() => {
+		setExportError('');
+		setExporting(false);
+	}, []);
+
 	return (
 		<main className="videomaker">
 			<Header
@@ -323,11 +329,8 @@ export default function App() {
 				<Export
 					progress={exportProgress}
 					error={exportError}
-					onCancel={() => abortRef.current?.abort()}
-					onClose={() => {
-						setExportError('');
-						setExporting(false);
-					}}
+					onCancel={cancelExport}
+					onClose={closeExport}
 				/>
 			) : null}
 		</main>

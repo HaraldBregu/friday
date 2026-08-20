@@ -1,4 +1,5 @@
 import { LoaderCircle, X } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 interface ExportProps {
 	progress: number;
@@ -8,9 +9,52 @@ interface ExportProps {
 }
 
 export function Export({ progress, error, onCancel, onClose }: ExportProps) {
+	const dialogRef = useRef<HTMLElement>(null);
+	const errorRef = useRef(error);
+	errorRef.current = error;
+
+	useEffect(() => {
+		const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		return () => {
+			window.setTimeout(() => previouslyFocused?.focus());
+		};
+	}, []);
+
+	useEffect(() => {
+		dialogRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+	}, [error]);
+
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				if (errorRef.current) onClose();
+				else onCancel();
+				return;
+			}
+			if (event.key !== 'Tab') return;
+			const buttons = Array.from(
+				dialogRef.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? []
+			);
+			if (buttons.length === 0) return;
+			const first = buttons[0];
+			const last = buttons[buttons.length - 1];
+			if (event.shiftKey && document.activeElement === first) {
+				event.preventDefault();
+				last.focus();
+			} else if (!event.shiftKey && document.activeElement === last) {
+				event.preventDefault();
+				first.focus();
+			}
+		};
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [onCancel, onClose]);
+
 	return (
 		<div className="dialog-backdrop" role="presentation">
 			<section
+				ref={dialogRef}
 				className="export-dialog"
 				role="dialog"
 				aria-modal="true"

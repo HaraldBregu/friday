@@ -42,6 +42,7 @@ export function Media({ clips, selectedId, onSelect, onImport, onFiles }: MediaP
 							key={clip.id}
 							className={`asset-item ${selectedId === clip.id ? 'selected' : ''}`}
 							onClick={() => onSelect(clip.id)}
+							aria-pressed={selectedId === clip.id}
 						>
 							<span className={`asset-icon ${clip.kind}`} aria-hidden="true">
 								{clip.kind === 'video' ? (
@@ -55,7 +56,7 @@ export function Media({ clips, selectedId, onSelect, onImport, onFiles }: MediaP
 							<span>
 								<strong>{clip.name}</strong>
 								<small>
-									{clip.kind} · {clip.duration.toFixed(1)}s
+									{clip.available ? clip.kind : 'unavailable'} · {clip.duration.toFixed(1)}s
 								</small>
 							</span>
 						</button>

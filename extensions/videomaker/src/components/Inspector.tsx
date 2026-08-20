@@ -39,6 +39,11 @@ export function Inspector({ project, clip, onProject, onClip, onRemove }: Inspec
 				</section>
 				{clip ? (
 					<section className="property-section">
+						{!clip.available ? (
+							<p className="media-warning" role="alert">
+								The saved media file is unavailable. This layer is preserved but will not render.
+							</p>
+						) : null}
 						<div className="section-title">
 							<h2>Layer</h2>
 							<button
