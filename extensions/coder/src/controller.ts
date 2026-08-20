@@ -1,40 +1,75 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { CoderProviderId, CoderThinkingLevel, CoderToolMode } from '@friday/sdk';
+import type {
+	CoderProject,
+	CoderProviderId,
+	CoderRunMode,
+	CoderSessionSummary,
+	CoderThinkingLevel,
+	CoderToolMode,
+} from '@friday/sdk';
 
-export type RunState = 'idle' | 'running' | 'error';
+export type RunState = 'loading' | 'idle' | 'running' | 'error';
 
-export interface CoderMessage {
+export interface CoderMessageBlock {
 	id: string;
+	type: 'message';
 	role: 'user' | 'assistant';
 	content: string;
-	status?: 'streaming' | 'complete' | 'error';
+	status: 'streaming' | 'complete' | 'error';
+	timestamp: string;
 }
 
-export interface CoderActivity {
+export interface CoderToolBlock {
 	id: string;
-	name: string;
-	status: 'running' | 'ok' | 'error';
-	detail: string;
+	type: 'tool';
+	toolName: string;
+	status: 'running' | 'succeeded' | 'failed';
+	timestamp: string;
 }
+
+export interface CoderCommandBlock {
+	id: string;
+	type: 'command';
+	command: string;
+	output: string;
+	status: 'running' | 'succeeded' | 'failed' | 'cancelled';
+	exitCode?: number;
+	truncated: boolean;
+	timestamp: string;
+}
+
+export type CoderBlock = CoderMessageBlock | CoderToolBlock | CoderCommandBlock;
 
 export interface CoderController {
-	activities: CoderActivity[];
+	activeProject?: CoderProject;
+	activeProjectId?: string;
+	activeSessionId?: string;
+	blocks: CoderBlock[];
+	busy: boolean;
 	error: string;
 	input: string;
 	isPreview: boolean;
 	leftOpen: boolean;
-	messages: CoderMessage[];
+	loading: boolean;
+	mode: CoderRunMode;
 	modelId: string;
+	projects: CoderProject[];
 	providerId: CoderProviderId;
+	query: string;
 	runLabel: string;
 	runState: RunState;
+	sessions: CoderSessionSummary[];
 	thinkingLevel: CoderThinkingLevel;
 	toolMode: CoderToolMode;
-	workingDirectory: string;
-	workspaceName: string;
+	addProject: () => Promise<void>;
 	cancelRun: () => void;
-	clearTerminal: () => void;
+	newSession: () => void;
+	removeProject: (projectId: string) => Promise<void>;
+	selectProject: (projectId: string) => Promise<void>;
+	selectSession: (sessionId: string) => Promise<void>;
 	send: () => Promise<void>;
 	setInput: Dispatch<SetStateAction<string>>;
 	setLeftOpen: Dispatch<SetStateAction<boolean>>;
+	setMode: Dispatch<SetStateAction<CoderRunMode>>;
+	setQuery: Dispatch<SetStateAction<string>>;
 }
