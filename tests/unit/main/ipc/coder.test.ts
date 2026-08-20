@@ -26,10 +26,7 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		once: jest.fn(),
 		removeListener: jest.fn(),
 	};
-	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never },
-		{} as EventBus
-	);
+	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
@@ -64,10 +61,7 @@ it('rejects Coder access from other extensions', async () => {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('demo'),
 	};
-	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never },
-		{} as EventBus
-	);
+	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
 	const getSettings = (ipcMain.handle as jest.Mock).mock.calls.find(
 		([channel]) => channel === CoderChannels.getSettings
 	)?.[1];
@@ -79,7 +73,9 @@ it('rejects Coder access from other extensions', async () => {
 	await expect(getSettings({ sender })).resolves.toEqual(
 		expect.objectContaining({
 			success: false,
-			error: expect.objectContaining({ message: 'Coder is only available to the Coder extension.' }),
+			error: expect.objectContaining({
+				message: 'Coder is only available to the Coder extension.',
+			}),
 		})
 	);
 	await expect(send({ sender }, 'prompt', 'run-1')).resolves.toEqual(
@@ -107,10 +103,7 @@ it('keeps configuration and authentication host-only', async () => {
 		canceled: false,
 		filePaths: ['/project'],
 	});
-	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never },
-		{} as EventBus
-	);
+	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 

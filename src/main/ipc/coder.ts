@@ -4,10 +4,7 @@ import { isCoderSettings } from '../../shared/coder_types';
 import type { Coder } from '../coder';
 import type { EventBus } from '../event_bus';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
-import {
-	registerCommandWithEvent,
-	registerQueryWithEvent,
-} from './core/gateway';
+import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
 
 interface CoderIpcDependencies {

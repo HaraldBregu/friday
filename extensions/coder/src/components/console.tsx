@@ -17,14 +17,16 @@ export function Console({ coder }: { coder: CoderController }) {
 			<div ref={outputRef} className="terminal-output" role="log" aria-live="polite">
 				<div className="terminal-banner">
 					<strong>Friday Pi Coder</strong>
-					<span>workspace  {coder.workingDirectory || 'not configured'}</span>
-					<span>provider   {coder.providerId}</span>
-					<span>model      {coder.modelId || 'not selected'}</span>
-					<span>tools      {coder.toolMode}</span>
+					<span>workspace {coder.workingDirectory || 'not configured'}</span>
+					<span>provider {coder.providerId}</span>
+					<span>model {coder.modelId || 'not selected'}</span>
+					<span>tools {coder.toolMode}</span>
 				</div>
 
 				{coder.messages.length === 0 ? (
-					<p className="terminal-muted">Describe one coding task below. Pi will run it in the configured workspace.</p>
+					<p className="terminal-muted">
+						Describe one coding task below. Pi will run it in the configured workspace.
+					</p>
 				) : null}
 
 				{coder.messages.map((message) => (
@@ -34,7 +36,10 @@ export function Console({ coder }: { coder: CoderController }) {
 						coder.activities.length > 0 ? (
 							<div className="terminal-activity" aria-label="Coder tools">
 								{coder.activities.map((activity) => (
-									<div key={activity.id} className={`terminal-command terminal-command--${activity.status}`}>
+									<div
+										key={activity.id}
+										className={`terminal-command terminal-command--${activity.status}`}
+									>
 										{activity.status === 'running' ? (
 											<LoaderCircle className="is-spinning" />
 										) : activity.status === 'ok' ? (
@@ -59,7 +64,9 @@ export function Console({ coder }: { coder: CoderController }) {
 								<>
 									<span className="terminal-agent-label">pi</span>
 									{message.content ? (
-										<pre className={message.status === 'error' ? 'is-error' : undefined}>{message.content}</pre>
+										<pre className={message.status === 'error' ? 'is-error' : undefined}>
+											{message.content}
+										</pre>
 									) : (
 										<span className="terminal-cursor" aria-label="Coder is working" />
 									)}
@@ -69,7 +76,11 @@ export function Console({ coder }: { coder: CoderController }) {
 					</div>
 				))}
 
-				{coder.error ? <div className="terminal-error" role="alert">error: {coder.error}</div> : null}
+				{coder.error ? (
+					<div className="terminal-error" role="alert">
+						error: {coder.error}
+					</div>
+				) : null}
 			</div>
 
 			<form
@@ -98,19 +109,44 @@ export function Console({ coder }: { coder: CoderController }) {
 							void coder.send();
 						}
 					}}
-					placeholder={coder.modelId ? 'Describe a coding task…' : 'Configure a Coder model in Friday Settings…'}
+					placeholder={
+						coder.modelId
+							? 'Describe a coding task…'
+							: 'Configure a Coder model in Friday Settings…'
+					}
 					aria-label="Coding task"
 					rows={1}
 				/>
 				{coder.runState === 'running' ? (
-					<Button type="button" size="icon" variant="ghost" aria-label="Stop Coder" onClick={coder.cancelRun}><CircleStop /></Button>
+					<Button
+						type="button"
+						size="icon"
+						variant="ghost"
+						aria-label="Stop Coder"
+						onClick={coder.cancelRun}
+					>
+						<CircleStop />
+					</Button>
 				) : (
-					<Button type="submit" size="sm" variant="ghost" disabled={!coder.input.trim() || !coder.modelId}>run</Button>
+					<Button
+						type="submit"
+						size="sm"
+						variant="ghost"
+						disabled={!coder.input.trim() || !coder.modelId}
+					>
+						run
+					</Button>
 				)}
 			</form>
 			<footer className="terminal-statusbar">
-				<span>{coder.runState === 'running' ? 'ctrl+c to stop' : 'enter to run · shift+enter for newline'}</span>
-				<span>{coder.providerId} · {coder.modelId || 'model required'} · {coder.toolMode}</span>
+				<span>
+					{coder.runState === 'running'
+						? 'ctrl+c to stop'
+						: 'enter to run · shift+enter for newline'}
+				</span>
+				<span>
+					{coder.providerId} · {coder.modelId || 'model required'} · {coder.toolMode}
+				</span>
 			</footer>
 		</div>
 	);

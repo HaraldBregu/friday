@@ -57,9 +57,7 @@ export function useCoder(): CoderController {
 		preview ? previewSettings : initialSettings
 	);
 	const [messages, setMessages] = useState<CoderMessage[]>(preview ? previewMessages : []);
-	const [activities, setActivities] = useState<CoderActivity[]>(
-		preview ? previewActivities : []
-	);
+	const [activities, setActivities] = useState<CoderActivity[]>(preview ? previewActivities : []);
 	const [input, setInput] = useState('');
 	const [runState, setRunState] = useState<RunState>('idle');
 	const [runLabel, setRunLabel] = useState(preview ? 'Preview' : 'Loading');
@@ -241,7 +239,8 @@ export function useCoder(): CoderController {
 			setRunState('idle');
 			setRunLabel('Ready');
 		} catch (reason) {
-			const message = reason instanceof Error ? reason.message : 'Coder could not finish this task.';
+			const message =
+				reason instanceof Error ? reason.message : 'Coder could not finish this task.';
 			const cancelled = cancelRequestedRef.current || message === 'Coder run cancelled.';
 			setRunState(cancelled ? 'idle' : 'error');
 			setRunLabel(cancelled ? 'Cancelled' : 'Failed');

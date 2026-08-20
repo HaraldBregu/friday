@@ -31,7 +31,11 @@ export default function App() {
 						>
 							{coder.leftOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
 						</Button>
-						<span className="terminal-window-dots" aria-hidden="true"><i /><i /><i /></span>
+						<span className="terminal-window-dots" aria-hidden="true">
+							<i />
+							<i />
+							<i />
+						</span>
 					</div>
 					<strong>{coder.workspaceName} — Pi Coder</strong>
 					<span className={`coder-run-state coder-run-state--${coder.runState}`}>

@@ -1,9 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type {
-	CoderProviderId,
-	CoderThinkingLevel,
-	CoderToolMode,
-} from '@friday/sdk';
+import type { CoderProviderId, CoderThinkingLevel, CoderToolMode } from '@friday/sdk';
 
 export type RunState = 'idle' | 'running' | 'error';
 
