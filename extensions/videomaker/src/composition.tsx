@@ -3,9 +3,9 @@ import { AbsoluteFill, Img, interpolate, Sequence, useCurrentFrame } from 'remot
 
 import type { Project } from './types';
 
-export interface CompositionProps {
+export type CompositionProps = {
 	project: Project;
-}
+};
 
 export function VideoComposition({ project }: CompositionProps) {
 	const frame = useCurrentFrame();

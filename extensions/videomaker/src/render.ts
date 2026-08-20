@@ -26,6 +26,7 @@ export async function renderProject(
 		composition: {
 			id: 'videomaker',
 			component: VideoComposition,
+			defaultProps: { project },
 			durationInFrames: Math.max(1, Math.ceil(getProjectDuration(project) * project.fps)),
 			fps: project.fps,
 			width: project.width,

@@ -1,6 +1,7 @@
 import type { PlayerRef } from '@remotion/player';
 import { Player } from '@remotion/player';
 import { memo, type RefObject } from 'react';
+import type { AnyZodObject } from 'remotion';
 
 import { VideoComposition, type CompositionProps } from '../composition';
 import { getProjectDuration } from '../duration';
@@ -16,7 +17,7 @@ export const Preview = memo(function Preview({ inputProps, playerRef }: PreviewP
 		<section className="preview-panel" aria-label="Video preview">
 			<div className="preview-stage">
 				<div className="player-shell" style={{ aspectRatio: `${project.width} / ${project.height}` }}>
-					<Player
+					<Player<AnyZodObject, CompositionProps>
 						ref={playerRef}
 						component={VideoComposition}
 						inputProps={inputProps}
