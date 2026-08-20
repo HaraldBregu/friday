@@ -3,12 +3,12 @@ import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Console } from '@/components/console';
 import { Sidebar } from '@/components/sidebar';
 import { Button } from '@/components/ui/button';
-import { useCoder } from '@/hooks/coder';
+import { useCoderWorkspace } from '@/hooks/workspace';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function App() {
 	useTheme();
-	const coder = useCoder();
+	const coder = useCoderWorkspace();
 
 	return (
 		<main
