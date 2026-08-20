@@ -21,7 +21,6 @@ export interface CoderSettings {
 	readonly modelId: string;
 	readonly thinkingLevel: CoderThinkingLevel;
 	readonly toolMode: CoderToolMode;
-	readonly workingDirectory: string;
 }
 
 export interface CoderModel {
@@ -166,9 +165,7 @@ export function isCoderSettings(value: unknown): value is CoderSettings {
 		typeof settings.thinkingLevel === 'string' &&
 		CODER_THINKING_LEVELS.includes(settings.thinkingLevel as CoderThinkingLevel) &&
 		typeof settings.toolMode === 'string' &&
-		CODER_TOOL_MODES.includes(settings.toolMode as CoderToolMode) &&
-		typeof settings.workingDirectory === 'string' &&
-		settings.workingDirectory.trim().length > 0
+		CODER_TOOL_MODES.includes(settings.toolMode as CoderToolMode)
 	);
 }
 

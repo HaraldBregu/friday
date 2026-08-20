@@ -64,7 +64,6 @@ export interface CoderInvokeChannelMap {
 		result: import('./coder_types').CoderSettings;
 	};
 	[CoderChannels.listModels]: { args: []; result: import('./coder_types').CoderCatalog };
-	[CoderChannels.pickDirectory]: { args: []; result: string | undefined };
 	[CoderChannels.listProjects]: { args: []; result: import('./coder_types').CoderProject[] };
 	[CoderChannels.addProject]: {
 		args: [];

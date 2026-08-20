@@ -41,15 +41,6 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			assertHostCaller(event);
 			return coder.listModels();
 		});
-		registerQueryWithEvent(CoderChannels.pickDirectory, async (event) => {
-			assertHostCaller(event);
-			const window = BrowserWindow.fromWebContents(event.sender);
-			if (!window) throw new Error('Directory selection requires an originating window.');
-			const result = await dialog.showOpenDialog(window, {
-				properties: ['openDirectory', 'createDirectory'],
-			});
-			return result.canceled ? undefined : result.filePaths[0];
-		});
 		registerQueryWithEvent(CoderChannels.listProjects, (event) => {
 			assertCoderCaller(event);
 			return coder.listProjects();

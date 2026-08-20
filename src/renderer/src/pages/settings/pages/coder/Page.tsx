@@ -171,7 +171,7 @@ const CoderPage: React.FC = () => {
 
 			<SettingsPanel>
 				{loading || !settings ? (
-					<SettingsLoadingRows rows={6} />
+					<SettingsLoadingRows rows={5} />
 				) : (
 					<>
 						<SettingsRow
@@ -344,30 +344,6 @@ const CoderPage: React.FC = () => {
 										<SelectItem value="coding">{t('settings.coder.codingTools')}</SelectItem>
 									</SelectContent>
 								</Select>
-							}
-						/>
-
-						<SettingsRow
-							title={t('settings.coder.workingDirectory')}
-							description={t('settings.coder.workingDirectoryDescription')}
-							actions={
-								<>
-									<SettingsValue mono className="max-w-72">
-										{settings.workingDirectory}
-									</SettingsValue>
-									<Button
-										size="xs"
-										variant="outline"
-										disabled={saving}
-										onClick={() => {
-											void window.coder.pickDirectory().then((directory) => {
-												if (directory) save({ ...settings, workingDirectory: directory });
-											});
-										}}
-									>
-										{t('settings.coder.choose')}
-									</Button>
-								</>
 							}
 						/>
 					</>

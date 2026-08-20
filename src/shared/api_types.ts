@@ -193,7 +193,6 @@ export interface CoderApi {
 	getSettings: () => Promise<CoderSettings>;
 	saveSettings: (settings: CoderSettings) => Promise<CoderSettings>;
 	listModels: () => Promise<CoderCatalog>;
-	pickDirectory: () => Promise<string | undefined>;
 	listProjects: () => Promise<CoderProject[]>;
 	addProject: () => Promise<CoderProject | undefined>;
 	removeProject: (projectId: string) => Promise<boolean>;

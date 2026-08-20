@@ -51,7 +51,6 @@ export const CoderChannels = {
 	getSettings: 'coder:settings:get',
 	saveSettings: 'coder:settings:save',
 	listModels: 'coder:models:list',
-	pickDirectory: 'coder:directory:pick',
 	listProjects: 'coder:projects:list',
 	addProject: 'coder:projects:add',
 	removeProject: 'coder:projects:remove',

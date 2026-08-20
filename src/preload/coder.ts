@@ -10,7 +10,6 @@ export const coder: CoderApi = {
 		return typedInvokeUnwrap(CoderChannels.saveSettings, settings);
 	},
 	listModels: () => typedInvokeUnwrap(CoderChannels.listModels),
-	pickDirectory: () => typedInvokeUnwrap(CoderChannels.pickDirectory),
 	listProjects: () => typedInvokeUnwrap(CoderChannels.listProjects),
 	addProject: () => typedInvokeUnwrap(CoderChannels.addProject),
 	removeProject: (projectId) => {
