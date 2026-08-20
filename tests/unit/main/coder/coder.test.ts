@@ -1,4 +1,4 @@
-jest.mock('../../../../../src/main/coder/location', () => ({
+jest.mock('../../../../src/main/coder/location', () => ({
 	coderLocation: () => '/tmp/friday-coder-test',
 }));
 
@@ -7,8 +7,8 @@ import {
 	DefaultResourceLoader,
 	modelRuntimeCreate,
 } from '@earendil-works/pi-coding-agent';
-import { Coder } from '../../../../../src/main/coder/coder';
-import type { CoderStore } from '../../../../../src/main/coder/store';
+import { Coder } from '../../../../src/main/coder/coder';
+import type { CoderStore } from '../../../../src/main/coder/store';
 
 const settings = {
 	runtime: 'pi' as const,

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { CoderStore, DEFAULT_CODER_SETTINGS } from '../../../../../src/main/coder/store';
+import { CoderStore, DEFAULT_CODER_SETTINGS } from '../../../../src/main/coder/store';
 
 it('defaults to Pi, Codex, and read-only tools', () => {
 	const store = new CoderStore('/tmp/friday-coder-store-test');
