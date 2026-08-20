@@ -297,13 +297,28 @@ export default function App() {
 								{text.storageValue}: {extensionStoreValue || text.storageEmpty}
 							</p>
 							<div className="flex flex-wrap gap-2">
-								<Button size="sm" variant="outline" disabled={storageBusy} onClick={storeExtensionValue}>
+								<Button
+									size="sm"
+									variant="outline"
+									disabled={storageBusy}
+									onClick={storeExtensionValue}
+								>
 									{text.storeStorageValue}
 								</Button>
-								<Button size="sm" variant="secondary" disabled={storageBusy} onClick={loadExtensionValue}>
+								<Button
+									size="sm"
+									variant="secondary"
+									disabled={storageBusy}
+									onClick={loadExtensionValue}
+								>
 									{text.loadStorageValue}
 								</Button>
-								<Button size="sm" variant="destructive" disabled={storageBusy} onClick={deleteExtensionValue}>
+								<Button
+									size="sm"
+									variant="destructive"
+									disabled={storageBusy}
+									onClick={deleteExtensionValue}
+								>
 									{text.deleteStorageValue}
 								</Button>
 							</div>
@@ -313,13 +328,28 @@ export default function App() {
 								{text.storageFile}: {extensionFileValue || text.storageEmpty}
 							</p>
 							<div className="flex flex-wrap gap-2">
-								<Button size="sm" variant="outline" disabled={storageBusy} onClick={saveExtensionFile}>
+								<Button
+									size="sm"
+									variant="outline"
+									disabled={storageBusy}
+									onClick={saveExtensionFile}
+								>
 									{text.saveStorageFile}
 								</Button>
-								<Button size="sm" variant="secondary" disabled={storageBusy} onClick={readExtensionFile}>
+								<Button
+									size="sm"
+									variant="secondary"
+									disabled={storageBusy}
+									onClick={readExtensionFile}
+								>
 									{text.readStorageFile}
 								</Button>
-								<Button size="sm" variant="destructive" disabled={storageBusy} onClick={deleteExtensionFile}>
+								<Button
+									size="sm"
+									variant="destructive"
+									disabled={storageBusy}
+									onClick={deleteExtensionFile}
+								>
 									{text.deleteStorageFile}
 								</Button>
 							</div>
