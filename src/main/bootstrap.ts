@@ -12,8 +12,9 @@ import { ExecSandbox } from './agent/sandbox';
 import { createRealtimeVoiceManager } from './agent/realtime_voice';
 import { StorageOperations } from './storage';
 import { StorageChannels } from '../shared/ipc_channels_definitions';
-import { Coder, CoderStore } from './coder';
+import { Coder, CoderProjectStore, CoderStore } from './coder';
 import { getProvider } from './settings_store';
+import { agentLocation } from './shared/agent_location';
 
 export interface MainServices {
 	appState: AppState;
@@ -40,7 +41,15 @@ export function bootstrapServices(): BootstrapResult {
 	const extensionStorage = new ExtensionStorage();
 	const windowFactory = new WindowFactory(logger, extensionRegistry);
 	const agentService = new Agent(windowFactory, new ExecSandbox());
-	const coderService = new Coder({ store: new CoderStore(), getProvider });
+	const coderStore = new CoderStore();
+	const coderService = new Coder({
+		store: coderStore,
+		projects: new CoderProjectStore(undefined, [
+			agentLocation(),
+			coderStore.get().workingDirectory,
+		]),
+		getProvider,
+	});
 	const channelRegistry = createChannelRegistry({ logger, eventBus, agentService });
 	const windowContextManager = new WindowContextManager(logger, eventBus);
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
