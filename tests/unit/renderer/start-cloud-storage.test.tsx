@@ -259,11 +259,12 @@ it('rehydrates a running backup after the page remounts', async () => {
 	});
 	storageApi.getOperationStatuses.mockResolvedValue([running]);
 
+	const unsubscribeCount = unsubscribeOperationStatus.mock.calls.length;
 	const first = render(<StoragePage />);
 	expect(await screen.findByText('Backup is running in the background…')).toBeInTheDocument();
 	expect(screen.getByRole('button', { name: 'settings.storage.pushing' })).toBeDisabled();
 	first.unmount();
-	expect(unsubscribeOperationStatus).toHaveBeenCalledTimes(1);
+	expect(unsubscribeOperationStatus).toHaveBeenCalledTimes(unsubscribeCount + 1);
 
 	render(<StoragePage />);
 	expect(await screen.findByText('Backup is running in the background…')).toBeInTheDocument();
