@@ -1,13 +1,16 @@
 jest.mock('../../../../src/main/coder/location', () => ({
 	coderLocation: () => '/tmp/friday-coder-test',
+	coderSessionsLocation: () => '/tmp/friday-coder-test/sessions',
 }));
 
 import {
 	createAgentSession,
 	DefaultResourceLoader,
 	modelRuntimeCreate,
+	sessionManagerCreate,
 } from '@earendil-works/pi-coding-agent';
 import { Coder } from '../../../../src/main/coder/coder';
+import type { CoderProjectStore } from '../../../../src/main/coder/projects';
 import type { CoderStore } from '../../../../src/main/coder/store';
 
 const settings = {
@@ -19,9 +22,28 @@ const settings = {
 	workingDirectory: process.cwd(),
 };
 
+const project = {
+	id: 'project-1',
+	name: 'Friday',
+	directory: process.cwd(),
+	kind: 'external' as const,
+	createdAt: '2026-08-20T10:00:00.000Z',
+	lastOpenedAt: '2026-08-20T10:00:00.000Z',
+	available: true,
+};
+
+const projects = {
+	list: jest.fn(() => [project]),
+	get: jest.fn((projectId: string) => (projectId === project.id ? project : undefined)),
+	add: jest.fn(),
+	remove: jest.fn(),
+	touch: jest.fn(),
+};
+
 beforeEach(() => {
 	jest.clearAllMocks();
 	DefaultResourceLoader.instances.length = 0;
+	sessionManagerCreate.mockReturnValue({ getSessionId: () => 'session-1' });
 });
 
 it('runs Pi with the saved model, isolated resources, and redacted stream events', async () => {
@@ -63,12 +85,15 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 				isError: false,
 			});
 		}),
+		executeBash: jest.fn(),
+		abortBash: jest.fn(),
 		abort: jest.fn(async () => undefined),
 		dispose: jest.fn(),
 	};
 	(createAgentSession as jest.Mock).mockResolvedValue({ session });
 	const coder = new Coder({
 		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
 		getProvider: (id) =>
 			id === 'openai'
 				? { id, name: 'OpenAI', apiKey: 'key', baseUrl: 'https://api.openai.com/v1' }
@@ -77,8 +102,17 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 	const events: unknown[] = [];
 
 	await expect(
-		coder.send(4, 'run-1', 'Inspect this project', (event) => events.push(event))
-	).resolves.toBe('done');
+		coder.send(
+			4,
+			'run-1',
+			{ projectId: project.id, mode: 'agent', input: 'Inspect this project' },
+			(event) => events.push(event)
+		)
+	).resolves.toEqual({ projectId: project.id, sessionId: 'session-1', output: 'done' });
+	expect(sessionManagerCreate).toHaveBeenCalledWith(
+		project.directory,
+		'/tmp/friday-coder-test/sessions'
+	);
 	expect(createAgentSession).toHaveBeenCalledWith(
 		expect.objectContaining({
 			model,
@@ -93,10 +127,18 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 			noThemes: true,
 		})
 	);
-	expect(events).toContainEqual({ type: 'text-delta', runId: 'run-1', delta: 'done' });
+	expect(events).toContainEqual({
+		type: 'text-delta',
+		runId: 'run-1',
+		projectId: project.id,
+		sessionId: 'session-1',
+		delta: 'done',
+	});
 	expect(events).toContainEqual({
 		type: 'tool-start',
 		runId: 'run-1',
+		projectId: project.id,
+		sessionId: 'session-1',
 		toolCallId: 'tool-1',
 		toolName: 'read',
 	});
@@ -125,6 +167,7 @@ it('uses Codex device OAuth and projects only the device code event', async () =
 	modelRuntimeCreate.mockResolvedValue(runtime);
 	const coder = new Coder({
 		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
 		getProvider: () => undefined,
 	});
 	const events: unknown[] = [];
