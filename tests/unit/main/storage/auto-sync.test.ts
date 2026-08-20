@@ -41,3 +41,28 @@ it('skips a schedule tick when a manual backup is already running', async () => 
 		'Auto sync "Backup" skipped; backup already running'
 	);
 });
+
+it('logs a failed background operation as an error', async () => {
+	const logger = { info: jest.fn(), error: jest.fn() };
+	const operations = {
+		backup: jest.fn().mockReturnValue({
+			operationId: 'scheduled-1',
+			trigger: 'scheduled',
+		}),
+		wait: jest.fn().mockResolvedValue({
+			state: 'failed',
+			transferred: 0,
+			failed: 0,
+			error: 'offline',
+		}),
+	};
+
+	await runProviderSync(storage, logger, operations as never);
+
+	expect(logger.info).not.toHaveBeenCalled();
+	expect(logger.error).toHaveBeenCalledWith(
+		'Storage',
+		'Auto sync failed for "Backup"',
+		expect.objectContaining({ message: 'offline' })
+	);
+});

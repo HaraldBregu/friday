@@ -25,6 +25,14 @@ export async function runProviderSync(
 		}
 		const result = await operations.wait(started.operationId);
 		if (!result) throw new Error('Storage operation status was lost.');
+		if (result.state === 'failed') {
+			logger.error(
+				'Storage',
+				`Auto sync failed for "${storage.name}"`,
+				new Error(result.error ?? 'Cloud backup failed.')
+			);
+			return;
+		}
 		const failedSuffix = result.failed ? `, ${result.failed} failed` : '';
 		logger.info(
 			'Storage',
