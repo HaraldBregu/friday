@@ -1,7 +1,8 @@
 import { app, isFriday } from '@friday/sdk';
 
 import { defaultProject } from './defaults';
-import type { Clip, Project } from './types';
+import { readMedia } from './read';
+import type { Project } from './types';
 
 export async function loadProject(): Promise<Project> {
 	const stored = isFriday()
@@ -12,19 +13,19 @@ export async function loadProject(): Promise<Project> {
 	}
 	const project = stored as unknown as Project;
 	const clips = await Promise.all(
-		project.clips.map(async (clip): Promise<Clip | null> => {
-			if (clip.kind === 'text') return { ...clip, src: '' };
-			if (!isFriday() || !clip.assetPath || !clip.mime) return null;
+		project.clips.map(async (clip) => {
+			if (clip.kind === 'text') return { ...clip, src: '', available: true };
+			if (!clip.assetPath || !clip.mime) return { ...clip, src: '', available: false };
 			try {
-				const bytes = await app.readExtensionStoreFile(clip.assetPath);
 				return {
 					...clip,
-					src: URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: clip.mime })),
+					src: await readMedia(clip.assetPath, clip.mime),
+					available: true,
 				};
 			} catch {
-				return null;
+				return { ...clip, src: '', available: false };
 			}
 		})
 	);
-	return { ...project, clips: clips.filter((clip): clip is Clip => clip !== null) };
+	return { ...project, clips };
 }

@@ -9,6 +9,7 @@ export interface Clip {
 	src: string;
 	assetPath: string | null;
 	mime: string | null;
+	available: boolean;
 	start: number;
 	duration: number;
 	sourceDuration: number | null;

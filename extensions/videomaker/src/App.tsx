@@ -16,7 +16,6 @@ import { makeId } from './id';
 import { getFileKind } from './kind';
 import { loadProject } from './load';
 import { readMediaDuration } from './metadata';
-import { removeMedia } from './remove';
 import { saveProject } from './save';
 import { storeMedia } from './store';
 import { useFridayTheme } from './theme';
@@ -27,10 +26,12 @@ export default function App() {
 	const playerRef = useRef<PlayerRef>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
+	const saveRevisionRef = useRef(0);
 	const [project, setProject] = useState<Project>(defaultProject);
 	const [selectedId, setSelectedId] = useState<string | null>(defaultProject.clips[0]?.id ?? null);
 	const [currentFrame, setCurrentFrame] = useState(0);
 	const [hydrated, setHydrated] = useState(false);
+	const [canSave, setCanSave] = useState(false);
 	const [saveStatus, setSaveStatus] = useState<'loading' | 'saving' | 'saved' | 'error'>('loading');
 	const [notice, setNotice] = useState('');
 	const [exporting, setExporting] = useState(false);
@@ -47,7 +48,11 @@ export default function App() {
 				if (!active) return;
 				setProject(loaded);
 				setSelectedId(loaded.clips[0]?.id ?? null);
+				setCanSave(true);
 				setSaveStatus('saved');
+				if (loaded.clips.some((clip) => !clip.available)) {
+					setNotice('Some saved media is unavailable. Its layers were kept so the project can recover.');
+				}
 			})
 			.catch((reason) => {
 				if (!active) return;
@@ -61,15 +66,27 @@ export default function App() {
 	}, []);
 
 	useEffect(() => {
-		if (!hydrated) return;
+		if (!hydrated || !canSave) return;
+		const revision = ++saveRevisionRef.current;
 		const timeout = window.setTimeout(() => {
 			setSaveStatus('saving');
 			saveProject(project)
-				.then(() => setSaveStatus('saved'))
-				.catch(() => setSaveStatus('error'));
+				.then(() => {
+					if (saveRevisionRef.current === revision) setSaveStatus('saved');
+				})
+				.catch(() => {
+					if (saveRevisionRef.current === revision) setSaveStatus('error');
+				});
 		}, 450);
 		return () => window.clearTimeout(timeout);
-	}, [hydrated, project]);
+	}, [canSave, hydrated, project]);
+
+	useEffect(() => {
+		if (!canSave) return;
+		const flush = () => void saveProject(project);
+		window.addEventListener('pagehide', flush);
+		return () => window.removeEventListener('pagehide', flush);
+	}, [canSave, project]);
 
 	useEffect(() => {
 		const player = playerRef.current;
@@ -115,6 +132,7 @@ export default function App() {
 			src: '',
 			assetPath: null,
 			mime: null,
+			available: true,
 			start,
 			duration: 3,
 			sourceDuration: null,
@@ -154,6 +172,7 @@ export default function App() {
 						src,
 						assetPath,
 						mime: file.type,
+						available: true,
 						start: cursor,
 						duration: sourceDuration,
 						sourceDuration,
@@ -182,9 +201,6 @@ export default function App() {
 	const removeSelected = useCallback(() => {
 		if (!selectedClip) return;
 		if (selectedClip.src.startsWith('blob:')) URL.revokeObjectURL(selectedClip.src);
-		void removeMedia(selectedClip.assetPath).catch(() =>
-			setNotice('The layer was removed, but its saved media could not be deleted.')
-		);
 		setProject((current) => ({
 			...current,
 			clips: current.clips.filter((clip) => clip.id !== selectedClip.id),

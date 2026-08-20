@@ -1,7 +1,7 @@
 import { canRenderMediaOnWeb, renderMediaOnWeb } from '@remotion/web-renderer';
 
 import { VideoComposition } from './composition';
-import { getProjectDuration } from './duration';
+import { getProjectDurationInFrames } from './frames';
 import type { Project } from './types';
 
 export async function renderProject(
@@ -27,7 +27,7 @@ export async function renderProject(
 			id: 'videomaker',
 			component: VideoComposition,
 			defaultProps: { project },
-			durationInFrames: Math.max(1, Math.ceil(getProjectDuration(project) * project.fps)),
+			durationInFrames: getProjectDurationInFrames(project),
 			fps: project.fps,
 			width: project.width,
 			height: project.height,
@@ -39,6 +39,7 @@ export async function renderProject(
 		videoBitrate: 'high',
 		audioBitrate: 'high',
 		pageResponsiveness: 'high',
+		isProduction: import.meta.env.PROD,
 		onProgress: ({ progress }) => onProgress(progress),
 		signal,
 	});

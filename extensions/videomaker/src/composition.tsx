@@ -12,9 +12,10 @@ export function VideoComposition({ project }: CompositionProps) {
 	return (
 		<AbsoluteFill style={{ backgroundColor: project.background, overflow: 'hidden' }}>
 			{project.clips.map((clip) => {
+				if (!clip.available) return null;
 				const from = Math.max(0, Math.round(clip.start * project.fps));
-				const durationInFrames = Math.max(1, Math.round(clip.duration * project.fps));
-				const end = from + durationInFrames;
+				const end = Math.max(from + 1, Math.ceil((clip.start + clip.duration) * project.fps));
+				const durationInFrames = end - from;
 				const fade = Math.max(1, Math.min(12, Math.floor(durationInFrames / 3)));
 				const opacity = interpolate(frame, [from, from + fade, end - fade, end], [0, 1, 1, 0], {
 					extrapolateLeft: 'clamp',

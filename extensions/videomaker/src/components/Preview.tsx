@@ -4,7 +4,7 @@ import { memo, type RefObject } from 'react';
 import type { AnyZodObject } from 'remotion';
 
 import { VideoComposition, type CompositionProps } from '../composition';
-import { getProjectDuration } from '../duration';
+import { getProjectDurationInFrames } from '../frames';
 
 interface PreviewProps {
 	inputProps: CompositionProps;
@@ -29,7 +29,7 @@ export const Preview = memo(function Preview({ inputProps, playerRef }: PreviewP
 						ref={playerRef}
 						component={VideoComposition}
 						inputProps={inputProps}
-						durationInFrames={Math.max(1, Math.ceil(getProjectDuration(project) * project.fps))}
+						durationInFrames={getProjectDurationInFrames(project)}
 						compositionWidth={project.width}
 						compositionHeight={project.height}
 						fps={project.fps}
