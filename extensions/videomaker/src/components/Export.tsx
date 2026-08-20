@@ -10,8 +10,6 @@ interface ExportProps {
 
 export function Export({ progress, error, onCancel, onClose }: ExportProps) {
 	const dialogRef = useRef<HTMLElement>(null);
-	const errorRef = useRef(error);
-	errorRef.current = error;
 
 	useEffect(() => {
 		const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -28,7 +26,7 @@ export function Export({ progress, error, onCancel, onClose }: ExportProps) {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
 				event.preventDefault();
-				if (errorRef.current) onClose();
+				if (error) onClose();
 				else onCancel();
 				return;
 			}
@@ -49,7 +47,7 @@ export function Export({ progress, error, onCancel, onClose }: ExportProps) {
 		};
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [onCancel, onClose]);
+	}, [error, onCancel, onClose]);
 
 	return (
 		<div className="dialog-backdrop" role="presentation">
