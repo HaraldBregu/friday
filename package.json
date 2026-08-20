@@ -77,6 +77,7 @@
 		"typecheck": "npm run typecheck:app && npm run typecheck:packages",
 		"build": "cross-env NODE_ENV=production npm run typecheck && electron-vite build",
 		"build:mermaid": "npm ci --prefix extensions/mermaid && npm run build --prefix extensions/mermaid",
+		"build:videomaker": "npm ci --prefix extensions/videomaker && npm run build --prefix extensions/videomaker",
 		"build:tldraw": "npm ci --prefix extensions/tldraw && npm run build --prefix extensions/tldraw",
 		"build:demo": "npm run build --prefix extensions/demo",
 		"build:packages": "npm run build --workspaces --if-present",
