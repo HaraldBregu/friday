@@ -56,7 +56,7 @@ export function Header({ coder }: { coder: CoderController }) {
 							size="icon-sm"
 							aria-label="New coding session"
 							disabled={!coder.activeProject || coder.runState === 'running'}
-							onClick={coder.newSession}
+							onClick={() => coder.newSession()}
 						>
 							<Plus />
 						</Button>
