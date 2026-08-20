@@ -9,8 +9,11 @@ beforeEach(() => {
 });
 
 it('streams Coder extension runs back to the originating view and scopes cancellation', async () => {
-	const send = jest.fn().mockResolvedValue('reply');
+	const send = jest
+		.fn()
+		.mockResolvedValue({ projectId: 'project-1', sessionId: 'session-1', output: 'reply' });
 	const cancel = jest.fn().mockReturnValue(true);
+	const request = { projectId: 'project-1', mode: 'agent', input: 'prompt' } as const;
 	const coder = {
 		getSettings: jest.fn().mockReturnValue({ runtime: 'pi' }),
 		send,
@@ -34,15 +37,23 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		success: true,
 		data: { runtime: 'pi' },
 	});
-	await expect(handler(CoderChannels.send)({ sender }, ' prompt ', 'run-1')).resolves.toEqual({
+	await expect(handler(CoderChannels.send)({ sender }, request, 'run-1')).resolves.toEqual({
 		success: true,
-		data: 'reply',
+		data: { projectId: 'project-1', sessionId: 'session-1', output: 'reply' },
 	});
-	expect(send).toHaveBeenCalledWith(23, 'run-1', 'prompt', expect.any(Function));
-	send.mock.calls[0][3]({ type: 'status', runId: 'run-1', status: 'started' });
+	expect(send).toHaveBeenCalledWith(23, 'run-1', request, expect.any(Function));
+	send.mock.calls[0][3]({
+		type: 'status',
+		runId: 'run-1',
+		projectId: 'project-1',
+		sessionId: 'session-1',
+		status: 'started',
+	});
 	expect(sender.send).toHaveBeenCalledWith(CoderChannels.response, {
 		type: 'status',
 		runId: 'run-1',
+		projectId: 'project-1',
+		sessionId: 'session-1',
 		status: 'started',
 	});
 	expect(sender.once).toHaveBeenCalledWith('destroyed', expect.any(Function));
@@ -53,6 +64,51 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		data: true,
 	});
 	expect(cancel).toHaveBeenCalledWith('run-1', 23);
+});
+
+it('lets the Coder extension select main-owned projects and read their sessions', async () => {
+	const selectedProject = {
+		id: 'project-1',
+		name: 'project',
+		directory: '/project',
+		kind: 'external',
+		createdAt: '2026-08-20T10:00:00.000Z',
+		lastOpenedAt: '2026-08-20T10:00:00.000Z',
+		available: true,
+	};
+	const coder = {
+		listProjects: jest.fn().mockReturnValue([selectedProject]),
+		addProject: jest.fn().mockReturnValue(selectedProject),
+		listSessions: jest.fn().mockResolvedValue([]),
+	} as unknown as Coder;
+	const extensionRegistry = {
+		has: jest.fn().mockReturnValue(true),
+		resolve: jest.fn().mockReturnValue('coder'),
+	};
+	const sender = { id: 23 };
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(undefined);
+	(dialog.showOpenDialog as jest.Mock).mockResolvedValue({
+		canceled: false,
+		filePaths: ['/project'],
+	});
+	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	const handler = (channel: string) =>
+		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+	await expect(handler(CoderChannels.addProject)({ sender })).resolves.toEqual({
+		success: true,
+		data: selectedProject,
+	});
+	expect(coder.addProject).toHaveBeenCalledWith('/project');
+	await expect(handler(CoderChannels.listProjects)({ sender })).resolves.toEqual({
+		success: true,
+		data: [selectedProject],
+	});
+	await expect(handler(CoderChannels.listSessions)({ sender }, ' project-1 ')).resolves.toEqual({
+		success: true,
+		data: [],
+	});
+	expect(coder.listSessions).toHaveBeenCalledWith('project-1');
 });
 
 it('rejects Coder access from other extensions', async () => {
