@@ -10,7 +10,6 @@ import {
 	type CoderThinkingLevel,
 	type CoderToolMode,
 } from '../../shared/coder_types';
-import { agentLocation } from '../shared/agent_location';
 import { userDataLocation } from '../shared/user_data_location';
 
 export const DEFAULT_CODER_SETTINGS: CoderSettings = {
@@ -19,13 +18,11 @@ export const DEFAULT_CODER_SETTINGS: CoderSettings = {
 	modelId: '',
 	thinkingLevel: 'medium',
 	toolMode: 'read-only',
-	workingDirectory: agentLocation(),
 };
 
+type StoredCoderSettings = CoderSettings & { workingDirectory?: string };
+
 function normalizeSettings(value: unknown): CoderSettings {
-	if (isCoderSettings(value)) {
-		return { ...value, workingDirectory: path.resolve(value.workingDirectory) };
-	}
 	const stored = value && typeof value === 'object' ? (value as Partial<CoderSettings>) : {};
 	const providerId = CODER_PROVIDER_IDS.includes(stored.providerId as CoderProviderId)
 		? (stored.providerId as CoderProviderId)
@@ -42,23 +39,25 @@ function normalizeSettings(value: unknown): CoderSettings {
 		modelId: typeof stored.modelId === 'string' ? stored.modelId.trim() : '',
 		thinkingLevel,
 		toolMode,
-		workingDirectory:
-			typeof stored.workingDirectory === 'string' && stored.workingDirectory.trim()
-				? path.resolve(stored.workingDirectory)
-				: DEFAULT_CODER_SETTINGS.workingDirectory,
 	};
 }
 
 export class CoderStore {
-	private readonly store: Store<CoderSettings>;
+	private readonly store: Store<StoredCoderSettings>;
+	private readonly legacyWorkingDirectory?: string;
 
 	constructor(directory = path.resolve(userDataLocation(), 'settings')) {
-		this.store = new Store<CoderSettings>({
+		this.store = new Store<StoredCoderSettings>({
 			name: 'coder',
 			cwd: directory,
 			accessPropertiesByDotNotation: false,
 			defaults: DEFAULT_CODER_SETTINGS,
 		});
+		const legacyDirectory = this.store.store.workingDirectory;
+		this.legacyWorkingDirectory =
+			typeof legacyDirectory === 'string' && path.isAbsolute(legacyDirectory)
+				? path.resolve(legacyDirectory)
+				: undefined;
 		this.store.store = normalizeSettings(this.store.store);
 	}
 
@@ -68,11 +67,12 @@ export class CoderStore {
 
 	set(settings: CoderSettings): CoderSettings {
 		if (!isCoderSettings(settings)) throw new Error('Invalid coder settings.');
-		if (!path.isAbsolute(settings.workingDirectory)) {
-			throw new Error('Coder working directory must be an absolute path.');
-		}
 		const normalized = normalizeSettings(settings);
 		this.store.store = normalized;
 		return normalized;
+	}
+
+	getLegacyWorkingDirectory(): string | undefined {
+		return this.legacyWorkingDirectory;
 	}
 }

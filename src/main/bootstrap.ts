@@ -44,10 +44,12 @@ export function bootstrapServices(): BootstrapResult {
 	const coderStore = new CoderStore();
 	const coderService = new Coder({
 		store: coderStore,
-		projects: new CoderProjectStore(undefined, [
-			agentLocation(),
-			coderStore.get().workingDirectory,
-		]),
+		projects: new CoderProjectStore(
+			undefined,
+			[agentLocation(), coderStore.getLegacyWorkingDirectory()].filter(
+				(directory): directory is string => Boolean(directory)
+			)
+		),
 		getProvider,
 	});
 	const channelRegistry = createChannelRegistry({ logger, eventBus, agentService });
