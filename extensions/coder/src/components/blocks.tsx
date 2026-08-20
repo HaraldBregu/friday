@@ -58,7 +58,11 @@ function ToolBlock({ block }: { block: Extract<CoderBlock, { type: 'tool' }> }) 
 				{icon}
 				<span className="text-command">{block.toolName}</span>
 				<span className="text-muted-foreground">
-					{block.status === 'running' ? 'Running' : block.status === 'succeeded' ? 'Completed' : 'Failed'}
+					{block.status === 'running'
+						? 'Running'
+						: block.status === 'succeeded'
+							? 'Completed'
+							: 'Failed'}
 				</span>
 			</div>
 		</div>
@@ -80,7 +84,9 @@ function CommandBlock({
 				<Terminal className="size-3.5 shrink-0 text-command" />
 				<CollapsibleTrigger className="flex min-w-0 flex-1 items-center gap-2 rounded-sm py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring">
 					<code className="truncate font-mono text-xs text-code-foreground">{block.command}</code>
-					<ChevronDown className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition ${open ? '' : '-rotate-90'}`} />
+					<ChevronDown
+						className={`ml-auto size-3.5 shrink-0 text-muted-foreground transition ${open ? '' : '-rotate-90'}`}
+					/>
 				</CollapsibleTrigger>
 				<Badge variant={failed ? 'destructive' : 'outline'}>
 					{block.status === 'running'
@@ -126,11 +132,16 @@ function CommandBlock({
 				</Tooltip>
 			</div>
 			<CollapsibleContent>
-				<pre className={`max-h-80 overflow-auto border-t px-4 py-3 font-mono text-xs leading-5 whitespace-pre-wrap ${failed ? 'text-destructive' : 'text-code-foreground'}`}>
-					{block.output || (block.status === 'running' ? 'Waiting for output…' : 'Command produced no output.')}
+				<pre
+					className={`max-h-80 overflow-auto border-t px-4 py-3 font-mono text-xs leading-5 whitespace-pre-wrap ${failed ? 'text-destructive' : 'text-code-foreground'}`}
+				>
+					{block.output ||
+						(block.status === 'running' ? 'Waiting for output…' : 'Command produced no output.')}
 				</pre>
 				{block.truncated ? (
-					<p className="border-t px-4 py-2 text-[11px] text-muted-foreground">Output was truncated by Pi.</p>
+					<p className="border-t px-4 py-2 text-[11px] text-muted-foreground">
+						Output was truncated by Pi.
+					</p>
 				) : null}
 			</CollapsibleContent>
 		</Collapsible>

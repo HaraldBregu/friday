@@ -152,11 +152,16 @@ export function Sidebar({ coder }: { coder: CoderController }) {
 				<div className="flex flex-wrap gap-1.5">
 					<Badge variant="secondary">Pi</Badge>
 					<Badge variant="outline">{coder.providerId}</Badge>
-					<Badge variant="outline" className="max-w-full truncate">{coder.modelId || 'model required'}</Badge>
-					<Badge variant={coder.toolMode === 'coding' ? 'destructive' : 'outline'}>{coder.toolMode}</Badge>
+					<Badge variant="outline" className="max-w-full truncate">
+						{coder.modelId || 'model required'}
+					</Badge>
+					<Badge variant={coder.toolMode === 'coding' ? 'destructive' : 'outline'}>
+						{coder.toolMode}
+					</Badge>
 				</div>
 				<p className="mt-2 text-[9px] leading-4 text-muted-foreground">
-					A project sets the default cwd, not a filesystem sandbox. Pi tools run with your desktop account.
+					A project sets the default cwd, not a filesystem sandbox. Pi tools run with your desktop
+					account.
 				</p>
 			</footer>
 		</div>

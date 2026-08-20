@@ -129,14 +129,13 @@ const CoderPage: React.FC = () => {
 	);
 	const selectedModel = selectedProvider?.models.find((model) => model.id === settings?.modelId);
 	const deviceCode = authEvent?.type === 'device-code' ? authEvent : undefined;
-	const authMessage =
-		deviceCode
-			? t('settings.coder.deviceCode')
-			: authEvent && 'message' in authEvent
-				? authEvent.message
-				: authEvent?.type === 'auth-url'
-					? (authEvent.instructions ?? t('settings.coder.completeLogin'))
-					: null;
+	const authMessage = deviceCode
+		? t('settings.coder.deviceCode')
+		: authEvent && 'message' in authEvent
+			? authEvent.message
+			: authEvent?.type === 'auth-url'
+				? (authEvent.instructions ?? t('settings.coder.completeLogin'))
+				: null;
 	const authUrl =
 		authEvent?.type === 'device-code'
 			? authEvent.verificationUri

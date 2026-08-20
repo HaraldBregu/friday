@@ -85,11 +85,11 @@ export function useCoderWorkspace(): CoderController {
 	const cancelRequestedRef = useRef(false);
 	const runningRef = useRef(false);
 	const loadSequenceRef = useRef(0);
-	const [settings, setSettings] = useState<CoderSettings>(preview ? previewSettings : previewSettings);
-	const [projects, setProjects] = useState<CoderProject[]>(preview ? previewProjects : []);
-	const [sessions, setSessions] = useState<CoderSessionSummary[]>(
-		preview ? previewSessions : []
+	const [settings, setSettings] = useState<CoderSettings>(
+		preview ? previewSettings : previewSettings
 	);
+	const [projects, setProjects] = useState<CoderProject[]>(preview ? previewProjects : []);
+	const [sessions, setSessions] = useState<CoderSessionSummary[]>(preview ? previewSessions : []);
 	const [blocks, setBlocks] = useState<CoderBlock[]>(preview ? previewBlocks : []);
 	const [activeProjectId, setActiveProjectId] = useState<string | undefined>(
 		preview ? 'friday' : undefined
@@ -134,10 +134,9 @@ export function useCoderWorkspace(): CoderController {
 				if (sequence !== loadSequenceRef.current) return;
 				setActiveSessionId(session.id);
 				setBlocks(
-					snapshot.blocks.map((block: CoderSessionBlock): CoderBlock =>
-						block.type === 'message'
-							? { ...block, status: 'complete' }
-							: block
+					snapshot.blocks.map(
+						(block: CoderSessionBlock): CoderBlock =>
+							block.type === 'message' ? { ...block, status: 'complete' } : block
 					)
 				);
 			} catch (reason) {
@@ -165,8 +164,7 @@ export function useCoderWorkspace(): CoderController {
 				if (!active) return;
 				setSettings(nextSettings);
 				setProjects(nextProjects);
-				const project =
-					nextProjects.find((item) => item.id === savedProjectId) ?? nextProjects[0];
+				const project = nextProjects.find((item) => item.id === savedProjectId) ?? nextProjects[0];
 				if (!project) {
 					setRunLabel(nextSettings.modelId ? 'Open a project' : 'Setup needed');
 					setRunState('idle');
@@ -242,10 +240,9 @@ export function useCoderWorkspace(): CoderController {
 					const snapshot = await coderApi.getSession(activeProjectId, sessionId);
 					setActiveSessionId(sessionId);
 					setBlocks(
-						snapshot.blocks.map((block: CoderSessionBlock): CoderBlock =>
-							block.type === 'message'
-								? { ...block, status: 'complete' }
-								: block
+						snapshot.blocks.map(
+							(block: CoderSessionBlock): CoderBlock =>
+								block.type === 'message' ? { ...block, status: 'complete' } : block
 						)
 					);
 				}
@@ -411,7 +408,11 @@ export function useCoderWorkspace(): CoderController {
 				setRunLabel('Responding');
 				setBlocks((current) => {
 					const last = current.at(-1);
-					if (last?.type === 'message' && last.role === 'assistant' && last.status === 'streaming') {
+					if (
+						last?.type === 'message' &&
+						last.role === 'assistant' &&
+						last.status === 'streaming'
+					) {
 						return current.map((block) =>
 							block.id === last.id ? { ...last, content: last.content + event.delta } : block
 						);
@@ -514,7 +515,8 @@ export function useCoderWorkspace(): CoderController {
 			setProjects(nextProjects);
 			setSessions(nextSessions);
 		} catch (reason) {
-			const message = reason instanceof Error ? reason.message : 'Coder could not finish this task.';
+			const message =
+				reason instanceof Error ? reason.message : 'Coder could not finish this task.';
 			const cancelled = cancelRequestedRef.current || message === 'Coder run cancelled.';
 			setRunState(cancelled ? 'idle' : 'error');
 			setRunLabel(cancelled ? 'Cancelled' : 'Failed');

@@ -6,9 +6,7 @@ import CoderPage from '../../../src/renderer/src/pages/settings/pages/coder/Page
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({
 		t: (key: string, values?: Record<string, string>) =>
-			key === 'settings.coder.apiKeyMissing'
-					? `Missing ${values?.provider}`
-					: key,
+			key === 'settings.coder.apiKeyMissing' ? `Missing ${values?.provider}` : key,
 	}),
 }));
 

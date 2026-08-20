@@ -7,5 +7,5 @@ import './workbench.css';
 createRoot(document.getElementById('root') as HTMLElement).render(
 	<StrictMode>
 		<App />
-	</StrictMode>,
+	</StrictMode>
 );

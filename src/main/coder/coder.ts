@@ -330,7 +330,8 @@ export class Coder {
 						cancelled: result.cancelled,
 						truncated: result.truncated,
 					});
-					if (controller.signal.aborted || result.cancelled) throw new Error('Coder run cancelled.');
+					if (controller.signal.aborted || result.cancelled)
+						throw new Error('Coder run cancelled.');
 				} else {
 					await session.prompt(request.input, { expandPromptTemplates: false, source: 'rpc' });
 					if (controller.signal.aborted) throw new Error('Coder run cancelled.');
@@ -443,14 +444,13 @@ export class Coder {
 		if (typeof content === 'string') return content;
 		if (!Array.isArray(content)) return '';
 		return content
-			.filter(
-				(item): item is { type: 'text'; text: string } =>
-					Boolean(
-						item &&
-							typeof item === 'object' &&
-							(item as Record<string, unknown>).type === 'text' &&
-							typeof (item as Record<string, unknown>).text === 'string'
-					)
+			.filter((item): item is { type: 'text'; text: string } =>
+				Boolean(
+					item &&
+					typeof item === 'object' &&
+					(item as Record<string, unknown>).type === 'text' &&
+					typeof (item as Record<string, unknown>).text === 'string'
+				)
 			)
 			.map((item) => item.text)
 			.join('');

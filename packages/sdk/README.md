@@ -81,13 +81,16 @@ const settings = await coder.getSettings();
 const projects = await coder.listProjects();
 const project = projects[0] ?? (await coder.addProject());
 if (!project) throw new Error('Choose a Coder project first.');
-const result = await coder.send({
-	projectId: project.id,
-	mode: 'agent',
-	input: 'Add focused tests for the current change.',
-}, (event) => {
-	if (event.type === 'text-delta') console.log(event.delta);
-});
+const result = await coder.send(
+	{
+		projectId: project.id,
+		mode: 'agent',
+		input: 'Add focused tests for the current change.',
+	},
+	(event) => {
+		if (event.type === 'text-delta') console.log(event.delta);
+	}
+);
 const sessions = await coder.listSessions(project.id);
 const snapshot = await coder.getSession(project.id, result.sessionId);
 const action = await win.showContextMenu([

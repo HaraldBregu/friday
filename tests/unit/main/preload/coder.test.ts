@@ -29,20 +29,26 @@ it('normalizes run requests, filters events, and removes the exact event listene
 
 	const runId = invoke.mock.calls[0][2];
 	const listener = on.mock.calls[0][1];
-	listener({}, {
-		type: 'text-delta',
-		runId: 'different-run',
-		projectId: 'project-1',
-		sessionId: 'session-1',
-		delta: 'ignored',
-	});
-	listener({}, {
-		type: 'text-delta',
-		runId,
-		projectId: 'project-1',
-		sessionId: 'session-1',
-		delta: 'kept',
-	});
+	listener(
+		{},
+		{
+			type: 'text-delta',
+			runId: 'different-run',
+			projectId: 'project-1',
+			sessionId: 'session-1',
+			delta: 'ignored',
+		}
+	);
+	listener(
+		{},
+		{
+			type: 'text-delta',
+			runId,
+			projectId: 'project-1',
+			sessionId: 'session-1',
+			delta: 'kept',
+		}
+	);
 	await expect(pending).resolves.toEqual({
 		projectId: 'project-1',
 		sessionId: 'session-1',
@@ -64,9 +70,9 @@ it('normalizes run requests, filters events, and removes the exact event listene
 	expect(callback).toHaveBeenCalledTimes(1);
 	expect(callback).toHaveBeenCalledWith(expect.objectContaining({ delta: 'kept' }));
 	expect(runId).toHaveLength(36);
-	expect(() =>
-		coder.send({ projectId: 'project-1', mode: 'agent', input: ' ' })
-	).toThrow('Invalid coder run request.');
+	expect(() => coder.send({ projectId: 'project-1', mode: 'agent', input: ' ' })).toThrow(
+		'Invalid coder run request.'
+	);
 });
 
 it('normalizes project and session identifiers before forwarding them', async () => {

@@ -42,7 +42,7 @@ export function Composer({ coder }: { coder: CoderController }) {
 					disabled={disabled}
 					aria-label={coder.mode === 'agent' ? 'Agent prompt' : 'Shell command'}
 					className="min-h-20 max-h-48 border-0 bg-transparent font-sans shadow-none focus-visible:border-0 focus-visible:ring-0"
-			/>
+				/>
 				<div className="flex items-center gap-2 border-t px-2 py-2">
 					<div className="flex items-center rounded-md bg-muted p-0.5" aria-label="Input mode">
 						<Button
@@ -74,7 +74,12 @@ export function Composer({ coder }: { coder: CoderController }) {
 						<Tooltip>
 							<TooltipTrigger
 								render={
-									<Button type="button" size="icon-sm" variant="destructive" onClick={coder.cancelRun}>
+									<Button
+										type="button"
+										size="icon-sm"
+										variant="destructive"
+										onClick={coder.cancelRun}
+									>
 										<CircleStop />
 										<span className="sr-only">Stop current run</span>
 									</Button>
@@ -83,7 +88,12 @@ export function Composer({ coder }: { coder: CoderController }) {
 							<TooltipContent>Stop · Ctrl+C</TooltipContent>
 						</Tooltip>
 					) : (
-						<Button type="submit" size="sm" disabled={disabled || !coder.input.trim()} className="gap-1.5">
+						<Button
+							type="submit"
+							size="sm"
+							disabled={disabled || !coder.input.trim()}
+							className="gap-1.5"
+						>
 							Run <CornerDownLeft />
 						</Button>
 					)}
@@ -91,7 +101,8 @@ export function Composer({ coder }: { coder: CoderController }) {
 			</div>
 			{coder.mode === 'shell' ? (
 				<p className="mx-auto mt-2 max-w-4xl text-[10px] text-muted-foreground">
-					Shell mode runs one recorded, non-interactive command in the project directory. It is not a PTY.
+					Shell mode runs one recorded, non-interactive command in the project directory. It is not
+					a PTY.
 				</p>
 			) : null}
 		</form>

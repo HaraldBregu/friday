@@ -12,7 +12,10 @@ export function useTheme() {
 				document.documentElement.style.setProperty(`--${name}`, value);
 			}
 		};
-		void app.getThemeData().then(apply).catch(() => undefined);
+		void app
+			.getThemeData()
+			.then(apply)
+			.catch(() => undefined);
 		const unsubscribe = app.onThemeModeChanged(apply);
 		return () => {
 			active = false;

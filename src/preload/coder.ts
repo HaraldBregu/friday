@@ -26,11 +26,7 @@ export const coder: CoderApi = {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
 		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
 		if (!normalizedProjectId || !normalizedSessionId) throw new Error('Invalid coder session.');
-		return typedInvokeUnwrap(
-			CoderChannels.getSession,
-			normalizedProjectId,
-			normalizedSessionId
-		);
+		return typedInvokeUnwrap(CoderChannels.getSession, normalizedProjectId, normalizedSessionId);
 	},
 	send: (request, onEvent) => {
 		if (!isCoderRunRequest(request)) throw new Error('Invalid coder run request.');

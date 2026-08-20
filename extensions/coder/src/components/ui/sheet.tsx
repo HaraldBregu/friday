@@ -6,11 +6,7 @@ import { cn } from '@/lib/utils';
 
 export const Sheet = SheetPrimitive.Root;
 
-export function SheetContent({
-	className,
-	children,
-	...props
-}: SheetPrimitive.Popup.Props) {
+export function SheetContent({ className, children, ...props }: SheetPrimitive.Popup.Props) {
 	return (
 		<SheetPrimitive.Portal>
 			<SheetPrimitive.Backdrop className="fixed inset-0 z-40 bg-foreground/10 backdrop-blur-[1px]" />

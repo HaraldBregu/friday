@@ -169,9 +169,8 @@ assert.deepEqual(await coder.getSettings(), coderSettings);
 const coderEvents = [];
 assert.deepEqual(await coder.listProjects(), [coderProject]);
 assert.deepEqual(
-	await coder.send(
-		{ projectId: coderProject.id, mode: 'agent', input: 'Fix the tests' },
-		(event) => coderEvents.push(event)
+	await coder.send({ projectId: coderProject.id, mode: 'agent', input: 'Fix the tests' }, (event) =>
+		coderEvents.push(event)
 	),
 	{ projectId: coderProject.id, sessionId: 'session-1', output: 'done' }
 );
