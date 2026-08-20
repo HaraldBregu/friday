@@ -16,6 +16,24 @@ function MessageBlock({ block }: { block: Extract<CoderBlock, { type: 'message' 
 			<div className="mb-2 flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
 				<span>{block.role === 'user' ? 'You' : 'Pi'}</span>
 				{block.status === 'streaming' ? <LoaderCircle className="size-3 animate-spin" /> : null}
+				{block.content ? (
+					<Tooltip>
+						<TooltipTrigger
+							render={
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									className="ml-auto size-6 opacity-70 hover:opacity-100"
+									aria-label={`Copy ${block.role} message`}
+									onClick={() => void navigator.clipboard.writeText(block.content)}
+								>
+									<Clipboard />
+								</Button>
+							}
+						/>
+						<TooltipContent>Copy message</TooltipContent>
+					</Tooltip>
+				) : null}
 			</div>
 			{block.role === 'assistant' ? (
 				<div className="coder-markdown max-w-none text-sm leading-6">
@@ -109,6 +127,22 @@ function CommandBlock({
 						}
 					/>
 					<TooltipContent>Copy command</TooltipContent>
+				</Tooltip>
+				<Tooltip>
+					<TooltipTrigger
+						render={
+							<Button
+								variant="ghost"
+								size="icon-sm"
+								aria-label="Copy command output"
+								disabled={!block.output}
+								onClick={() => void navigator.clipboard.writeText(block.output)}
+							>
+								<Clipboard />
+							</Button>
+						}
+					/>
+					<TooltipContent>Copy output</TooltipContent>
 				</Tooltip>
 				<Tooltip>
 					<TooltipTrigger
