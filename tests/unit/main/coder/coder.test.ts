@@ -8,6 +8,8 @@ import {
 	DefaultResourceLoader,
 	modelRuntimeCreate,
 	sessionManagerCreate,
+	sessionManagerList,
+	sessionManagerOpen,
 } from '@earendil-works/pi-coding-agent';
 import { Coder } from '../../../../src/main/coder/coder';
 import type { CoderProjectStore } from '../../../../src/main/coder/projects';
@@ -142,6 +144,70 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 		toolName: 'read',
 	});
 	expect(JSON.stringify(events)).not.toContain('secret');
+});
+
+it('reopens a project session and records streamed Shell output', async () => {
+	const sessionInfo = {
+		id: 'session-1',
+		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		cwd: project.directory,
+		name: undefined,
+		created: new Date('2026-08-20T10:00:00.000Z'),
+		modified: new Date('2026-08-20T10:01:00.000Z'),
+		messageCount: 2,
+		firstMessage: 'Inspect this project',
+	};
+	const manager = { getSessionId: () => sessionInfo.id };
+	sessionManagerList.mockResolvedValue([sessionInfo]);
+	sessionManagerOpen.mockReturnValue(manager);
+	modelRuntimeCreate.mockResolvedValue({
+		getModel: jest.fn(() => ({ id: 'gpt-coder' })),
+		checkAuth: jest.fn(async () => ({ type: 'api_key' })),
+		setRuntimeApiKey: jest.fn(async () => undefined),
+		removeRuntimeApiKey: jest.fn(async () => undefined),
+	});
+	const session = {
+		subscribe: jest.fn(() => jest.fn()),
+		prompt: jest.fn(),
+		executeBash: jest.fn(async (_command, onChunk) => {
+			onChunk('file-a\n');
+			return { exitCode: 0, cancelled: false, truncated: false };
+		}),
+		abortBash: jest.fn(),
+		abort: jest.fn(async () => undefined),
+		dispose: jest.fn(),
+	};
+	(createAgentSession as jest.Mock).mockResolvedValue({ session });
+	const coder = new Coder({
+		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
+		getProvider: (id) => ({ id, name: id, apiKey: 'key', baseUrl: '' }),
+	});
+	const events: unknown[] = [];
+
+	await expect(
+		coder.send(
+			4,
+			'run-shell',
+			{ projectId: project.id, sessionId: sessionInfo.id, mode: 'shell', input: 'ls' },
+			(event) => events.push(event)
+		)
+	).resolves.toEqual({ projectId: project.id, sessionId: sessionInfo.id, output: 'file-a\n' });
+	expect(sessionManagerOpen).toHaveBeenCalledWith(
+		sessionInfo.path,
+		'/tmp/friday-coder-test/sessions',
+		project.directory
+	);
+	expect(session.executeBash).toHaveBeenCalledWith('ls', expect.any(Function));
+	expect(events).toContainEqual({
+		type: 'command-end',
+		runId: 'run-shell',
+		projectId: project.id,
+		sessionId: sessionInfo.id,
+		exitCode: 0,
+		cancelled: false,
+		truncated: false,
+	});
 });
 
 it('uses Codex device OAuth and projects only the device code event', async () => {
