@@ -88,7 +88,6 @@ it('validates settings before forwarding them to main', () => {
 			modelId: 'model',
 			thinkingLevel: 'medium',
 			toolMode: 'read-only',
-			workingDirectory: '/project',
 		} as never)
 	).toThrow('Invalid coder settings.');
 });

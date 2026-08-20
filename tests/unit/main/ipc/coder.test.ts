@@ -154,19 +154,10 @@ it('keeps configuration and authentication host-only', async () => {
 	} as unknown as Coder;
 	const extensionRegistry = { has: jest.fn().mockReturnValue(false) };
 	const sender = { id: 8, send: jest.fn(), once: jest.fn(), removeListener: jest.fn() };
-	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 8 });
-	(dialog.showOpenDialog as jest.Mock).mockResolvedValue({
-		canceled: false,
-		filePaths: ['/project'],
-	});
 	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
-	await expect(handler(CoderChannels.pickDirectory)({ sender })).resolves.toEqual({
-		success: true,
-		data: '/project',
-	});
 	await expect(handler(CoderChannels.connectCodex)({ sender })).resolves.toEqual({
 		success: true,
 		data: { configured: true, type: 'oauth' },

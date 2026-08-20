@@ -20,7 +20,6 @@ const settings = {
 	modelId: 'gpt-coder',
 	thinkingLevel: 'medium' as const,
 	toolMode: 'read-only' as const,
-	workingDirectory: '/project',
 };
 
 const disconnectedCatalog = {
@@ -45,7 +44,6 @@ beforeEach(() => {
 			getSettings: jest.fn().mockResolvedValue(settings),
 			saveSettings: jest.fn(async (next) => next),
 			listModels: jest.fn().mockResolvedValue(disconnectedCatalog),
-			pickDirectory: jest.fn(),
 			connectCodex,
 			cancelCodexLogin: jest.fn(),
 			disconnectCodex: jest.fn(),

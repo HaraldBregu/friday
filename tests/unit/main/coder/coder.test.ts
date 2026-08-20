@@ -19,7 +19,6 @@ const settings = {
 	modelId: 'gpt-coder',
 	thinkingLevel: 'medium' as const,
 	toolMode: 'read-only' as const,
-	workingDirectory: process.cwd(),
 };
 
 const project = {

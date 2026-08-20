@@ -21,7 +21,6 @@ const previewSettings: CoderSettings = {
 	modelId: 'gpt-5.4',
 	thinkingLevel: 'high',
 	toolMode: 'coding',
-	workingDirectory: '/workspace/friday',
 };
 const previewProjects: CoderProject[] = [
 	{
