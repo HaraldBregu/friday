@@ -203,6 +203,12 @@ export function useCoderWorkspace(): CoderController {
 		};
 	}, [loadProject, preview]);
 
+	useEffect(() => {
+		if (!preview && runState !== 'loading') {
+			void app.setExtensionStoreValue(SIDEBAR_OPEN_KEY, leftOpen);
+		}
+	}, [leftOpen, preview, runState]);
+
 	const newSession = useCallback((projectId = activeProjectId) => {
 		if (runningRef.current || !projectId) return;
 		setActiveProjectId(projectId);
