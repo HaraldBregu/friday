@@ -13,8 +13,7 @@ export const storage: StorageApi = {
 	syncFolders: () => typedInvokeUnwrap(StorageChannels.syncFolders),
 	pickFolders: () => typedInvokeUnwrap(StorageChannels.pickFolders),
 	getOperationStatuses: () => typedInvokeUnwrap(StorageChannels.getOperationStatuses),
-	onOperationStatusChanged: (callback) =>
-		typedOn(StorageChannels.operationStatusChanged, callback),
+	onOperationStatusChanged: (callback) => typedOn(StorageChannels.operationStatusChanged, callback),
 	backup: (id) => typedInvokeUnwrap(StorageChannels.backup, id),
 	restore: (id) => typedInvokeUnwrap(StorageChannels.restore, id),
 };

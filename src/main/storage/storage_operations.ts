@@ -103,8 +103,7 @@ export class StorageOperations {
 					: await this.dependencies.lock(running.storageId, () =>
 							this.dependencies.restore(running.storageId)
 						);
-			const transferred =
-				'uploaded' in result ? result.uploaded.length : result.downloaded.length;
+			const transferred = 'uploaded' in result ? result.uploaded.length : result.downloaded.length;
 			return this.finish(running, result, transferred);
 		} catch (error) {
 			return this.publish({

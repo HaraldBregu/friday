@@ -23,10 +23,7 @@ it('starts scheduled backups through the shared operation service', async () => 
 
 	expect(operations.backup).toHaveBeenCalledWith('backup', 'scheduled');
 	expect(operations.wait).toHaveBeenCalledWith('scheduled-1');
-	expect(logger.info).toHaveBeenCalledWith(
-		'Storage',
-		'Auto sync "Backup" uploaded 3 file(s)'
-	);
+	expect(logger.info).toHaveBeenCalledWith('Storage', 'Auto sync "Backup" uploaded 3 file(s)');
 });
 
 it('skips a schedule tick when a manual backup is already running', async () => {

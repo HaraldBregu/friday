@@ -378,7 +378,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 									<Select
 										value={selectedId ?? ''}
 										onValueChange={(value) => void selectProvider(value)}
-									disabled={savingSync}
+										disabled={savingSync}
 									>
 										<SelectTrigger
 											size="sm"

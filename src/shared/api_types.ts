@@ -235,9 +235,7 @@ export interface StorageApi {
 	syncFolders: () => Promise<StorageSyncFolder[]>;
 	pickFolders: () => Promise<string[]>;
 	getOperationStatuses: () => Promise<StorageOperationStatus[]>;
-	onOperationStatusChanged: (
-		callback: (status: StorageOperationStatus) => void
-	) => () => void;
+	onOperationStatusChanged: (callback: (status: StorageOperationStatus) => void) => () => void;
 	backup: (id: string) => Promise<StorageOperationStatus>;
 	restore: (id: string) => Promise<StorageOperationStatus>;
 }
