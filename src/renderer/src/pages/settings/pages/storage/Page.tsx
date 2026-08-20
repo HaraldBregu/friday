@@ -39,6 +39,7 @@ import { Switch } from '@/components/ui/switch';
 import type {
 	StorageConfig,
 	StorageConfiguration,
+	StorageOperationStatus,
 	StorageSyncFolder,
 } from '../../../../../../shared/storage_types';
 import { getErrorMessage } from '../../../start/constants';
@@ -77,8 +78,6 @@ interface StoragePageProps {
 	readonly emptyAction?: ReactNode;
 }
 
-type RunningAction = 'backup' | 'restore' | null;
-
 const StoragePage: React.FC<StoragePageProps> = ({
 	embedded = false,
 	inline = false,
@@ -92,21 +91,37 @@ const StoragePage: React.FC<StoragePageProps> = ({
 	const [error, setError] = useState<string | null>(null);
 	const [syncStatus, setSyncStatus] = useState<string | null>(null);
 	const [savingSync, setSavingSync] = useState(false);
-	const [runningAction, setRunningAction] = useState<RunningAction>(null);
+	const [operationStatuses, setOperationStatuses] = useState<
+		Record<string, StorageOperationStatus>
+	>({});
+	const [operationStatusesLoading, setOperationStatusesLoading] = useState(true);
 	const [restoreOpen, setRestoreOpen] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
+		const applyOperationStatus = (status: StorageOperationStatus): void => {
+			if (cancelled) return;
+			setOperationStatuses((current) => {
+				const previous = current[status.storageId];
+				return previous && previous.revision >= status.revision
+					? current
+					: { ...current, [status.storageId]: status };
+			});
+		};
+		const unsubscribe = window.storage.onOperationStatusChanged(applyOperationStatus);
 		void Promise.all([
 			window.storage.getStorages(),
 			window.storage.syncFolders(),
 			window.storage.getStorageConfiguration(),
+			window.storage.getOperationStatuses(),
 		]).then(
-			([storages, folders, configuration]) => {
+			([storages, folders, configuration, statuses]) => {
 				if (cancelled) return;
 				setEntries(storages.map((storage) => ({ key: storage.id, storage })));
 				setAvailableFolders(folders);
 				setSelection(configuration);
+				statuses.forEach(applyOperationStatus);
+				setOperationStatusesLoading(false);
 			},
 			(err) => {
 				if (cancelled) return;
@@ -118,11 +133,13 @@ const StoragePage: React.FC<StoragePageProps> = ({
 					syncEnabled: false,
 					syncCronExpression: DEFAULT_SYNC_CRON_EXPRESSION,
 				});
+				setOperationStatusesLoading(false);
 				setError(getErrorMessage(err, t('settings.storage.errors.load')));
 			}
 		);
 		return () => {
 			cancelled = true;
+			unsubscribe();
 		};
 	}, [t]);
 
@@ -139,13 +156,27 @@ const StoragePage: React.FC<StoragePageProps> = ({
 		: savedEntries[0]?.storage.id;
 	const selectedStorage = savedEntries.find((entry) => entry.storage.id === selectedId)?.storage;
 	const storage = draft ?? selectedStorage;
+	const operationStatus = selectedId ? operationStatuses[selectedId] : undefined;
+	const runningOperation = operationStatus?.state === 'running' ? operationStatus : undefined;
 	const builtInPaths = new Set(availableFolders.map((folder) => folder.path));
 	const customPaths = storage?.paths.filter((entry) => !builtInPaths.has(entry)) ?? [];
 	const intervalValue = !storage?.syncEnabled
 		? 'off'
 		: (SYNC_INTERVALS.find((interval) => interval.cron === storage.syncCronExpression)?.key ??
 			'custom');
-	const busy = savingSync || runningAction !== null;
+	const busy = operationStatusesLoading || savingSync || Boolean(runningOperation);
+	const operationStatusKey = operationStatus
+		? operationStatus.state === 'running' && operationStatus.trigger === 'scheduled'
+			? `settings.storage.operation.${operationStatus.operation}.scheduledRunning`
+			: `settings.storage.operation.${operationStatus.operation}.${operationStatus.state}`
+		: undefined;
+	const operationStatusText = operationStatusKey
+		? t(operationStatusKey, {
+				count: operationStatus?.transferred,
+				failed: operationStatus?.failed,
+				error: operationStatus?.error,
+			})
+		: undefined;
 
 	const updateDraft = (next: StorageConfig): void => {
 		setDraft(next);
@@ -203,49 +234,39 @@ const StoragePage: React.FC<StoragePageProps> = ({
 	};
 
 	const runBackup = async (): Promise<void> => {
-		setRunningAction('backup');
 		setError(null);
 		setSyncStatus(null);
 		try {
 			const saved = await saveSync();
 			if (!saved) return;
-			const result = await window.storage.backup(saved.id);
-			setSyncStatus(
-				result.failed.length > 0
-					? t('settings.storage.pushPartial', {
-							uploaded: result.uploaded.length,
-							failed: result.failed.length,
-						})
-					: t('settings.storage.pushOk', { count: result.uploaded.length })
-			);
+			const status = await window.storage.backup(saved.id);
+			setOperationStatuses((current) => {
+				const previous = current[status.storageId];
+				return previous && previous.revision >= status.revision
+					? current
+					: { ...current, [status.storageId]: status };
+			});
 		} catch (err) {
 			setError(getErrorMessage(err, t('settings.storage.errors.push')));
-		} finally {
-			setRunningAction(null);
 		}
 	};
 
 	const runRestore = async (): Promise<void> => {
-		setRunningAction('restore');
 		setRestoreOpen(false);
 		setError(null);
 		setSyncStatus(null);
 		try {
 			const saved = await saveSync();
 			if (!saved) return;
-			const result = await window.storage.restore(saved.id);
-			setSyncStatus(
-				result.failed.length > 0
-					? t('settings.storage.pullPartial', {
-							downloaded: result.downloaded.length,
-							failed: result.failed.length,
-						})
-					: t('settings.storage.pullOk', { count: result.downloaded.length })
-			);
+			const status = await window.storage.restore(saved.id);
+			setOperationStatuses((current) => {
+				const previous = current[status.storageId];
+				return previous && previous.revision >= status.revision
+					? current
+					: { ...current, [status.storageId]: status };
+			});
 		} catch (err) {
 			setError(getErrorMessage(err, t('settings.storage.errors.pull')));
-		} finally {
-			setRunningAction(null);
 		}
 	};
 
@@ -339,7 +360,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 				</>
 			) : (
 				<>
-					<Card size="sm" className="gap-0! py-0!" aria-busy={busy}>
+					<Card size="sm" className="gap-0! py-0!" aria-busy={Boolean(runningOperation)}>
 						<CardHeader className="border-b border-border/60 py-3">
 							<CardTitle>
 								<h2 className="text-sm font-medium">{t('settings.storage.cardTitle')}</h2>
@@ -357,7 +378,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 									<Select
 										value={selectedId ?? ''}
 										onValueChange={(value) => void selectProvider(value)}
-										disabled={busy}
+									disabled={savingSync}
 									>
 										<SelectTrigger
 											size="sm"
@@ -501,7 +522,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 								disabled={busy || !storage || storage.paths.length === 0}
 							>
 								<Download className="size-3" />
-								{runningAction === 'restore'
+								{runningOperation?.operation === 'restore'
 									? t('settings.storage.pulling')
 									: t('settings.storage.restore')}
 							</Button>
@@ -512,7 +533,7 @@ const StoragePage: React.FC<StoragePageProps> = ({
 								disabled={busy || !storage || storage.paths.length === 0}
 							>
 								<Upload className="size-3" />
-								{runningAction === 'backup'
+								{runningOperation?.operation === 'backup'
 									? t('settings.storage.pushing')
 									: t('settings.storage.backup')}
 							</Button>
@@ -529,6 +550,21 @@ const StoragePage: React.FC<StoragePageProps> = ({
 					{syncStatus && (
 						<div role="status" aria-live="polite">
 							<SettingsNotice icon={FolderSync}>{syncStatus}</SettingsNotice>
+						</div>
+					)}
+
+					{operationStatusText && (
+						<div
+							role={operationStatus?.state === 'failed' ? 'alert' : 'status'}
+							aria-live={operationStatus?.state === 'failed' ? 'assertive' : 'polite'}
+							aria-atomic="true"
+						>
+							<SettingsNotice
+								icon={operationStatus?.state === 'failed' ? AlertTriangle : FolderSync}
+								variant={operationStatus?.state === 'failed' ? 'destructive' : 'default'}
+							>
+								{operationStatusText}
+							</SettingsNotice>
 						</div>
 					)}
 

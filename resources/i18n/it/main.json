@@ -1083,6 +1083,21 @@
 				"description": "I file cloud sostituiscono i file locali corrispondenti nelle cartelle selezionate. Gli altri file locali vengono conservati.",
 				"confirm": "Ripristina file"
 			},
+			"operation": {
+				"backup": {
+					"running": "Il backup è in esecuzione in background…",
+					"scheduledRunning": "Il backup pianificato è in esecuzione in background…",
+					"succeeded": "Backup completato per {{count}} file.",
+					"partial": "Backup completato per {{count}} file; {{failed}} non riusciti.",
+					"failed": "Backup non riuscito. {{error}}"
+				},
+				"restore": {
+					"running": "Il ripristino è in esecuzione in background…",
+					"succeeded": "Ripristinati {{count}} file.",
+					"partial": "Ripristinati {{count}} file; {{failed}} non riusciti.",
+					"failed": "Ripristino non riuscito. {{error}}"
+				}
+			},
 			"push": "Carica sul bucket",
 			"pushing": "Caricamento…",
 			"pushOk": "Caricati {{count}} file.",

@@ -1084,6 +1084,21 @@
 				"description": "Cloud files replace matching local files in the selected folders. Other local files are kept.",
 				"confirm": "Restore files"
 			},
+			"operation": {
+				"backup": {
+					"running": "Backup is running in the background…",
+					"scheduledRunning": "Scheduled backup is running in the background…",
+					"succeeded": "Backed up {{count}} file(s).",
+					"partial": "Backed up {{count}} file(s); {{failed}} failed.",
+					"failed": "Backup failed. {{error}}"
+				},
+				"restore": {
+					"running": "Restore is running in the background…",
+					"succeeded": "Restored {{count}} file(s).",
+					"partial": "Restored {{count}} file(s); {{failed}} failed.",
+					"failed": "Restore failed. {{error}}"
+				}
+			},
 			"push": "Push to bucket",
 			"pushing": "Pushing…",
 			"pushOk": "Pushed {{count}} file(s).",
