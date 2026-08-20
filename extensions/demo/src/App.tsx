@@ -4,6 +4,7 @@ import { cva } from 'class-variance-authority';
 import {
 	app,
 	isFriday,
+	isExtensionStoreValue,
 	type AppLanguage,
 	type AppTheme,
 	type AppThemeColors,
@@ -11,7 +12,10 @@ import {
 } from '@friday/sdk';
 import { cn } from './lib/utils';
 import { Button } from './components/ui/button';
+import { Input } from './components/ui/input';
+import { Textarea } from './components/ui/textarea';
 import translations from './i18n.json';
+import { runStorageTest } from './storage';
 
 const fallbackColors: AppThemeColors = {
 	radius: '0.625rem',
@@ -51,10 +55,10 @@ const fallbackColors: AppThemeColors = {
 };
 const fallbackTheme: AppThemeData = { themeMode: 'light', isDark: false, colors: fallbackColors };
 const fallbackLanguage: AppLanguage = 'en';
-type DemoStorageValue = { label: string; count: number };
-const demoStorageKey = 'demo';
-const demoStorageFile = 'demo/message.txt';
-const demoStorageFileContent = 'Saved by the Friday demo extension.';
+const initialStorageKey = 'demo';
+const initialStorageJson = '{\n  "label": "Friday demo",\n  "count": 1\n}';
+const initialStoragePath = 'demo/message.txt';
+const initialStorageFileContent = 'Saved by the Friday demo extension.';
 const themeBadgeClass = cva(
 	'inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold',
 	{
@@ -74,8 +78,13 @@ export default function App() {
 	const [theme, setTheme] = useState<AppThemeData>(fallbackTheme);
 	const [language, setLanguage] = useState<AppLanguage>(fallbackLanguage);
 	const [status, setStatus] = useState(translations.en.waiting);
+	const [storageKey, setStorageKey] = useState(initialStorageKey);
+	const [storageJson, setStorageJson] = useState(initialStorageJson);
 	const [extensionStoreValue, setExtensionStoreValue] = useState('');
+	const [storagePath, setStoragePath] = useState(initialStoragePath);
+	const [storageFileContent, setStorageFileContent] = useState(initialStorageFileContent);
 	const [extensionFileValue, setExtensionFileValue] = useState('');
+	const [storageTestResults, setStorageTestResults] = useState<string[]>([]);
 	const [storageBusy, setStorageBusy] = useState(false);
 	const inFridayApp = isFriday();
 	const text = translations[language] ?? translations.en;
@@ -169,49 +178,75 @@ export default function App() {
 
 	const storeExtensionValue = () =>
 		runStorageAction(async () => {
-			const value: DemoStorageValue = { label: 'Friday demo', count: 1 };
-			await app.setExtensionStoreValue(demoStorageKey, value);
-			setExtensionStoreValue(JSON.stringify(value));
+			const key = storageKey.trim();
+			if (!key) throw new Error(text.storageKeyRequired);
+			let value: unknown;
+			try {
+				value = JSON.parse(storageJson);
+			} catch {
+				throw new Error(text.storageJsonInvalid);
+			}
+			if (!isExtensionStoreValue(value)) throw new Error(text.storageValueInvalid);
+			await app.setExtensionStoreValue(key, value);
+			setExtensionStoreValue(JSON.stringify(value, null, 2));
 			return text.storageValueStored;
 		});
 
 	const loadExtensionValue = () =>
 		runStorageAction(async () => {
-			const value = await app.getExtensionStoreValue<DemoStorageValue>(demoStorageKey);
-			setExtensionStoreValue(value ? JSON.stringify(value) : '');
-			return value ? text.storageValueLoaded : text.storageValueMissing;
+			const key = storageKey.trim();
+			if (!key) throw new Error(text.storageKeyRequired);
+			const value = await app.getExtensionStoreValue(key);
+			const formattedValue = value === undefined ? '' : JSON.stringify(value, null, 2);
+			setExtensionStoreValue(formattedValue);
+			if (formattedValue) setStorageJson(formattedValue);
+			return value === undefined ? text.storageValueMissing : text.storageValueLoaded;
 		});
 
 	const deleteExtensionValue = () =>
 		runStorageAction(async () => {
-			await app.deleteExtensionStoreValue(demoStorageKey);
+			const key = storageKey.trim();
+			if (!key) throw new Error(text.storageKeyRequired);
+			await app.deleteExtensionStoreValue(key);
 			setExtensionStoreValue('');
 			return text.storageValueDeleted;
 		});
 
 	const saveExtensionFile = () =>
 		runStorageAction(async () => {
-			await app.writeExtensionStoreFile(
-				demoStorageFile,
-				new TextEncoder().encode(demoStorageFileContent)
-			);
-			setExtensionFileValue(demoStorageFileContent);
+			const path = storagePath.trim();
+			if (!path) throw new Error(text.storagePathRequired);
+			await app.writeExtensionStoreFile(path, new TextEncoder().encode(storageFileContent));
+			setExtensionFileValue(storageFileContent);
 			return text.storageFileSaved;
 		});
 
 	const readExtensionFile = () =>
 		runStorageAction(async () => {
-			const value = new TextDecoder().decode(await app.readExtensionStoreFile(demoStorageFile));
+			const path = storagePath.trim();
+			if (!path) throw new Error(text.storagePathRequired);
+			const value = new TextDecoder().decode(await app.readExtensionStoreFile(path));
+			setStorageFileContent(value);
 			setExtensionFileValue(value);
 			return text.storageFileLoaded;
 		});
 
 	const deleteExtensionFile = () =>
 		runStorageAction(async () => {
-			await app.deleteExtensionStoreFile(demoStorageFile);
+			const path = storagePath.trim();
+			if (!path) throw new Error(text.storagePathRequired);
+			await app.deleteExtensionStoreFile(path);
 			setExtensionFileValue('');
 			return text.storageFileDeleted;
 		});
+
+	const runCompleteStorageTest = () => {
+		setStorageTestResults([]);
+		void runStorageAction(async () => {
+			setStorageTestResults(await runStorageTest());
+			return text.storageTestPassed;
+		});
+	};
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -244,7 +279,7 @@ export default function App() {
 	return (
 		<main className={cn('app-demo overflow-y-auto', theme.isDark && 'dark')} style={themeStyle}>
 			<div className="flex min-h-full items-center justify-center p-8">
-				<div className="w-full max-w-md space-y-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+				<div className="w-full max-w-2xl space-y-5 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
 					<p className="text-lg font-semibold">{text.title}</p>
 					<p className="text-sm text-muted-foreground">
 						{inFridayApp ? text.connected : text.disconnected}
@@ -290,12 +325,30 @@ export default function App() {
 							</Button>
 						</div>
 					</div>
-					<div className="space-y-2">
+					<div className="space-y-4 border-t border-border pt-4">
 						<p className="text-sm font-semibold">{text.storage}</p>
-						<div className="space-y-2">
-							<p className="break-all text-sm">
-								{text.storageValue}: {extensionStoreValue || text.storageEmpty}
-							</p>
+						<p className="text-sm text-muted-foreground">{text.storageDescription}</p>
+						<div className="space-y-3 rounded-md border border-border p-4">
+							<p className="text-sm font-semibold">{text.storageValue}</p>
+							<label className="block space-y-1 text-sm" htmlFor="storage-key">
+								<span>{text.storageKey}</span>
+								<Input
+									id="storage-key"
+									value={storageKey}
+									disabled={storageBusy}
+									onChange={(event) => setStorageKey(event.target.value)}
+								/>
+							</label>
+							<label className="block space-y-1 text-sm" htmlFor="storage-json">
+								<span>{text.storageJson}</span>
+								<Textarea
+									id="storage-json"
+									value={storageJson}
+									disabled={storageBusy}
+									className="font-mono"
+									onChange={(event) => setStorageJson(event.target.value)}
+								/>
+							</label>
 							<div className="flex flex-wrap gap-2">
 								<Button
 									size="sm"
@@ -322,11 +375,33 @@ export default function App() {
 									{text.deleteStorageValue}
 								</Button>
 							</div>
+							<div className="space-y-1">
+								<p className="text-xs font-medium text-muted-foreground">{text.storageResult}</p>
+								<pre className="max-h-36 min-h-10 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">
+									{extensionStoreValue || text.storageEmpty}
+								</pre>
+							</div>
 						</div>
-						<div className="space-y-2">
-							<p className="break-all text-sm">
-								{text.storageFile}: {extensionFileValue || text.storageEmpty}
-							</p>
+						<div className="space-y-3 rounded-md border border-border p-4">
+							<p className="text-sm font-semibold">{text.storageFile}</p>
+							<label className="block space-y-1 text-sm" htmlFor="storage-path">
+								<span>{text.storagePath}</span>
+								<Input
+									id="storage-path"
+									value={storagePath}
+									disabled={storageBusy}
+									onChange={(event) => setStoragePath(event.target.value)}
+								/>
+							</label>
+							<label className="block space-y-1 text-sm" htmlFor="storage-file-content">
+								<span>{text.storageFileContent}</span>
+								<Textarea
+									id="storage-file-content"
+									value={storageFileContent}
+									disabled={storageBusy}
+									onChange={(event) => setStorageFileContent(event.target.value)}
+								/>
+							</label>
 							<div className="flex flex-wrap gap-2">
 								<Button
 									size="sm"
@@ -353,6 +428,28 @@ export default function App() {
 									{text.deleteStorageFile}
 								</Button>
 							</div>
+							<div className="space-y-1">
+								<p className="text-xs font-medium text-muted-foreground">{text.storageResult}</p>
+								<pre className="max-h-36 min-h-10 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">
+									{extensionFileValue || text.storageEmpty}
+								</pre>
+							</div>
+						</div>
+						<div className="space-y-3 rounded-md border border-border p-4">
+							<div>
+								<p className="text-sm font-semibold">{text.storageTest}</p>
+								<p className="mt-1 text-sm text-muted-foreground">{text.storageTestDescription}</p>
+							</div>
+							<Button disabled={storageBusy} onClick={runCompleteStorageTest}>
+								{text.runStorageTest}
+							</Button>
+							{storageTestResults.length > 0 && (
+								<ul className="space-y-1 text-xs" aria-label={text.storageTestResults}>
+									{storageTestResults.map((result) => (
+										<li key={result}>✓ {result}</li>
+									))}
+								</ul>
+							)}
 						</div>
 					</div>
 					<p className="text-sm text-muted-foreground">
