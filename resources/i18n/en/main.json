@@ -297,7 +297,7 @@
 			"menuBar": "Menu Bar",
 			"menuBarDescription": "Show or hide the app icon in the menu bar",
 			"keepAwake": "Keep Computer Active",
-			"keepAwakeDescription": "Prevent Friday from being suspended while it works in the background",
+			"keepAwakeDescription": "Keep the computer and display awake while Friday is running",
 			"appData": "Application Data",
 			"appDataDescription": "Folder where Friday stores application settings and logs",
 			"openAppData": "Open Folder",

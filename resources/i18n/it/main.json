@@ -296,7 +296,7 @@
 			"menuBar": "Barra dei Menu",
 			"menuBarDescription": "Mostra o nascondi l'icona dell'app nella barra dei menu",
 			"keepAwake": "Mantieni il computer attivo",
-			"keepAwakeDescription": "Impedisci a Friday di essere sospeso mentre lavora in background",
+			"keepAwakeDescription": "Mantieni attivi il computer e lo schermo mentre Friday è in esecuzione",
 			"appData": "Dati Applicazione",
 			"appDataDescription": "Cartella in cui Friday salva impostazioni e log dell'applicazione",
 			"openAppData": "Apri Cartella",

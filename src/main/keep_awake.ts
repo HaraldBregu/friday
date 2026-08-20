@@ -2,13 +2,16 @@ import { powerSaveBlocker } from 'electron';
 
 let blockerId: number | null = null;
 
-// ponytail: 'prevent-app-suspension' keeps the OS awake but lets the display sleep;
-// switch to 'prevent-display-sleep' if the screen must stay on too.
 export function setKeepAwake(enabled: boolean): void {
-	if (enabled && blockerId === null) {
-		blockerId = powerSaveBlocker.start('prevent-app-suspension');
-	} else if (!enabled && blockerId !== null) {
-		powerSaveBlocker.stop(blockerId);
+	if (enabled) {
+		if (blockerId === null || !powerSaveBlocker.isStarted(blockerId)) {
+			blockerId = powerSaveBlocker.start('prevent-display-sleep');
+		}
+		return;
+	}
+
+	if (blockerId !== null) {
+		if (powerSaveBlocker.isStarted(blockerId)) powerSaveBlocker.stop(blockerId);
 		blockerId = null;
 	}
 }

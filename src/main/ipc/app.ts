@@ -394,8 +394,6 @@ export class AppIpc implements IpcModule {
 		eventBus: EventBus
 	): void {
 		registerExtensionStoreIpc({ extensionRegistry, extensionStorage });
-		// Honor the persisted keep-awake setting on startup
-		applyKeepAwake(getStoredKeepAwake());
 		let currentThemeData: AppThemeData = getThemeData();
 		const emitThemeChangeEvent = (): void => {
 			const nextThemeData: AppThemeData = getThemeData();

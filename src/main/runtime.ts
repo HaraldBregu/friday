@@ -168,6 +168,7 @@ const menuManager = new Menu({
 });
 
 app.whenReady().then(async () => {
+	setKeepAwake(getKeepAwake());
 	registerLocalResourceProtocolHandler(logger);
 	setupMediaPermissionHandlers(services.extensionRegistry);
 	ensureExtensions();
@@ -227,6 +228,7 @@ app.whenReady().then(async () => {
 // Core window and quit-state handlers are managed by setupAppLifecycle.
 
 app.on('quit', () => {
+	setKeepAwake(false);
 	stopStorageSync();
 	stopRagSchedule();
 	stopWiki();

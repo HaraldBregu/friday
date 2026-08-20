@@ -69,6 +69,12 @@ export const crashReporter = {
 	start: jest.fn(),
 };
 
+export const powerSaveBlocker = {
+	start: jest.fn(() => 1),
+	stop: jest.fn(() => true),
+	isStarted: jest.fn(() => true),
+};
+
 export const safeStorage = {
 	isEncryptionAvailable: jest.fn(() => true),
 	encryptString: jest.fn((value: string) => Buffer.from(value, 'utf8')),

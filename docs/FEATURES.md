@@ -510,7 +510,7 @@ Extensions are standalone mini-app windows:
 
 - View application name and version.
 - Enable or disable the tray/menu-bar icon.
-- Keep the computer active by preventing app suspension while still allowing the display to sleep.
+- Keep the computer and display active while Friday is running.
 - Open the application-data folder.
 - Select English or Italian.
 - Select light, dark, or system theme; system mode follows OS theme changes.
