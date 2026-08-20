@@ -1,7 +1,8 @@
-import { Bot, Menu, Plus, TerminalSquare } from 'lucide-react';
+import { Bot, Plus, TerminalSquare } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CoderController } from '@/controller';
 
@@ -9,21 +10,7 @@ export function Header({ coder }: { coder: CoderController }) {
 	const session = coder.sessions.find((item) => item.id === coder.activeSessionId);
 	return (
 		<header className="flex h-12 shrink-0 items-center gap-3 border-b bg-background px-3">
-			<Tooltip>
-				<TooltipTrigger
-					render={
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							aria-label="Toggle project navigation"
-							onClick={() => coder.setLeftOpen(!coder.leftOpen)}
-						>
-							<Menu />
-						</Button>
-					}
-				/>
-				<TooltipContent>Projects and sessions</TooltipContent>
-			</Tooltip>
+			<SidebarTrigger />
 
 			<div className="flex min-w-0 flex-1 items-center gap-2">
 				{coder.mode === 'agent' ? (
