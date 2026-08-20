@@ -11,19 +11,73 @@ import { CoderChannels } from '../../../../src/shared/ipc_channels_definitions';
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	invoke.mockResolvedValue({ success: true, data: 'reply' });
+	invoke.mockResolvedValue({
+		success: true,
+		data: { projectId: 'project-1', sessionId: 'session-1', output: 'reply' },
+	});
 });
 
-it('normalizes prompts, generates a run id, and removes the exact event listener', async () => {
+it('normalizes run requests, filters events, and removes the exact event listener', async () => {
 	const callback = jest.fn();
-	await expect(coder.send(' inspect ', callback)).resolves.toBe('reply');
+	const request = {
+		projectId: ' project-1 ',
+		sessionId: ' session-1 ',
+		mode: 'agent' as const,
+		input: ' inspect ',
+	};
+	const pending = coder.send(request, callback);
 
 	const runId = invoke.mock.calls[0][2];
-	expect(invoke).toHaveBeenCalledWith(CoderChannels.send, 'inspect', expect.any(String));
+	const listener = on.mock.calls[0][1];
+	listener({}, {
+		type: 'text-delta',
+		runId: 'different-run',
+		projectId: 'project-1',
+		sessionId: 'session-1',
+		delta: 'ignored',
+	});
+	listener({}, {
+		type: 'text-delta',
+		runId,
+		projectId: 'project-1',
+		sessionId: 'session-1',
+		delta: 'kept',
+	});
+	await expect(pending).resolves.toEqual({
+		projectId: 'project-1',
+		sessionId: 'session-1',
+		output: 'reply',
+	});
+
+	expect(invoke).toHaveBeenCalledWith(
+		CoderChannels.send,
+		{
+			projectId: 'project-1',
+			sessionId: 'session-1',
+			mode: 'agent',
+			input: 'inspect',
+		},
+		expect.any(String)
+	);
 	expect(on).toHaveBeenCalledWith(CoderChannels.response, expect.any(Function));
 	expect(removeListener).toHaveBeenCalledWith(CoderChannels.response, on.mock.calls[0][1]);
+	expect(callback).toHaveBeenCalledTimes(1);
+	expect(callback).toHaveBeenCalledWith(expect.objectContaining({ delta: 'kept' }));
 	expect(runId).toHaveLength(36);
-	expect(() => coder.send(' ')).toThrow('Invalid coder prompt.');
+	expect(() =>
+		coder.send({ projectId: 'project-1', mode: 'agent', input: ' ' })
+	).toThrow('Invalid coder run request.');
+});
+
+it('normalizes project and session identifiers before forwarding them', async () => {
+	await coder.listSessions(' project-1 ');
+	expect(invoke).toHaveBeenCalledWith(CoderChannels.listSessions, 'project-1');
+
+	await coder.getSession(' project-1 ', ' session-1 ');
+	expect(invoke).toHaveBeenCalledWith(CoderChannels.getSession, 'project-1', 'session-1');
+
+	expect(() => coder.removeProject(' ')).toThrow('Invalid coder project id.');
+	expect(() => coder.getSession('project-1', ' ')).toThrow('Invalid coder session.');
 });
 
 it('validates settings before forwarding them to main', () => {
