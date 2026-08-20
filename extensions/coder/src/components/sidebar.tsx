@@ -92,7 +92,9 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 												className="grid size-7 shrink-0 place-items-center rounded-md hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[state=collapsed]/sidebar:hidden"
 												aria-label={`${expanded ? 'Collapse' : 'Expand'} ${project.name}`}
 											>
-												<ChevronRight className={`size-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+												<ChevronRight
+													className={`size-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`}
+												/>
 											</CollapsibleTrigger>
 											<Tooltip>
 												<TooltipTrigger
@@ -100,11 +102,15 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 														<Button
 															variant={project.id === coder.activeProjectId ? 'secondary' : 'ghost'}
 															className="h-auto min-w-0 flex-1 justify-start gap-2 px-2 py-2 text-left group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:p-0"
-															aria-current={project.id === coder.activeProjectId ? 'location' : undefined}
+															aria-current={
+																project.id === coder.activeProjectId ? 'location' : undefined
+															}
 															disabled={coder.runState === 'running'}
 															onClick={() => void coder.selectProject(project.id)}
 														>
-															<FolderGit2 className={`size-3.5 ${project.available ? '' : 'text-destructive'}`} />
+															<FolderGit2
+																className={`size-3.5 ${project.available ? '' : 'text-destructive'}`}
+															/>
 															<span className="min-w-0 flex-1 group-data-[state=collapsed]/sidebar:hidden">
 																<span className="block truncate text-xs">{project.name}</span>
 																<span className="block truncate font-mono text-[9px] font-normal text-muted-foreground">
@@ -120,7 +126,12 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 										<CollapsibleContent className="group-data-[state=collapsed]/sidebar:hidden">
 											<ul className="ml-5 border-l border-sidebar-border pl-2">
 												<li>
-													<Button variant="ghost" className="h-7 w-full justify-start gap-2 px-2 text-[11px] text-muted-foreground" disabled={coder.runState === 'running'} onClick={() => coder.newSession(project.id)}>
+													<Button
+														variant="ghost"
+														className="h-7 w-full justify-start gap-2 px-2 text-[11px] text-muted-foreground"
+														disabled={coder.runState === 'running'}
+														onClick={() => coder.newSession(project.id)}
+													>
 														<Plus className="size-3" /> New session
 													</Button>
 												</li>
@@ -129,14 +140,20 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 														<Button
 															variant={session.id === coder.activeSessionId ? 'secondary' : 'ghost'}
 															className="h-auto w-full justify-start gap-2 px-2 py-1.5 text-left"
-															aria-current={session.id === coder.activeSessionId ? 'page' : undefined}
+															aria-current={
+																session.id === coder.activeSessionId ? 'page' : undefined
+															}
 															disabled={coder.runState === 'running'}
 															onClick={() => void coder.selectSession(project.id, session.id)}
 														>
 															<MessageSquare className="size-3.5" />
 															<span className="min-w-0 flex-1">
 																<span className="block truncate text-[11px]">{session.title}</span>
-																<time dateTime={session.updatedAt} title={new Date(session.updatedAt).toLocaleString()} className="block text-[9px] font-normal text-muted-foreground">
+																<time
+																	dateTime={session.updatedAt}
+																	title={new Date(session.updatedAt).toLocaleString()}
+																	className="block text-[9px] font-normal text-muted-foreground"
+																>
 																	{relativeTime(session.updatedAt)} · {session.messageCount}
 																</time>
 															</span>
@@ -156,18 +173,82 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 			<SidebarFooter className="border-t border-sidebar-border p-2">
 				{coder.activeProject ? (
 					<div className="mb-2 grid grid-cols-4 gap-1 group-data-[state=collapsed]/sidebar:grid-cols-1">
-						<Tooltip><TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label="Open workspace folder" onClick={() => void coder.openProject(coder.activeProject!.id)}><FolderOpen /></Button>} /><TooltipContent>Open workspace folder</TooltipContent></Tooltip>
-						<Tooltip><TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label="Copy workspace path" onClick={() => void navigator.clipboard.writeText(coder.activeProject!.directory)}><Copy /></Button>} /><TooltipContent>Copy workspace path</TooltipContent></Tooltip>
-						<Tooltip><TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label="Refresh workspaces and sessions" disabled={coder.busy} onClick={() => void coder.refresh()}><RefreshCw /></Button>} /><TooltipContent>Refresh</TooltipContent></Tooltip>
-						<Tooltip><TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label="Remove workspace from Coder" disabled={coder.runState === 'running'} onClick={() => void coder.removeProject(coder.activeProject!.id)}><Trash2 /></Button>} /><TooltipContent>Remove reference; files stay on disk</TooltipContent></Tooltip>
+						<Tooltip>
+							<TooltipTrigger
+								render={
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										aria-label="Open workspace folder"
+										onClick={() => void coder.openProject(coder.activeProject!.id)}
+									>
+										<FolderOpen />
+									</Button>
+								}
+							/>
+							<TooltipContent>Open workspace folder</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger
+								render={
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										aria-label="Copy workspace path"
+										onClick={() =>
+											void navigator.clipboard.writeText(coder.activeProject!.directory)
+										}
+									>
+										<Copy />
+									</Button>
+								}
+							/>
+							<TooltipContent>Copy workspace path</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger
+								render={
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										aria-label="Refresh workspaces and sessions"
+										disabled={coder.busy}
+										onClick={() => void coder.refresh()}
+									>
+										<RefreshCw />
+									</Button>
+								}
+							/>
+							<TooltipContent>Refresh</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger
+								render={
+									<Button
+										variant="ghost"
+										size="icon-sm"
+										aria-label="Remove workspace from Coder"
+										disabled={coder.runState === 'running'}
+										onClick={() => void coder.removeProject(coder.activeProject!.id)}
+									>
+										<Trash2 />
+									</Button>
+								}
+							/>
+							<TooltipContent>Remove reference; files stay on disk</TooltipContent>
+						</Tooltip>
 					</div>
 				) : null}
 				<Separator className="mb-2 group-data-[state=collapsed]/sidebar:hidden" />
 				<div className="flex flex-wrap gap-1.5 group-data-[state=collapsed]/sidebar:hidden">
 					<Badge variant="secondary">Pi</Badge>
 					<Badge variant="outline">{coder.providerId}</Badge>
-					<Badge variant="outline" className="max-w-full truncate">{coder.modelId || 'model required'}</Badge>
-					<Badge variant={coder.toolMode === 'coding' ? 'destructive' : 'outline'}>{coder.toolMode}</Badge>
+					<Badge variant="outline" className="max-w-full truncate">
+						{coder.modelId || 'model required'}
+					</Badge>
+					<Badge variant={coder.toolMode === 'coding' ? 'destructive' : 'outline'}>
+						{coder.toolMode}
+					</Badge>
 				</div>
 			</SidebarFooter>
 		</>

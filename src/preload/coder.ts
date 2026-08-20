@@ -37,7 +37,12 @@ export const coder: CoderApi = {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
 		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
 		const normalizedTitle = typeof title === 'string' ? title.trim() : '';
-		if (!normalizedProjectId || !normalizedSessionId || !normalizedTitle || normalizedTitle.length > 120) {
+		if (
+			!normalizedProjectId ||
+			!normalizedSessionId ||
+			!normalizedTitle ||
+			normalizedTitle.length > 120
+		) {
 			throw new Error('Invalid coder session title.');
 		}
 		return typedInvokeUnwrap(
@@ -51,11 +56,7 @@ export const coder: CoderApi = {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
 		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
 		if (!normalizedProjectId || !normalizedSessionId) throw new Error('Invalid coder session.');
-		return typedInvokeUnwrap(
-			CoderChannels.deleteSession,
-			normalizedProjectId,
-			normalizedSessionId
-		);
+		return typedInvokeUnwrap(CoderChannels.deleteSession, normalizedProjectId, normalizedSessionId);
 	},
 	send: (request, onEvent) => {
 		if (!isCoderRunRequest(request)) throw new Error('Invalid coder run request.');

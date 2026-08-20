@@ -91,9 +91,9 @@ export function useCoderWorkspace(): CoderController {
 		preview ? previewSettings : previewSettings
 	);
 	const [projects, setProjects] = useState<CoderProject[]>(preview ? previewProjects : []);
-	const [sessionsByProject, setSessionsByProject] = useState<
-		Record<string, CoderSessionSummary[]>
-	>(preview ? previewSessionsByProject : {});
+	const [sessionsByProject, setSessionsByProject] = useState<Record<string, CoderSessionSummary[]>>(
+		preview ? previewSessionsByProject : {}
+	);
 	const [blocks, setBlocks] = useState<CoderBlock[]>(preview ? previewBlocks : []);
 	const [activeProjectId, setActiveProjectId] = useState<string | undefined>(
 		preview ? 'friday' : undefined
@@ -108,9 +108,7 @@ export function useCoderWorkspace(): CoderController {
 	const [runLabel, setRunLabel] = useState(preview ? 'Preview' : 'Loading');
 	const [error, setError] = useState('');
 	const [leftOpen, setLeftOpen] = useState(true);
-	const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>(
-		preview ? ['friday'] : []
-	);
+	const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>(preview ? ['friday'] : []);
 	const [busy, setBusy] = useState(!preview);
 	const sessions = activeProjectId ? (sessionsByProject[activeProjectId] ?? []) : [];
 
@@ -174,7 +172,9 @@ export function useCoderWorkspace(): CoderController {
 				setProjects(nextProjects);
 				if (typeof savedSidebarOpen === 'boolean') setLeftOpen(savedSidebarOpen);
 				const groupedSessions = await Promise.all(
-					nextProjects.map(async (project) => [project.id, await coderApi.listSessions(project.id)] as const)
+					nextProjects.map(
+						async (project) => [project.id, await coderApi.listSessions(project.id)] as const
+					)
 				);
 				if (!active) return;
 				setSessionsByProject(Object.fromEntries(groupedSessions));
@@ -209,22 +209,25 @@ export function useCoderWorkspace(): CoderController {
 		}
 	}, [leftOpen, preview, runState]);
 
-	const newSession = useCallback((projectId = activeProjectId) => {
-		if (runningRef.current || !projectId) return;
-		setActiveProjectId(projectId);
-		setExpandedProjectIds((current) =>
-			current.includes(projectId) ? current : [...current, projectId]
-		);
-		setActiveSessionId(undefined);
-		setBlocks([]);
-		setError('');
-		setRunState('idle');
-		setRunLabel(settings.modelId ? 'Ready' : 'Setup needed');
-		window.requestAnimationFrame(() =>
-			document.querySelector<HTMLTextAreaElement>('#coder-composer')?.focus()
-		);
-		if (!preview) void app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, projectId);
-	}, [activeProjectId, preview, settings.modelId]);
+	const newSession = useCallback(
+		(projectId = activeProjectId) => {
+			if (runningRef.current || !projectId) return;
+			setActiveProjectId(projectId);
+			setExpandedProjectIds((current) =>
+				current.includes(projectId) ? current : [...current, projectId]
+			);
+			setActiveSessionId(undefined);
+			setBlocks([]);
+			setError('');
+			setRunState('idle');
+			setRunLabel(settings.modelId ? 'Ready' : 'Setup needed');
+			window.requestAnimationFrame(() =>
+				document.querySelector<HTMLTextAreaElement>('#coder-composer')?.focus()
+			);
+			if (!preview) void app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, projectId);
+		},
+		[activeProjectId, preview, settings.modelId]
+	);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -257,10 +260,8 @@ export function useCoderWorkspace(): CoderController {
 
 	const selectSession = useCallback(
 		async (projectId: string, sessionId: string): Promise<void> => {
-			if (
-				runningRef.current ||
-				(projectId === activeProjectId && sessionId === activeSessionId)
-			) return;
+			if (runningRef.current || (projectId === activeProjectId && sessionId === activeSessionId))
+				return;
 			setBusy(true);
 			setError('');
 			try {
@@ -348,15 +349,18 @@ export function useCoderWorkspace(): CoderController {
 		[activeProjectId, loadProject, preview]
 	);
 
-	const openProject = useCallback(async (projectId: string): Promise<void> => {
-		if (preview) return;
-		setError('');
-		try {
-			await coderApi.openProject(projectId);
-		} catch (reason) {
-			setError(reason instanceof Error ? reason.message : 'Unable to open this project folder.');
-		}
-	}, [preview]);
+	const openProject = useCallback(
+		async (projectId: string): Promise<void> => {
+			if (preview) return;
+			setError('');
+			try {
+				await coderApi.openProject(projectId);
+			} catch (reason) {
+				setError(reason instanceof Error ? reason.message : 'Unable to open this project folder.');
+			}
+		},
+		[preview]
+	);
 
 	const refresh = useCallback(async (): Promise<void> => {
 		if (preview) return;
@@ -365,7 +369,9 @@ export function useCoderWorkspace(): CoderController {
 		try {
 			const nextProjects = await coderApi.listProjects();
 			const groupedSessions = await Promise.all(
-				nextProjects.map(async (project) => [project.id, await coderApi.listSessions(project.id)] as const)
+				nextProjects.map(
+					async (project) => [project.id, await coderApi.listSessions(project.id)] as const
+				)
 			);
 			setProjects(nextProjects);
 			setSessionsByProject(Object.fromEntries(groupedSessions));

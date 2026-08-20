@@ -202,7 +202,10 @@ assert.deepEqual(coderEvents, [
 ]);
 assert.equal(await coder.cancel('coder-run'), true);
 await coder.openProject(coderProject.id);
-assert.equal((await coder.renameSession(coderProject.id, 'session-1', 'Focused tests')).title, 'Focused tests');
+assert.equal(
+	(await coder.renameSession(coderProject.id, 'session-1', 'Focused tests')).title,
+	'Focused tests'
+);
 assert.equal(await coder.deleteSession(coderProject.id, 'session-1'), true);
 assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open');
 assert.equal(await win.isMaximized(), true);

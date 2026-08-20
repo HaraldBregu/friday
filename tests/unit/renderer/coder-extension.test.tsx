@@ -165,7 +165,5 @@ it('groups sessions by workspace and opens an inactive workspace session', async
 	await act(async () => result.current.selectSession(otherProject.id, otherSession.id));
 	expect(result.current.activeProjectId).toBe(otherProject.id);
 	expect(result.current.activeSessionId).toBe(otherSession.id);
-	expect(result.current.blocks).toEqual([
-		expect.objectContaining({ content: 'Website response' }),
-	]);
+	expect(result.current.blocks).toEqual([expect.objectContaining({ content: 'Website response' })]);
 });

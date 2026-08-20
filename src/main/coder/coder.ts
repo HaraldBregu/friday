@@ -135,7 +135,12 @@ export class Coder {
 		const root = path.resolve(coderSessionsLocation());
 		const target = path.resolve(session.path);
 		const relative = path.relative(root, target);
-		if (!relative || relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+		if (
+			!relative ||
+			relative === '..' ||
+			relative.startsWith(`..${path.sep}`) ||
+			path.isAbsolute(relative)
+		) {
 			throw new Error('Coder session path is invalid.');
 		}
 		unlinkSync(target);

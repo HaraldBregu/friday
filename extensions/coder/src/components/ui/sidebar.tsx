@@ -34,7 +34,10 @@ export function SidebarProvider({
 
 	return (
 		<SidebarContext.Provider value={{ open, toggle: () => onOpenChange(!open) }}>
-			<div className="group/sidebar flex h-full min-h-0 w-full" data-state={open ? 'expanded' : 'collapsed'}>
+			<div
+				className="group/sidebar flex h-full min-h-0 w-full"
+				data-state={open ? 'expanded' : 'collapsed'}
+			>
 				{children}
 			</div>
 		</SidebarContext.Provider>
@@ -62,7 +65,9 @@ export function SidebarHeader({ className, ...props }: ComponentProps<'div'>) {
 }
 
 export function SidebarContent({ className, ...props }: ComponentProps<'div'>) {
-	return <div className={cn('min-h-0 flex-1 overflow-y-auto overflow-x-hidden', className)} {...props} />;
+	return (
+		<div className={cn('min-h-0 flex-1 overflow-y-auto overflow-x-hidden', className)} {...props} />
+	);
 }
 
 export function SidebarFooter({ className, ...props }: ComponentProps<'div'>) {
