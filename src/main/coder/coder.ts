@@ -271,7 +271,6 @@ export class Coder {
 		};
 		const eventContext = { runId, projectId: project.id, sessionId };
 		this.runs.set(runId, run);
-		emit({ ...eventContext, type: 'status', status: 'started' });
 		const timeout = setTimeout(() => controller.abort(), RUN_TIMEOUT_MS);
 		try {
 			const settings = this.getSettings();
@@ -317,6 +316,7 @@ export class Coder {
 				session.abortBash();
 				await session.abort();
 			};
+			emit({ ...eventContext, type: 'status', status: 'started' });
 			let output = '';
 			let finalError: string | undefined;
 			const unsubscribe = session.subscribe((event: AgentSessionEvent) => {

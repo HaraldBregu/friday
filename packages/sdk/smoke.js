@@ -88,6 +88,7 @@ globalThis.coder = {
 	listModels: async () => ({ providers: [] }),
 	listProjects: async () => [coderProject],
 	addProject: async () => coderProject,
+	openProject: async () => undefined,
 	removeProject: async (projectId) => projectId === coderProject.id,
 	listSessions: async () => [],
 	getSession: async () => ({
@@ -101,6 +102,15 @@ globalThis.coder = {
 		},
 		blocks: [],
 	}),
+	renameSession: async (projectId, sessionId, title) => ({
+		id: sessionId,
+		projectId,
+		title,
+		createdAt: '2026-08-20T10:00:00.000Z',
+		updatedAt: '2026-08-20T10:00:00.000Z',
+		messageCount: 2,
+	}),
+	deleteSession: async () => true,
 	send: async (request, onEvent) => {
 		const context = {
 			runId: 'coder-run',
@@ -191,6 +201,9 @@ assert.deepEqual(coderEvents, [
 	},
 ]);
 assert.equal(await coder.cancel('coder-run'), true);
+await coder.openProject(coderProject.id);
+assert.equal((await coder.renameSession(coderProject.id, 'session-1', 'Focused tests')).title, 'Focused tests');
+assert.equal(await coder.deleteSession(coderProject.id, 'session-1'), true);
 assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open');
 assert.equal(await win.isMaximized(), true);
 

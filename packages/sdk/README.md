@@ -93,6 +93,9 @@ const result = await coder.send(
 );
 const sessions = await coder.listSessions(project.id);
 const snapshot = await coder.getSession(project.id, result.sessionId);
+await coder.openProject(project.id);
+await coder.renameSession(project.id, result.sessionId, 'Focused tests');
+await coder.deleteSession(project.id, result.sessionId);
 const action = await win.showContextMenu([
 	{ type: 'role', role: 'copy' },
 	{ type: 'separator' },
@@ -118,7 +121,8 @@ runs use an opaque main-owned project ID rather than accepting a filesystem path
 Agent conversations persist per project; Shell mode records non-interactive commands in the same
 session but is not a PTY. A project's directory is the default cwd, not a security sandbox: coding
 tools can execute with the desktop user's authority. Extensions receive redacted agent-tool events
-and never receive provider credentials. Coder is not exposed by `connect()`.
+and never receive provider credentials. Project opening and session mutation also resolve opaque IDs
+inside the main process. Coder is not exposed by `connect()`.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.
