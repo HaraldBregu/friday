@@ -82,8 +82,10 @@ it('refreshes toggles changed from the native application menu', async () => {
 	);
 
 	await screen.findByRole('switch', { name: 'settings.application.menuBar', checked: true });
-	notifyTrayEnabled(false);
-	notifyKeepAwake(true);
+	act(() => {
+		notifyTrayEnabled(false);
+		notifyKeepAwake(true);
+	});
 
 	expect(await screen.findByRole('switch', { name: 'settings.application.menuBar' })).not.toBeChecked();
 	expect(screen.getByRole('switch', { name: 'settings.application.keepAwake' })).toBeChecked();
