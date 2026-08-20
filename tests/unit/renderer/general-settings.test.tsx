@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import GeneralPage from '../../../src/renderer/src/pages/settings/pages/general/Page';
@@ -54,11 +54,13 @@ beforeEach(() => {
 
 it('enables keep awake from General settings', async () => {
 	const user = userEvent.setup();
-	render(
-		<MemoryRouter>
-			<GeneralPage />
-		</MemoryRouter>
-	);
+	await act(async () => {
+		render(
+			<MemoryRouter>
+				<GeneralPage />
+			</MemoryRouter>
+		);
+	});
 	const keepAwake = await screen.findByRole('switch', {
 		name: 'settings.application.keepAwake',
 		checked: false,
