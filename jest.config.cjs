@@ -76,6 +76,10 @@ module.exports = {
 			},
 			moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 			moduleNameMapper: {
+				'^react$': '<rootDir>/node_modules/react',
+				'^react/(.*)$': '<rootDir>/node_modules/react/$1',
+				'^react-dom$': '<rootDir>/node_modules/react-dom',
+				'^react-dom/(.*)$': '<rootDir>/node_modules/react-dom/$1',
 				// Path aliases (match tsconfig.web.json and electron.vite.config.ts)
 				'^@/(.*)$': '<rootDir>/src/renderer/src/$1',
 				'^@utils/(.*)$': '<rootDir>/src/renderer/src/utils/$1',
