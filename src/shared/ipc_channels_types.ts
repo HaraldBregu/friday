@@ -69,6 +69,7 @@ export interface CoderInvokeChannelMap {
 		args: [];
 		result: import('./coder_types').CoderProject | undefined;
 	};
+	[CoderChannels.openProject]: { args: [projectId: string]; result: void };
 	[CoderChannels.removeProject]: { args: [projectId: string]; result: boolean };
 	[CoderChannels.listSessions]: {
 		args: [projectId: string];
@@ -77,6 +78,14 @@ export interface CoderInvokeChannelMap {
 	[CoderChannels.getSession]: {
 		args: [projectId: string, sessionId: string];
 		result: import('./coder_types').CoderSessionSnapshot;
+	};
+	[CoderChannels.renameSession]: {
+		args: [projectId: string, sessionId: string, title: string];
+		result: import('./coder_types').CoderSessionSummary;
+	};
+	[CoderChannels.deleteSession]: {
+		args: [projectId: string, sessionId: string];
+		result: boolean;
 	};
 	[CoderChannels.send]: {
 		args: [request: import('./coder_types').CoderRunRequest, runId: string];

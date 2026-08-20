@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog } from 'electron';
+import { BrowserWindow, dialog, shell } from 'electron';
 import { CoderChannels } from '../../shared/ipc_channels_definitions';
 import { isCoderRunRequest, isCoderSettings } from '../../shared/coder_types';
 import type { Coder } from '../coder';
@@ -56,6 +56,16 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 				? undefined
 				: coder.addProject(result.filePaths[0]);
 		});
+		registerCommandWithEvent(CoderChannels.openProject, async (event, projectId) => {
+			assertCoderCaller(event);
+			if (typeof projectId !== 'string' || !projectId.trim()) {
+				throw new Error('Invalid coder project id.');
+			}
+			const project = coder.listProjects().find((item) => item.id === projectId.trim());
+			if (!project || !project.available) throw new Error('Coder project directory is unavailable.');
+			const error = await shell.openPath(project.directory);
+			if (error) throw new Error(error);
+		});
 		registerCommandWithEvent(CoderChannels.removeProject, (event, projectId) => {
 			assertCoderCaller(event);
 			if (typeof projectId !== 'string' || !projectId.trim()) {
@@ -81,6 +91,36 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 				throw new Error('Invalid coder session.');
 			}
 			return coder.getSession(projectId.trim(), sessionId.trim());
+		});
+		registerCommandWithEvent(
+			CoderChannels.renameSession,
+			(event, projectId, sessionId, title) => {
+				assertCoderCaller(event);
+				if (
+					typeof projectId !== 'string' ||
+					!projectId.trim() ||
+					typeof sessionId !== 'string' ||
+					!sessionId.trim() ||
+					typeof title !== 'string' ||
+					!title.trim() ||
+					title.trim().length > 120
+				) {
+					throw new Error('Invalid coder session title.');
+				}
+				return coder.renameSession(projectId.trim(), sessionId.trim(), title.trim());
+			}
+		);
+		registerCommandWithEvent(CoderChannels.deleteSession, (event, projectId, sessionId) => {
+			assertCoderCaller(event);
+			if (
+				typeof projectId !== 'string' ||
+				!projectId.trim() ||
+				typeof sessionId !== 'string' ||
+				!sessionId.trim()
+			) {
+				throw new Error('Invalid coder session.');
+			}
+			return coder.deleteSession(projectId.trim(), sessionId.trim());
 		});
 		registerCommandWithEvent(CoderChannels.send, (event, request, runId) => {
 			assertCoderCaller(event);

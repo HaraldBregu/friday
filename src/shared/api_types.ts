@@ -195,9 +195,16 @@ export interface CoderApi {
 	listModels: () => Promise<CoderCatalog>;
 	listProjects: () => Promise<CoderProject[]>;
 	addProject: () => Promise<CoderProject | undefined>;
+	openProject: (projectId: string) => Promise<void>;
 	removeProject: (projectId: string) => Promise<boolean>;
 	listSessions: (projectId: string) => Promise<CoderSessionSummary[]>;
 	getSession: (projectId: string, sessionId: string) => Promise<CoderSessionSnapshot>;
+	renameSession: (
+		projectId: string,
+		sessionId: string,
+		title: string
+	) => Promise<CoderSessionSummary>;
+	deleteSession: (projectId: string, sessionId: string) => Promise<boolean>;
 	send: (
 		request: CoderRunRequest,
 		onEvent?: (event: CoderResponseEvent) => void

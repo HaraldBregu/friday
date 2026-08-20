@@ -1,4 +1,4 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import {
 	createAgentSession,
@@ -103,6 +103,43 @@ export class Coder {
 			.filter((block): block is CoderSessionBlock => Boolean(block));
 		this.dependencies.projects.touch(project.id);
 		return { session: this.sessionSummary(project.id, sessionInfo), blocks };
+	}
+
+	async renameSession(
+		projectId: string,
+		sessionId: string,
+		title: string
+	): Promise<CoderSessionSummary> {
+		const project = this.requireProject(projectId);
+		const session = await this.requireSession(project, sessionId);
+		if ([...this.runs.values()].some((run) => run.sessionKey === `${project.id}:${session.id}`)) {
+			throw new Error('Stop the active run before renaming this session.');
+		}
+		const normalizedTitle = title.trim();
+		if (!normalizedTitle || normalizedTitle.length > 120) {
+			throw new Error('Coder session title must be between 1 and 120 characters.');
+		}
+		SessionManager.open(session.path, coderSessionsLocation(), project.directory).appendSessionInfo(
+			normalizedTitle
+		);
+		const updated = await this.requireSession(project, sessionId);
+		return this.sessionSummary(project.id, updated);
+	}
+
+	async deleteSession(projectId: string, sessionId: string): Promise<boolean> {
+		const project = this.requireProject(projectId);
+		const session = await this.requireSession(project, sessionId);
+		if ([...this.runs.values()].some((run) => run.sessionKey === `${project.id}:${session.id}`)) {
+			throw new Error('Stop the active run before deleting this session.');
+		}
+		const root = path.resolve(coderSessionsLocation());
+		const target = path.resolve(session.path);
+		const relative = path.relative(root, target);
+		if (!relative || relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+			throw new Error('Coder session path is invalid.');
+		}
+		unlinkSync(target);
+		return true;
 	}
 
 	async listModels(): Promise<CoderCatalog> {

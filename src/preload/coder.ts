@@ -12,6 +12,11 @@ export const coder: CoderApi = {
 	listModels: () => typedInvokeUnwrap(CoderChannels.listModels),
 	listProjects: () => typedInvokeUnwrap(CoderChannels.listProjects),
 	addProject: () => typedInvokeUnwrap(CoderChannels.addProject),
+	openProject: (projectId) => {
+		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
+		if (!normalizedProjectId) throw new Error('Invalid coder project id.');
+		return typedInvokeUnwrap(CoderChannels.openProject, normalizedProjectId);
+	},
 	removeProject: (projectId) => {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
 		if (!normalizedProjectId) throw new Error('Invalid coder project id.');
@@ -27,6 +32,30 @@ export const coder: CoderApi = {
 		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
 		if (!normalizedProjectId || !normalizedSessionId) throw new Error('Invalid coder session.');
 		return typedInvokeUnwrap(CoderChannels.getSession, normalizedProjectId, normalizedSessionId);
+	},
+	renameSession: (projectId, sessionId, title) => {
+		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
+		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
+		const normalizedTitle = typeof title === 'string' ? title.trim() : '';
+		if (!normalizedProjectId || !normalizedSessionId || !normalizedTitle || normalizedTitle.length > 120) {
+			throw new Error('Invalid coder session title.');
+		}
+		return typedInvokeUnwrap(
+			CoderChannels.renameSession,
+			normalizedProjectId,
+			normalizedSessionId,
+			normalizedTitle
+		);
+	},
+	deleteSession: (projectId, sessionId) => {
+		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
+		const normalizedSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
+		if (!normalizedProjectId || !normalizedSessionId) throw new Error('Invalid coder session.');
+		return typedInvokeUnwrap(
+			CoderChannels.deleteSession,
+			normalizedProjectId,
+			normalizedSessionId
+		);
 	},
 	send: (request, onEvent) => {
 		if (!isCoderRunRequest(request)) throw new Error('Invalid coder run request.');
