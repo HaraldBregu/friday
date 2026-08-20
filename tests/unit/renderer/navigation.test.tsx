@@ -44,7 +44,9 @@ it.each([
 	if (path === '/settings/assistant/data' || path === '/settings/general/persona') {
 		expect(SETTINGS_DETAIL_ITEMS).toContainEqual(expect.objectContaining({ path, labelKey }));
 	} else if (path === '/settings/coder') {
-		expect(SETTINGS_MODEL_SERVICE_ITEMS).toContainEqual(expect.objectContaining({ path, labelKey }));
+		expect(SETTINGS_MODEL_SERVICE_ITEMS).toContainEqual(
+			expect.objectContaining({ path, labelKey })
+		);
 	} else if (!path.endsWith('/permissions') || path === '/settings/assistant/permissions') {
 		expect(SETTINGS_NAVIGATION).toContainEqual(expect.objectContaining({ path, labelKey }));
 	}
@@ -99,15 +101,27 @@ it('renders settings navigation beside the workspace and marks the current secti
 	expect(screen.getByRole('heading', { name: 'Settings page' })).toHaveClass('text-lg');
 	expect(returnToChat).toHaveAttribute('href', '/home');
 	expect(within(sidebar as HTMLElement).getAllByRole('link')[0]).toBe(returnToChat);
-	expect(within(workspace as HTMLElement).queryByRole('navigation', {
-		name: 'settings.breadcrumb.label',
-	})).not.toBeInTheDocument();
+	expect(
+		within(workspace as HTMLElement).queryByRole('navigation', {
+			name: 'settings.breadcrumb.label',
+		})
+	).not.toBeInTheDocument();
 	expect(screen.getByRole('separator', { name: 'Resize sidebar' })).toBeInTheDocument();
-	expect(within(navigation).queryByRole('link', { name: 'settings.title' })).not.toBeInTheDocument();
+	expect(
+		within(navigation).queryByRole('link', { name: 'settings.title' })
+	).not.toBeInTheDocument();
 	expect(assistantGroup).not.toBeNull();
 	expect(providersGroup).not.toBeNull();
-	expect(within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.tabs.skills' })).toBeInTheDocument();
-	expect(within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.coder.title' })).toBeInTheDocument();
-	expect(within(providersGroup as HTMLElement).getByRole('link', { name: 'settings.overview.groups.mlModels' })).toBeInTheDocument();
+	expect(
+		within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.tabs.skills' })
+	).toBeInTheDocument();
+	expect(
+		within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.coder.title' })
+	).toBeInTheDocument();
+	expect(
+		within(providersGroup as HTMLElement).getByRole('link', {
+			name: 'settings.overview.groups.mlModels',
+		})
+	).toBeInTheDocument();
 	expect(currentSection).toHaveAttribute('data-active');
 });

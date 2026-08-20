@@ -86,24 +86,24 @@ export function SettingsSidebar(): React.JSX.Element {
 								</h2>
 							) : null}
 							<ul className="flex min-w-0 flex-col gap-1">
-									{group.items.map((item) => {
-										const Icon = item.icon;
-										const isActive = item.path === activePath;
+								{group.items.map((item) => {
+									const Icon = item.icon;
+									const isActive = item.path === activePath;
 
-										return (
-											<li key={item.path}>
-												<Link
-													to={item.path}
-													data-active={isActive ? '' : undefined}
-													aria-current={isActive ? 'page' : undefined}
-													className={cn(SPLIT_ITEM_CLASS, isActive && SPLIT_ITEM_ACTIVE_CLASS)}
-												>
-													<Icon className="size-4 shrink-0" strokeWidth={1.8} />
-													<span>{t(item.labelKey)}</span>
-												</Link>
-											</li>
-										);
-									})}
+									return (
+										<li key={item.path}>
+											<Link
+												to={item.path}
+												data-active={isActive ? '' : undefined}
+												aria-current={isActive ? 'page' : undefined}
+												className={cn(SPLIT_ITEM_CLASS, isActive && SPLIT_ITEM_ACTIVE_CLASS)}
+											>
+												<Icon className="size-4 shrink-0" strokeWidth={1.8} />
+												<span>{t(item.labelKey)}</span>
+											</Link>
+										</li>
+									);
+								})}
 							</ul>
 						</section>
 					))}

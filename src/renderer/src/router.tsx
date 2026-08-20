@@ -1,11 +1,4 @@
-import React, {
-	Suspense,
-	lazy,
-	useLayoutEffect,
-	useRef,
-	useState,
-	type ReactNode,
-} from 'react';
+import React, { Suspense, lazy, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import {
 	Navigate,
 	Outlet,
@@ -131,10 +124,7 @@ function RootRouteComponent(): React.JSX.Element {
 		}
 
 		setShowSettingsBreadcrumb(false);
-		const timeout = window.setTimeout(
-			() => setShowSettingsBreadcrumb(true),
-			SIDEBAR_TRANSITION_MS
-		);
+		const timeout = window.setTimeout(() => setShowSettingsBreadcrumb(true), SIDEBAR_TRANSITION_MS);
 		return () => window.clearTimeout(timeout);
 	}, [isMobile, isSettings, state.sidebarOpen]);
 
