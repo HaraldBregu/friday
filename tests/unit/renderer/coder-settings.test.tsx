@@ -6,9 +6,7 @@ import CoderPage from '../../../src/renderer/src/pages/settings/pages/coder/Page
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({
 		t: (key: string, values?: Record<string, string>) =>
-			key === 'settings.coder.deviceCode'
-				? `Enter ${values?.code}`
-				: key === 'settings.coder.apiKeyMissing'
+			key === 'settings.coder.apiKeyMissing'
 					? `Missing ${values?.provider}`
 					: key,
 	}),
@@ -86,5 +84,7 @@ it('starts Codex device authentication and displays the projected code', async (
 
 	await user.click(await screen.findByRole('button', { name: 'settings.coder.connect' }));
 	await waitFor(() => expect(openExternalUrl).toHaveBeenCalledWith('https://example.com/device'));
-	expect(screen.getByText('Enter ABCD-EFGH')).toBeInTheDocument();
+	expect(screen.getByText('ABCD-EFGH')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.coder.copyCode' })).toBeInTheDocument();
+	expect(screen.getByText('settings.coder.waitingForAuthorization')).toBeInTheDocument();
 });

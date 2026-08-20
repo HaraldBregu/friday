@@ -128,9 +128,10 @@ const CoderPage: React.FC = () => {
 		(provider) => provider.id === settings?.providerId
 	);
 	const selectedModel = selectedProvider?.models.find((model) => model.id === settings?.modelId);
+	const deviceCode = authEvent?.type === 'device-code' ? authEvent : undefined;
 	const authMessage =
-		authEvent?.type === 'device-code'
-			? t('settings.coder.deviceCode', { code: authEvent.userCode })
+		deviceCode
+			? t('settings.coder.deviceCode')
 			: authEvent && 'message' in authEvent
 				? authEvent.message
 				: authEvent?.type === 'auth-url'
@@ -354,6 +355,20 @@ const CoderPage: React.FC = () => {
 				<SettingsNotice>
 					<span className="flex flex-wrap items-center gap-2">
 						<span>{authMessage}</span>
+						{deviceCode && (
+							<>
+								<code className="select-all rounded-md border bg-muted px-2 py-1 font-mono text-sm font-semibold tracking-widest text-foreground">
+									{deviceCode.userCode}
+								</code>
+								<Button
+									size="xs"
+									variant="outline"
+									onClick={() => void navigator.clipboard.writeText(deviceCode.userCode)}
+								>
+									{t('settings.coder.copyCode')}
+								</Button>
+							</>
+						)}
 						{authUrl && (
 							<Button
 								size="xs"
@@ -363,6 +378,11 @@ const CoderPage: React.FC = () => {
 								<ExternalLink />
 								{t('settings.coder.openLogin')}
 							</Button>
+						)}
+						{deviceCode && (
+							<span className="text-muted-foreground">
+								{t('settings.coder.waitingForAuthorization')}
+							</span>
 						)}
 					</span>
 				</SettingsNotice>
