@@ -184,52 +184,58 @@ const CoderPage: React.FC = () => {
 							title={t('settings.coder.provider')}
 							description={t('settings.coder.providerDescription')}
 							actions={
-							<Select
-								value={settings.providerId}
-								onValueChange={(value) => {
-									if (value) handleProviderChange(value as CoderProviderId);
-								}}
-								disabled={saving}
-							>
-								<SelectTrigger className="w-56 max-w-full text-xs" aria-label={t('settings.coder.provider')}>
-									<SelectValue>{selectedProvider?.name}</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{catalog.providers.map((provider) => (
-										<SelectItem key={provider.id} value={provider.id}>
-											{provider.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						}
+								<Select
+									value={settings.providerId}
+									onValueChange={(value) => {
+										if (value) handleProviderChange(value as CoderProviderId);
+									}}
+									disabled={saving}
+								>
+									<SelectTrigger
+										className="w-56 max-w-full text-xs"
+										aria-label={t('settings.coder.provider')}
+									>
+										<SelectValue>{selectedProvider?.name}</SelectValue>
+									</SelectTrigger>
+									<SelectContent>
+										{catalog.providers.map((provider) => (
+											<SelectItem key={provider.id} value={provider.id}>
+												{provider.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							}
 						/>
 
 						<SettingsRow
 							title={t('settings.coder.model')}
 							description={t('settings.coder.modelDescription')}
 							actions={
-							<Select
-								value={selectedModel?.id ?? null}
-								onValueChange={(value) => {
-									if (value) save({ ...settings, modelId: value });
-								}}
-								disabled={saving || !selectedProvider?.models.length}
-							>
-								<SelectTrigger className="w-56 max-w-full text-xs" aria-label={t('settings.coder.model')}>
-									<SelectValue placeholder={t('settings.coder.selectModel')}>
-										{selectedModel?.name}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{selectedProvider?.models.map((model) => (
-										<SelectItem key={model.id} value={model.id}>
-											{model.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						}
+								<Select
+									value={selectedModel?.id ?? null}
+									onValueChange={(value) => {
+										if (value) save({ ...settings, modelId: value });
+									}}
+									disabled={saving || !selectedProvider?.models.length}
+								>
+									<SelectTrigger
+										className="w-56 max-w-full text-xs"
+										aria-label={t('settings.coder.model')}
+									>
+										<SelectValue placeholder={t('settings.coder.selectModel')}>
+											{selectedModel?.name}
+										</SelectValue>
+									</SelectTrigger>
+									<SelectContent>
+										{selectedProvider?.models.map((model) => (
+											<SelectItem key={model.id} value={model.id}>
+												{model.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							}
 						/>
 
 						<SettingsRow
@@ -240,116 +246,129 @@ const CoderPage: React.FC = () => {
 									: t('settings.coder.apiKeyDescription')
 							}
 							actions={
-							<>
-								<Badge variant={selectedProvider?.configured ? 'secondary' : 'outline'}>
-									{selectedProvider?.configured
-										? t('settings.coder.connected')
-										: t('settings.coder.notConnected')}
-								</Badge>
-								{settings.providerId === 'openai-codex' ? (
-									selectedProvider?.configured ? (
-										<Button size="xs" variant="outline" disabled={connecting} onClick={handleDisconnect}>
-											{t('settings.coder.disconnect')}
-										</Button>
-									) : connecting ? (
+								<>
+									<Badge variant={selectedProvider?.configured ? 'secondary' : 'outline'}>
+										{selectedProvider?.configured
+											? t('settings.coder.connected')
+											: t('settings.coder.notConnected')}
+									</Badge>
+									{settings.providerId === 'openai-codex' ? (
+										selectedProvider?.configured ? (
+											<Button
+												size="xs"
+												variant="outline"
+												disabled={connecting}
+												onClick={handleDisconnect}
+											>
+												{t('settings.coder.disconnect')}
+											</Button>
+										) : connecting ? (
+											<Button
+												size="xs"
+												variant="outline"
+												onClick={() => void window.coder.cancelCodexLogin()}
+											>
+												{t('settings.coder.cancel')}
+											</Button>
+										) : (
+											<Button size="xs" onClick={handleConnect}>
+												{t('settings.coder.connect')}
+											</Button>
+										)
+									) : (
 										<Button
 											size="xs"
 											variant="outline"
-											onClick={() => void window.coder.cancelCodexLogin()}
+											onClick={() => navigate('/settings/providers/models')}
 										>
-											{t('settings.coder.cancel')}
+											{t('settings.coder.manageApiKeys')}
 										</Button>
-									) : (
-										<Button size="xs" onClick={handleConnect}>
-											{t('settings.coder.connect')}
-										</Button>
-									)
-								) : (
-									<Button
-										size="xs"
-										variant="outline"
-										onClick={() => navigate('/settings/providers/models')}
-									>
-										{t('settings.coder.manageApiKeys')}
-									</Button>
-								)}
-							</>
-						}
+									)}
+								</>
+							}
 						/>
 
 						<SettingsRow
 							title={t('settings.coder.thinking')}
 							description={t('settings.coder.thinkingDescription')}
 							actions={
-							<Select
-								value={settings.thinkingLevel}
-								onValueChange={(value) => {
-									if (value) save({ ...settings, thinkingLevel: value as CoderThinkingLevel });
-								}}
-								disabled={saving}
-							>
-								<SelectTrigger className="w-40 max-w-full text-xs" aria-label={t('settings.coder.thinking')}>
-									<SelectValue>{t(`settings.coder.thinkingLevels.${settings.thinkingLevel}`)}</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									{CODER_THINKING_LEVELS.map((level) => (
-										<SelectItem key={level} value={level}>
-											{t(`settings.coder.thinkingLevels.${level}`)}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						}
+								<Select
+									value={settings.thinkingLevel}
+									onValueChange={(value) => {
+										if (value) save({ ...settings, thinkingLevel: value as CoderThinkingLevel });
+									}}
+									disabled={saving}
+								>
+									<SelectTrigger
+										className="w-40 max-w-full text-xs"
+										aria-label={t('settings.coder.thinking')}
+									>
+										<SelectValue>
+											{t(`settings.coder.thinkingLevels.${settings.thinkingLevel}`)}
+										</SelectValue>
+									</SelectTrigger>
+									<SelectContent>
+										{CODER_THINKING_LEVELS.map((level) => (
+											<SelectItem key={level} value={level}>
+												{t(`settings.coder.thinkingLevels.${level}`)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							}
 						/>
 
 						<SettingsRow
 							title={t('settings.coder.tools')}
 							description={t('settings.coder.toolsDescription')}
 							actions={
-							<Select
-								value={settings.toolMode}
-								onValueChange={(value) => {
-									if (value) save({ ...settings, toolMode: value as CoderToolMode });
-								}}
-								disabled={saving}
-							>
-								<SelectTrigger className="w-40 max-w-full text-xs" aria-label={t('settings.coder.tools')}>
-									<SelectValue>
-										{settings.toolMode === 'coding'
-											? t('settings.coder.codingTools')
-											: t('settings.coder.readOnlyTools')}
-									</SelectValue>
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="read-only">{t('settings.coder.readOnlyTools')}</SelectItem>
-									<SelectItem value="coding">{t('settings.coder.codingTools')}</SelectItem>
-								</SelectContent>
-							</Select>
-						}
+								<Select
+									value={settings.toolMode}
+									onValueChange={(value) => {
+										if (value) save({ ...settings, toolMode: value as CoderToolMode });
+									}}
+									disabled={saving}
+								>
+									<SelectTrigger
+										className="w-40 max-w-full text-xs"
+										aria-label={t('settings.coder.tools')}
+									>
+										<SelectValue>
+											{settings.toolMode === 'coding'
+												? t('settings.coder.codingTools')
+												: t('settings.coder.readOnlyTools')}
+										</SelectValue>
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="read-only">{t('settings.coder.readOnlyTools')}</SelectItem>
+										<SelectItem value="coding">{t('settings.coder.codingTools')}</SelectItem>
+									</SelectContent>
+								</Select>
+							}
 						/>
 
 						<SettingsRow
 							title={t('settings.coder.workingDirectory')}
 							description={t('settings.coder.workingDirectoryDescription')}
 							actions={
-							<>
-								<SettingsValue mono className="max-w-72">
-									{settings.workingDirectory}
-								</SettingsValue>
-								<Button
-									size="xs"
-									variant="outline"
-									disabled={saving}
-									onClick={() => {
-										void window.coder.pickDirectory().then((directory) => {
-											if (directory) save({ ...settings, workingDirectory: directory });
-										});
-									}}
-								>
-									{t('settings.coder.choose')}
-								</Button>
-							</>
-						}
+								<>
+									<SettingsValue mono className="max-w-72">
+										{settings.workingDirectory}
+									</SettingsValue>
+									<Button
+										size="xs"
+										variant="outline"
+										disabled={saving}
+										onClick={() => {
+											void window.coder.pickDirectory().then((directory) => {
+												if (directory) save({ ...settings, workingDirectory: directory });
+											});
+										}}
+									>
+										{t('settings.coder.choose')}
+									</Button>
+								</>
+							}
 						/>
 					</>
 				)}
@@ -379,11 +398,13 @@ const CoderPage: React.FC = () => {
 				</SettingsNotice>
 			)}
 
-			{selectedProvider && !selectedProvider.configured && settings?.providerId !== 'openai-codex' && (
-				<SettingsNotice icon={AlertTriangle}>
-					{t('settings.coder.apiKeyMissing', { provider: selectedProvider.name })}
-				</SettingsNotice>
-			)}
+			{selectedProvider &&
+				!selectedProvider.configured &&
+				settings?.providerId !== 'openai-codex' && (
+					<SettingsNotice icon={AlertTriangle}>
+						{t('settings.coder.apiKeyMissing', { provider: selectedProvider.name })}
+					</SettingsNotice>
+				)}
 		</SettingsPageShell>
 	);
 };

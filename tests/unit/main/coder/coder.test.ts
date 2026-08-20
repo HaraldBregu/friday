@@ -76,9 +76,9 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 	});
 	const events: unknown[] = [];
 
-	await expect(coder.send(4, 'run-1', 'Inspect this project', (event) => events.push(event))).resolves.toBe(
-		'done'
-	);
+	await expect(
+		coder.send(4, 'run-1', 'Inspect this project', (event) => events.push(event))
+	).resolves.toBe('done');
 	expect(createAgentSession).toHaveBeenCalledWith(
 		expect.objectContaining({
 			model,

@@ -30,9 +30,7 @@ function normalizeSettings(value: unknown): CoderSettings {
 	const providerId = CODER_PROVIDER_IDS.includes(stored.providerId as CoderProviderId)
 		? (stored.providerId as CoderProviderId)
 		: DEFAULT_CODER_SETTINGS.providerId;
-	const thinkingLevel = CODER_THINKING_LEVELS.includes(
-		stored.thinkingLevel as CoderThinkingLevel
-	)
+	const thinkingLevel = CODER_THINKING_LEVELS.includes(stored.thinkingLevel as CoderThinkingLevel)
 		? (stored.thinkingLevel as CoderThinkingLevel)
 		: DEFAULT_CODER_SETTINGS.thinkingLevel;
 	const toolMode = CODER_TOOL_MODES.includes(stored.toolMode as CoderToolMode)

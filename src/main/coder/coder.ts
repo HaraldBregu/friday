@@ -21,11 +21,7 @@ import type {
 import { coderLocation } from './location';
 import { CoderStore } from './store';
 
-const SUPPORTED_PROVIDERS: readonly CoderProviderId[] = [
-	'openai-codex',
-	'openai',
-	'anthropic',
-];
+const SUPPORTED_PROVIDERS: readonly CoderProviderId[] = ['openai-codex', 'openai', 'anthropic'];
 const READ_ONLY_TOOLS = ['read', 'grep', 'find', 'ls'];
 const CODING_TOOLS = ['read', 'bash', 'edit', 'write', 'grep', 'find', 'ls'];
 const RUN_TIMEOUT_MS = 10 * 60 * 1000;
@@ -92,7 +88,8 @@ export class Coder {
 		windowId: number,
 		emit: (event: CoderAuthEvent) => void
 	): Promise<CoderAuthStatus> {
-		if (this.authControllers.has(windowId)) throw new Error('A Codex login is already in progress.');
+		if (this.authControllers.has(windowId))
+			throw new Error('A Codex login is already in progress.');
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), AUTH_TIMEOUT_MS);
 		this.authControllers.set(windowId, controller);
@@ -114,9 +111,7 @@ export class Coder {
 							type: 'device-code',
 							userCode: event.userCode,
 							verificationUri: event.verificationUri,
-							...(event.expiresInSeconds
-								? { expiresInSeconds: event.expiresInSeconds }
-								: {}),
+							...(event.expiresInSeconds ? { expiresInSeconds: event.expiresInSeconds } : {}),
 						});
 					} else if (event.type === 'auth_url') {
 						emit({
