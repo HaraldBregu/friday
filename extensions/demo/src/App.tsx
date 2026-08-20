@@ -54,6 +54,7 @@ const fallbackLanguage: AppLanguage = 'en';
 type DemoStorageValue = { label: string; count: number };
 const demoStorageKey = 'demo';
 const demoStorageFile = 'demo/message.txt';
+const demoStorageFileContent = 'Saved by the Friday demo extension.';
 const themeBadgeClass = cva(
 	'inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold',
 	{
@@ -152,62 +153,65 @@ export default function App() {
 		}
 	};
 
-	const testExtensionValueStorage = async () => {
+	const runStorageAction = async (action: () => Promise<string>) => {
 		if (!ensureFridayApp()) return;
 		setStorageBusy(true);
 		try {
-			const expected: DemoStorageValue = { label: 'Friday demo', count: 1 };
-			await app.setExtensionStoreValue(demoStorageKey, expected);
-			const stored = await app.getExtensionStoreValue<DemoStorageValue>(demoStorageKey);
-			if (stored?.label !== expected.label || stored.count !== expected.count) {
-				throw new Error('Stored value did not round-trip.');
-			}
-			await app.deleteExtensionStoreValue(demoStorageKey);
-			if ((await app.getExtensionStoreValue(demoStorageKey)) !== undefined) {
-				throw new Error('Deleted value is still available.');
-			}
-			setExtensionStoreValue(JSON.stringify(stored));
-			setStatus(text.storageValuePassed);
+			setStatus(await action());
 		} catch (error) {
 			setStatus(
-				`${text.storageTestFailed}: ${error instanceof Error ? error.message : String(error)}`
+				`${text.storageActionFailed}: ${error instanceof Error ? error.message : String(error)}`
 			);
 		} finally {
 			setStorageBusy(false);
 		}
 	};
 
-	const testExtensionFileStorage = async () => {
-		if (!ensureFridayApp()) return;
-		setStorageBusy(true);
-		try {
-			const encoder = new TextEncoder();
-			const decoder = new TextDecoder();
-			await app.writeExtensionStoreFile(demoStorageFile, encoder.encode('first'));
-			if (decoder.decode(await app.readExtensionStoreFile(demoStorageFile)) !== 'first') {
-				throw new Error('Stored file did not round-trip.');
-			}
-			await app.writeExtensionStoreFile(demoStorageFile, encoder.encode('overwritten'));
-			const stored = decoder.decode(await app.readExtensionStoreFile(demoStorageFile));
-			if (stored !== 'overwritten') throw new Error('Stored file was not overwritten.');
-			await app.deleteExtensionStoreFile(demoStorageFile);
-			let missingReadRejected = false;
-			try {
-				await app.readExtensionStoreFile(demoStorageFile);
-			} catch {
-				missingReadRejected = true;
-			}
-			if (!missingReadRejected) throw new Error('Deleted file is still available.');
-			setExtensionFileValue(stored);
-			setStatus(text.storageFilePassed);
-		} catch (error) {
-			setStatus(
-				`${text.storageTestFailed}: ${error instanceof Error ? error.message : String(error)}`
+	const storeExtensionValue = () =>
+		runStorageAction(async () => {
+			const value: DemoStorageValue = { label: 'Friday demo', count: 1 };
+			await app.setExtensionStoreValue(demoStorageKey, value);
+			setExtensionStoreValue(JSON.stringify(value));
+			return text.storageValueStored;
+		});
+
+	const loadExtensionValue = () =>
+		runStorageAction(async () => {
+			const value = await app.getExtensionStoreValue<DemoStorageValue>(demoStorageKey);
+			setExtensionStoreValue(value ? JSON.stringify(value) : '');
+			return value ? text.storageValueLoaded : text.storageValueMissing;
+		});
+
+	const deleteExtensionValue = () =>
+		runStorageAction(async () => {
+			await app.deleteExtensionStoreValue(demoStorageKey);
+			setExtensionStoreValue('');
+			return text.storageValueDeleted;
+		});
+
+	const saveExtensionFile = () =>
+		runStorageAction(async () => {
+			await app.writeExtensionStoreFile(
+				demoStorageFile,
+				new TextEncoder().encode(demoStorageFileContent)
 			);
-		} finally {
-			setStorageBusy(false);
-		}
-	};
+			setExtensionFileValue(demoStorageFileContent);
+			return text.storageFileSaved;
+		});
+
+	const readExtensionFile = () =>
+		runStorageAction(async () => {
+			const value = new TextDecoder().decode(await app.readExtensionStoreFile(demoStorageFile));
+			setExtensionFileValue(value);
+			return text.storageFileLoaded;
+		});
+
+	const deleteExtensionFile = () =>
+		runStorageAction(async () => {
+			await app.deleteExtensionStoreFile(demoStorageFile);
+			setExtensionFileValue('');
+			return text.storageFileDeleted;
+		});
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -288,19 +292,37 @@ export default function App() {
 					</div>
 					<div className="space-y-2">
 						<p className="text-sm font-semibold">{text.storage}</p>
-						<p className="break-all text-sm">
-							{text.storageValue}: {extensionStoreValue || text.storageEmpty}
-						</p>
-						<p className="break-all text-sm">
-							{text.storageFile}: {extensionFileValue || text.storageEmpty}
-						</p>
-						<div className="mt-2 flex flex-wrap gap-2">
-							<Button variant="outline" disabled={storageBusy} onClick={testExtensionValueStorage}>
-								{text.testStorageValue}
-							</Button>
-							<Button variant="secondary" disabled={storageBusy} onClick={testExtensionFileStorage}>
-								{text.testStorageFile}
-							</Button>
+						<div className="space-y-2">
+							<p className="break-all text-sm">
+								{text.storageValue}: {extensionStoreValue || text.storageEmpty}
+							</p>
+							<div className="flex flex-wrap gap-2">
+								<Button size="sm" variant="outline" disabled={storageBusy} onClick={storeExtensionValue}>
+									{text.storeStorageValue}
+								</Button>
+								<Button size="sm" variant="secondary" disabled={storageBusy} onClick={loadExtensionValue}>
+									{text.loadStorageValue}
+								</Button>
+								<Button size="sm" variant="destructive" disabled={storageBusy} onClick={deleteExtensionValue}>
+									{text.deleteStorageValue}
+								</Button>
+							</div>
+						</div>
+						<div className="space-y-2">
+							<p className="break-all text-sm">
+								{text.storageFile}: {extensionFileValue || text.storageEmpty}
+							</p>
+							<div className="flex flex-wrap gap-2">
+								<Button size="sm" variant="outline" disabled={storageBusy} onClick={saveExtensionFile}>
+									{text.saveStorageFile}
+								</Button>
+								<Button size="sm" variant="secondary" disabled={storageBusy} onClick={readExtensionFile}>
+									{text.readStorageFile}
+								</Button>
+								<Button size="sm" variant="destructive" disabled={storageBusy} onClick={deleteExtensionFile}>
+									{text.deleteStorageFile}
+								</Button>
+							</div>
 						</div>
 					</div>
 					<p className="text-sm text-muted-foreground">
