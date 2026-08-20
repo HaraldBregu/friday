@@ -72,17 +72,44 @@ const coderSettings = {
 	modelId: 'gpt-5.4',
 	thinkingLevel: 'high',
 	toolMode: 'coding',
-	workingDirectory: '/tmp/friday-workspace',
+};
+const coderProject = {
+	id: 'project-1',
+	name: 'friday-workspace',
+	directory: '/tmp/friday-workspace',
+	kind: 'agent-workspace',
+	createdAt: '2026-08-20T10:00:00.000Z',
+	lastOpenedAt: '2026-08-20T10:00:00.000Z',
+	available: true,
 };
 globalThis.coder = {
 	getSettings: async () => coderSettings,
 	saveSettings: async (settings) => settings,
 	listModels: async () => ({ providers: [] }),
-	pickDirectory: async () => '/tmp/friday-workspace',
-	send: async (_prompt, onEvent) => {
-		onEvent?.({ type: 'status', runId: 'coder-run', status: 'started' });
-		onEvent?.({ type: 'text-delta', runId: 'coder-run', delta: 'done' });
-		return 'done';
+	listProjects: async () => [coderProject],
+	addProject: async () => coderProject,
+	removeProject: async (projectId) => projectId === coderProject.id,
+	listSessions: async () => [],
+	getSession: async () => ({
+		session: {
+			id: 'session-1',
+			projectId: coderProject.id,
+			title: 'Fix the tests',
+			createdAt: '2026-08-20T10:00:00.000Z',
+			updatedAt: '2026-08-20T10:00:00.000Z',
+			messageCount: 2,
+		},
+		blocks: [],
+	}),
+	send: async (request, onEvent) => {
+		const context = {
+			runId: 'coder-run',
+			projectId: request.projectId,
+			sessionId: 'session-1',
+		};
+		onEvent?.({ ...context, type: 'status', status: 'started' });
+		onEvent?.({ ...context, type: 'text-delta', delta: 'done' });
+		return { projectId: request.projectId, sessionId: 'session-1', output: 'done' };
 	},
 	cancel: async (runId) => runId === 'coder-run',
 	connectCodex: async () => ({ configured: true, type: 'oauth' }),
@@ -140,10 +167,29 @@ await agent.deleteWorkspaceFile('old.md');
 await agent.deleteWorkspaceDirectory('archive');
 assert.deepEqual(await coder.getSettings(), coderSettings);
 const coderEvents = [];
-assert.equal(await coder.send('Fix the tests', (event) => coderEvents.push(event)), 'done');
+assert.deepEqual(await coder.listProjects(), [coderProject]);
+assert.deepEqual(
+	await coder.send(
+		{ projectId: coderProject.id, mode: 'agent', input: 'Fix the tests' },
+		(event) => coderEvents.push(event)
+	),
+	{ projectId: coderProject.id, sessionId: 'session-1', output: 'done' }
+);
 assert.deepEqual(coderEvents, [
-	{ type: 'status', runId: 'coder-run', status: 'started' },
-	{ type: 'text-delta', runId: 'coder-run', delta: 'done' },
+	{
+		type: 'status',
+		runId: 'coder-run',
+		projectId: coderProject.id,
+		sessionId: 'session-1',
+		status: 'started',
+	},
+	{
+		type: 'text-delta',
+		runId: 'coder-run',
+		projectId: coderProject.id,
+		sessionId: 'session-1',
+		delta: 'done',
+	},
 ]);
 assert.equal(await coder.cancel('coder-run'), true);
 assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open');

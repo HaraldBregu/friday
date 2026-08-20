@@ -78,9 +78,18 @@ await agent.deleteWorkspaceFile('old.md');
 await agent.deleteWorkspaceDirectory('archive');
 
 const settings = await coder.getSettings();
-const answer = await coder.send('Add focused tests for the current change.', (event) => {
+const projects = await coder.listProjects();
+const project = projects[0] ?? (await coder.addProject());
+if (!project) throw new Error('Choose a Coder project first.');
+const result = await coder.send({
+	projectId: project.id,
+	mode: 'agent',
+	input: 'Add focused tests for the current change.',
+}, (event) => {
 	if (event.type === 'text-delta') console.log(event.delta);
 });
+const sessions = await coder.listSessions(project.id);
+const snapshot = await coder.getSession(project.id, result.sessionId);
 const action = await win.showContextMenu([
 	{ type: 'role', role: 'copy' },
 	{ type: 'separator' },
@@ -95,15 +104,18 @@ const maximized = await win.isMaximized();
 
 - `app`: app data + settings APIs exposed by preload (`setTheme`, `getThemeData`, `getLanguage`, etc.)
 - `agent`: workspace APIs exposed by preload, including text reads, typed asset reads, and Markdown writes.
-- `coder`: embedded Pi coding-agent settings, model catalog, authentication, streaming runs, and cancellation.
+- `coder`: embedded Pi coding-agent projects, persistent sessions, Agent/Shell runs, settings, authentication, streaming, and cancellation.
 - `win`: embedded-only window APIs, including native context menus and window controls.
 - `connect()`: remote client for the app API and workspace agent APIs.
 - `isFriday()`: host check for in-app mode.
 - `ping()`: validate API reachability in remote mode.
 
-`coder` is intentionally embedded-only. It is not exposed by `connect()` because coding runs can
-execute tools with the desktop user's authority. Extensions receive redacted streaming events and
-never receive provider credentials.
+`coder` is intentionally embedded-only. `addProject()` opens Friday's native folder picker, and all
+runs use an opaque main-owned project ID rather than accepting a filesystem path from an extension.
+Agent conversations persist per project; Shell mode records non-interactive commands in the same
+session but is not a PTY. A project's directory is the default cwd, not a security sandbox: coding
+tools can execute with the desktop user's authority. Extensions receive redacted agent-tool events
+and never receive provider credentials. Coder is not exposed by `connect()`.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.
