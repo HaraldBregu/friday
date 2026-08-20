@@ -2,7 +2,7 @@
 	"name": "friday-coder",
 	"private": true,
 	"version": "1.0.0",
-	"description": "A terminal-first Pi coding agent for Friday.",
+	"description": "A project-based Pi coding agent with persistent sessions for Friday.",
 	"keywords": [
 		"utility"
 	],

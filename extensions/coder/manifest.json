@@ -1,6 +1,6 @@
 {
 	"title": "Coder",
-	"description": "A terminal-first Pi coding agent with streamed tool activity and workspace context.",
+	"description": "A project-based Pi coding agent with persistent sessions and recorded shell commands.",
 	"metadata": {
 		"version": "1.0.0",
 		"category": "utility",
