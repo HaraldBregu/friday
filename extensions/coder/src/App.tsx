@@ -1,49 +1,46 @@
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { Console } from '@/components/console';
+import { Header } from '@/components/header';
 import { Sidebar } from '@/components/sidebar';
-import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Workspace } from '@/components/workspace';
 import { useCoderWorkspace } from '@/hooks/workspace';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function App() {
 	useTheme();
 	const coder = useCoderWorkspace();
+	const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 759px)').matches);
+
+	useEffect(() => {
+		const media = window.matchMedia('(max-width: 759px)');
+		const update = () => setMobile(media.matches);
+		media.addEventListener('change', update);
+		if (media.matches) coder.setLeftOpen(false);
+		return () => media.removeEventListener('change', update);
+	}, []);
 
 	return (
-		<main
-			className="coder-shell"
-			data-left-open={coder.leftOpen}
-			style={{ gridTemplateColumns: `${coder.leftOpen ? '248px' : '0px'} minmax(320px, 1fr)` }}
-		>
-			<aside className="coder-left" aria-label="Coder configuration">
-				<Sidebar coder={coder} />
-			</aside>
-
-			<section className="coder-main">
-				<header className="terminal-titlebar">
-					<div className="terminal-titlebar-left">
-						<Button
-							variant="ghost"
-							size="icon"
-							aria-label={coder.leftOpen ? 'Hide left sidebar' : 'Show left sidebar'}
-							onClick={() => coder.setLeftOpen(!coder.leftOpen)}
-						>
-							{coder.leftOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-						</Button>
-						<span className="terminal-window-dots" aria-hidden="true">
-							<i />
-							<i />
-							<i />
-						</span>
-					</div>
-					<strong>{coder.workspaceName} — Pi Coder</strong>
-					<span className={`coder-run-state coder-run-state--${coder.runState}`}>
-						<i aria-hidden="true" /> {coder.runLabel}
-					</span>
-				</header>
-				<Console coder={coder} />
-			</section>
-		</main>
+		<TooltipProvider>
+			<main className="flex h-full min-h-0 bg-background text-foreground">
+				{!mobile && coder.leftOpen ? (
+					<aside className="w-72 shrink-0 border-r" aria-label="Coder projects and sessions">
+						<Sidebar coder={coder} />
+					</aside>
+				) : null}
+				{mobile ? (
+					<Sheet open={coder.leftOpen} onOpenChange={coder.setLeftOpen}>
+						<SheetContent>
+							<Sidebar coder={coder} />
+						</SheetContent>
+					</Sheet>
+				) : null}
+				<section className="flex min-w-0 flex-1 flex-col">
+					<Header coder={coder} />
+					<Workspace coder={coder} />
+				</section>
+			</main>
+		</TooltipProvider>
 	);
 }
