@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, mkdirSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, realpathSync, symlinkSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { CoderProjectStore } from '../../../../src/main/coder/projects';
@@ -15,7 +15,7 @@ it('persists canonical external projects and removes only their metadata', () =>
 	expect(seeded).toHaveLength(1);
 	expect(seeded[0]).toMatchObject({
 		name: 'project',
-		directory: projectDirectory,
+		directory: realpathSync.native(projectDirectory),
 		kind: 'external',
 		available: true,
 	});
