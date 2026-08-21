@@ -9,20 +9,35 @@ import { useTheme } from '@/hooks/use-theme';
 export default function App() {
 	useTheme();
 	const coder = useCoderWorkspace();
+	const [page, setPage] = useState<'workspace' | 'configuration'>('workspace');
 
 	return (
 		<TooltipProvider>
 			<SidebarProvider open={coder.leftOpen} onOpenChange={coder.setLeftOpen}>
 				<main className="flex h-full min-h-0 w-full bg-background text-foreground">
 					<Sidebar aria-label="Coder workspaces and sessions">
-						<ProjectSidebar coder={coder} />
+						<ProjectSidebar
+							coder={coder}
+							configurationOpen={page === 'configuration'}
+							onOpenConfiguration={() => setPage('configuration')}
+							onOpenWorkspace={() => setPage('workspace')}
+						/>
 					</Sidebar>
 					<SidebarInset>
-						<Header coder={coder} />
-						<Workspace coder={coder} />
+						{page === 'configuration' ? (
+							<Configuration onDone={() => setPage('workspace')} />
+						) : (
+							<>
+								<Header coder={coder} />
+								<Workspace coder={coder} />
+							</>
+						)}
 					</SidebarInset>
 				</main>
 			</SidebarProvider>
 		</TooltipProvider>
 	);
 }
+import { useState } from 'react';
+
+import { Configuration } from '@/components/configuration';

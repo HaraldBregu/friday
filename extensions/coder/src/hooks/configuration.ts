@@ -98,6 +98,9 @@ export function useConfiguration() {
 			setConnecting(false);
 		}
 	};
+	const cancelConnect = async (): Promise<void> => {
+		await coder.cancelCodexLogin();
+	};
 
 	const selectedProvider = catalog.providers.find((item) => item.id === settings?.providerId);
 	return {
@@ -110,6 +113,7 @@ export function useConfiguration() {
 		settings,
 		selectedProvider,
 		connect,
+		cancelConnect,
 		disconnect,
 		setModel,
 		setProvider,

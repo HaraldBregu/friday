@@ -1,4 +1,4 @@
-import { ChevronRight, FolderGit2, FolderPlus, Search } from 'lucide-react';
+import { ChevronRight, FolderGit2, FolderPlus, Search, Settings } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -7,7 +7,17 @@ import { SidebarContent, SidebarHeader } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CoderController } from '@/controller';
 
-export function ProjectSidebar({ coder }: { coder: CoderController }) {
+export function ProjectSidebar({
+	coder,
+	configurationOpen,
+	onOpenConfiguration,
+	onOpenWorkspace,
+}: {
+	coder: CoderController;
+	configurationOpen: boolean;
+	onOpenConfiguration: () => void;
+	onOpenWorkspace: () => void;
+}) {
 	const query = coder.query.trim().toLowerCase();
 	const visibleProjects = coder.projects.filter((project) => {
 		const projectMatches = `${project.name} ${project.directory}`.toLowerCase().includes(query);
@@ -20,7 +30,7 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 	return (
 		<>
 			<SidebarHeader className="px-2 pb-2 pt-2">
-				<div className="flex h-9 items-center gap-2">
+				<div className="flex min-h-9 items-center gap-1 group-data-[state=collapsed]/sidebar:flex-col">
 					<div className="flex min-w-0 flex-1 items-center gap-2 group-data-[state=collapsed]/sidebar:hidden">
 						<FolderGit2 className="size-4 text-muted-foreground" />
 						<span className="truncate text-xs font-medium">Coder</span>
@@ -41,6 +51,22 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 							}
 						/>
 						<TooltipContent>Add workspace</TooltipContent>
+					</Tooltip>
+					<Tooltip>
+						<TooltipTrigger
+							render={
+								<Button
+									variant={configurationOpen ? 'secondary' : 'ghost'}
+									size="icon-sm"
+									className="group-data-[state=collapsed]/sidebar:mx-auto"
+									aria-label="Open Coder configuration"
+									onClick={onOpenConfiguration}
+								>
+									<Settings />
+								</Button>
+							}
+						/>
+						<TooltipContent>Configuration</TooltipContent>
 					</Tooltip>
 				</div>
 				<div className="relative group-data-[state=collapsed]/sidebar:hidden">
@@ -83,7 +109,10 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 															className="h-8 min-w-0 flex-1 justify-start gap-2 px-2 text-left font-normal group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:p-0"
 															aria-current={project.id === coder.activeProjectId ? 'location' : undefined}
 															disabled={coder.runState === 'running'}
-															onClick={() => void coder.selectProject(project.id)}
+															onClick={() => {
+																onOpenWorkspace();
+																void coder.selectProject(project.id);
+															}}
 														>
 															<FolderGit2 className={`size-3.5 ${project.available ? '' : 'text-destructive'}`} />
 															<span className="truncate text-xs group-data-[state=collapsed]/sidebar:hidden">
@@ -105,7 +134,10 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 															className="h-7 w-full justify-start px-2 text-left text-[11px] font-normal"
 															aria-current={session.id === coder.activeSessionId ? 'page' : undefined}
 															disabled={coder.runState === 'running'}
-															onClick={() => void coder.selectSession(project.id, session.id)}
+															onClick={() => {
+																onOpenWorkspace();
+																void coder.selectSession(project.id, session.id);
+															}}
 														>
 															<span className="truncate">{session.title}</span>
 														</Button>
