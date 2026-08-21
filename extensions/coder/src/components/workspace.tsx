@@ -73,7 +73,9 @@ export function Workspace({ coder }: { coder: CoderController }) {
 					</Empty>
 				) : coder.blocks.length === 0 ? (
 					<Empty>
-						<p className="text-xs text-muted-foreground">Start with a prompt or switch to Command.</p>
+						<p className="text-xs text-muted-foreground">
+							Start with a prompt or switch to Command.
+						</p>
 					</Empty>
 				) : (
 					<Blocks coder={coder} />

@@ -15,8 +15,7 @@ export function DropdownMenuContent({
 	sideOffset = 4,
 	className,
 	...props
-}: MenuPrimitive.Popup.Props &
-	Pick<MenuPrimitive.Positioner.Props, 'align' | 'sideOffset'>) {
+}: MenuPrimitive.Popup.Props & Pick<MenuPrimitive.Positioner.Props, 'align' | 'sideOffset'>) {
 	return (
 		<MenuPrimitive.Portal>
 			<MenuPrimitive.Positioner align={align} sideOffset={sideOffset} className="z-50">
@@ -49,9 +48,8 @@ export function DropdownMenuItem({
 	);
 }
 
-export function DropdownMenuSeparator({
-	className,
-	...props
-}: MenuPrimitive.Separator.Props) {
-	return <MenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />;
+export function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.Props) {
+	return (
+		<MenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />
+	);
 }

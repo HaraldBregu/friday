@@ -156,7 +156,9 @@ it('rejects Coder access from other extensions', async () => {
 		expect.objectContaining({ success: false })
 	);
 	expect(coder.send).not.toHaveBeenCalled();
-	await expect(listModels({ sender })).resolves.toEqual(expect.objectContaining({ success: false }));
+	await expect(listModels({ sender })).resolves.toEqual(
+		expect.objectContaining({ success: false })
+	);
 });
 
 it('allows configuration and authentication from the host and Coder extension only', async () => {

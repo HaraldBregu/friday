@@ -19,7 +19,8 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 	const configuration = useConfiguration();
 	const settings = configuration.settings;
 	const provider = configuration.selectedProvider;
-	const deviceCode = configuration.authEvent?.type === 'device-code' ? configuration.authEvent : null;
+	const deviceCode =
+		configuration.authEvent?.type === 'device-code' ? configuration.authEvent : null;
 	const authUrl =
 		configuration.authEvent?.type === 'device-code'
 			? configuration.authEvent.verificationUri
@@ -32,8 +33,12 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 			<header className="flex h-11 shrink-0 items-center gap-2 px-3">
 				<SidebarTrigger />
 				<h1 className="flex-1 text-xs font-medium">Configuration</h1>
-				{configuration.saving ? <span className="text-[11px] text-muted-foreground">Saving…</span> : null}
-				<Button variant="ghost" size="sm" onClick={onDone}>Done</Button>
+				{configuration.saving ? (
+					<span className="text-[11px] text-muted-foreground">Saving…</span>
+				) : null}
+				<Button variant="ghost" size="sm" onClick={onDone}>
+					Done
+				</Button>
 			</header>
 
 			<div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-4 sm:px-6">
@@ -54,7 +59,10 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								<Setting title="Provider">
 									<Choice
 										value={settings.providerId}
-										options={configuration.catalog.providers.map((item) => ({ value: item.id, label: item.name }))}
+										options={configuration.catalog.providers.map((item) => ({
+											value: item.id,
+											label: item.name,
+										}))}
 										disabled={configuration.saving}
 										onChange={(value) => configuration.setProvider(value as CoderProviderId)}
 									/>
@@ -62,7 +70,10 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								<Setting title="Model">
 									<Choice
 										value={settings.modelId}
-										options={(provider?.models ?? []).map((model) => ({ value: model.id, label: model.name }))}
+										options={(provider?.models ?? []).map((model) => ({
+											value: model.id,
+											label: model.name,
+										}))}
 										disabled={configuration.saving || !provider?.models.length}
 										onChange={configuration.setModel}
 									/>
@@ -70,7 +81,11 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								<Setting title="Thinking">
 									<Choice
 										value={settings.thinkingLevel}
-										options={CODER_THINKING_LEVELS.map((level) => ({ value: level, label: level === 'xhigh' ? 'Extra high' : level[0].toUpperCase() + level.slice(1) }))}
+										options={CODER_THINKING_LEVELS.map((level) => ({
+											value: level,
+											label:
+												level === 'xhigh' ? 'Extra high' : level[0].toUpperCase() + level.slice(1),
+										}))}
 										disabled={configuration.saving}
 										onChange={(value) => configuration.setThinking(value as CoderThinkingLevel)}
 									/>
@@ -78,7 +93,10 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								<Setting title="Tools" description="Controls which Pi tools can run">
 									<Choice
 										value={settings.toolMode}
-										options={[{ value: 'read-only', label: 'Read only' }, { value: 'coding', label: 'Coding' }]}
+										options={[
+											{ value: 'read-only', label: 'Read only' },
+											{ value: 'coding', label: 'Coding' },
+										]}
 										disabled={configuration.saving}
 										onChange={(value) => configuration.setTools(value as CoderToolMode)}
 									/>
@@ -104,13 +122,26 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								</span>
 								{provider.id === 'openai-codex' ? (
 									provider.configured ? (
-										<Button variant="outline" size="sm" disabled={configuration.connecting} onClick={() => void configuration.disconnect()}>
+										<Button
+											variant="outline"
+											size="sm"
+											disabled={configuration.connecting}
+											onClick={() => void configuration.disconnect()}
+										>
 											Disconnect
 										</Button>
 									) : configuration.connecting ? (
-										<Button variant="outline" size="sm" onClick={() => void configuration.cancelConnect()}>Cancel</Button>
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => void configuration.cancelConnect()}
+										>
+											Cancel
+										</Button>
 									) : (
-										<Button size="sm" onClick={() => void configuration.connect()}>Connect</Button>
+										<Button size="sm" onClick={() => void configuration.connect()}>
+											Connect
+										</Button>
 									)
 								) : null}
 							</Setting>
@@ -121,10 +152,26 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 						<Alert>
 							<div className="space-y-2 text-xs">
 								<p>Enter this device code on the OpenAI sign-in page:</p>
-								<code className="block select-all font-mono text-lg font-semibold tracking-widest">{deviceCode.userCode}</code>
+								<code className="block select-all font-mono text-lg font-semibold tracking-widest">
+									{deviceCode.userCode}
+								</code>
 								<div className="flex flex-wrap gap-2">
-									<Button variant="outline" size="sm" onClick={() => void navigator.clipboard.writeText(deviceCode.userCode)}><Copy /> Copy code</Button>
-									{authUrl ? <Button variant="outline" size="sm" onClick={() => void app.openExternalUrl(authUrl)}><ExternalLink /> Open sign-in</Button> : null}
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => void navigator.clipboard.writeText(deviceCode.userCode)}
+									>
+										<Copy /> Copy code
+									</Button>
+									{authUrl ? (
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={() => void app.openExternalUrl(authUrl)}
+										>
+											<ExternalLink /> Open sign-in
+										</Button>
+									) : null}
 								</div>
 								<p className="text-muted-foreground">Waiting for authorization…</p>
 							</div>
@@ -132,9 +179,15 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 					) : null}
 
 					{settings?.toolMode === 'coding' ? (
-						<Alert className="text-destructive"><AlertTriangle /> Coding tools run with your desktop account permissions.</Alert>
+						<Alert className="text-destructive">
+							<AlertTriangle /> Coding tools run with your desktop account permissions.
+						</Alert>
 					) : null}
-					{configuration.error ? <Alert className="text-destructive"><AlertTriangle /> {configuration.error}</Alert> : null}
+					{configuration.error ? (
+						<Alert className="text-destructive">
+							<AlertTriangle /> {configuration.error}
+						</Alert>
+					) : null}
 				</div>
 			</div>
 		</div>

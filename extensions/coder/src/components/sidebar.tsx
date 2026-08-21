@@ -99,7 +99,9 @@ export function ProjectSidebar({
 												className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[state=collapsed]/sidebar:hidden"
 												aria-label={`${expanded ? 'Collapse' : 'Expand'} ${project.name}`}
 											>
-												<ChevronRight className={`size-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+												<ChevronRight
+													className={`size-3.5 transition-transform ${expanded ? 'rotate-90' : ''}`}
+												/>
 											</CollapsibleTrigger>
 											<Tooltip>
 												<TooltipTrigger
@@ -107,21 +109,27 @@ export function ProjectSidebar({
 														<Button
 															variant={project.id === coder.activeProjectId ? 'secondary' : 'ghost'}
 															className="h-8 min-w-0 flex-1 justify-start gap-2 px-2 text-left font-normal group-data-[state=collapsed]/sidebar:size-8 group-data-[state=collapsed]/sidebar:p-0"
-															aria-current={project.id === coder.activeProjectId ? 'location' : undefined}
+															aria-current={
+																project.id === coder.activeProjectId ? 'location' : undefined
+															}
 															disabled={coder.runState === 'running'}
 															onClick={() => {
 																onOpenWorkspace();
 																void coder.selectProject(project.id);
 															}}
 														>
-															<FolderGit2 className={`size-3.5 ${project.available ? '' : 'text-destructive'}`} />
+															<FolderGit2
+																className={`size-3.5 ${project.available ? '' : 'text-destructive'}`}
+															/>
 															<span className="truncate text-xs group-data-[state=collapsed]/sidebar:hidden">
 																{project.name}
 															</span>
 														</Button>
 													}
 												/>
-												<TooltipContent>{project.available ? project.directory : 'Unavailable'}</TooltipContent>
+												<TooltipContent>
+													{project.available ? project.directory : 'Unavailable'}
+												</TooltipContent>
 											</Tooltip>
 										</div>
 
@@ -132,7 +140,9 @@ export function ProjectSidebar({
 														<Button
 															variant={session.id === coder.activeSessionId ? 'secondary' : 'ghost'}
 															className="h-7 w-full justify-start px-2 text-left text-[11px] font-normal"
-															aria-current={session.id === coder.activeSessionId ? 'page' : undefined}
+															aria-current={
+																session.id === coder.activeSessionId ? 'page' : undefined
+															}
 															disabled={coder.runState === 'running'}
 															onClick={() => {
 																onOpenWorkspace();

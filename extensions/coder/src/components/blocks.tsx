@@ -98,7 +98,9 @@ function ToolBlock({ block }: { block: Extract<CoderBlock, { type: 'tool' }> }) 
 		<div className="px-4 py-1 sm:px-6">
 			<div className="mx-auto flex max-w-4xl items-center gap-2 text-[11px] text-muted-foreground">
 				{icon}
-				<span className={block.status === 'failed' ? 'text-destructive' : ''}>{block.toolName}</span>
+				<span className={block.status === 'failed' ? 'text-destructive' : ''}>
+					{block.toolName}
+				</span>
 				{block.status !== 'succeeded' ? <span>· {block.status}</span> : null}
 			</div>
 		</div>
@@ -142,7 +144,12 @@ function CommandBlock({
 					<DropdownMenu>
 						<DropdownMenuTrigger
 							render={
-								<Button variant="ghost" size="icon-sm" className="size-7" aria-label="Command actions">
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									className="size-7"
+									aria-label="Command actions"
+								>
 									<MoreHorizontal />
 								</Button>
 							}
