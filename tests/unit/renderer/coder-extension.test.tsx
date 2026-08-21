@@ -6,6 +6,7 @@ import { useConfiguration } from '../../../extensions/coder/src/hooks/configurat
 jest.mock('@friday/sdk', () => ({
 	isFriday: () => true,
 	app: {
+		openExternalUrl: jest.fn(),
 		getExtensionStoreValue: jest.fn(),
 		setExtensionStoreValue: jest.fn(),
 		deleteExtensionStoreValue: jest.fn(),
