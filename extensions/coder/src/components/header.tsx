@@ -1,7 +1,13 @@
-import { Bot, Plus, TerminalSquare } from 'lucide-react';
+import { Copy, FolderOpen, LoaderCircle, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CoderController } from '@/controller';
@@ -9,50 +15,58 @@ import type { CoderController } from '@/controller';
 export function Header({ coder }: { coder: CoderController }) {
 	const session = coder.sessions.find((item) => item.id === coder.activeSessionId);
 	return (
-		<header className="flex h-12 shrink-0 items-center gap-3 border-b bg-background px-3">
+		<header className="flex h-11 shrink-0 items-center gap-2 bg-background px-3">
 			<SidebarTrigger />
 
-			<div className="flex min-w-0 flex-1 items-center gap-2">
-				{coder.mode === 'agent' ? (
-					<Bot className="size-4 shrink-0 text-muted-foreground" />
-				) : (
-					<TerminalSquare className="size-4 shrink-0 text-muted-foreground" />
-				)}
-				<div className="min-w-0">
-					<div className="flex min-w-0 items-center gap-1.5 text-xs font-medium">
-						<span className="truncate">{coder.activeProject?.name ?? 'Coder'}</span>
-						<span className="text-muted-foreground">/</span>
-						<span className="truncate text-muted-foreground">
-							{session?.title ?? 'New session'}
-						</span>
-					</div>
-					<p className="truncate font-mono text-[10px] text-muted-foreground">
-						{coder.activeProject?.directory ?? 'Open a project to begin'}
-					</p>
-				</div>
+			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs">
+				<span className="truncate font-medium">{coder.activeProject?.name ?? 'Coder'}</span>
+				<span className="text-muted-foreground">/</span>
+				<span className="truncate text-muted-foreground">{session?.title ?? 'New session'}</span>
 			</div>
 
-			<Badge
-				variant={
-					coder.runState === 'error'
-						? 'destructive'
-						: coder.runState === 'running'
-							? 'secondary'
-							: 'outline'
-				}
-				className="hidden sm:inline-flex"
-			>
-				<span
-					className={`size-1.5 rounded-full ${coder.runState === 'running' ? 'animate-pulse bg-command' : coder.runState === 'error' ? 'bg-destructive' : 'bg-foreground/50'}`}
-				/>
-				{coder.runLabel}
-			</Badge>
+			{coder.runState === 'running' ? (
+				<span className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
+					<LoaderCircle className="size-3 animate-spin" /> {coder.runLabel}
+				</span>
+			) : coder.runState === 'error' ? (
+				<span className="hidden text-[11px] text-destructive sm:block">{coder.runLabel}</span>
+			) : null}
+
+			{coder.activeProject ? (
+				<DropdownMenu>
+					<DropdownMenuTrigger
+						render={
+							<Button variant="ghost" size="icon-sm" aria-label="Workspace actions">
+								<MoreHorizontal />
+							</Button>
+						}
+					/>
+					<DropdownMenuContent>
+						<DropdownMenuItem onClick={() => void coder.openProject(coder.activeProject!.id)}>
+							<FolderOpen /> Open folder
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => void navigator.clipboard.writeText(coder.activeProject!.directory)}
+						>
+							<Copy /> Copy path
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							variant="destructive"
+							disabled={coder.runState === 'running'}
+							onClick={() => void coder.removeProject(coder.activeProject!.id)}
+						>
+							<Trash2 /> Remove workspace
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			) : null}
 
 			<Tooltip>
 				<TooltipTrigger
 					render={
 						<Button
-							variant="outline"
+							variant="ghost"
 							size="icon-sm"
 							aria-label="New coding session"
 							disabled={!coder.activeProject || coder.runState === 'running'}
