@@ -1,5 +1,6 @@
 import {
 	CODER_THINKING_LEVELS,
+	app,
 	type CoderProviderId,
 	type CoderThinkingLevel,
 	type CoderToolMode,
