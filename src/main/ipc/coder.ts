@@ -22,23 +22,17 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 				throw new Error('Coder is only available to the Coder extension.');
 			}
 		};
-		const assertHostCaller = (event: Electron.IpcMainInvokeEvent): void => {
-			if (extensionRegistry.has(event.sender)) {
-				throw new Error('Coder configuration is unavailable to extension views.');
-			}
-		};
-
 		registerQueryWithEvent(CoderChannels.getSettings, (event) => {
 			assertCoderCaller(event);
 			return coder.getSettings();
 		});
 		registerCommandWithEvent(CoderChannels.saveSettings, (event, settings) => {
-			assertHostCaller(event);
+			assertCoderCaller(event);
 			if (!isCoderSettings(settings)) throw new Error('Invalid coder settings.');
 			return coder.saveSettings(settings);
 		});
 		registerQueryWithEvent(CoderChannels.listModels, (event) => {
-			assertHostCaller(event);
+			assertCoderCaller(event);
 			return coder.listModels();
 		});
 		registerQueryWithEvent(CoderChannels.listProjects, (event) => {
@@ -142,7 +136,7 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			return coder.cancel(runId.trim(), event.sender.id);
 		});
 		registerCommandWithEvent(CoderChannels.connectCodex, (event) => {
-			assertHostCaller(event);
+			assertCoderCaller(event);
 			const callerId = event.sender.id;
 			const cancel = (): void => {
 				coder.cancelCodexLogin(callerId);
@@ -155,11 +149,11 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 				.finally(() => event.sender.removeListener('destroyed', cancel));
 		});
 		registerCommandWithEvent(CoderChannels.cancelCodexLogin, (event) => {
-			assertHostCaller(event);
+			assertCoderCaller(event);
 			return coder.cancelCodexLogin(event.sender.id);
 		});
 		registerCommandWithEvent(CoderChannels.disconnectCodex, (event) => {
-			assertHostCaller(event);
+			assertCoderCaller(event);
 			return coder.disconnectCodex();
 		});
 	}

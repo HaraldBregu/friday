@@ -122,7 +122,9 @@ Agent conversations persist per project; Shell mode records non-interactive comm
 session but is not a PTY. A project's directory is the default cwd, not a security sandbox: coding
 tools can execute with the desktop user's authority. Extensions receive redacted agent-tool events
 and never receive provider credentials. Project opening and session mutation also resolve opaque IDs
-inside the main process. Coder is not exposed by `connect()`.
+inside the main process. The registered Coder extension may read and save non-secret runtime settings,
+list the Pi model catalog, and run Codex OAuth; other extensions are rejected. Coder is not exposed by
+`connect()`.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.

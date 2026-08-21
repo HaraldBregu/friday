@@ -155,7 +155,7 @@ it('rejects Coder access from other extensions', async () => {
 	expect(coder.send).not.toHaveBeenCalled();
 });
 
-it('keeps configuration and authentication host-only', async () => {
+it('allows configuration and authentication from the host and Coder extension only', async () => {
 	const connectCodex = jest.fn((_owner, emit) => {
 		emit({ type: 'progress', message: 'Waiting' });
 		return Promise.resolve({ configured: true, type: 'oauth' });
@@ -186,8 +186,15 @@ it('keeps configuration and authentication host-only', async () => {
 	expect(sender.removeListener).toHaveBeenCalledWith('destroyed', expect.any(Function));
 
 	extensionRegistry.has.mockReturnValue(true);
+	(extensionRegistry as { resolve?: jest.Mock }).resolve = jest.fn().mockReturnValue('coder');
+	await expect(handler(CoderChannels.listModels)({ sender })).resolves.toEqual({
+		success: true,
+		data: { providers: [] },
+	});
+	expect(coder.listModels).toHaveBeenCalled();
+
+	(extensionRegistry.resolve as jest.Mock).mockReturnValue('demo');
 	await expect(handler(CoderChannels.listModels)({ sender })).resolves.toEqual(
 		expect.objectContaining({ success: false })
 	);
-	expect(coder.listModels).not.toHaveBeenCalled();
 });
