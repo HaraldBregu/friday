@@ -367,12 +367,16 @@ export function useCoderWorkspace(): CoderController {
 		setBusy(true);
 		setError('');
 		try {
-			const nextProjects = await coderApi.listProjects();
+			const [nextSettings, nextProjects] = await Promise.all([
+				coderApi.getSettings(),
+				coderApi.listProjects(),
+			]);
 			const groupedSessions = await Promise.all(
 				nextProjects.map(
 					async (project) => [project.id, await coderApi.listSessions(project.id)] as const
 				)
 			);
+			setSettings(nextSettings);
 			setProjects(nextProjects);
 			setSessionsByProject(Object.fromEntries(groupedSessions));
 		} catch (reason) {

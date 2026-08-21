@@ -25,7 +25,12 @@ export default function App() {
 					</Sidebar>
 					<SidebarInset>
 						{page === 'configuration' ? (
-							<Configuration onDone={() => setPage('workspace')} />
+							<Configuration
+								onDone={() => {
+									void coder.refresh();
+									setPage('workspace');
+								}}
+							/>
 						) : (
 							<>
 								<Header coder={coder} />
