@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
 	app,
 	coder,
+	isFriday,
 	type CoderAuthEvent,
 	type CoderCatalog,
 	type CoderProviderId,
@@ -10,18 +11,48 @@ import {
 	type CoderToolMode,
 } from '@friday/sdk';
 
+const previewSettings: CoderSettings = {
+	runtime: 'pi',
+	providerId: 'openai-codex',
+	modelId: 'gpt-5.4',
+	thinkingLevel: 'high',
+	toolMode: 'coding',
+};
+const previewCatalog: CoderCatalog = {
+	providers: [
+		{
+			id: 'openai-codex',
+			name: 'OpenAI Codex',
+			authentication: 'oauth',
+			configured: true,
+			models: [
+				{
+					id: 'gpt-5.4',
+					name: 'GPT-5.4',
+					reasoning: true,
+					contextWindow: 200000,
+				},
+			],
+		},
+	],
+};
+
 export function useConfiguration() {
-	const [settings, setSettings] = useState<CoderSettings | null>(null);
-	const [catalog, setCatalog] = useState<CoderCatalog>({ providers: [] });
-	const [loading, setLoading] = useState(true);
+	const preview = !isFriday();
+	const [settings, setSettings] = useState<CoderSettings | null>(preview ? previewSettings : null);
+	const [catalog, setCatalog] = useState<CoderCatalog>(preview ? previewCatalog : { providers: [] });
+	const [loading, setLoading] = useState(!preview);
 	const [saving, setSaving] = useState(false);
 	const [connecting, setConnecting] = useState(false);
 	const [authEvent, setAuthEvent] = useState<CoderAuthEvent | null>(null);
 	const [error, setError] = useState('');
 
-	const refreshCatalog = async (): Promise<void> => setCatalog(await coder.listModels());
+	const refreshCatalog = async (): Promise<void> => {
+		if (!preview) setCatalog(await coder.listModels());
+	};
 	const save = async (next: CoderSettings): Promise<void> => {
 		setSettings(next);
+		if (preview) return;
 		setSaving(true);
 		setError('');
 		try {
@@ -34,6 +65,7 @@ export function useConfiguration() {
 	};
 
 	useEffect(() => {
+		if (preview) return;
 		let active = true;
 		void Promise.all([coder.getSettings(), coder.listModels()])
 			.then(([nextSettings, nextCatalog]) => {
@@ -50,7 +82,7 @@ export function useConfiguration() {
 		return () => {
 			active = false;
 		};
-	}, []);
+	}, [preview]);
 
 	const setProvider = (providerId: CoderProviderId): void => {
 		if (!settings) return;
@@ -70,6 +102,7 @@ export function useConfiguration() {
 		if (settings) void save({ ...settings, toolMode });
 	};
 	const connect = async (): Promise<void> => {
+		if (preview) return;
 		setConnecting(true);
 		setAuthEvent(null);
 		setError('');
@@ -87,6 +120,7 @@ export function useConfiguration() {
 		}
 	};
 	const disconnect = async (): Promise<void> => {
+		if (preview) return;
 		setConnecting(true);
 		setError('');
 		try {
@@ -99,7 +133,7 @@ export function useConfiguration() {
 		}
 	};
 	const cancelConnect = async (): Promise<void> => {
-		await coder.cancelCodexLogin();
+		if (!preview) await coder.cancelCodexLogin();
 	};
 
 	const selectedProvider = catalog.providers.find((item) => item.id === settings?.providerId);
