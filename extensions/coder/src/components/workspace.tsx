@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, FolderOpen, MessageSquarePlus, TriangleAlert } from 'lucide-react';
+import { ArrowDown, FolderOpen, TriangleAlert } from 'lucide-react';
 
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Empty } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Blocks } from '@/components/blocks';
 import { Composer } from '@/components/composer';
 import type { CoderController } from '@/controller';
@@ -36,20 +37,18 @@ export function Workspace({ coder }: { coder: CoderController }) {
 				}}
 			>
 				{coder.loading ? (
-					<div className="space-y-4 p-6">
-						<Skeleton className="h-20 w-3/4" />
-						<Skeleton className="h-28 w-full" />
-						<Skeleton className="h-16 w-2/3" />
+					<div className="mx-auto max-w-4xl space-y-3 p-6">
+						<Skeleton className="h-4 w-1/3" />
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="h-4 w-4/5" />
 					</div>
 				) : !coder.activeProject ? (
 					<Empty>
-						<div className="grid size-10 place-items-center rounded-lg bg-muted">
-							<FolderOpen className="size-5" />
-						</div>
+						<FolderOpen className="size-5 text-muted-foreground" />
 						<div>
 							<h1 className="text-sm font-medium">Open a project</h1>
 							<p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
-								Choose Friday’s workspace or any folder you want Pi to use as its working directory.
+								Choose a folder to start coding.
 							</p>
 						</div>
 						<Button onClick={() => void coder.addProject()} disabled={coder.busy}>
@@ -74,16 +73,7 @@ export function Workspace({ coder }: { coder: CoderController }) {
 					</Empty>
 				) : coder.blocks.length === 0 ? (
 					<Empty>
-						<div className="grid size-10 place-items-center rounded-lg bg-muted">
-							<MessageSquarePlus className="size-5" />
-						</div>
-						<div>
-							<h1 className="text-sm font-medium">Start a coding session</h1>
-							<p className="mt-1 max-w-md text-xs leading-5 text-muted-foreground">
-								Ask Pi to inspect the project, implement a change, debug a failure, or switch to
-								Shell for a direct command.
-							</p>
-						</div>
+						<p className="text-xs text-muted-foreground">Start with a prompt or switch to Command.</p>
 					</Empty>
 				) : (
 					<Blocks coder={coder} />
@@ -99,14 +89,22 @@ export function Workspace({ coder }: { coder: CoderController }) {
 			</div>
 
 			{!atBottom && coder.blocks.length > 0 ? (
-				<Button
-					variant="secondary"
-					size="sm"
-					className="absolute bottom-32 left-1/2 z-10 -translate-x-1/2 gap-1.5 shadow-md"
-					onClick={scrollToLatest}
-				>
-					<ArrowDown /> Jump to latest
-				</Button>
+				<Tooltip>
+					<TooltipTrigger
+						render={
+							<Button
+								variant="secondary"
+								size="icon-sm"
+								className="absolute bottom-28 left-1/2 z-10 -translate-x-1/2"
+								aria-label="Jump to latest"
+								onClick={scrollToLatest}
+							>
+								<ArrowDown />
+							</Button>
+						}
+					/>
+					<TooltipContent>Jump to latest</TooltipContent>
+				</Tooltip>
 			) : null}
 
 			<div className="sr-only" aria-live="polite">
