@@ -40,7 +40,9 @@ const previewCatalog: CoderCatalog = {
 export function useConfiguration() {
 	const preview = !isFriday();
 	const [settings, setSettings] = useState<CoderSettings | null>(preview ? previewSettings : null);
-	const [catalog, setCatalog] = useState<CoderCatalog>(preview ? previewCatalog : { providers: [] });
+	const [catalog, setCatalog] = useState<CoderCatalog>(
+		preview ? previewCatalog : { providers: [] }
+	);
 	const [loading, setLoading] = useState(!preview);
 	const [saving, setSaving] = useState(false);
 	const [connecting, setConnecting] = useState(false);
