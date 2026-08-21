@@ -1,4 +1,4 @@
-import { ChevronRight, FolderGit2, FolderPlus, Plus, Search } from 'lucide-react';
+import { ChevronRight, FolderGit2, FolderPlus, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -98,16 +98,6 @@ export function ProjectSidebar({ coder }: { coder: CoderController }) {
 
 										<CollapsibleContent className="group-data-[state=collapsed]/sidebar:hidden">
 											<ul className="ml-7 space-y-0.5 py-0.5">
-												<li>
-													<Button
-														variant="ghost"
-														className="h-7 w-full justify-start gap-2 px-2 text-[11px] font-normal text-muted-foreground"
-														disabled={coder.runState === 'running'}
-														onClick={() => coder.newSession(project.id)}
-													>
-														<Plus className="size-3" /> New session
-													</Button>
-												</li>
 												{filteredSessions.map((session) => (
 													<li key={session.id}>
 														<Button
