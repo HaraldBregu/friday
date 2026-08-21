@@ -1,3 +1,6 @@
+import { useState } from 'react';
+
+import { Configuration } from '@/components/configuration';
 import { Header } from '@/components/header';
 import { ProjectSidebar } from '@/components/sidebar';
 import { Sidebar, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -43,6 +46,3 @@ export default function App() {
 		</TooltipProvider>
 	);
 }
-import { useState } from 'react';
-
-import { Configuration } from '@/components/configuration';
