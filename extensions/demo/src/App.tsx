@@ -278,8 +278,8 @@ export default function App() {
 
 	return (
 		<main className={cn('app-demo overflow-y-auto', theme.isDark && 'dark')} style={themeStyle}>
-			<div className="flex min-h-full items-center justify-center p-8">
-				<div className="w-full max-w-2xl space-y-5 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+			<div className="min-h-full w-full">
+				<div className="min-h-full w-full space-y-5 border border-border bg-card p-6 text-card-foreground shadow-sm">
 					<p className="text-lg font-semibold">{text.title}</p>
 					<p className="text-sm text-muted-foreground">
 						{inFridayApp ? text.connected : text.disconnected}
