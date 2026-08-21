@@ -139,6 +139,9 @@ it('rejects Coder access from other extensions', async () => {
 	const send = (ipcMain.handle as jest.Mock).mock.calls.find(
 		([channel]) => channel === CoderChannels.send
 	)?.[1];
+	const listModels = (ipcMain.handle as jest.Mock).mock.calls.find(
+		([channel]) => channel === CoderChannels.listModels
+	)?.[1];
 	const sender = { id: 24 };
 
 	await expect(getSettings({ sender })).resolves.toEqual(
@@ -153,6 +156,7 @@ it('rejects Coder access from other extensions', async () => {
 		expect.objectContaining({ success: false })
 	);
 	expect(coder.send).not.toHaveBeenCalled();
+	await expect(listModels({ sender })).resolves.toEqual(expect.objectContaining({ success: false }));
 });
 
 it('allows configuration and authentication from the host and Coder extension only', async () => {

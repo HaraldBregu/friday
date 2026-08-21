@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { app, coder as coderApi } from '@friday/sdk';
 import { useCoderWorkspace } from '../../../extensions/coder/src/hooks/workspace';
+import { useConfiguration } from '../../../extensions/coder/src/hooks/configuration';
 
 jest.mock('@friday/sdk', () => ({
 	isFriday: () => true,
@@ -11,6 +12,8 @@ jest.mock('@friday/sdk', () => ({
 	},
 	coder: {
 		getSettings: jest.fn(),
+		saveSettings: jest.fn(),
+		listModels: jest.fn(),
 		listProjects: jest.fn(),
 		listSessions: jest.fn(),
 		getSession: jest.fn(),
@@ -19,6 +22,9 @@ jest.mock('@friday/sdk', () => ({
 		addProject: jest.fn(),
 		openProject: jest.fn(),
 		removeProject: jest.fn(),
+		connectCodex: jest.fn(),
+		cancelCodexLogin: jest.fn(),
+		disconnectCodex: jest.fn(),
 	},
 }));
 
@@ -67,6 +73,21 @@ beforeEach(() => {
 		thinkingLevel: 'medium',
 		toolMode: 'coding',
 	});
+	(coderApi.saveSettings as jest.Mock).mockImplementation(async (settings) => settings);
+	(coderApi.listModels as jest.Mock).mockResolvedValue({
+		providers: [
+			{
+				id: 'openai-codex',
+				name: 'OpenAI Codex',
+				authentication: 'oauth',
+				configured: false,
+				models: [{ id: 'gpt-coder', name: 'GPT Coder', reasoning: true, contextWindow: 200000 }],
+			},
+		],
+	});
+	(coderApi.connectCodex as jest.Mock).mockResolvedValue({ configured: true, type: 'oauth' });
+	(coderApi.cancelCodexLogin as jest.Mock).mockResolvedValue(true);
+	(coderApi.disconnectCodex as jest.Mock).mockResolvedValue(undefined);
 	(coderApi.listProjects as jest.Mock).mockResolvedValue([project]);
 	(coderApi.listSessions as jest.Mock).mockResolvedValue([session]);
 	(coderApi.getSession as jest.Mock).mockResolvedValue({
@@ -166,4 +187,37 @@ it('groups sessions by workspace and opens an inactive workspace session', async
 	expect(result.current.activeProjectId).toBe(otherProject.id);
 	expect(result.current.activeSessionId).toBe(otherSession.id);
 	expect(result.current.blocks).toEqual([expect.objectContaining({ content: 'Website response' })]);
+});
+
+it('loads and saves the extension configuration through the Coder SDK', async () => {
+	const { result } = renderHook(() => useConfiguration());
+
+	await waitFor(() => expect(result.current.loading).toBe(false));
+	expect(result.current.selectedProvider?.name).toBe('OpenAI Codex');
+
+	act(() => result.current.setTools('read-only'));
+	await waitFor(() =>
+		expect(coderApi.saveSettings).toHaveBeenCalledWith(
+			expect.objectContaining({ toolMode: 'read-only' })
+		)
+	);
+});
+
+it('projects Codex device authentication into the extension configuration', async () => {
+	(coderApi.connectCodex as jest.Mock).mockImplementation(async (onEvent) => {
+		onEvent({
+			type: 'device-code',
+			userCode: 'ABCD-EFGH',
+			verificationUri: 'https://example.com/device',
+		});
+		return { configured: true, type: 'oauth' };
+	});
+	const { result } = renderHook(() => useConfiguration());
+	await waitFor(() => expect(result.current.loading).toBe(false));
+
+	await act(async () => result.current.connect());
+	expect(result.current.authEvent).toEqual(
+		expect.objectContaining({ type: 'device-code', userCode: 'ABCD-EFGH' })
+	);
+	expect(app.openExternalUrl).toHaveBeenCalledWith('https://example.com/device');
 });
