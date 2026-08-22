@@ -5,33 +5,37 @@ import { useConfiguration } from '../../../extensions/coder/src/hooks/configurat
 import { useProjectInstructions } from '../../../extensions/coder/src/hooks/instructions';
 import { canLeaveInstructions } from '../../../extensions/coder/src/navigation';
 
-jest.mock('@friday/sdk', () => ({
-	isFriday: () => true,
-	app: {
-		openExternalUrl: jest.fn(),
-		getExtensionStoreValue: jest.fn(),
-		setExtensionStoreValue: jest.fn(),
-		deleteExtensionStoreValue: jest.fn(),
-	},
-	coder: {
-		getSettings: jest.fn(),
-		saveSettings: jest.fn(),
-		listModels: jest.fn(),
-		listProjects: jest.fn(),
-		listSessions: jest.fn(),
-		getSession: jest.fn(),
-		send: jest.fn(),
-		cancel: jest.fn(),
-		addProject: jest.fn(),
-		openProject: jest.fn(),
-		removeProject: jest.fn(),
-		getProjectInstructions: jest.fn(),
-		saveProjectInstructions: jest.fn(),
-		connectCodex: jest.fn(),
-		cancelCodexLogin: jest.fn(),
-		disconnectCodex: jest.fn(),
-	},
-}));
+jest.mock(
+	'@friday/sdk',
+	() => ({
+		isFriday: () => true,
+		app: {
+			openExternalUrl: jest.fn(),
+			getExtensionStoreValue: jest.fn(),
+			setExtensionStoreValue: jest.fn(),
+			deleteExtensionStoreValue: jest.fn(),
+		},
+		coder: {
+			getSettings: jest.fn(),
+			saveSettings: jest.fn(),
+			listModels: jest.fn(),
+			listProjects: jest.fn(),
+			listSessions: jest.fn(),
+			getSession: jest.fn(),
+			send: jest.fn(),
+			cancel: jest.fn(),
+			addProject: jest.fn(),
+			openProject: jest.fn(),
+			removeProject: jest.fn(),
+			getProjectInstructions: jest.fn(),
+			saveProjectInstructions: jest.fn(),
+			connectCodex: jest.fn(),
+			cancelCodexLogin: jest.fn(),
+			disconnectCodex: jest.fn(),
+		},
+	}),
+	{ virtual: true }
+);
 
 const project = {
 	id: 'project-1',
