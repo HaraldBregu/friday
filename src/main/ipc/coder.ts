@@ -27,7 +27,10 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			}
 		};
 		const assertCoderExtensionCaller = (event: Electron.IpcMainInvokeEvent): void => {
-			if (!extensionRegistry.has(event.sender) || extensionRegistry.resolve(event.sender) !== 'coder') {
+			if (
+				!extensionRegistry.has(event.sender) ||
+				extensionRegistry.resolve(event.sender) !== 'coder'
+			) {
 				throw new Error('Project instructions are only available to the Coder extension.');
 			}
 		};
@@ -84,19 +87,16 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			}
 			return coder.getProjectInstructions(projectId.trim());
 		});
-		registerCommandWithEvent(
-			CoderChannels.saveProjectInstructions,
-			(event, projectId, update) => {
-				assertCoderExtensionCaller(event);
-				if (typeof projectId !== 'string' || !projectId.trim()) {
-					throw new Error('Invalid coder project id.');
-				}
-				if (!isCoderProjectInstructionsUpdate(update)) {
-					throw new Error('Invalid coder project instructions.');
-				}
-				return coder.saveProjectInstructions(projectId.trim(), update);
+		registerCommandWithEvent(CoderChannels.saveProjectInstructions, (event, projectId, update) => {
+			assertCoderExtensionCaller(event);
+			if (typeof projectId !== 'string' || !projectId.trim()) {
+				throw new Error('Invalid coder project id.');
 			}
-		);
+			if (!isCoderProjectInstructionsUpdate(update)) {
+				throw new Error('Invalid coder project instructions.');
+			}
+			return coder.saveProjectInstructions(projectId.trim(), update);
+		});
 		registerQueryWithEvent(CoderChannels.listSessions, (event, projectId) => {
 			assertCoderCaller(event);
 			if (typeof projectId !== 'string' || !projectId.trim()) {

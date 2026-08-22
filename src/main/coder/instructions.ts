@@ -42,7 +42,11 @@ export class CoderInstructions {
 			content = await readFile(activeFilePath, 'utf8');
 			exists = true;
 		} catch (error) {
-			if (!error || typeof error !== 'object' || (error as NodeJS.ErrnoException).code !== 'ENOENT') {
+			if (
+				!error ||
+				typeof error !== 'object' ||
+				(error as NodeJS.ErrnoException).code !== 'ENOENT'
+			) {
 				throw error;
 			}
 		}
@@ -90,9 +94,7 @@ export class CoderInstructions {
 		}
 		const current = await this.get(project);
 		if (current.revision !== update.expectedRevision) {
-			throw new Error(
-				'Coder project instructions changed outside Friday. Reload before saving.'
-			);
+			throw new Error('Coder project instructions changed outside Friday. Reload before saving.');
 		}
 		if (!current.editable) {
 			throw new Error('Coder project instructions cannot be edited through a symbolic link.');

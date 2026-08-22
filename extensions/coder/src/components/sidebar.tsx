@@ -114,10 +114,10 @@ export function ProjectSidebar({
 															aria-current={
 																project.id === coder.activeProjectId ? 'location' : undefined
 															}
-													disabled={coder.runState === 'running'}
-													onClick={() => {
-														if (!onOpenWorkspace()) return;
-														void coder.selectProject(project.id);
+															disabled={coder.runState === 'running'}
+															onClick={() => {
+																if (!onOpenWorkspace()) return;
+																void coder.selectProject(project.id);
 															}}
 														>
 															<FolderGit2
@@ -145,10 +145,10 @@ export function ProjectSidebar({
 															aria-current={
 																session.id === coder.activeSessionId ? 'page' : undefined
 															}
-																	disabled={coder.runState === 'running'}
-																	onClick={() => {
-																		if (!onOpenWorkspace()) return;
-																		void coder.selectSession(project.id, session.id);
+															disabled={coder.runState === 'running'}
+															onClick={() => {
+																if (!onOpenWorkspace()) return;
+																void coder.selectSession(project.id, session.id);
 															}}
 														>
 															<span className="truncate">{session.title}</span>

@@ -101,11 +101,7 @@ it('normalizes project and session identifiers before forwarding them', async ()
 
 	const update = { content: '  keep whitespace\n', expectedRevision: 'revision-1' };
 	await coder.saveProjectInstructions(' project-1 ', update);
-	expect(invoke).toHaveBeenCalledWith(
-		CoderChannels.saveProjectInstructions,
-		'project-1',
-		update
-	);
+	expect(invoke).toHaveBeenCalledWith(CoderChannels.saveProjectInstructions, 'project-1', update);
 
 	expect(() => coder.removeProject(' ')).toThrow('Invalid coder project id.');
 	expect(() => coder.getSession('project-1', ' ')).toThrow('Invalid coder session.');

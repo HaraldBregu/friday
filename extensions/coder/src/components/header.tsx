@@ -1,4 +1,12 @@
-import { Copy, FileText, FolderOpen, LoaderCircle, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import {
+	Copy,
+	FileText,
+	FolderOpen,
+	LoaderCircle,
+	MoreHorizontal,
+	Plus,
+	Trash2,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {

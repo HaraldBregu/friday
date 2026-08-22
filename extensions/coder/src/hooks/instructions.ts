@@ -29,9 +29,7 @@ export function useProjectInstructions(projectId: string | undefined) {
 			})
 			.catch((reason) => {
 				if (sequence !== loadSequenceRef.current) return;
-				setError(
-					reason instanceof Error ? reason.message : 'Unable to load project instructions.'
-				);
+				setError(reason instanceof Error ? reason.message : 'Unable to load project instructions.');
 			})
 			.finally(() => {
 				if (sequence === loadSequenceRef.current) setLoading(false);
@@ -40,11 +38,7 @@ export function useProjectInstructions(projectId: string | undefined) {
 
 	const dirty = Boolean(instructions && content !== instructions.content);
 	const canSave = Boolean(
-		projectId &&
-			instructions?.editable &&
-			!loading &&
-			!saving &&
-			(dirty || !instructions.exists)
+		projectId && instructions?.editable && !loading && !saving && (dirty || !instructions.exists)
 	);
 
 	const save = useCallback(async (): Promise<void> => {

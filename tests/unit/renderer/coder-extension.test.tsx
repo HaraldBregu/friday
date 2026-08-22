@@ -126,12 +126,14 @@ beforeEach(() => {
 		],
 	});
 	(coderApi.getProjectInstructions as jest.Mock).mockResolvedValue(projectInstructions);
-	(coderApi.saveProjectInstructions as jest.Mock).mockImplementation(async (_projectId, update) => ({
-		...projectInstructions,
-		content: update.content,
-		exists: true,
-		revision: 'revision-2',
-	}));
+	(coderApi.saveProjectInstructions as jest.Mock).mockImplementation(
+		async (_projectId, update) => ({
+			...projectInstructions,
+			content: update.content,
+			exists: true,
+			revision: 'revision-2',
+		})
+	);
 });
 
 it('restores the active project session and starts a new persistent Agent run', async () => {

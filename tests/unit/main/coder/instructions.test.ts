@@ -39,7 +39,12 @@ it('uses Pi filename precedence, reports inherited sources, and isolates workspa
 		lastOpenedAt: timestamp,
 		available: true,
 	};
-	const second: CoderProject = { ...first, id: 'second', name: 'second', directory: secondDirectory };
+	const second: CoderProject = {
+		...first,
+		id: 'second',
+		name: 'second',
+		directory: secondDirectory,
+	};
 	const instructions = new CoderInstructions(agentDirectory);
 
 	const firstResult = await instructions.get(first);

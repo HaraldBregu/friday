@@ -70,8 +70,8 @@ export function Instructions({
 							</h2>
 						</div>
 						<p className="text-xs leading-5 text-muted-foreground">
-							Changes apply to the next Coder message, including resumed sessions. A running
-							tool loop keeps the instructions it started with.
+							Changes apply to the next Coder message, including resumed sessions. A running tool
+							loop keeps the instructions it started with.
 						</p>
 						{editor.instructions ? (
 							<p className="break-all font-mono text-[11px] text-muted-foreground">

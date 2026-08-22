@@ -90,9 +90,7 @@ const coderInstructions = {
 	exists: true,
 	editable: true,
 	revision: 'revision-1',
-	loadedSources: [
-		{ path: '/tmp/friday-workspace/AGENTS.md', scope: 'workspace' },
-	],
+	loadedSources: [{ path: '/tmp/friday-workspace/AGENTS.md', scope: 'workspace' }],
 };
 globalThis.coder = {
 	getSettings: async () => coderSettings,
