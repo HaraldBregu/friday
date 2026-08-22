@@ -27,8 +27,7 @@ export function useProjectInstructions(projectId: string | undefined) {
 				setState({
 					projectId,
 					content: '',
-					error:
-						reason instanceof Error ? reason.message : 'Unable to load project instructions.',
+					error: reason instanceof Error ? reason.message : 'Unable to load project instructions.',
 				});
 			});
 	}, [projectId]);
@@ -67,9 +66,7 @@ export function useProjectInstructions(projectId: string | undefined) {
 					? {
 							...value,
 							error:
-								reason instanceof Error
-									? reason.message
-									: 'Unable to save project instructions.',
+								reason instanceof Error ? reason.message : 'Unable to save project instructions.',
 						}
 					: value
 			);
@@ -80,9 +77,7 @@ export function useProjectInstructions(projectId: string | undefined) {
 	const setContent = useCallback(
 		(value: string): void => {
 			setState((currentState) =>
-				currentState.projectId === projectId
-					? { ...currentState, content: value }
-					: currentState
+				currentState.projectId === projectId ? { ...currentState, content: value } : currentState
 			);
 		},
 		[projectId]
