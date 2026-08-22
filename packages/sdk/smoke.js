@@ -82,6 +82,18 @@ const coderProject = {
 	lastOpenedAt: '2026-08-20T10:00:00.000Z',
 	available: true,
 };
+const coderInstructions = {
+	projectId: coderProject.id,
+	activeFilePath: '/tmp/friday-workspace/AGENTS.md',
+	activeFileName: 'AGENTS.md',
+	content: '# Instructions',
+	exists: true,
+	editable: true,
+	revision: 'revision-1',
+	loadedSources: [
+		{ path: '/tmp/friday-workspace/AGENTS.md', scope: 'workspace' },
+	],
+};
 globalThis.coder = {
 	getSettings: async () => coderSettings,
 	saveSettings: async (settings) => settings,
@@ -90,6 +102,12 @@ globalThis.coder = {
 	addProject: async () => coderProject,
 	openProject: async () => undefined,
 	removeProject: async (projectId) => projectId === coderProject.id,
+	getProjectInstructions: async () => coderInstructions,
+	saveProjectInstructions: async (_projectId, update) => ({
+		...coderInstructions,
+		content: update.content,
+		revision: 'revision-2',
+	}),
 	listSessions: async () => [],
 	getSession: async () => ({
 		session: {
@@ -178,6 +196,16 @@ await agent.deleteWorkspaceDirectory('archive');
 assert.deepEqual(await coder.getSettings(), coderSettings);
 const coderEvents = [];
 assert.deepEqual(await coder.listProjects(), [coderProject]);
+assert.deepEqual(await coder.getProjectInstructions(coderProject.id), coderInstructions);
+assert.equal(
+	(
+		await coder.saveProjectInstructions(coderProject.id, {
+			content: '# Updated',
+			expectedRevision: coderInstructions.revision,
+		})
+	).content,
+	'# Updated'
+);
 assert.deepEqual(
 	await coder.send({ projectId: coderProject.id, mode: 'agent', input: 'Fix the tests' }, (event) =>
 		coderEvents.push(event)

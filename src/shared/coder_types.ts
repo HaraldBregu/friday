@@ -54,6 +54,29 @@ export interface CoderProject {
 	readonly available: boolean;
 }
 
+export type CoderProjectInstructionScope = 'workspace' | 'ancestor' | 'coder-global';
+
+export interface CoderProjectInstructionSource {
+	readonly path: string;
+	readonly scope: CoderProjectInstructionScope;
+}
+
+export interface CoderProjectInstructions {
+	readonly projectId: string;
+	readonly activeFilePath: string;
+	readonly activeFileName: string;
+	readonly content: string;
+	readonly exists: boolean;
+	readonly editable: boolean;
+	readonly revision: string;
+	readonly loadedSources: readonly CoderProjectInstructionSource[];
+}
+
+export interface CoderProjectInstructionsUpdate {
+	readonly content: string;
+	readonly expectedRevision: string;
+}
+
 export interface CoderSessionSummary {
 	readonly id: string;
 	readonly projectId: string;
@@ -180,5 +203,17 @@ export function isCoderRunRequest(value: unknown): value is CoderRunRequest {
 		(request.mode === 'agent' || request.mode === 'shell') &&
 		typeof request.input === 'string' &&
 		request.input.trim().length > 0
+	);
+}
+
+export function isCoderProjectInstructionsUpdate(
+	value: unknown
+): value is CoderProjectInstructionsUpdate {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+	const update = value as Partial<CoderProjectInstructionsUpdate>;
+	return (
+		typeof update.content === 'string' &&
+		typeof update.expectedRevision === 'string' &&
+		update.expectedRevision.length > 0
 	);
 }

@@ -55,6 +55,8 @@ export const CoderChannels = {
 	addProject: 'coder:projects:add',
 	openProject: 'coder:projects:open',
 	removeProject: 'coder:projects:remove',
+	getProjectInstructions: 'coder:projects:instructions:get',
+	saveProjectInstructions: 'coder:projects:instructions:save',
 	listSessions: 'coder:sessions:list',
 	getSession: 'coder:sessions:get',
 	renameSession: 'coder:sessions:rename',

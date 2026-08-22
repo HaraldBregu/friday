@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Configuration } from '@/components/configuration';
 import { Header } from '@/components/header';
+import { Instructions } from '@/components/instructions';
 import { ProjectSidebar } from '@/components/sidebar';
 import { Sidebar, SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -12,7 +13,21 @@ import { useTheme } from '@/hooks/use-theme';
 export default function App() {
 	useTheme();
 	const coder = useCoderWorkspace();
-	const [page, setPage] = useState<'workspace' | 'configuration'>('workspace');
+	const [page, setPage] = useState<'workspace' | 'configuration' | 'instructions'>('workspace');
+	const [instructionsDirty, setInstructionsDirty] = useState(false);
+	const openPage = (nextPage: 'workspace' | 'configuration' | 'instructions'): boolean => {
+		if (
+			page === 'instructions' &&
+			nextPage !== 'instructions' &&
+			instructionsDirty &&
+			!window.confirm('Discard unsaved agent instruction changes?')
+		) {
+			return false;
+		}
+		setPage(nextPage);
+		if (nextPage !== 'instructions') setInstructionsDirty(false);
+		return true;
+	};
 
 	return (
 		<TooltipProvider>
@@ -22,8 +37,8 @@ export default function App() {
 						<ProjectSidebar
 							coder={coder}
 							configurationOpen={page === 'configuration'}
-							onOpenConfiguration={() => setPage('configuration')}
-							onOpenWorkspace={() => setPage('workspace')}
+							onOpenConfiguration={() => void openPage('configuration')}
+							onOpenWorkspace={() => openPage('workspace')}
 						/>
 					</Sidebar>
 					<SidebarInset>
@@ -31,12 +46,19 @@ export default function App() {
 							<Configuration
 								onDone={() => {
 									void coder.refresh();
-									setPage('workspace');
+									openPage('workspace');
 								}}
+							/>
+						) : page === 'instructions' && coder.activeProject ? (
+							<Instructions
+								projectId={coder.activeProject.id}
+								projectName={coder.activeProject.name}
+								onDirtyChange={setInstructionsDirty}
+								onDone={() => void openPage('workspace')}
 							/>
 						) : (
 							<>
-								<Header coder={coder} />
+								<Header coder={coder} onOpenInstructions={() => void openPage('instructions')} />
 								<Workspace coder={coder} />
 							</>
 						)}

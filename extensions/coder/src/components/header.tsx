@@ -1,4 +1,4 @@
-import { Copy, FolderOpen, LoaderCircle, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import { Copy, FileText, FolderOpen, LoaderCircle, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +12,13 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CoderController } from '@/controller';
 
-export function Header({ coder }: { coder: CoderController }) {
+export function Header({
+	coder,
+	onOpenInstructions,
+}: {
+	coder: CoderController;
+	onOpenInstructions: () => void;
+}) {
 	const session = coder.sessions.find((item) => item.id === coder.activeSessionId);
 	return (
 		<header className="flex h-11 shrink-0 items-center gap-2 bg-background px-3">
@@ -49,6 +55,12 @@ export function Header({ coder }: { coder: CoderController }) {
 							onClick={() => void navigator.clipboard.writeText(coder.activeProject!.directory)}
 						>
 							<Copy /> Copy path
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							disabled={!coder.activeProject.available}
+							onClick={onOpenInstructions}
+						>
+							<FileText /> Agent instructions
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem

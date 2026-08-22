@@ -1,6 +1,10 @@
 import { BrowserWindow, dialog, shell } from 'electron';
 import { CoderChannels } from '../../shared/ipc_channels_definitions';
-import { isCoderRunRequest, isCoderSettings } from '../../shared/coder_types';
+import {
+	isCoderProjectInstructionsUpdate,
+	isCoderRunRequest,
+	isCoderSettings,
+} from '../../shared/coder_types';
 import type { Coder } from '../coder';
 import type { EventBus } from '../event_bus';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
@@ -20,6 +24,11 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			if (!extensionRegistry.has(event.sender)) return;
 			if (extensionRegistry.resolve(event.sender) !== 'coder') {
 				throw new Error('Coder is only available to the Coder extension.');
+			}
+		};
+		const assertCoderExtensionCaller = (event: Electron.IpcMainInvokeEvent): void => {
+			if (!extensionRegistry.has(event.sender) || extensionRegistry.resolve(event.sender) !== 'coder') {
+				throw new Error('Project instructions are only available to the Coder extension.');
 			}
 		};
 		registerQueryWithEvent(CoderChannels.getSettings, (event) => {
@@ -68,6 +77,26 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			}
 			return coder.removeProject(projectId.trim());
 		});
+		registerQueryWithEvent(CoderChannels.getProjectInstructions, (event, projectId) => {
+			assertCoderExtensionCaller(event);
+			if (typeof projectId !== 'string' || !projectId.trim()) {
+				throw new Error('Invalid coder project id.');
+			}
+			return coder.getProjectInstructions(projectId.trim());
+		});
+		registerCommandWithEvent(
+			CoderChannels.saveProjectInstructions,
+			(event, projectId, update) => {
+				assertCoderExtensionCaller(event);
+				if (typeof projectId !== 'string' || !projectId.trim()) {
+					throw new Error('Invalid coder project id.');
+				}
+				if (!isCoderProjectInstructionsUpdate(update)) {
+					throw new Error('Invalid coder project instructions.');
+				}
+				return coder.saveProjectInstructions(projectId.trim(), update);
+			}
+		);
 		registerQueryWithEvent(CoderChannels.listSessions, (event, projectId) => {
 			assertCoderCaller(event);
 			if (typeof projectId !== 'string' || !projectId.trim()) {

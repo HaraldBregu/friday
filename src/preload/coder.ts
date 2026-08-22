@@ -1,6 +1,10 @@
 import type { CoderApi } from '../shared/api_types';
 import { CoderChannels } from '../shared/ipc_channels_definitions';
-import { isCoderRunRequest, isCoderSettings } from '../shared/coder_types';
+import {
+	isCoderProjectInstructionsUpdate,
+	isCoderRunRequest,
+	isCoderSettings,
+} from '../shared/coder_types';
 import { typedInvokeUnwrap, typedOn } from '../shared/ipc_types';
 
 export const coder: CoderApi = {
@@ -21,6 +25,19 @@ export const coder: CoderApi = {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
 		if (!normalizedProjectId) throw new Error('Invalid coder project id.');
 		return typedInvokeUnwrap(CoderChannels.removeProject, normalizedProjectId);
+	},
+	getProjectInstructions: (projectId) => {
+		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
+		if (!normalizedProjectId) throw new Error('Invalid coder project id.');
+		return typedInvokeUnwrap(CoderChannels.getProjectInstructions, normalizedProjectId);
+	},
+	saveProjectInstructions: (projectId, update) => {
+		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';
+		if (!normalizedProjectId) throw new Error('Invalid coder project id.');
+		if (!isCoderProjectInstructionsUpdate(update)) {
+			throw new Error('Invalid coder project instructions.');
+		}
+		return typedInvokeUnwrap(CoderChannels.saveProjectInstructions, normalizedProjectId, update);
 	},
 	listSessions: (projectId) => {
 		const normalizedProjectId = typeof projectId === 'string' ? projectId.trim() : '';

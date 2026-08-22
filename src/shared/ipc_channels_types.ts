@@ -71,6 +71,14 @@ export interface CoderInvokeChannelMap {
 	};
 	[CoderChannels.openProject]: { args: [projectId: string]; result: void };
 	[CoderChannels.removeProject]: { args: [projectId: string]; result: boolean };
+	[CoderChannels.getProjectInstructions]: {
+		args: [projectId: string];
+		result: import('./coder_types').CoderProjectInstructions;
+	};
+	[CoderChannels.saveProjectInstructions]: {
+		args: [projectId: string, update: import('./coder_types').CoderProjectInstructionsUpdate];
+		result: import('./coder_types').CoderProjectInstructions;
+	};
 	[CoderChannels.listSessions]: {
 		args: [projectId: string];
 		result: import('./coder_types').CoderSessionSummary[];

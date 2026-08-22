@@ -105,6 +105,8 @@ import type {
 	CoderAuthStatus,
 	CoderCatalog,
 	CoderProject,
+	CoderProjectInstructions,
+	CoderProjectInstructionsUpdate,
 	CoderResponseEvent,
 	CoderRunRequest,
 	CoderRunResult,
@@ -197,6 +199,11 @@ export interface CoderApi {
 	addProject: () => Promise<CoderProject | undefined>;
 	openProject: (projectId: string) => Promise<void>;
 	removeProject: (projectId: string) => Promise<boolean>;
+	getProjectInstructions: (projectId: string) => Promise<CoderProjectInstructions>;
+	saveProjectInstructions: (
+		projectId: string,
+		update: CoderProjectInstructionsUpdate
+	) => Promise<CoderProjectInstructions>;
 	listSessions: (projectId: string) => Promise<CoderSessionSummary[]>;
 	getSession: (projectId: string, sessionId: string) => Promise<CoderSessionSnapshot>;
 	renameSession: (

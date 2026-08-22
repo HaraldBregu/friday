@@ -15,6 +15,8 @@ import type {
 	CoderAuthStatus,
 	CoderCatalog,
 	CoderProject,
+	CoderProjectInstructions,
+	CoderProjectInstructionsUpdate,
 	CoderProvider,
 	CoderProviderId,
 	CoderResponseEvent,
@@ -26,6 +28,7 @@ import type {
 	CoderSettings,
 } from '../../shared/coder_types';
 import { coderLocation, coderSessionsLocation } from './location';
+import { CoderInstructions } from './instructions';
 import { CoderProjectStore } from './projects';
 import { CoderStore } from './store';
 
@@ -53,6 +56,7 @@ interface CoderDependencies {
 export class Coder {
 	private readonly runs = new Map<string, ActiveRun>();
 	private readonly authControllers = new Map<number, AbortController>();
+	private readonly instructions = new CoderInstructions();
 	private runtimePromise?: Promise<ModelRuntime>;
 
 	constructor(private readonly dependencies: CoderDependencies) {
@@ -81,6 +85,17 @@ export class Coder {
 			throw new Error('Stop the active project run before removing it from Coder.');
 		}
 		return this.dependencies.projects.remove(projectId);
+	}
+
+	getProjectInstructions(projectId: string): Promise<CoderProjectInstructions> {
+		return this.instructions.get(this.requireProject(projectId));
+	}
+
+	saveProjectInstructions(
+		projectId: string,
+		update: CoderProjectInstructionsUpdate
+	): Promise<CoderProjectInstructions> {
+		return this.instructions.save(this.requireProject(projectId), update);
 	}
 
 	async listSessions(projectId: string): Promise<CoderSessionSummary[]> {

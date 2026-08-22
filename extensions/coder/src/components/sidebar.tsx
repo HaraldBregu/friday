@@ -16,7 +16,7 @@ export function ProjectSidebar({
 	coder: CoderController;
 	configurationOpen: boolean;
 	onOpenConfiguration: () => void;
-	onOpenWorkspace: () => void;
+	onOpenWorkspace: () => boolean;
 }) {
 	const query = coder.query.trim().toLowerCase();
 	const visibleProjects = coder.projects.filter((project) => {
@@ -44,7 +44,9 @@ export function ProjectSidebar({
 									className="group-data-[state=collapsed]/sidebar:mx-auto"
 									aria-label="Add workspace folder"
 									disabled={coder.busy || coder.runState === 'running'}
-									onClick={() => void coder.addProject()}
+									onClick={() => {
+										if (onOpenWorkspace()) void coder.addProject();
+									}}
 								>
 									<FolderPlus />
 								</Button>
@@ -112,10 +114,10 @@ export function ProjectSidebar({
 															aria-current={
 																project.id === coder.activeProjectId ? 'location' : undefined
 															}
-															disabled={coder.runState === 'running'}
-															onClick={() => {
-																onOpenWorkspace();
-																void coder.selectProject(project.id);
+													disabled={coder.runState === 'running'}
+													onClick={() => {
+														if (!onOpenWorkspace()) return;
+														void coder.selectProject(project.id);
 															}}
 														>
 															<FolderGit2
@@ -143,10 +145,10 @@ export function ProjectSidebar({
 															aria-current={
 																session.id === coder.activeSessionId ? 'page' : undefined
 															}
-															disabled={coder.runState === 'running'}
-															onClick={() => {
-																onOpenWorkspace();
-																void coder.selectSession(project.id, session.id);
+																	disabled={coder.runState === 'running'}
+																	onClick={() => {
+																		if (!onOpenWorkspace()) return;
+																		void coder.selectSession(project.id, session.id);
 															}}
 														>
 															<span className="truncate">{session.title}</span>
