@@ -87,11 +87,11 @@ export class Coder {
 		return this.dependencies.projects.remove(projectId);
 	}
 
-	getProjectInstructions(projectId: string): Promise<CoderProjectInstructions> {
+	async getProjectInstructions(projectId: string): Promise<CoderProjectInstructions> {
 		return this.instructions.get(this.requireProject(projectId));
 	}
 
-	saveProjectInstructions(
+	async saveProjectInstructions(
 		projectId: string,
 		update: CoderProjectInstructionsUpdate
 	): Promise<CoderProjectInstructions> {
