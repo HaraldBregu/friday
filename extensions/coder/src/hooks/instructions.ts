@@ -1,41 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { coder, type CoderProjectInstructions } from '@friday/sdk';
 
+interface InstructionsState {
+	readonly projectId?: string;
+	readonly instructions?: CoderProjectInstructions;
+	readonly content: string;
+	readonly error: string;
+}
+
 export function useProjectInstructions(projectId: string | undefined) {
 	const loadSequenceRef = useRef(0);
-	const [instructions, setInstructions] = useState<CoderProjectInstructions>();
-	const [content, setContent] = useState('');
-	const [loading, setLoading] = useState(Boolean(projectId));
+	const [state, setState] = useState<InstructionsState>({ content: '', error: '' });
 	const [saving, setSaving] = useState(false);
-	const [error, setError] = useState('');
 
 	useEffect(() => {
 		const sequence = ++loadSequenceRef.current;
-		setInstructions(undefined);
-		setContent('');
-		setError('');
-		setSaving(false);
-		if (!projectId) {
-			setLoading(false);
-			return;
-		}
-		setLoading(true);
+		if (!projectId) return;
 		void coder
 			.getProjectInstructions(projectId)
 			.then((next) => {
 				if (sequence !== loadSequenceRef.current) return;
-				setInstructions(next);
-				setContent(next.content);
+				setState({ projectId, instructions: next, content: next.content, error: '' });
 			})
 			.catch((reason) => {
 				if (sequence !== loadSequenceRef.current) return;
-				setError(reason instanceof Error ? reason.message : 'Unable to load project instructions.');
-			})
-			.finally(() => {
-				if (sequence === loadSequenceRef.current) setLoading(false);
+				setState({
+					projectId,
+					content: '',
+					error:
+						reason instanceof Error ? reason.message : 'Unable to load project instructions.',
+				});
 			});
 	}, [projectId]);
 
+	const current = state.projectId === projectId ? state : { content: '', error: '' };
+	const instructions = current.instructions;
+	const content = current.content;
+	const loading = Boolean(projectId && state.projectId !== projectId);
 	const dirty = Boolean(instructions && content !== instructions.content);
 	const canSave = Boolean(
 		projectId && instructions?.editable && !loading && !saving && (dirty || !instructions.exists)
@@ -45,27 +46,54 @@ export function useProjectInstructions(projectId: string | undefined) {
 		if (!projectId || !instructions || !canSave) return;
 		const submittedContent = content;
 		setSaving(true);
-		setError('');
+		setState((value) => (value.projectId === projectId ? { ...value, error: '' } : value));
 		try {
 			const next = await coder.saveProjectInstructions(projectId, {
 				content: submittedContent,
 				expectedRevision: instructions.revision,
 			});
-			setInstructions(next);
-			setContent((current) => (current === submittedContent ? next.content : current));
+			setState((value) =>
+				value.projectId === projectId
+					? {
+							...value,
+							instructions: next,
+							content: value.content === submittedContent ? next.content : value.content,
+						}
+					: value
+			);
 		} catch (reason) {
-			setError(reason instanceof Error ? reason.message : 'Unable to save project instructions.');
+			setState((value) =>
+				value.projectId === projectId
+					? {
+							...value,
+							error:
+								reason instanceof Error
+									? reason.message
+									: 'Unable to save project instructions.',
+						}
+					: value
+			);
 		} finally {
 			setSaving(false);
 		}
 	}, [canSave, content, instructions, projectId]);
+	const setContent = useCallback(
+		(value: string): void => {
+			setState((currentState) =>
+				currentState.projectId === projectId
+					? { ...currentState, content: value }
+					: currentState
+			);
+		},
+		[projectId]
+	);
 
 	return {
 		instructions,
 		content,
 		loading,
 		saving,
-		error,
+		error: current.error,
 		dirty,
 		canSave,
 		save,
