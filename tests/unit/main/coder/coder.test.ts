@@ -146,6 +146,87 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 	expect(JSON.stringify(events)).not.toContain('secret');
 });
 
+it('reloads cwd-bound instructions before the next message in a resumed session', async () => {
+	const model = { id: 'gpt-coder' };
+	modelRuntimeCreate.mockResolvedValue({
+		getModel: jest.fn(() => model),
+		checkAuth: jest.fn(async () => ({ type: 'api_key' })),
+		setRuntimeApiKey: jest.fn(async () => undefined),
+		removeRuntimeApiKey: jest.fn(async () => undefined),
+	});
+	const session = {
+		subscribe: jest.fn(() => jest.fn()),
+		prompt: jest.fn(async () => undefined),
+		executeBash: jest.fn(),
+		abortBash: jest.fn(),
+		abort: jest.fn(async () => undefined),
+		dispose: jest.fn(),
+	};
+	(createAgentSession as jest.Mock).mockResolvedValue({ session });
+	const sessionInfo = {
+		id: 'session-1',
+		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		cwd: project.directory,
+		name: undefined,
+		created: new Date('2026-08-20T10:00:00.000Z'),
+		modified: new Date('2026-08-20T10:01:00.000Z'),
+		messageCount: 1,
+		firstMessage: 'First message',
+	};
+	const reopenedManager = { getSessionId: () => sessionInfo.id };
+	sessionManagerList.mockResolvedValue([sessionInfo]);
+	sessionManagerOpen.mockReturnValue(reopenedManager);
+	const coder = new Coder({
+		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
+		getProvider: (id) => ({ id, name: id, apiKey: 'key', baseUrl: '' }),
+	});
+
+	await coder.send(
+		4,
+		'run-first',
+		{ projectId: project.id, mode: 'agent', input: 'First message' },
+		() => undefined
+	);
+	await coder.send(
+		4,
+		'run-second',
+		{ projectId: project.id, sessionId: sessionInfo.id, mode: 'agent', input: 'Next message' },
+		() => undefined
+	);
+
+	expect(DefaultResourceLoader.instances).toHaveLength(2);
+	expect(DefaultResourceLoader.instances[0]).not.toBe(DefaultResourceLoader.instances[1]);
+	for (const loader of DefaultResourceLoader.instances) {
+		expect(loader.options).toEqual(expect.objectContaining({ cwd: project.directory }));
+		expect(loader.reload).toHaveBeenCalledTimes(1);
+	}
+	expect(createAgentSession).toHaveBeenNthCalledWith(
+		1,
+		expect.objectContaining({ resourceLoader: DefaultResourceLoader.instances[0] })
+	);
+	expect(createAgentSession).toHaveBeenNthCalledWith(
+		2,
+		expect.objectContaining({
+			resourceLoader: DefaultResourceLoader.instances[1],
+			sessionManager: reopenedManager,
+		})
+	);
+});
+
+it('rejects instruction access for an unavailable stored project', async () => {
+	projects.get.mockReturnValueOnce({ ...project, available: false });
+	const coder = new Coder({
+		store: { get: jest.fn(() => settings), set: jest.fn() } as unknown as CoderStore,
+		projects: projects as unknown as CoderProjectStore,
+		getProvider: () => undefined,
+	});
+
+	await expect(coder.getProjectInstructions(project.id)).rejects.toThrow(
+		'Coder project directory is unavailable.'
+	);
+});
+
 it('reopens a project session and records streamed Shell output', async () => {
 	const sessionInfo = {
 		id: 'session-1',

@@ -2,6 +2,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { app, coder as coderApi } from '@friday/sdk';
 import { useCoderWorkspace } from '../../../extensions/coder/src/hooks/workspace';
 import { useConfiguration } from '../../../extensions/coder/src/hooks/configuration';
+import { useProjectInstructions } from '../../../extensions/coder/src/hooks/instructions';
+import { canLeaveInstructions } from '../../../extensions/coder/src/navigation';
 
 jest.mock('@friday/sdk', () => ({
 	isFriday: () => true,
@@ -23,6 +25,8 @@ jest.mock('@friday/sdk', () => ({
 		addProject: jest.fn(),
 		openProject: jest.fn(),
 		removeProject: jest.fn(),
+		getProjectInstructions: jest.fn(),
+		saveProjectInstructions: jest.fn(),
 		connectCodex: jest.fn(),
 		cancelCodexLogin: jest.fn(),
 		disconnectCodex: jest.fn(),
@@ -61,6 +65,20 @@ const otherSession = {
 	id: 'session-2',
 	projectId: otherProject.id,
 	title: 'Website session',
+};
+
+const projectInstructions = {
+	projectId: project.id,
+	activeFilePath: '/workspace/friday/AGENTS.md',
+	activeFileName: 'AGENTS.md',
+	content: '# Initial',
+	exists: true,
+	editable: true,
+	revision: 'revision-1',
+	loadedSources: [
+		{ path: '/global/AGENTS.md', scope: 'coder-global' as const },
+		{ path: '/workspace/friday/AGENTS.md', scope: 'workspace' as const },
+	],
 };
 
 beforeEach(() => {
@@ -103,6 +121,13 @@ beforeEach(() => {
 			},
 		],
 	});
+	(coderApi.getProjectInstructions as jest.Mock).mockResolvedValue(projectInstructions);
+	(coderApi.saveProjectInstructions as jest.Mock).mockImplementation(async (_projectId, update) => ({
+		...projectInstructions,
+		content: update.content,
+		exists: true,
+		revision: 'revision-2',
+	}));
 });
 
 it('restores the active project session and starts a new persistent Agent run', async () => {
@@ -221,4 +246,64 @@ it('projects Codex device authentication into the extension configuration', asyn
 		expect.objectContaining({ type: 'device-code', userCode: 'ABCD-EFGH' })
 	);
 	expect(app.openExternalUrl).toHaveBeenCalledWith('https://example.com/device');
+});
+
+it('loads and explicitly saves active workspace instructions with their revision', async () => {
+	const { result } = renderHook(() => useProjectInstructions(project.id));
+
+	await waitFor(() => expect(result.current.loading).toBe(false));
+	expect(result.current.instructions).toEqual(projectInstructions);
+	expect(result.current.content).toBe('# Initial');
+
+	act(() => result.current.setContent('  # Updated\n'));
+	expect(result.current.dirty).toBe(true);
+	expect(result.current.canSave).toBe(true);
+	await act(async () => result.current.save());
+
+	expect(coderApi.saveProjectInstructions).toHaveBeenCalledWith(project.id, {
+		content: '  # Updated\n',
+		expectedRevision: 'revision-1',
+	});
+	expect(result.current.content).toBe('  # Updated\n');
+	expect(result.current.dirty).toBe(false);
+});
+
+it('allows explicit empty-file creation and preserves dirty content after a save conflict', async () => {
+	(coderApi.getProjectInstructions as jest.Mock).mockResolvedValue({
+		...projectInstructions,
+		content: '',
+		exists: false,
+		revision: 'missing-revision',
+	});
+	const { result } = renderHook(() => useProjectInstructions(project.id));
+
+	await waitFor(() => expect(result.current.loading).toBe(false));
+	expect(result.current.dirty).toBe(false);
+	expect(result.current.canSave).toBe(true);
+	await act(async () => result.current.save());
+	expect(coderApi.saveProjectInstructions).toHaveBeenCalledWith(project.id, {
+		content: '',
+		expectedRevision: 'missing-revision',
+	});
+
+	act(() => result.current.setContent('# Local edit'));
+	(coderApi.saveProjectInstructions as jest.Mock).mockRejectedValueOnce(
+		new Error('Coder project instructions changed outside Friday. Reload before saving.')
+	);
+	await act(async () => result.current.save());
+	expect(result.current.content).toBe('# Local edit');
+	expect(result.current.dirty).toBe(true);
+	expect(result.current.error).toContain('changed outside Friday');
+});
+
+it('guards navigation away from dirty instructions', () => {
+	const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+	expect(canLeaveInstructions('instructions', true)).toBe(false);
+	expect(confirm).toHaveBeenCalledWith('Discard unsaved agent instruction changes?');
+	expect(canLeaveInstructions('instructions', false)).toBe(true);
+	expect(canLeaveInstructions('workspace', true)).toBe(true);
+
+	confirm.mockReturnValue(true);
+	expect(canLeaveInstructions('instructions', true)).toBe(true);
 });

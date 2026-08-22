@@ -9,6 +9,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Workspace } from '@/components/workspace';
 import { useCoderWorkspace } from '@/hooks/workspace';
 import { useTheme } from '@/hooks/use-theme';
+import { canLeaveInstructions } from '@/navigation';
 
 export default function App() {
 	useTheme();
@@ -16,12 +17,7 @@ export default function App() {
 	const [page, setPage] = useState<'workspace' | 'configuration' | 'instructions'>('workspace');
 	const [instructionsDirty, setInstructionsDirty] = useState(false);
 	const openPage = (nextPage: 'workspace' | 'configuration' | 'instructions'): boolean => {
-		if (
-			page === 'instructions' &&
-			nextPage !== 'instructions' &&
-			instructionsDirty &&
-			!window.confirm('Discard unsaved agent instruction changes?')
-		) {
+		if (nextPage !== 'instructions' && !canLeaveInstructions(page, instructionsDirty)) {
 			return false;
 		}
 		setPage(nextPage);

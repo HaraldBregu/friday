@@ -82,6 +82,8 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		listSessions: jest.fn().mockResolvedValue([]),
 		renameSession: jest.fn().mockResolvedValue({ id: 'session-1', title: 'Renamed' }),
 		deleteSession: jest.fn().mockResolvedValue(true),
+		getProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
+		saveProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
 	} as unknown as Coder;
 	const extensionRegistry = {
 		has: jest.fn().mockReturnValue(true),
@@ -124,6 +126,51 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		handler(CoderChannels.deleteSession)({ sender }, ' project-1 ', ' session-1 ')
 	).resolves.toEqual({ success: true, data: true });
 	expect(coder.deleteSession).toHaveBeenCalledWith('project-1', 'session-1');
+	await expect(
+		handler(CoderChannels.getProjectInstructions)({ sender }, ' project-1 ')
+	).resolves.toEqual({ success: true, data: { projectId: 'project-1' } });
+	expect(coder.getProjectInstructions).toHaveBeenCalledWith('project-1');
+	const update = { content: '  keep whitespace\n', expectedRevision: 'revision-1' };
+	await expect(
+		handler(CoderChannels.saveProjectInstructions)({ sender }, ' project-1 ', update)
+	).resolves.toEqual({ success: true, data: { projectId: 'project-1' } });
+	expect(coder.saveProjectInstructions).toHaveBeenCalledWith('project-1', update);
+});
+
+it('restricts project instruction files to the Coder extension and validates updates', async () => {
+	const coder = {
+		getProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
+		saveProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
+	} as unknown as Coder;
+	const extensionRegistry = {
+		has: jest.fn().mockReturnValue(true),
+		resolve: jest.fn().mockReturnValue('coder'),
+	};
+	const sender = { id: 23 };
+	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	const handler = (channel: string) =>
+		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+	await expect(
+		handler(CoderChannels.saveProjectInstructions)({ sender }, 'project-1', {
+			content: 'content',
+			expectedRevision: '',
+		})
+	).resolves.toEqual(expect.objectContaining({ success: false }));
+	expect(coder.saveProjectInstructions).not.toHaveBeenCalled();
+
+	extensionRegistry.has.mockReturnValue(false);
+	await expect(
+		handler(CoderChannels.getProjectInstructions)({ sender }, 'project-1')
+	).resolves.toEqual(
+		expect.objectContaining({
+			success: false,
+			error: expect.objectContaining({
+				message: 'Project instructions are only available to the Coder extension.',
+			}),
+		})
+	);
+	expect(coder.getProjectInstructions).not.toHaveBeenCalled();
 });
 
 it('rejects Coder access from other extensions', async () => {
