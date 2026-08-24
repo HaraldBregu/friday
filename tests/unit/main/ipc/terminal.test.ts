@@ -37,9 +37,9 @@ it('validates create requests and accepts only registered main windows', async (
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 42 });
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
-	const handler = (ipcMain.handle as jest.Mock).mock.calls.find(
+	const handler = (ipcMain.handle as jest.Mock).mock.calls.filter(
 		([channel]) => channel === TerminalChannels.create
-	)?.[1];
+	).at(-1)?.[1];
 	const event = createEvent();
 
 	await expect(handler(event, { id: 'terminal-valid', cols: 80, rows: 24 })).resolves.toMatchObject({
@@ -76,9 +76,9 @@ it('accepts only the registered Coder extension', async () => {
 	} as unknown as ExtensionRegistry;
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
-	const handler = (ipcMain.handle as jest.Mock).mock.calls.find(
+	const handler = (ipcMain.handle as jest.Mock).mock.calls.filter(
 		([channel]) => channel === TerminalChannels.create
-	)?.[1];
+	).at(-1)?.[1];
 	const event = createEvent();
 
 	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject({
