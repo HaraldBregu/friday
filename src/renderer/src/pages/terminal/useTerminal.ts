@@ -118,9 +118,12 @@ export function useTerminal(): TerminalController {
 
 		const createPromise = window.terminalAPI
 			.create({ id, ...lastSize })
-			.then(() => {
+			.then(async () => {
 				created = true;
-				if (disposed) return window.terminalAPI.kill({ id }).then(() => undefined);
+				if (disposed) {
+					await window.terminalAPI.kill({ id });
+					return;
+				}
 				setStatus({ phase: 'ready' });
 				if (terminal.cols !== lastSize.cols || terminal.rows !== lastSize.rows) {
 					lastSize = { cols: terminal.cols, rows: terminal.rows };
