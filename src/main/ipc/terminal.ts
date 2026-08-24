@@ -89,7 +89,7 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 			throw new Error('Terminal IPC is only available to the Coder extension.');
 		}
 		const window = BrowserWindow.fromWebContents(event.sender);
-		if (!window || !windows.has(window.id)) {
+		if (!window || window.webContents !== event.sender || !windows.has(window.id)) {
 			throw new Error('Terminal IPC is unavailable to this renderer.');
 		}
 	}

@@ -107,6 +107,7 @@ export function useTerminalSession(cwd?: string): TerminalController {
 		const unsubscribeExit = terminal.onExit((event) => {
 			if (disposed || event.id !== id) return;
 			created = false;
+			xterm.options.disableStdin = true;
 			setStatus({
 				state: 'exited',
 				message: `Process exited with code ${event.exitCode}`,
@@ -145,6 +146,7 @@ export function useTerminalSession(cwd?: string): TerminalController {
 			.catch((error: unknown) => {
 				if (disposed) return;
 				const message = error instanceof Error ? error.message : 'Unable to start the terminal.';
+				xterm.options.disableStdin = true;
 				setStatus({ state: 'error', message });
 				xterm.writeln(`\r\n\x1b[31m${message}\x1b[0m`);
 			});
