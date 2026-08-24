@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import type { IpcMainInvokeEvent } from 'electron';
 import type { EventBus } from '../../../../src/main/event_bus';
+import type { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
 import { TerminalIpc } from '../../../../src/main/ipc/terminal';
 import type { LoggerService } from '../../../../src/main/shared';
 import type { PtyManager } from '../../../../src/main/terminal/manager';
@@ -29,9 +30,13 @@ it('validates create requests and accepts only registered main windows', async (
 	} as unknown as PtyManager;
 	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
 	const windows = { has: jest.fn(() => true) } as unknown as WindowContextManager;
+	const extensions = {
+		has: jest.fn(() => false),
+		resolve: jest.fn(),
+	} as unknown as ExtensionRegistry;
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 42 });
 
-	new TerminalIpc().register({ logger, manager, windows }, {} as EventBus);
+	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
 	const handler = (ipcMain.handle as jest.Mock).mock.calls.find(
 		([channel]) => channel === TerminalChannels.create
 	)?.[1];
@@ -50,5 +55,40 @@ it('validates create requests and accepts only registered main windows', async (
 	await expect(handler(event, { id: 'terminal-denied', cols: 80, rows: 24 })).resolves.toMatchObject({
 		success: false,
 		error: { message: 'Terminal IPC is unavailable to this renderer.' },
+	});
+});
+
+it('accepts only the registered Coder extension', async () => {
+	const manager = {
+		create: jest.fn(async (_sender, request) => ({
+			...request,
+			shell: '/bin/zsh',
+			cwd: process.cwd(),
+			createdAt: 1,
+		})),
+	} as unknown as PtyManager;
+	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
+	const windows = { has: jest.fn(() => false) } as unknown as WindowContextManager;
+	const extensions = {
+		has: jest.fn(() => true),
+		resolve: jest.fn(() => 'coder'),
+	} as unknown as ExtensionRegistry;
+
+	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
+	const handler = (ipcMain.handle as jest.Mock).mock.calls.find(
+		([channel]) => channel === TerminalChannels.create
+	)?.[1];
+	const event = createEvent();
+
+	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject({
+		success: true,
+		data: { id: 'terminal-coder' },
+	});
+	expect(BrowserWindow.fromWebContents).not.toHaveBeenCalled();
+
+	(extensions.resolve as jest.Mock).mockReturnValue('notes');
+	await expect(handler(event, { id: 'terminal-notes', cols: 80, rows: 24 })).resolves.toMatchObject({
+		success: false,
+		error: { message: 'Terminal IPC is only available to the Coder extension.' },
 	});
 });

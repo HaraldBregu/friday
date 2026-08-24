@@ -111,6 +111,7 @@ const maximized = await win.isMaximized();
 - `app`: app data + settings APIs exposed by preload (`setTheme`, `getThemeData`, `getLanguage`, etc.)
 - `agent`: workspace APIs exposed by preload, including text reads, typed asset reads, and Markdown writes.
 - `coder`: embedded Pi coding-agent projects, persistent sessions, Agent/Shell runs, settings, authentication, streaming, and cancellation.
+- `terminal`: embedded-only, owner-scoped PTY lifecycle, input, resize, output, and exit events.
 - `win`: embedded-only window APIs, including native context menus and window controls.
 - `connect()`: remote client for the app API and workspace agent APIs.
 - `isFriday()`: host check for in-app mode.
@@ -125,6 +126,10 @@ and never receive provider credentials. Project opening and session mutation als
 inside the main process. The registered Coder extension may read and save non-secret runtime settings,
 list the Pi model catalog, and run Codex OAuth; other extensions are rejected. Coder is not exposed by
 `connect()`.
+
+`terminal` is also intentionally embedded-only and is authorized only for trusted Friday windows and
+the registered Coder extension. It exposes the narrow preload bridge; shell selection, PTY ownership,
+and process lifecycle remain in the Electron main process. It is not exposed by `connect()`.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.

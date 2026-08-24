@@ -7,6 +7,7 @@ import {
 	connect,
 	isExtensionStoreValue,
 	isFriday,
+	terminal,
 	win,
 } from './dist/packages/sdk/index.js';
 
@@ -16,6 +17,7 @@ assert.equal(isFriday(), false);
 assert.throws(() => app.getTheme, /unavailable/);
 assert.throws(() => agent.getWorkspaceLocation, /unavailable/);
 assert.throws(() => coder.getSettings, /unavailable/);
+assert.throws(() => terminal.create, /unavailable/);
 assert.throws(() => win.showContextMenu, /unavailable/);
 
 const extensionValues = new Map();
@@ -142,6 +144,19 @@ globalThis.coder = {
 	cancelCodexLogin: async () => false,
 	disconnectCodex: async () => undefined,
 };
+globalThis.terminalAPI = {
+	create: async (request) => ({
+		...request,
+		shell: '/bin/zsh',
+		cwd: request.cwd ?? '/tmp/friday-workspace',
+		createdAt: 1,
+	}),
+	write: () => undefined,
+	resize: () => undefined,
+	kill: async () => true,
+	onData: () => () => undefined,
+	onExit: () => () => undefined,
+};
 globalThis.win = {
 	minimize: () => undefined,
 	maximize: () => undefined,
@@ -233,6 +248,25 @@ assert.equal(
 	'Focused tests'
 );
 assert.equal(await coder.deleteSession(coderProject.id, 'session-1'), true);
+assert.deepEqual(
+	await terminal.create({
+		id: 'terminal-coder',
+		cwd: coderProject.directory,
+		cols: 80,
+		rows: 24,
+	}),
+	{
+		id: 'terminal-coder',
+		cwd: coderProject.directory,
+		cols: 80,
+		rows: 24,
+		shell: '/bin/zsh',
+		createdAt: 1,
+	}
+);
+terminal.write({ id: 'terminal-coder', data: 'pwd\r' });
+terminal.resize({ id: 'terminal-coder', cols: 120, rows: 40 });
+assert.equal(await terminal.kill({ id: 'terminal-coder' }), true);
 assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open');
 assert.equal(await win.isMaximized(), true);
 
