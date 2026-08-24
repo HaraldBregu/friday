@@ -82,6 +82,7 @@ export function useTerminal(): TerminalController {
 		let created = false;
 		let animationFrame: number | undefined;
 		let lastSize = { cols: terminal.cols, rows: terminal.rows };
+		let pendingInput = '';
 
 		const removeDataListener = window.terminalAPI.onData((event) => {
 			if (event.id === id && !disposed) terminal.write(event.data);
@@ -94,7 +95,12 @@ export function useTerminal(): TerminalController {
 			setStatus({ phase: 'exited', message });
 		});
 		const inputSubscription = terminal.onData((data) => {
-			if (created && !disposed) window.terminalAPI.write({ id, data });
+			if (disposed) return;
+			if (created) {
+				window.terminalAPI.write({ id, data });
+				return;
+			}
+			pendingInput = `${pendingInput}${data}`.slice(-1024 * 1024);
 		});
 		const focus = (): void => terminal.focus();
 		container.addEventListener('pointerdown', focus);
@@ -125,6 +131,10 @@ export function useTerminal(): TerminalController {
 					return;
 				}
 				setStatus({ phase: 'ready' });
+				if (pendingInput) {
+					window.terminalAPI.write({ id, data: pendingInput });
+					pendingInput = '';
+				}
 				if (terminal.cols !== lastSize.cols || terminal.rows !== lastSize.rows) {
 					lastSize = { cols: terminal.cols, rows: terminal.rows };
 					window.terminalAPI.resize({ id, ...lastSize });
