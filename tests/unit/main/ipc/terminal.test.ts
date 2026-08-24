@@ -69,9 +69,10 @@ it('accepts only the registered Coder extension', async () => {
 	} as unknown as PtyManager;
 	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
 	const windows = { has: jest.fn(() => false) } as unknown as WindowContextManager;
+	let extensionId = 'coder';
 	const extensions = {
-		has: jest.fn(() => true),
-		resolve: jest.fn(() => 'coder'),
+		has: () => true,
+		resolve: () => extensionId,
 	} as unknown as ExtensionRegistry;
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
@@ -86,7 +87,7 @@ it('accepts only the registered Coder extension', async () => {
 	});
 	expect(BrowserWindow.fromWebContents).not.toHaveBeenCalled();
 
-	(extensions.resolve as jest.Mock).mockReturnValue('notes');
+	extensionId = 'notes';
 	await expect(handler(event, { id: 'terminal-notes', cols: 80, rows: 24 })).resolves.toMatchObject({
 		success: false,
 		error: { message: 'Terminal IPC is only available to the Coder extension.' },
