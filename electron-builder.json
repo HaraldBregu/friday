@@ -25,11 +25,12 @@
 	"asar": true,
 	"asarUnpack": [
 		"node_modules/@anthropic-ai/sandbox-runtime/vendor/**/*",
-		"node_modules/@silvia-odwyer/photon-node/**/*"
+		"node_modules/@silvia-odwyer/photon-node/**/*",
+		"node_modules/node-pty/**/*"
 	],
 	"nodeGypRebuild": false,
 	"buildDependenciesFromSource": false,
-	"npmRebuild": false,
+	"npmRebuild": true,
 	"mac": {
 		"target": [
 			{

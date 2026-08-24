@@ -16,6 +16,7 @@ import { extensions } from './extensions';
 import { wiki } from './wiki';
 import { win } from './win';
 import { data } from './data';
+import { terminalAPI } from './terminal';
 
 export { agent } from './agent';
 export { coder } from './coder';
@@ -33,6 +34,7 @@ export { database } from './database';
 export { extensions } from './extensions';
 export { wiki } from './wiki';
 export { data } from './data';
+export { terminalAPI } from './terminal';
 
 if (process.contextIsolated) {
 	try {
@@ -53,6 +55,7 @@ if (process.contextIsolated) {
 		contextBridge.exposeInMainWorld('extensions', extensions);
 		contextBridge.exposeInMainWorld('wiki', wiki);
 		contextBridge.exposeInMainWorld('dataControls', data);
+		contextBridge.exposeInMainWorld('terminalAPI', terminalAPI);
 	} catch (error) {
 		console.error('[preload] Failed to expose IPC APIs:', error);
 	}
@@ -91,4 +94,6 @@ if (process.contextIsolated) {
 	globalThis.wiki = wiki;
 	// @ts-ignore (define in dts)
 	globalThis.dataControls = data;
+	// @ts-ignore (define in dts)
+	globalThis.terminalAPI = terminalAPI;
 }

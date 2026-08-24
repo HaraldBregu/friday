@@ -15,6 +15,9 @@ import { StorageChannels } from '../shared/ipc_channels_definitions';
 import { Coder, CoderProjectStore, CoderStore } from './coder';
 import { getProvider } from './settings_store';
 import { agentLocation } from './shared/agent_location';
+import { EnvironmentManager } from './terminal/environment';
+import { PtyManager } from './terminal/manager';
+import { ShellDetector } from './terminal/shell';
 
 export interface MainServices {
 	appState: AppState;
@@ -29,6 +32,7 @@ export interface MainServices {
 	extensionRegistry: ExtensionRegistry;
 	extensionStorage: ExtensionStorage;
 	storageOperations: StorageOperations;
+	terminalManager: PtyManager;
 }
 
 export interface BootstrapResult extends MainServices {}
@@ -59,6 +63,11 @@ export function bootstrapServices(): BootstrapResult {
 	const storageOperations = new StorageOperations((status) => {
 		eventBus.broadcastToWindows(StorageChannels.operationStatusChanged, status);
 	});
+	const terminalManager = new PtyManager(
+		logger,
+		new ShellDetector(),
+		new EnvironmentManager(logger)
+	);
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
 		coderService.cancelWindow((event.payload as { windowId: number }).windowId);
@@ -84,12 +93,15 @@ export function bootstrapServices(): BootstrapResult {
 		extensionRegistry,
 		extensionStorage,
 		storageOperations,
+		terminalManager,
 	};
 }
 
 export async function cleanup(services: MainServices): Promise<void> {
-	const { logger, windowContextManager, channelRegistry, conversationService } = services;
+	const { logger, windowContextManager, channelRegistry, conversationService, terminalManager } =
+		services;
 	logger.info('Bootstrap', 'Starting cleanup');
+	terminalManager.shutdown();
 	await conversationService.execute({ type: 'voice', action: 'stop-all' });
 	await windowContextManager.destroyAll();
 	channelRegistry.destroy();

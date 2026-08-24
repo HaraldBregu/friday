@@ -69,21 +69,24 @@ export class WindowFactory {
 	}
 
 	private secureNavigation(webContents: WebContents, fileRoot?: string): void {
-		if (fileRoot) {
-			webContents.setWindowOpenHandler(({ url }) => {
+		webContents.setWindowOpenHandler(({ url }) => {
+			if (fileRoot) {
 				const target = externalUrl(url);
 				if (target) {
 					void shell.openExternal(target).catch((error) => {
 						this.logger?.warn('WindowFactory', 'Failed to open external URL', { url: target, error });
 					});
 				}
-				return { action: 'deny' };
-			});
-		}
+			}
+			return { action: 'deny' };
+		});
 		webContents.on('will-navigate', (event, url) => {
 			const target = new URL(url);
 			if (target.protocol === 'file:') {
-				if (!fileRoot) return;
+				if (!fileRoot) {
+					event.preventDefault();
+					return;
+				}
 				const relative = path.relative(fileRoot, fileURLToPath(target));
 				if (relative.startsWith('..') || path.isAbsolute(relative)) event.preventDefault();
 				return;
@@ -121,25 +124,16 @@ export class WindowFactory {
 			webPreferences: {
 				...this.getBaseWebPreferences(),
 				...overrides.webPreferences,
+				sandbox: true,
+				nodeIntegration: false,
+				contextIsolation: true,
+				webSecurity: true,
+				allowRunningInsecureContent: false,
 			},
 		};
 
 		const win = new BrowserWindow(options);
 		setupPdfContextMenu(win);
-
-		// Prevent arbitrary window.open() calls from creating unrestricted windows
-		// win.webContents.setWindowOpenHandler(({ url }) => {
-		// 	const externalUrl = normalizeExternalUrl(url);
-		// 	if (externalUrl) {
-		// 		void shell.openExternal(externalUrl).catch((error) => {
-		// 			this.logger?.warn('WindowFactory', 'Failed to open external URL', {
-		// 				url: externalUrl,
-		// 				error,
-		// 			});
-		// 		});
-		// 	}
-		// 	return { action: 'deny' };
-		// });
 
 		this.secureNavigation(win.webContents, content.file ? path.dirname(content.file) : undefined);
 

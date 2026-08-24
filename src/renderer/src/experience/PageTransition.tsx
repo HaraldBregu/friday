@@ -13,7 +13,10 @@ export function PageTransition({ children }: PageTransitionProps): React.JSX.Ele
 
 	// Key on the top-level segment so sub-route changes (e.g. /settings/*) don't trigger a transition
 	const topKey = location.pathname.split('/')[1] ?? 'root';
-	const variants = topKey === 'home' || topKey === 'settings' ? fadeVariants : pageVariants;
+	const variants =
+		topKey === 'home' || topKey === 'settings' || topKey === 'terminal'
+			? fadeVariants
+			: pageVariants;
 
 	if (prefersReducedMotion) {
 		return <div className="h-full">{children}</div>;

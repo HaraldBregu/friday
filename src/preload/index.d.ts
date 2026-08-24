@@ -18,6 +18,7 @@ import type {
 	WikiApi,
 	WindowApi,
 	DataApi,
+	TerminalApi,
 } from '../shared/api_types';
 
 declare global {
@@ -39,5 +40,6 @@ declare global {
 		extensions: ExtensionsApi;
 		wiki: WikiApi;
 		dataControls: DataApi;
+		terminalAPI: TerminalApi;
 	}
 }

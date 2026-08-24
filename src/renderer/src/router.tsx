@@ -61,6 +61,7 @@ const VideoPage = lazy(() => import('./pages/settings/pages/video/Page'));
 const MusicPage = lazy(() => import('./pages/settings/pages/music/Page'));
 const ExtensionsPage = lazy(() => import('./pages/settings/pages/extensions/Page'));
 const ExtensionDetailsPage = lazy(() => import('./pages/settings/pages/extensions/details/Page'));
+const TerminalPage = lazy(() => import('./pages/terminal/Page'));
 const SIDEBAR_TRANSITION_MS = 200;
 
 function ModelServiceLegacyRedirect(): React.JSX.Element {
@@ -112,6 +113,7 @@ function RootRouteComponent(): React.JSX.Element {
 
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
+	const isTerminal = location.pathname === '/terminal';
 	const hasSidebar = isHome || isSettings;
 
 	useLayoutEffect(() => {
@@ -146,7 +148,13 @@ function RootRouteComponent(): React.JSX.Element {
 				>
 					<TitleBar
 						centerContent={
-							isSettings && showSettingsBreadcrumb ? <SettingsBreadcrumb /> : undefined
+							isSettings && showSettingsBreadcrumb ? (
+								<SettingsBreadcrumb />
+							) : isTerminal ? (
+								<span className="truncate text-xs font-medium text-muted-foreground">
+									Terminal
+								</span>
+							) : undefined
 						}
 						centerContentClassName={
 							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
@@ -204,6 +212,14 @@ const routes: RouteObject[] = [
 				element: (
 					<RouteWrapper fallback={<HomePageLoadingSkeleton />}>
 						<HomePage />
+					</RouteWrapper>
+				),
+			},
+			{
+				path: 'terminal',
+				element: (
+					<RouteWrapper>
+						<TerminalPage />
 					</RouteWrapper>
 				),
 			},

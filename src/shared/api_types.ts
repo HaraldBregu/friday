@@ -116,6 +116,7 @@ import type {
 } from './coder_types';
 export type { DataApi } from './data_types';
 export type { A2aApi } from './a2a_types';
+export type { TerminalApi } from './terminal';
 
 export interface WindowApi {
 	minimize: () => void;

@@ -54,6 +54,7 @@ import {
 	WikiChannels,
 	DataChannels,
 	WindowChannels,
+	TerminalChannels,
 } from './ipc_channels_definitions';
 type ProviderStoreRecord = StoredProvider | StoredBotProvider;
 
@@ -981,6 +982,31 @@ export interface WindowEventChannelMap {
 	[WindowChannels.fullScreenChange]: { data: boolean };
 }
 
+export interface TerminalInvokeChannelMap {
+	[TerminalChannels.create]: {
+		args: [request: import('./terminal').TerminalCreateRequest];
+		result: import('./terminal').TerminalSessionInfo;
+	};
+	[TerminalChannels.kill]: {
+		args: [request: import('./terminal').TerminalKillRequest];
+		result: boolean;
+	};
+}
+
+export interface TerminalSendChannelMap {
+	[TerminalChannels.write]: {
+		args: [request: import('./terminal').TerminalWriteRequest];
+	};
+	[TerminalChannels.resize]: {
+		args: [request: import('./terminal').TerminalResizeRequest];
+	};
+}
+
+export interface TerminalEventChannelMap {
+	[TerminalChannels.data]: { data: import('./terminal').TerminalDataEvent };
+	[TerminalChannels.exit]: { data: import('./terminal').TerminalExitEvent };
+}
+
 export interface InvokeChannelMap
 	extends
 		AppInvokeChannelMap,
@@ -1006,9 +1032,10 @@ export interface InvokeChannelMap
 		SttInvokeChannelMap,
 		TextInvokeChannelMap,
 		VideoInvokeChannelMap,
-		ExtensionsInvokeChannelMap {}
+		ExtensionsInvokeChannelMap,
+		TerminalInvokeChannelMap {}
 
-export interface SendChannelMap extends WindowSendChannelMap {}
+export interface SendChannelMap extends WindowSendChannelMap, TerminalSendChannelMap {}
 
 export interface AppEventChannelMap {
 	[AppChannels.modelsChanged]: { data: void };
@@ -1033,4 +1060,5 @@ export interface EventChannelMap
 		StorageEventChannelMap,
 		WindowEventChannelMap,
 		RealtimeVoiceEventChannelMap,
-		SttEventChannelMap {}
+		SttEventChannelMap,
+		TerminalEventChannelMap {}

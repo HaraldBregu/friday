@@ -107,6 +107,7 @@
 		"test:main:agent": "jest --config jest.config.cjs --selectProjects main tests/unit/main/agent",
 		"test:main:store": "jest --config jest.config.cjs --selectProjects main tests/unit/main/store",
 		"test:renderer": "jest --config jest.config.cjs --selectProjects renderer",
+		"test:terminal": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/terminal-smoke.cjs",
 		"test:packages": "npm test --workspaces --if-present",
 		"test:coverage": "jest --config jest.config.cjs --coverage",
 		"test:e2e": "npx playwright test --config playwright.config.ts",

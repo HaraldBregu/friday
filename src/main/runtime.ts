@@ -229,6 +229,7 @@ app.whenReady().then(async () => {
 
 app.on('will-quit', () => {
 	setKeepAwake(false);
+	services.terminalManager.shutdown();
 });
 
 app.on('quit', () => {

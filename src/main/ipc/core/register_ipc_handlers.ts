@@ -16,6 +16,7 @@ import { WindowIpc } from '../window';
 import { DataIpc } from '../data';
 import { RealtimeVoiceIpc } from '../realtime_voice';
 import { CoderIpc } from '../coder';
+import { TerminalIpc } from '../terminal';
 import type { EventBus } from '../../event_bus';
 import type { MainServices } from '../../bootstrap';
 
@@ -30,6 +31,8 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		extensionRegistry,
 		extensionStorage,
 		storageOperations,
+		terminalManager,
+		windowContextManager,
 	} = services;
 
 	const safeRegister = (name: string, register: () => void): void => {
@@ -82,6 +85,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('wiki', () => new WikiIpc().register(undefined, eventBus));
 	safeRegister('data', () => new DataIpc().register({ agent: agentService }, eventBus));
 	safeRegister('window', () => new WindowIpc().register({ logger }, eventBus));
+	safeRegister('terminal', () =>
+		new TerminalIpc().register(
+			{ logger, manager: terminalManager, windows: windowContextManager },
+			eventBus
+		)
+	);
 
 	logger.info('Bootstrap', 'Registered IPC modules');
 }

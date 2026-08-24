@@ -356,3 +356,12 @@ export const WindowChannels = {
 	popupMenu: 'window:popup-menu',
 	showContextMenu: 'window:context-menu:show',
 } as const;
+
+export const TerminalChannels = {
+	create: 'terminal:create',
+	write: 'terminal:write',
+	resize: 'terminal:resize',
+	kill: 'terminal:kill',
+	data: 'terminal:data',
+	exit: 'terminal:exit',
+} as const;

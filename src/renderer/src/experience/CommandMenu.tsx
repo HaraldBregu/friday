@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
 	Home,
 	Settings,
+	SquareTerminal,
 	type LucideIcon,
 } from 'lucide-react';
 import {
@@ -64,6 +65,14 @@ const TOP_LEVEL_ROUTES: readonly StaticRouteDefinition[] = [
 		icon: Home,
 		path: '/home',
 		keywords: 'chat agent ai assistant friday',
+	},
+	{
+		id: 'route-terminal',
+		label: 'Terminal',
+		description: 'Open a local shell',
+		icon: SquareTerminal,
+		path: '/terminal',
+		keywords: 'shell command line console pty',
 	},
 	{
 		id: 'route-settings',
