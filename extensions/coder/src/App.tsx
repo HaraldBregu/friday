@@ -10,16 +10,13 @@ import { Workspace } from '@/components/workspace';
 import { useCoderWorkspace } from '@/hooks/workspace';
 import { useTheme } from '@/hooks/use-theme';
 import { canLeaveInstructions } from '@/navigation';
-import { TerminalView } from '@/terminal/view';
-
-type CoderPage = 'workspace' | 'terminal' | 'configuration' | 'instructions';
 
 export default function App() {
 	useTheme();
 	const coder = useCoderWorkspace();
-	const [page, setPage] = useState<CoderPage>('workspace');
+	const [page, setPage] = useState<'workspace' | 'configuration' | 'instructions'>('workspace');
 	const [instructionsDirty, setInstructionsDirty] = useState(false);
-	const openPage = (nextPage: CoderPage): boolean => {
+	const openPage = (nextPage: 'workspace' | 'configuration' | 'instructions'): boolean => {
 		if (nextPage !== 'instructions' && !canLeaveInstructions(page, instructionsDirty)) {
 			return false;
 		}
@@ -57,25 +54,8 @@ export default function App() {
 							/>
 						) : (
 							<>
-								<Header
-									coder={coder}
-									terminalOpen={page === 'terminal'}
-									onOpenInstructions={() => void openPage('instructions')}
-									onToggleTerminal={() =>
-										void openPage(page === 'terminal' ? 'workspace' : 'terminal')
-									}
-								/>
-								{page === 'terminal' ? (
-									<TerminalView
-										cwd={
-											coder.activeProject?.available
-												? coder.activeProject.directory
-												: undefined
-										}
-									/>
-								) : (
-									<Workspace coder={coder} />
-								)}
+								<Header coder={coder} onOpenInstructions={() => void openPage('instructions')} />
+								<Workspace coder={coder} />
 							</>
 						)}
 					</SidebarInset>

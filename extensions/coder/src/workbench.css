@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import '@xterm/xterm/css/xterm.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -178,41 +177,6 @@
 .coder-markdown pre,
 .coder-markdown blockquote {
 	margin: 0.65rem 0;
-}
-
-.coder-terminal {
-	position: relative;
-	min-height: 0;
-	flex: 1;
-	overflow: hidden;
-	background: #0f111a;
-}
-
-.coder-terminal-host {
-	position: absolute;
-	inset: 0;
-	padding: 8px 10px;
-}
-
-.coder-terminal-host .xterm {
-	height: 100%;
-}
-
-.coder-terminal-status {
-	position: absolute;
-	top: 8px;
-	right: 12px;
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	max-width: min(70%, 520px);
-	border: 1px solid rgb(255 255 255 / 10%);
-	border-radius: 6px;
-	background: rgb(15 17 26 / 88%);
-	padding: 4px 7px;
-	color: #aeb7c4;
-	font-size: 11px;
-	pointer-events: none;
 }
 
 .coder-markdown ul,
