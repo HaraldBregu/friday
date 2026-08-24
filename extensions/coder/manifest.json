@@ -1,6 +1,6 @@
 {
 	"title": "Coder",
-	"description": "A project-based Pi coding agent with persistent sessions and recorded shell commands.",
+	"description": "A project-based coding agent with persistent sessions and an interactive terminal.",
 	"metadata": {
 		"version": "1.0.0",
 		"category": "utility",

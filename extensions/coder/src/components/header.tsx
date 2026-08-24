@@ -3,8 +3,10 @@ import {
 	FileText,
 	FolderOpen,
 	LoaderCircle,
+	MessageSquareText,
 	MoreHorizontal,
 	Plus,
+	SquareTerminal,
 	Trash2,
 } from 'lucide-react';
 
@@ -22,10 +24,14 @@ import type { CoderController } from '@/controller';
 
 export function Header({
 	coder,
+	terminalOpen,
 	onOpenInstructions,
+	onToggleTerminal,
 }: {
 	coder: CoderController;
+	terminalOpen: boolean;
 	onOpenInstructions: () => void;
+	onToggleTerminal: () => void;
 }) {
 	const session = coder.sessions.find((item) => item.id === coder.activeSessionId);
 	return (
@@ -35,7 +41,9 @@ export function Header({
 			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs">
 				<span className="truncate font-medium">{coder.activeProject?.name ?? 'Coder'}</span>
 				<span className="text-muted-foreground">/</span>
-				<span className="truncate text-muted-foreground">{session?.title ?? 'New session'}</span>
+				<span className="truncate text-muted-foreground">
+					{terminalOpen ? 'Terminal' : (session?.title ?? 'New session')}
+				</span>
 			</div>
 
 			{coder.runState === 'running' ? (
@@ -81,6 +89,23 @@ export function Header({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			) : null}
+
+			<Tooltip>
+				<TooltipTrigger
+					render={
+						<Button
+							variant={terminalOpen ? 'secondary' : 'ghost'}
+							size="icon-sm"
+							aria-label={terminalOpen ? 'Return to coding session' : 'Open terminal'}
+							aria-pressed={terminalOpen}
+							onClick={onToggleTerminal}
+						>
+							{terminalOpen ? <MessageSquareText /> : <SquareTerminal />}
+						</Button>
+					}
+				/>
+				<TooltipContent>{terminalOpen ? 'Coding session' : 'Terminal'}</TooltipContent>
+			</Tooltip>
 
 			<Tooltip>
 				<TooltipTrigger
