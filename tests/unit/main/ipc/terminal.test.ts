@@ -80,6 +80,7 @@ it('accepts only the registered Coder extension', async () => {
 		([channel]) => channel === TerminalChannels.create
 	).at(-1)?.[1];
 	const event = createEvent();
+	(BrowserWindow.fromWebContents as jest.Mock).mockClear();
 
 	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject({
 		success: true,
