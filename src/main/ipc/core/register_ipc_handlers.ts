@@ -87,7 +87,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('window', () => new WindowIpc().register({ logger }, eventBus));
 	safeRegister('terminal', () =>
 		new TerminalIpc().register(
-			{ logger, manager: terminalManager, windows: windowContextManager },
+			{
+				logger,
+				manager: terminalManager,
+				windows: windowContextManager,
+				extensions: extensionRegistry,
+			},
 			eventBus
 		)
 	);

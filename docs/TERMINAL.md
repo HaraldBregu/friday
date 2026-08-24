@@ -6,15 +6,16 @@ pseudoterminals. It does not implement a terminal renderer in the main Friday UI
 ## Data flow
 
 ```text
-approved client input -> terminalAPI -> validated Electron IPC -> PtyManager -> node-pty
-node-pty output -> owner-only Electron IPC -> terminalAPI event
-approved client resize -> terminalAPI -> node-pty resize
+Coder xterm input -> @friday/sdk -> terminalAPI -> validated Electron IPC -> PtyManager -> node-pty
+node-pty output -> owner-only Electron IPC -> terminalAPI event -> @friday/sdk -> Coder xterm
+Coder resize -> @friday/sdk -> terminalAPI -> node-pty resize
 ```
 
 `node-pty` runs only in the Electron main process. The preload exposes a narrow typed API and never
 exposes `ipcRenderer`, `require`, `fs`, `child_process`, or `node-pty`. Callers cannot choose an
-executable. Every terminal belongs to the approved `webContents` that created it; other windows,
-extension views, unknown renderers, and subframes cannot control that session.
+executable. Every terminal belongs to the approved `webContents` that created it. Only trusted main
+windows and the registered Coder extension may create terminals; other extension views, unknown
+renderers, subframes, and other owners cannot control that session.
 
 macOS sessions merge the Finder/Dock environment with the user's login-shell environment through
 `shell-env`, then set only terminal-specific variables (`TERM`, `COLORTERM`, and `TERM_PROGRAM`).
@@ -58,11 +59,12 @@ cross-platform artifacts cannot be fully validated from one host OS.
 - Reload, crash, or close the owner and confirm no child shell remains.
 - Verify commands installed through Homebrew, nvm, pnpm, Bun, Cargo, pyenv, and rbenv are found on
   macOS when they are available in the normal login shell.
-- Verify an extension view and a second window cannot control another window's PTY.
+- Verify a non-Coder extension view and a second window cannot control another owner's PTY.
 - Verify packaged macOS, Windows, and Linux applications load the unpacked native module.
 
 ## Current scope
 
-No terminal UI, xterm integration, tabs, split panes, display serialization, or SSH backend is part
-of this layer. PTYs live in the Electron main process and end when their owner reloads, closes,
-crashes, or the application quits.
+The main Friday renderer has no terminal UI. The Coder extension owns the xterm renderer and consumes
+this layer only through `@friday/sdk`. Tabs, split panes, display serialization, and SSH backends are
+not part of the current scope. PTYs live in the Electron main process and end when their owner
+reloads, closes, crashes, or the application quits.

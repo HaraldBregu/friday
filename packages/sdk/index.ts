@@ -1,4 +1,5 @@
 import type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
+import type { TerminalApi } from '../../src/shared/terminal';
 
 export {
 	connect,
@@ -8,6 +9,16 @@ export {
 	type WorkspaceAgentApi,
 } from './connect';
 export type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
+export type {
+	TerminalApi,
+	TerminalCreateRequest,
+	TerminalDataEvent,
+	TerminalExitEvent,
+	TerminalKillRequest,
+	TerminalResizeRequest,
+	TerminalSessionInfo,
+	TerminalWriteRequest,
+} from '../../src/shared/terminal';
 export type {
 	AppLanguage,
 	AppTheme,
@@ -82,6 +93,7 @@ function bridge<T extends object>(name: string): T {
 export const app = bridge<AppApi>('app');
 export const agent = bridge<AgentApi>('agent');
 export const coder = bridge<CoderApi>('coder');
+export const terminal = bridge<TerminalApi>('terminalAPI');
 export const win = bridge<WindowApi>('win');
 
 const requiredMethods = [
