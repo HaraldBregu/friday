@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { Plus, Settings2, SquareTerminal } from 'lucide-react';
+import { Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -194,17 +194,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 				)}
 			</section>
 			<footer className="shrink-0 border-t border-sidebar-border/50 p-2">
-				<div className="grid min-w-0 gap-1">
-					<Link
-						to="/terminal"
-						aria-label="Terminal"
-						className="flex h-8 min-w-0 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
-					>
-						<span className="flex size-6 shrink-0 items-center justify-center" aria-hidden="true">
-							<SquareTerminal className="size-4" strokeWidth={1.7} />
-						</span>
-						<span className="min-w-0 truncate text-sm font-medium">Terminal</span>
-					</Link>
+				<div className="flex min-w-0 items-center gap-1">
 					<Link
 						to="/settings"
 						aria-label={t('settings.title')}

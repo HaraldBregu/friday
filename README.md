@@ -15,7 +15,6 @@ You choose the providers and models behind each AI capability. Friday keeps its 
 ## What Friday Can Do
 
 - **Work with your computer** — read, create, and edit files; apply precise patches; and run commands or long-lived processes.
-- **Use a real local terminal** — open an interactive PTY-backed shell with xterm.js rendering and native terminal behavior.
 - **Understand more than text** — accept image and PDF attachments, transcribe speech, and read responses aloud.
 - **Research and browse** — search the web, fetch pages, and automate browser interactions when a task requires them.
 - **Create media** — generate images, videos, music, and sound effects with your selected providers and models.
@@ -40,7 +39,6 @@ Friday runs on Windows, macOS, and Linux, with English and Italian interfaces an
 
 - Electron 41 and Node.js
 - React 19, TypeScript, Tailwind CSS 4, and shadcn components
-- xterm.js and node-pty for the local terminal workbench
 - Jest, Testing Library, and Playwright
 - electron-vite and electron-builder
 
@@ -134,7 +132,7 @@ chat and other supported features from running.
 - `src/renderer/src` contains the React user interface.
 - `src/preload` exposes the narrow bridge between the renderer and main process.
 - `src/shared` contains cross-process types and API contracts.
-- `src/main/terminal` and `src/renderer/src/pages/terminal` contain the PTY lifecycle and terminal workbench. See [Terminal Architecture](docs/TERMINAL.md).
+- `src/main/terminal` contains the PTY lifecycle behind the typed terminal IPC API. See [Terminal IPC Architecture](docs/TERMINAL.md).
 - `packages/cli` contains the publishable TypeScript command-line and terminal interface.
 - `packages/sdk` contains the publishable typed client for Friday's local API.
 - `src/main/agent` contains sessions, tools, skills, memory, schedules, health runs, sandboxing, and permission policy.

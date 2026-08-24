@@ -56,7 +56,6 @@ export class ShortcutManager {
 	attach(win: BrowserWindow): void {
 		win.webContents.on('before-input-event', (event, input) => {
 			if (input.type !== 'keyDown' || input.isAutoRepeat) return;
-			if (win.webContents.getURL().includes('#/terminal')) return;
 			const match = this.findMatch(input);
 			if (!match) return;
 			event.preventDefault();

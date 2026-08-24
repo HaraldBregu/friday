@@ -1,20 +1,20 @@
-# Terminal Architecture
+# Terminal IPC Architecture
 
-Friday's terminal workbench is available at `/terminal`. Stage 1 provides one local interactive
-shell backed by a real operating-system pseudoterminal.
+Friday provides a backend API for local interactive shells backed by real operating-system
+pseudoterminals. It does not implement a terminal renderer in the main Friday UI.
 
 ## Data flow
 
 ```text
-xterm.js input -> terminalAPI -> validated Electron IPC -> PtyManager -> node-pty
-node-pty output -> owner-only Electron IPC -> xterm.js write
-ResizeObserver -> FitAddon -> terminalAPI -> node-pty resize
+approved client input -> terminalAPI -> validated Electron IPC -> PtyManager -> node-pty
+node-pty output -> owner-only Electron IPC -> terminalAPI event
+approved client resize -> terminalAPI -> node-pty resize
 ```
 
-`node-pty` runs only in the Electron main process. The sandboxed renderer receives a narrow typed
-API from the context-isolated preload and cannot choose an executable or access Node.js modules.
-Every terminal belongs to the `webContents` that created it. Other windows, extension views, and
-subframes cannot write, resize, or kill that session.
+`node-pty` runs only in the Electron main process. The preload exposes a narrow typed API and never
+exposes `ipcRenderer`, `require`, `fs`, `child_process`, or `node-pty`. Callers cannot choose an
+executable. Every terminal belongs to the approved `webContents` that created it; other windows,
+extension views, unknown renderers, and subframes cannot control that session.
 
 macOS sessions merge the Finder/Dock environment with the user's login-shell environment through
 `shell-env`, then set only terminal-specific variables (`TERM`, `COLORTERM`, and `TERM_PROGRAM`).
@@ -48,15 +48,14 @@ Electron Builder rebuilds native dependencies for each target architecture and u
 from ASAR. Release validation should launch every packaged target and repeat the PTY smoke check;
 cross-platform artifacts cannot be fully validated from one host OS.
 
-## Stage 1 verification checklist
+## Verification checklist
 
-- Run commands and verify ANSI, 256-color, true-color, Unicode, and emoji output.
-- Exercise Ctrl+C, Ctrl+D, Ctrl+Z, Tab, Backspace, arrows, Home/End, Page Up/Down, Alt/Option, and
-  function keys.
-- Run `vim` or `nvim`, `less`, `top` or `htop`, `tmux`, `ssh`, `fzf`, Python, Node, and Git.
-- Resize the window while a full-screen application is active.
-- Produce sustained output and confirm the React component does not rerender for each chunk.
-- Reload and close the window, then confirm no child shell remains.
+- Create a session, write a deterministic command, receive its output, resize it, and kill it.
+- Send Ctrl+C, Ctrl+D, Ctrl+Z, Tab, Backspace, arrows, Alt/Option, and function-key sequences through
+  the API and verify the PTY receives them unchanged.
+- Run `vim`, `less`, `top`, `tmux`, `ssh`, and `fzf` through an approved client.
+- Produce sustained output and verify chunks are delivered directly to the event subscriber.
+- Reload, crash, or close the owner and confirm no child shell remains.
 - Verify commands installed through Homebrew, nvm, pnpm, Bun, Cargo, pyenv, and rbenv are found on
   macOS when they are available in the normal login shell.
 - Verify an extension view and a second window cannot control another window's PTY.
@@ -64,7 +63,6 @@ cross-platform artifacts cannot be fully validated from one host OS.
 
 ## Current scope
 
-Tabs, split panes, search, link handling, native copy/paste menus, profiles, settings, themes,
-serialization, and SSH backends are Stage 2–6 work. Terminal display serialization will not be
-treated as restoration of a running process. PTYs currently live in the Electron process and end
-when their owner reloads, closes, crashes, or the application quits.
+No terminal UI, xterm integration, tabs, split panes, display serialization, or SSH backend is part
+of this layer. PTYs live in the Electron main process and end when their owner reloads, closes,
+crashes, or the application quits.
