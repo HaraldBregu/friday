@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -u
 
+exec 3>&1
 log_file="${TMPDIR:-/tmp}/codex-auto-commit.log"
 lock_dir=""
 
 finish() {
+	trap - EXIT INT TERM
 	if [ -n "$lock_dir" ] && [ -d "$lock_dir" ]; then
 		rmdir "$lock_dir" 2>/dev/null || true
 	fi
+	printf '{}\n' >&3
 	exit 0
 }
 
