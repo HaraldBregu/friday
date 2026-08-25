@@ -79,7 +79,12 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	const older = within(navigation).getByRole('button', { name: 'Older chat' });
 	expect(latest).toHaveAttribute('aria-current', 'page');
 	expect(latest).toHaveAttribute('data-run-status', 'running');
-	expect(within(latest).getByText('Latest chat')).toHaveClass('truncate');
+	expect(latest.style.animation).toBe('');
+	const latestTitle = within(latest).getByText('Latest chat');
+	expect(latestTitle).toHaveClass('truncate', 'bg-clip-text', 'text-transparent');
+	expect(latestTitle).toHaveStyle({
+		animation: 'text-shimmer var(--text-shimmer-duration) linear infinite',
+	});
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
