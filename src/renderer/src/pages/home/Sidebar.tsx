@@ -2,10 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { Plus, Settings2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import {
-	SPLIT_ITEM_ACTIVE_CLASS,
-	SPLIT_ITEM_CLASS,
-} from '@/components/app/base/page';
+import { SPLIT_ITEM_ACTIVE_CLASS, SPLIT_ITEM_CLASS } from '@/components/app/base/page';
 import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,8 +65,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 			});
 	};
 
-	const currentSessionId =
-		sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
+	const currentSessionId = sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
 
 	return (
 		<div data-slot="home-sidebar" className="flex h-full min-h-0 flex-col">
@@ -150,7 +146,11 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 												type="button"
 												data-active={isActive ? '' : undefined}
 												aria-current={isActive ? 'page' : undefined}
-												className={cn(SPLIT_ITEM_CLASS, 'min-w-0 flex-1', isActive && SPLIT_ITEM_ACTIVE_CLASS)}
+												className={cn(
+													SPLIT_ITEM_CLASS,
+													'min-w-0 flex-1',
+													isActive && SPLIT_ITEM_ACTIVE_CLASS
+												)}
 												data-run-status={session.runStatus}
 												onClick={() => setSessionId(session.id)}
 												onContextMenu={(event) => {
@@ -167,18 +167,22 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 															}
 															if (action === 'delete') {
 																void window.agent.deleteSession(session.id).then(() => {
-																	setSessions((current) => current.filter((item) => item.id !== session.id));
+																	setSessions((current) =>
+																		current.filter((item) => item.id !== session.id)
+																	);
 																	if (isActive) setSessionId(crypto.randomUUID());
 																});
 															}
 														});
-														}}
+												}}
 											>
 												{session.runStatus ? (
 													<TextShimmer
 														duration={2}
 														className="truncate"
-														style={{ '--foreground': 'var(--sidebar-foreground)' } as React.CSSProperties}
+														style={
+															{ '--foreground': 'var(--sidebar-foreground)' } as React.CSSProperties
+														}
 													>
 														{title}
 													</TextShimmer>

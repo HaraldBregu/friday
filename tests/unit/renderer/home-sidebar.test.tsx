@@ -88,10 +88,7 @@ it('loads chat history, marks the latest default session, and switches sessions'
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
-	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute(
-		'href',
-		'/settings'
-	);
+	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute('href', '/settings');
 	expect(screen.getByText('settings.title')).toBeInTheDocument();
 	expect(
 		screen.queryByRole('button', { name: 'settings.modelServices.voiceName' })
@@ -100,9 +97,7 @@ it('loads chat history, marks the latest default session, and switches sessions'
 
 it('renames a chat from its context menu without item action buttons', async () => {
 	const user = userEvent.setup();
-	listSessions.mockResolvedValue([
-		{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 },
-	]);
+	listSessions.mockResolvedValue([{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 }]);
 	showContextMenu.mockResolvedValue('rename');
 	renameSession.mockResolvedValue(undefined);
 
@@ -178,11 +173,7 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 		<MemoryRouter>
 			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
 				<PageContainer>
-					<Split
-						sidebar={
-							<HomeSidebar refreshKey="initial" />
-						}
-					>
+					<Split sidebar={<HomeSidebar refreshKey="initial" />}>
 						<div>Workspace</div>
 					</Split>
 				</PageContainer>
