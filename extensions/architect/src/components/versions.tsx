@@ -16,7 +16,7 @@ interface VersionsProps {
 export function Versions({ versions, currentId, cropMode, crop, busy, onSelect, onChange, onApply, onCancel }: VersionsProps) {
 	if (cropMode) {
 		return (
-			<aside className="versions-panel panel">
+			<aside className="versions-panel crop-panel panel">
 				<div className="panel-title">
 					<div><strong>Crop image</strong><span>Frame a new version</span></div>
 					<Crop size={15} />
