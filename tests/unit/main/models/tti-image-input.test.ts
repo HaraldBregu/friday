@@ -64,7 +64,7 @@ describe('image source editing adapters', () => {
 			source,
 		});
 
-		const request = fetch.mock.calls.find(([, init]) => init?.method === 'POST');
+		const request = fetch.mock.calls.find(([url]) => String(url).includes('flux-kontext-pro'));
 		const body = JSON.parse(String(request?.[1]?.body));
 		expect(body.input_image).toBe(source.base64);
 	});
@@ -93,7 +93,7 @@ describe('image source editing adapters', () => {
 			source,
 		});
 
-		const request = fetch.mock.calls.find(([, init]) => init?.method === 'POST');
+		const request = fetch.mock.calls.find(([url]) => String(url).includes('multimodal-generation'));
 		const body = JSON.parse(String(request?.[1]?.body));
 		expect(body.input.messages[0].content).toEqual([
 			{ image: 'data:image/png;base64,aGVsbG8=' },
