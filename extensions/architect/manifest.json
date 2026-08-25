@@ -1,0 +1,9 @@
+{
+	"title": "Architect",
+	"description": "Generate, crop, and iteratively revise interior architecture visualizations with Friday AI.",
+	"metadata": {
+		"version": "1.0.0",
+		"category": "creative",
+		"entry": "dist/index.html"
+	}
+}

@@ -65,13 +65,14 @@ beforeEach(() => {
 });
 
 it('passes agent image defaults and request overrides to image generation', async () => {
-	await createImage({ prompt: 'cat', options: { imageSize: '2K' } });
+	const source = { base64: 'aGVsbG8=', mimeType: 'image/png' as const };
+	await createImage({ prompt: 'cat', source, options: { imageSize: '2K' } });
 
 	expect(resolveOptions).toHaveBeenCalledWith('image', 'image-provider', 'image-model', {
 		imageSize: '2K',
 	});
 	expect(generateImage).toHaveBeenCalledWith(
-		expect.objectContaining({ options: { stored: true, imageSize: '2K' } })
+		expect.objectContaining({ source, options: { stored: true, imageSize: '2K' } })
 	);
 });
 

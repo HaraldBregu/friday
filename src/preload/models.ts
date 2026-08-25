@@ -17,6 +17,7 @@ import {
 } from '../shared/stt_transcription';
 import { normalizeSpeechSynthesisRequest } from '../shared/speech_types';
 import { REALTIME_VOICE_MAX_AUDIO_BASE64_LENGTH } from '../shared/realtime_voice';
+import { normalizeImageSource } from '../shared/image_types';
 import { optionalTrimmedString } from './normalize';
 
 function isSttRealtimeSessionId(value: unknown): value is string {
@@ -70,11 +71,13 @@ export const models: ModelsApi = {
 			if (!prompt) throw new Error('Invalid image prompt.');
 			const providerId = optionalTrimmedString(request?.providerId);
 			const modelId = optionalTrimmedString(request?.modelId);
+			const source = normalizeImageSource(request?.source);
 			const options = normalizeOptions(request?.options);
 			return typedInvokeUnwrap(ImageChannels.createImage, {
 				prompt,
 				...(providerId ? { providerId } : {}),
 				...(modelId ? { modelId } : {}),
+				...(source ? { source } : {}),
 				...(options ? { options } : {}),
 			});
 		},

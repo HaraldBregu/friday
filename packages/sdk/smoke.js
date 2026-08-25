@@ -7,6 +7,7 @@ import {
 	connect,
 	isExtensionStoreValue,
 	isFriday,
+	models,
 	terminal,
 	win,
 } from './dist/packages/sdk/index.js';
@@ -17,6 +18,7 @@ assert.equal(isFriday(), false);
 assert.throws(() => app.getTheme, /unavailable/);
 assert.throws(() => agent.getWorkspaceLocation, /unavailable/);
 assert.throws(() => coder.getSettings, /unavailable/);
+assert.throws(() => models.image.createImage, /unavailable/);
 assert.throws(() => terminal.create, /unavailable/);
 assert.throws(() => win.showContextMenu, /unavailable/);
 
@@ -144,6 +146,11 @@ globalThis.coder = {
 	cancelCodexLogin: async () => false,
 	disconnectCodex: async () => undefined,
 };
+globalThis.models = {
+	image: {
+		createImage: async (request) => ({ base64: request.source?.base64 ?? 'generated', mimeType: 'image/png' }),
+	},
+};
 globalThis.terminalAPI = {
 	create: async (request) => ({
 		...request,
@@ -242,6 +249,17 @@ assert.deepEqual(coderEvents, [
 	},
 ]);
 assert.equal(await coder.cancel('coder-run'), true);
+assert.deepEqual(await models.image.createImage({ prompt: 'room' }), {
+	base64: 'generated',
+	mimeType: 'image/png',
+});
+assert.deepEqual(
+	await models.image.createImage({
+		prompt: 'revise room',
+		source: { base64: 'aGVsbG8=', mimeType: 'image/png' },
+	}),
+	{ base64: 'aGVsbG8=', mimeType: 'image/png' }
+);
 await coder.openProject(coderProject.id);
 assert.equal(
 	(await coder.renameSession(coderProject.id, 'session-1', 'Focused tests')).title,

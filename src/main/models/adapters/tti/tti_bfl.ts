@@ -1,4 +1,8 @@
-import { ImageProviderAuthError, ImageProviderRequestError } from './tti_errors';
+import {
+	ImageProviderAuthError,
+	ImageProviderRequestError,
+	ImageProviderUnsupportedError,
+} from './tti_errors';
 import { fetchImageAsBase64, poll, requestJson } from './tti_shared';
 import type { ImageAdapter, ImageProviderSpec } from './tti_types';
 
@@ -18,12 +22,22 @@ export function createBflImageAdapter(spec: ImageProviderSpec): ImageAdapter {
 	const headers = { 'x-key': spec.apiKey, 'Content-Type': 'application/json' };
 
 	return {
+		supportsSource: true,
 		async generate(request) {
 			const endpoint = BFL_ENDPOINTS[request.modelId] ?? request.modelId;
+			if (request.source && endpoint !== 'flux-kontext-pro') {
+				throw new ImageProviderUnsupportedError(
+					`${request.modelId} does not support source-image editing.`
+				);
+			}
 			const submitted = await requestJson<BflSubmitResponse>(spec.name, `${baseURL}/${endpoint}`, {
 				method: 'POST',
 				headers,
-				body: JSON.stringify({ prompt: request.prompt, ...request.options }),
+				body: JSON.stringify({
+					prompt: request.prompt,
+					...request.options,
+					...(request.source ? { input_image: request.source.base64 } : {}),
+				}),
 				signal: request.signal,
 			});
 			const pollingUrl =

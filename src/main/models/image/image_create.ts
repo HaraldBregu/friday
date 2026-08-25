@@ -1,5 +1,9 @@
 import { normalizeProviderId } from '../../../shared/provider_types';
-import type { ImageRequest, ImageResult } from '../../../shared/image_types';
+import {
+	normalizeImageSource,
+	type ImageRequest,
+	type ImageResult,
+} from '../../../shared/image_types';
 import { loadProviders, providerModels, supportsCapability } from '../../models';
 import { getProvider } from '../../settings_store';
 import {
@@ -29,6 +33,7 @@ export async function createImage(
 		apiKey,
 		modelId,
 		prompt,
+		source: normalizeImageSource(request.source),
 		options: resolveOptions('image', providerId, modelId, request.options),
 		signal,
 	});

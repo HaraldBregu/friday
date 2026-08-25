@@ -51,7 +51,7 @@ Streaming callbacks (for `app` events) use the SSE stream opened on first use; c
 ## Usage inside Friday
 
 ```ts
-import { agent, app, coder, isFriday, win, type AppThemeData } from '@friday/sdk';
+import { agent, app, coder, isFriday, models, win, type AppThemeData } from '@friday/sdk';
 
 if (!isFriday()) throw new Error('Not running inside Friday');
 
@@ -69,6 +69,11 @@ const workspace = await agent.getWorkspaceLocation();
 const files = await agent.listWorkspaceFiles();
 const content = await agent.readWorkspaceFile('USER.md');
 const image = await agent.readWorkspaceAsset('images/photo.png');
+const generated = await models.image.createImage({ prompt: 'A calm, modern reading room' });
+const revised = await models.image.createImage({
+	prompt: 'Replace only the armchair with a caramel leather lounge chair.',
+	source: { base64: generated.base64, mimeType: 'image/png' },
+});
 await agent.writeWorkspaceMarkdown('USER.md', '# Updated');
 await agent.createWorkspaceFile('', 'draft.md');
 await agent.createWorkspaceDirectory('notes', 'ideas');
@@ -111,6 +116,7 @@ const maximized = await win.isMaximized();
 - `app`: app data + settings APIs exposed by preload (`setTheme`, `getThemeData`, `getLanguage`, etc.)
 - `agent`: workspace APIs exposed by preload, including text reads, typed asset reads, and Markdown writes.
 - `coder`: embedded Pi coding-agent projects, persistent sessions, Agent/Shell runs, settings, authentication, streaming, and cancellation.
+- `models`: embedded model APIs, including configured image generation and source-image editing without exposing provider credentials.
 - `terminal`: embedded-only, owner-scoped PTY lifecycle, input, resize, output, and exit events.
 - `win`: embedded-only window APIs, including native context menus and window controls.
 - `connect()`: remote client for the app API and workspace agent APIs.

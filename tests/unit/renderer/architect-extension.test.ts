@@ -1,0 +1,65 @@
+import type { CatalogModel } from '../../../src/shared/model_types';
+import { buildBriefPrompt } from '../../../extensions/architect/src/brief';
+import { createGenerationOptions } from '../../../extensions/architect/src/options';
+import { buildRevisionPrompt } from '../../../extensions/architect/src/revision';
+import { selectEditModel } from '../../../extensions/architect/src/model';
+
+const provider = { id: 'black-forest-labs', name: 'BFL' } as CatalogModel['provider'];
+const catalog = [
+	{
+		id: 'FLUX.2',
+		name: 'FLUX.2',
+		type: 'text-to-image',
+		provider,
+		metadata: { documentationUrl: 'https://example.test', inputs: { aspect_ratio: {} } },
+	},
+	{
+		id: 'FLUX.1 Kontext [pro]',
+		name: 'Kontext',
+		type: 'text-to-image',
+		provider,
+		metadata: { documentationUrl: 'https://example.test', inputs: { input_image: {} } },
+	},
+] as CatalogModel[];
+
+describe('Architect extension workflow', () => {
+	it('builds a domain-specific interior visualization prompt', () => {
+		const prompt = buildBriefPrompt({
+			description: 'a sunken conversation area facing the garden',
+			room: 'living room',
+			style: 'quiet modernism',
+			materials: 'travertine and walnut',
+			lighting: 'soft northern daylight',
+			ratio: '16:9',
+		});
+		expect(prompt).toContain('photorealistic architectural interior visualization');
+		expect(prompt).toContain('buildable proportions');
+		expect(prompt).toContain('travertine and walnut');
+	});
+
+	it('constrains revisions to the requested design change', () => {
+		const prompt = buildRevisionPrompt('replace the sofa with a low modular sectional');
+		expect(prompt).toContain('apply only this design revision');
+		expect(prompt).toContain('Preserve the room geometry, camera position, perspective');
+	});
+
+	it('selects a compatible edit model without switching providers', () => {
+		expect(selectEditModel(catalog, 'black-forest-labs', 'FLUX.2')?.id).toBe(
+			'FLUX.1 Kontext [pro]'
+		);
+		expect(selectEditModel(catalog, 'xai', 'grok-imagine-image')).toBeUndefined();
+	});
+
+	it('maps aspect-ratio controls through model metadata', () => {
+		expect(
+			createGenerationOptions(catalog[0], {
+				description: 'room',
+				room: 'living room',
+				style: 'modern',
+				materials: 'oak',
+				lighting: 'daylight',
+				ratio: '16:9',
+			})
+		).toEqual({ aspect_ratio: '16:9' });
+	});
+});

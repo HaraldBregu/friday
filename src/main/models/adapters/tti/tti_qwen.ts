@@ -1,4 +1,8 @@
-import { ImageProviderAuthError, ImageProviderRequestError } from './tti_errors';
+import {
+	ImageProviderAuthError,
+	ImageProviderRequestError,
+	ImageProviderUnsupportedError,
+} from './tti_errors';
 import { fetchImageAsBase64, requestJson } from './tti_shared';
 import type { ImageAdapter, ImageProviderSpec } from './tti_types';
 
@@ -15,7 +19,17 @@ export function createQwenImageAdapter(spec: ImageProviderSpec): ImageAdapter {
 	const baseURL = spec.baseURL ?? QWEN_BASE_URL;
 
 	return {
+		supportsSource: true,
 		async generate(request) {
+			if (
+				request.source &&
+				!request.modelId.includes('image-edit') &&
+				!/^qwen-image-[23]\.0/.test(request.modelId)
+			) {
+				throw new ImageProviderUnsupportedError(
+					`${request.modelId} does not support source-image editing.`
+				);
+			}
 			const response = await requestJson<QwenResponse>(
 				spec.name,
 				`${baseURL}/services/aigc/multimodal-generation/generation`,
@@ -27,7 +41,23 @@ export function createQwenImageAdapter(spec: ImageProviderSpec): ImageAdapter {
 					},
 					body: JSON.stringify({
 						model: request.modelId,
-						input: { messages: [{ role: 'user', content: [{ text: request.prompt }] }] },
+						input: {
+							messages: [
+								{
+									role: 'user',
+									content: [
+										...(request.source
+											? [
+													{
+														image: `data:${request.source.mimeType};base64,${request.source.base64}`,
+													},
+												]
+											: []),
+										{ text: request.prompt },
+									],
+								},
+							],
+						},
 						...(request.options ? { parameters: request.options } : {}),
 					}),
 					signal: request.signal,

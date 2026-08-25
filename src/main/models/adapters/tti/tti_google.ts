@@ -17,6 +17,7 @@ export function createGoogleImageAdapter(spec: ImageProviderSpec): ImageAdapter 
 	const baseURL = spec.baseURL ?? GOOGLE_BASE_URL;
 
 	return {
+		supportsSource: true,
 		async generate(request) {
 			const data = await requestJson<GoogleGenerateContentResponse>(
 				spec.name,
@@ -25,7 +26,23 @@ export function createGoogleImageAdapter(spec: ImageProviderSpec): ImageAdapter 
 					method: 'POST',
 					headers: { 'x-goog-api-key': spec.apiKey, 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						contents: [{ parts: [{ text: request.prompt }] }],
+						contents: [
+							{
+								parts: [
+									...(request.source
+										? [
+												{
+													inlineData: {
+														mimeType: request.source.mimeType,
+														data: request.source.base64,
+													},
+												},
+											]
+										: []),
+									{ text: request.prompt },
+								],
+							},
+						],
 						generationConfig: {
 							responseModalities: ['TEXT', 'IMAGE'],
 							...(request.options ? { imageConfig: request.options } : {}),

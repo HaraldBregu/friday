@@ -1,4 +1,4 @@
-import type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
+import type { AgentApi, AppApi, CoderApi, ModelsApi, WindowApi } from '../../src/shared/api_types';
 import type { TerminalApi } from '../../src/shared/terminal';
 
 export {
@@ -8,7 +8,7 @@ export {
 	type RemoteAppApi,
 	type WorkspaceAgentApi,
 } from './connect';
-export type { AgentApi, AppApi, CoderApi, WindowApi } from '../../src/shared/api_types';
+export type { AgentApi, AppApi, CoderApi, ModelsApi, WindowApi } from '../../src/shared/api_types';
 export type {
 	TerminalApi,
 	TerminalCreateRequest,
@@ -26,6 +26,19 @@ export type {
 	AppThemeData,
 } from '../../src/shared/app_types';
 export type { UrlMetadata } from '../../src/shared/app_types';
+export type {
+	CatalogModel,
+	ModelCapability,
+	ModelInputSchema,
+	ProviderModel,
+} from '../../src/shared/model_types';
+export {
+	IMAGE_SOURCE_MAX_BYTES,
+	normalizeImageSource,
+	type ImageRequest,
+	type ImageResult,
+	type ImageSource,
+} from '../../src/shared/image_types';
 export type { WorkspaceChangeEvent, WorkspaceTreeEntry } from '../../src/shared/agent_types';
 export {
 	workspaceFileType,
@@ -93,6 +106,7 @@ function bridge<T extends object>(name: string): T {
 export const app = bridge<AppApi>('app');
 export const agent = bridge<AgentApi>('agent');
 export const coder = bridge<CoderApi>('coder');
+export const models = bridge<ModelsApi>('models');
 export const terminal = bridge<TerminalApi>('terminalAPI');
 export const win = bridge<WindowApi>('win');
 
