@@ -226,7 +226,7 @@ it('turns terminal failures into tool errors and preserves interrupted task refe
 	mockCreateFromAgentCard.mockResolvedValue({ sendMessage });
 
 	await expect(sendA2aMessage('target', 'work')).rejects.toThrow(
-		'Remote task failed (context ctx) failed: boom'
+		'Remote task failed (context ctx) is failed: boom'
 	);
 	await expect(sendA2aMessage('target', 'work')).resolves.toBe(
 		'Remote task input (context ctx) requires input: Which city?'

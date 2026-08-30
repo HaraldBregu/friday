@@ -85,6 +85,10 @@ it('does not forward a stored token when the endpoint changes', async () => {
 			skills: [],
 		},
 	]);
+	mockDiscover.mockResolvedValue({
+		...card,
+		supportedInterfaces: [{ ...card.supportedInterfaces[0], url: 'https://new.example/a2a' }],
+	});
 	const saved = await saveA2aAgent({
 		id: 'saved',
 		name: 'Updated',
