@@ -202,6 +202,32 @@ it('honors artifact replacement and append semantics', async () => {
 	await expect(sendA2aMessage('target', 'work')).resolves.toBe('Hello');
 });
 
+it('redacts configured credentials from streamed terminal errors', async () => {
+	mockDiscover.mockResolvedValue({ ...card, capabilities: { streaming: true, extensions: [] } });
+	const sendMessageStream = jest.fn(async function* () {
+		yield {
+			payload: {
+				$case: 'statusUpdate',
+				value: {
+					taskId: 'task-secret',
+					contextId: 'ctx',
+					status: {
+						state: TaskState.TASK_STATE_FAILED,
+						message: {
+							parts: [{ content: { $case: 'text', value: 'credential secret rejected' } }],
+						},
+					},
+				},
+			},
+		};
+	});
+	mockCreateFromAgentCard.mockResolvedValue({ sendMessageStream });
+
+	await expect(sendA2aMessage('target', 'work')).rejects.toThrow(
+		'Remote task task-secret (context ctx) is failed: credential [REDACTED] rejected'
+	);
+});
+
 it('turns terminal failures into tool errors and preserves interrupted task references', async () => {
 	const sendMessage = jest
 		.fn()

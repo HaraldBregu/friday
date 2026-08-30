@@ -28,3 +28,17 @@ it.each([
 	expect(new Headers(init.headers).get('A2A-Version')).toBe('1.0');
 	expect(init.redirect).toBe('error');
 });
+
+it('rejects a stored credential before any cleartext request is sent', async () => {
+	global.fetch = jest.fn();
+	await expect(
+		createA2aFetch({ authType: 'bearer', credential: 'secret' })('http://agent.example/a2a')
+	).rejects.toThrow('must use HTTPS');
+	expect(global.fetch).not.toHaveBeenCalled();
+});
+
+it('rejects an oversized streamed response without a content-length header', async () => {
+	global.fetch = jest.fn().mockResolvedValue(new Response('x'.repeat(256_001)));
+	const response = await createA2aFetch({ authType: 'none' })('https://agent.example/a2a');
+	await expect(response.text()).rejects.toThrow('256 KB wire limit');
+});

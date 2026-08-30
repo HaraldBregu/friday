@@ -131,13 +131,13 @@ export default function A2aPage(): React.JSX.Element {
 							{form.authType !== 'none' && (
 								<div className="grid gap-1">
 									<Label htmlFor="a2a-credential">Secret</Label>
-								<Input
-									id="a2a-credential"
-									type="password"
-									value={form.credential ?? ''}
-									onChange={(event) => setForm({ ...form, credential: event.target.value })}
-									placeholder={form.id ? 'Leave blank to keep the current secret' : ''}
-								/>
+									<Input
+										id="a2a-credential"
+										type="password"
+										value={form.credential ?? ''}
+										onChange={(event) => setForm({ ...form, credential: event.target.value })}
+										placeholder={form.id ? 'Leave blank to keep the current secret' : ''}
+									/>
 								</div>
 							)}
 							<label className="flex items-center gap-2 text-xs">
@@ -160,7 +160,7 @@ export default function A2aPage(): React.JSX.Element {
 									Cancel
 								</Button>
 								<Button size="xs" disabled={busy || !form.url.trim()} onClick={() => void submit()}>
-									{busy ? 'Testing…' : 'Test and save'}
+									{busy ? 'Validating…' : 'Validate and save'}
 								</Button>
 							</div>
 						</div>

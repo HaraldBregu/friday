@@ -126,18 +126,18 @@ export async function sendA2aMessage(
 			state === TaskState.TASK_STATE_FAILED ||
 			state === TaskState.TASK_STATE_CANCELED ||
 			state === TaskState.TASK_STATE_REJECTED;
-			try {
-				return a2aTaskOutcome(
-					remoteTaskId,
-					remoteContextId,
-					state,
-					failed
-						? statusText || artifactText || messageText
-						: artifactText || messageText || statusText
-				);
-			} catch (error) {
-				throw sanitizeA2aError(error, remote);
-			}
+		try {
+			return a2aTaskOutcome(
+				remoteTaskId,
+				remoteContextId,
+				state,
+				failed
+					? statusText || artifactText || messageText
+					: artifactText || messageText || statusText
+			);
+		} catch (error) {
+			throw sanitizeA2aError(error, remote);
+		}
 	}
 	try {
 		const result = await client.sendMessage(request, options);
@@ -173,9 +173,9 @@ export async function sendA2aMessage(
 					{ tenant: '', id: taskId, metadata: undefined },
 					{ signal: AbortSignal.timeout(5_000) }
 				);
-				} catch {
-					void 0;
-				}
+			} catch {
+				void 0;
+			}
 		}
 		throw sanitizeA2aError(error, remote);
 	}
