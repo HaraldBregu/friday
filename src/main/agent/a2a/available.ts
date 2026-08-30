@@ -1,8 +1,8 @@
 import { safeStorage } from 'electron';
 
-export function isA2aSecureStorageAvailable(): boolean {
+export function isA2aSecureStorageAvailable(platform: NodeJS.Platform = process.platform): boolean {
 	return (
 		safeStorage.isEncryptionAvailable() &&
-		(process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text')
+		(platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text')
 	);
 }

@@ -1,4 +1,5 @@
 import { safeStorage } from 'electron';
+import { isA2aSecureStorageAvailable } from '../../../../src/main/agent/a2a/available';
 import { openA2aAgent } from '../../../../src/main/agent/a2a/open';
 import { preserveA2aCredential } from '../../../../src/main/agent/a2a/preserve';
 import { sealA2aAgent } from '../../../../src/main/agent/a2a/seal';
@@ -62,20 +63,9 @@ it('keeps credentials memory-only when OS encryption is unavailable', () => {
 	expect(sealed.volatileCredential).toBe('sentinel-secret');
 });
 
-it('keeps credentials memory-only with Electron basic text encryption on Linux', () => {
-	jest.replaceProperty(process, 'platform', 'linux');
+it('rejects Electron basic text encryption as secure storage on Linux', () => {
 	selectedBackend.mockReturnValue('basic_text');
-	const sealed = sealA2aAgent({
-		id: 'agent',
-		name: 'Agent',
-		url: 'https://agent.example',
-		authType: 'bearer',
-		credential: 'sentinel-secret',
-		enabled: true,
-		skills: [],
-	});
-	expect(sealed.record).not.toHaveProperty('encryptedCredential');
-	expect(sealed.volatileCredential).toBe('sentinel-secret');
+	expect(isA2aSecureStorageAvailable('linux')).toBe(false);
 });
 
 it('opens legacy plaintext bearer tokens for encrypted migration', () => {
