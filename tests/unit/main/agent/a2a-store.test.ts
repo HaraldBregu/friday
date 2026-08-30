@@ -1,5 +1,6 @@
 import { safeStorage } from 'electron';
 import { openA2aAgent } from '../../../../src/main/agent/a2a/open';
+import { preserveA2aCredential } from '../../../../src/main/agent/a2a/preserve';
 import { sealA2aAgent } from '../../../../src/main/agent/a2a/seal';
 
 const encryptionAvailable = safeStorage.isEncryptionAvailable as jest.Mock;
@@ -70,4 +71,36 @@ it('opens legacy plaintext bearer tokens for encrypted migration', () => {
 	} as never);
 	expect(opened.hasPlaintextCredential).toBe(true);
 	expect(opened.agent).toMatchObject({ authType: 'bearer', credential: 'legacy-secret' });
+});
+
+it('preserves only legacy secret fields while OS encryption is unavailable', () => {
+	expect(
+		preserveA2aCredential(
+			{
+				id: 'legacy',
+				name: 'Updated',
+				url: 'https://agent.example',
+				authType: 'bearer',
+				credential: 'legacy-secret',
+				enabled: false,
+				skills: ['Updated skill'],
+			},
+			{
+				id: 'legacy',
+				name: 'Legacy',
+				url: 'https://agent.example',
+				token: 'legacy-secret',
+				enabled: true,
+				skills: [],
+			} as never
+		)
+	).toEqual({
+		id: 'legacy',
+		name: 'Updated',
+		url: 'https://agent.example',
+		authType: 'bearer',
+		token: 'legacy-secret',
+		enabled: false,
+		skills: ['Updated skill'],
+	});
 });

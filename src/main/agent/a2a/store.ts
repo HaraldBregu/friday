@@ -5,6 +5,7 @@ import { userDataLocation } from '../../shared/user_data_location';
 import type { A2aAgent } from '../../../shared/a2a_types';
 import { openA2aAgent } from './open';
 import { restrictA2aStorePermissions } from './permissions';
+import { preserveA2aCredential } from './preserve';
 import { sealA2aAgent } from './seal';
 import type { A2aStoredAgent } from './stored';
 
@@ -47,15 +48,13 @@ export const setA2aAgents = (agents: A2aAgent[]): void => {
 	const nextPreservedRecords = new Map<string, A2aStoredAgent>();
 	const records = agents.map((agent) => {
 		const preserved = preservedRecords.get(agent.id);
+		const preservedRecord = preserved ? preserveA2aCredential(agent, preserved) : undefined;
 		if (
-			preserved &&
-			preserved.url === agent.url &&
-			preserved.authType === agent.authType &&
-			preserved.apiKeyHeader === agent.apiKeyHeader &&
+			preservedRecord &&
 			(!safeStorage.isEncryptionAvailable() || !agent.credential)
 		) {
-			nextPreservedRecords.set(agent.id, preserved);
-			return preserved;
+			nextPreservedRecords.set(agent.id, preservedRecord);
+			return preservedRecord;
 		}
 		const sealed = sealA2aAgent(agent);
 		if (sealed.volatileCredential) nextVolatileCredentials.set(agent.id, sealed.volatileCredential);
