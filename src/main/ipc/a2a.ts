@@ -1,4 +1,4 @@
-import type { IpcMainInvokeEvent } from 'electron';
+import { BrowserWindow, type IpcMainInvokeEvent } from 'electron';
 import type { EventBus } from '../event_bus';
 import { A2aChannels } from '../../shared/ipc_channels_definitions';
 import type { A2aAgentInput } from '../../shared/a2a_types';
@@ -16,7 +16,7 @@ export class A2aIpc implements IpcModule<A2aIpcDeps> {
 	readonly name = 'a2a';
 	register({ extensionRegistry }: A2aIpcDeps, _eventBus: EventBus): void {
 		const assertAppRenderer = (event: IpcMainInvokeEvent): void => {
-			if (extensionRegistry.has(event.sender)) {
+			if (extensionRegistry.has(event.sender) || !BrowserWindow.fromWebContents(event.sender)) {
 				throw new Error('A2A settings are unavailable to extension views.');
 			}
 		};

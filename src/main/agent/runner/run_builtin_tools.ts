@@ -3,7 +3,9 @@ import type { WindowFactory } from '../../window_factory';
 import type { ExecSandbox } from '../sandbox';
 import type { AgentInteractionMode } from '../../../shared/agent_types';
 import { completeBootstrapTool } from '../tools/assistant/complete_bootstrap';
+import { cancelA2aTaskTool } from '../tools/a2a/cancel';
 import { delegateA2aTool } from '../tools/a2a/delegate';
+import { getA2aTaskTool } from '../tools/a2a/get';
 import { listA2aAgentsTool } from '../tools/a2a/list';
 import { applyPatchTool } from '../tools/core/patch';
 import { editTool } from '../tools/core/edit';
@@ -54,6 +56,8 @@ export function builtinTools(
 	return [
 		listA2aAgentsTool,
 		delegateA2aTool,
+		getA2aTaskTool,
+		cancelA2aTaskTool,
 		readTool,
 		...(interactionMode === 'plan' ? [requestUserInputTool] : []),
 		writeTool,

@@ -1,5 +1,7 @@
 export { createA2aClient } from './client';
+export { cancelA2aTask } from './cancel';
 export { discoverA2aAgent } from './discover';
+export { getA2aTask } from './get';
 export { getA2aAgents } from './store';
 export { removeA2aAgent } from './remove';
 export { saveA2aAgent } from './save';

@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import {
 	SettingsEmptyState,
 	SettingsNotice,
 	SettingsPageHeader,
@@ -13,7 +20,14 @@ import {
 	SettingsSection,
 } from '../../components';
 
-const empty: A2aAgentInput = { name: '', url: '', token: '', enabled: true };
+const empty: A2aAgentInput = {
+	name: '',
+	url: '',
+	authType: 'none',
+	credential: '',
+	apiKeyHeader: 'X-API-Key',
+	enabled: true,
+};
 
 export default function A2aPage(): React.JSX.Element {
 	const [agents, setAgents] = useState<A2aAgentSummary[]>([]);
@@ -29,9 +43,8 @@ export default function A2aPage(): React.JSX.Element {
 		setBusy(true);
 		setNotice(undefined);
 		try {
-			const result = await window.a2a.test(form);
-			await window.a2a.save(form);
-			setNotice({ text: `Connected to ${result.name}.` });
+			const result = await window.a2a.save(form);
+			setNotice({ text: `Connected to ${result.cardName || result.name}.` });
 			setForm(empty);
 			setAdding(false);
 			await load();
@@ -81,15 +94,46 @@ export default function A2aPage(): React.JSX.Element {
 								/>
 							</div>
 							<div className="grid gap-1">
-								<Label htmlFor="a2a-token">Bearer token (optional)</Label>
-								<Input
-									id="a2a-token"
-									type="password"
-									value={form.token}
-									onChange={(event) => setForm({ ...form, token: event.target.value })}
-									placeholder={form.id ? 'Leave blank to keep the current token' : ''}
-								/>
+								<Label htmlFor="a2a-auth">Authentication</Label>
+								<Select
+									value={form.authType ?? 'none'}
+									onValueChange={(value) =>
+										setForm({ ...form, authType: value as A2aAgentInput['authType'] })
+									}
+								>
+									<SelectTrigger id="a2a-auth" className="w-full">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="none">No authentication</SelectItem>
+										<SelectItem value="bearer">Bearer or OAuth token</SelectItem>
+										<SelectItem value="api-key">API key header</SelectItem>
+									</SelectContent>
+								</Select>
 							</div>
+							{form.authType === 'api-key' && (
+								<div className="grid gap-1">
+									<Label htmlFor="a2a-api-key-header">API key header</Label>
+									<Input
+										id="a2a-api-key-header"
+										value={form.apiKeyHeader ?? ''}
+										onChange={(event) => setForm({ ...form, apiKeyHeader: event.target.value })}
+										placeholder="X-API-Key"
+									/>
+								</div>
+							)}
+							{form.authType !== 'none' && (
+								<div className="grid gap-1">
+									<Label htmlFor="a2a-credential">Secret</Label>
+								<Input
+									id="a2a-credential"
+									type="password"
+									value={form.credential ?? ''}
+									onChange={(event) => setForm({ ...form, credential: event.target.value })}
+									placeholder={form.id ? 'Leave blank to keep the current secret' : ''}
+								/>
+								</div>
+							)}
 							<label className="flex items-center gap-2 text-xs">
 								<input
 									type="checkbox"
@@ -127,6 +171,14 @@ export default function A2aPage(): React.JSX.Element {
 									<div className="mt-1 text-[10px] text-muted-foreground">
 										{agent.skills.join(', ') || 'No advertised skills'}
 									</div>
+									<div className="mt-1 text-[10px] text-muted-foreground">
+										{agent.enabled ? 'Enabled' : 'Disabled'} ·{' '}
+										{agent.authType === 'none'
+											? 'No authentication'
+											: agent.hasCredential
+												? `${agent.authType === 'api-key' ? 'API key' : 'Bearer/OAuth'} configured`
+												: 'Credential unavailable'}
+									</div>
 								</div>
 								<div className="flex gap-1">
 									<Button
@@ -136,8 +188,11 @@ export default function A2aPage(): React.JSX.Element {
 										onClick={() => {
 											setForm({
 												id: agent.id,
-												name: agent.name,
-												url: agent.url,
+											name: agent.name,
+											url: agent.url,
+											authType: agent.authType,
+											apiKeyHeader: agent.apiKeyHeader,
+											credential: '',
 												enabled: agent.enabled,
 											});
 											setAdding(true);
