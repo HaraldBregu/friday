@@ -8,7 +8,13 @@ export function resolveA2aAuthentication(
 	const suppliedCredential = input.credential?.trim() || input.token?.trim();
 	const authType =
 		input.authType ??
-		(input.token !== undefined || suppliedCredential ? 'bearer' : (existing?.authType ?? 'none'));
+		(input.token !== undefined
+			? suppliedCredential || (existing?.url === url && existing.credential)
+				? 'bearer'
+				: 'none'
+			: suppliedCredential
+				? 'bearer'
+				: (existing?.authType ?? 'none'));
 	if (authType === 'none') return { authType };
 	const apiKeyHeader =
 		authType === 'api-key'

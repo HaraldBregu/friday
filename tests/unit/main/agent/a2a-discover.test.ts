@@ -9,6 +9,7 @@ jest.mock('@a2a-js/sdk/client', () => ({
 import { discoverA2aAgent } from '../../../../src/main/agent/a2a/discover';
 
 const originalFetch = global.fetch;
+const noAuthentication = { authType: 'none' as const };
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -25,7 +26,11 @@ beforeEach(() => {
 	});
 	global.fetch = jest
 		.fn()
-		.mockResolvedValue({ json: jest.fn().mockResolvedValue({ name: 'Agent' }) });
+		.mockResolvedValue(
+			new Response(JSON.stringify({ name: 'Agent' }), {
+				headers: { 'content-type': 'application/json' },
+			})
+		);
 });
 
 afterAll(() => {
@@ -34,21 +39,25 @@ afterAll(() => {
 
 it('preserves resolver headers and uses the root well-known path with bearer authentication', async () => {
 	const controller = new AbortController();
-	await discoverA2aAgent(' https://agent.example/a2a/ ', ' secret ', controller.signal);
+	await discoverA2aAgent(
+		' https://agent.example/a2a/ ',
+		{ authType: 'bearer', credential: 'secret' },
+		controller.signal
+	);
 
 	expect(mockResolver).toHaveBeenCalledWith('https://agent.example/a2a');
-	const [url, init] = (global.fetch as jest.Mock).mock.calls[0] as [URL, RequestInit];
-	expect(url.toString()).toBe('https://agent.example/.well-known/agent-card.json');
+	const [request, init] = (global.fetch as jest.Mock).mock.calls[0] as [Request, RequestInit];
+	expect(request.url).toBe('https://agent.example/.well-known/agent-card.json');
 	expect(new Headers(init.headers)).toEqual(expect.objectContaining({}));
 	expect(new Headers(init.headers).get('A2A-Version')).toBe('1.0');
 	expect(new Headers(init.headers).get('Authorization')).toBe('Bearer secret');
-	expect(init.signal).toBe(controller.signal);
+	expect(init.redirect).toBe('error');
 });
 
 it.each(['file:///tmp/agent', 'relative-agent', 'https://user:pass@agent.example'])(
 	'rejects unsafe base URL %s',
 	async (url) => {
-		await expect(discoverA2aAgent(url)).rejects.toThrow();
+			await expect(discoverA2aAgent(url, noAuthentication)).rejects.toThrow();
 		expect(mockDefaultAgentCardResolver).not.toHaveBeenCalled();
 	}
 );

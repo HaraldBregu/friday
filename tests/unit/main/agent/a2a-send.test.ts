@@ -1,9 +1,15 @@
 const mockDiscover = jest.fn();
 const mockCreateFromAgentCard = jest.fn();
 const mockClientFactory = jest.fn();
+const mockJsonRpcTransportFactory = jest.fn();
+const mockRestTransportFactory = jest.fn();
 
 jest.mock('../../../../src/main/agent/a2a/discover', () => ({ discoverA2aAgent: mockDiscover }));
-jest.mock('@a2a-js/sdk/client', () => ({ ClientFactory: mockClientFactory }));
+jest.mock('@a2a-js/sdk/client', () => ({
+	ClientFactory: mockClientFactory,
+	JsonRpcTransportFactory: mockJsonRpcTransportFactory,
+	RestTransportFactory: mockRestTransportFactory,
+}));
 jest.mock('@a2a-js/sdk', () => ({
 	Role: { ROLE_USER: 1 },
 	TaskState: {
@@ -47,6 +53,8 @@ const card = {
 		},
 	],
 	capabilities: { streaming: false, extensions: [] },
+	securitySchemes: {},
+	securityRequirements: [],
 	defaultInputModes: ['text/plain'],
 	defaultOutputModes: ['text/plain'],
 	skills: [],
@@ -59,27 +67,42 @@ beforeEach(() => {
 			id: 'target',
 			name: 'Remote',
 			url: 'https://remote.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		},
 	]);
 	mockDiscover.mockResolvedValue(card);
 	mockClientFactory.mockImplementation(() => ({ createFromAgentCard: mockCreateFromAgentCard }));
+	mockJsonRpcTransportFactory.mockImplementation(() => ({}));
+	mockRestTransportFactory.mockImplementation(() => ({}));
 });
 
 it('prioritizes an exact ID and forwards continuation IDs, credentials, and cancellation', async () => {
 	setA2aAgents([
-		{ id: 'first', name: 'target', url: 'https://wrong.example', enabled: true, skills: [] },
+		{
+			id: 'first',
+			name: 'target',
+			url: 'https://wrong.example',
+			authType: 'none',
+			enabled: true,
+			skills: [],
+		},
 		{
 			id: 'target',
 			name: 'Right',
 			url: 'https://right.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		},
 	]);
+	mockDiscover.mockResolvedValue({
+		...card,
+		supportedInterfaces: [{ ...card.supportedInterfaces[0], url: 'https://right.example/a2a' }],
+	});
 	const sendMessage = jest
 		.fn()
 		.mockResolvedValue({ parts: [{ content: { $case: 'text', value: 'done' } }] });
@@ -89,16 +112,17 @@ it('prioritizes an exact ID and forwards continuation IDs, credentials, and canc
 	await expect(
 		sendA2aMessage('target', 'continue', controller.signal, 'task-1', 'context-1')
 	).resolves.toBe('done');
-	expect(mockDiscover).toHaveBeenCalledWith('https://right.example', 'secret', controller.signal);
+	expect(mockDiscover).toHaveBeenCalledWith(
+		'https://right.example',
+		expect.objectContaining({ authType: 'bearer', credential: 'secret' }),
+		expect.any(AbortSignal)
+	);
 	expect(sendMessage).toHaveBeenCalledWith(
 		expect.objectContaining({
 			message: expect.objectContaining({ taskId: 'task-1', contextId: 'context-1', role: 1 }),
 		}),
-		expect.objectContaining({
-			signal: controller.signal,
-			serviceParameters: { Authorization: 'Bearer secret' },
-		})
-	);
+			expect.objectContaining({ signal: controller.signal })
+		);
 });
 
 it('returns artifacts from a completed initial Task-only stream', async () => {
@@ -219,5 +243,58 @@ it('uses readable state fallback text instead of numeric enum values', async () 
 	mockCreateFromAgentCard.mockResolvedValue({ sendMessage });
 	await expect(sendA2aMessage('target', 'work')).resolves.toBe(
 		'Remote task task-1 (context ctx) is completed.'
+	);
+});
+
+it('preserves task references for non-terminal task output', async () => {
+	const sendMessage = jest.fn().mockResolvedValue({
+		id: 'task-1',
+		contextId: 'ctx',
+		status: { state: TaskState.TASK_STATE_WORKING },
+		artifacts: [
+			{ artifactId: 'answer', parts: [{ content: { $case: 'text', value: 'partial' } }] },
+		],
+	});
+	mockCreateFromAgentCard.mockResolvedValue({ sendMessage });
+	await expect(sendA2aMessage('target', 'work')).resolves.toBe(
+		'Remote task task-1 (context ctx) is working: partial'
+	);
+});
+
+it('rejects oversized non-stream responses', async () => {
+	const sendMessage = jest.fn().mockResolvedValue({
+		parts: [{ content: { $case: 'text', value: 'x'.repeat(200_001) } }],
+	});
+	mockCreateFromAgentCard.mockResolvedValue({ sendMessage });
+	await expect(sendA2aMessage('target', 'work')).rejects.toThrow('200 KB limit');
+});
+
+it('requests remote cancellation after an aborted task stream', async () => {
+	mockDiscover.mockResolvedValue({ ...card, capabilities: { streaming: true, extensions: [] } });
+	const controller = new AbortController();
+	const sendMessageStream = jest.fn(async function* () {
+		yield {
+			payload: {
+				$case: 'task',
+				value: {
+					id: 'task-1',
+					contextId: 'ctx',
+					status: { state: TaskState.TASK_STATE_WORKING },
+					artifacts: [],
+				},
+			},
+		};
+		controller.abort();
+		throw controller.signal.reason;
+	});
+	const cancelTask = jest.fn().mockResolvedValue({});
+	mockCreateFromAgentCard.mockResolvedValue({ sendMessageStream, cancelTask });
+
+	await expect(sendA2aMessage('target', 'work', controller.signal)).rejects.toMatchObject({
+		name: 'AbortError',
+	});
+	expect(cancelTask).toHaveBeenCalledWith(
+		{ tenant: '', id: 'task-1', metadata: undefined },
+		{ signal: expect.any(AbortSignal) }
 	);
 });

@@ -18,6 +18,7 @@ jest.mock('../../../../src/main/agent/a2a', () => ({
 
 import { A2aIpc } from '../../../../src/main/ipc/a2a';
 import { A2aChannels } from '../../../../src/shared/ipc_channels_definitions';
+import { BrowserWindow } from 'electron';
 
 const extensionRegistry = { has: jest.fn() };
 const event = { sender: { id: 1 } };
@@ -33,6 +34,7 @@ function query(channel: string): (...args: unknown[]) => unknown {
 beforeEach(() => {
 	jest.clearAllMocks();
 	extensionRegistry.has.mockReturnValue(false);
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 1 });
 	new A2aIpc().register({ extensionRegistry: extensionRegistry as never }, {} as never);
 });
 
@@ -41,7 +43,8 @@ it('redacts tokens from list and save results', async () => {
 		id: 'agent',
 		name: 'Agent',
 		url: 'https://agent.example',
-		token: 'secret',
+		authType: 'bearer',
+		credential: 'secret',
 		enabled: true,
 		skills: [],
 	};
@@ -49,15 +52,30 @@ it('redacts tokens from list and save results', async () => {
 	saveA2aAgent.mockResolvedValue(record);
 
 	expect(query(A2aChannels.list)(event)).toEqual([
-		{ id: 'agent', name: 'Agent', url: 'https://agent.example', enabled: true, skills: [] },
+		{
+			id: 'agent',
+			name: 'Agent',
+			url: 'https://agent.example',
+			authType: 'bearer',
+			enabled: true,
+			skills: [],
+			hasCredential: true,
+		},
 	]);
 	await expect(command(A2aChannels.save)(event, { name: '', url: record.url })).resolves.toEqual({
 		id: 'agent',
 		name: 'Agent',
 		url: record.url,
+		authType: 'bearer',
 		enabled: true,
 		skills: [],
+		hasCredential: true,
 	});
+});
+
+it('rejects unknown or revoked non-window renderers', () => {
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(null);
+	expect(() => query(A2aChannels.list)(event)).toThrow('unavailable to extension views');
 });
 
 it('rejects A2A settings access from extension views', async () => {

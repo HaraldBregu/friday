@@ -1,9 +1,15 @@
 const mockDiscover = jest.fn();
 const mockCreateFromAgentCard = jest.fn();
 const mockClientFactory = jest.fn();
+const mockJsonRpcTransportFactory = jest.fn();
+const mockRestTransportFactory = jest.fn();
 
 jest.mock('../../../../src/main/agent/a2a/discover', () => ({ discoverA2aAgent: mockDiscover }));
-jest.mock('@a2a-js/sdk/client', () => ({ ClientFactory: mockClientFactory }));
+jest.mock('@a2a-js/sdk/client', () => ({
+	ClientFactory: mockClientFactory,
+	JsonRpcTransportFactory: mockJsonRpcTransportFactory,
+	RestTransportFactory: mockRestTransportFactory,
+}));
 
 import { publicA2aAgent } from '../../../../src/main/agent/a2a/public';
 import { saveA2aAgent } from '../../../../src/main/agent/a2a/save';
@@ -22,6 +28,8 @@ const card = {
 		},
 	],
 	capabilities: { streaming: true, extensions: [] },
+	securitySchemes: {},
+	securityRequirements: [],
 	defaultInputModes: ['text/plain'],
 	defaultOutputModes: ['text/plain'],
 	skills: [{ name: 'Research' }],
@@ -32,16 +40,19 @@ beforeEach(() => {
 	setA2aAgents([]);
 	mockDiscover.mockResolvedValue(card);
 	mockClientFactory.mockImplementation(() => ({ createFromAgentCard: mockCreateFromAgentCard }));
+	mockJsonRpcTransportFactory.mockImplementation(() => ({}));
+	mockRestTransportFactory.mockImplementation(() => ({}));
 	mockCreateFromAgentCard.mockResolvedValue({});
 });
 
-it('uses a stored token when editing the same authenticated endpoint', async () => {
+it('uses a stored credential when editing the same authenticated endpoint', async () => {
 	setA2aAgents([
 		{
 			id: 'saved',
 			name: 'Saved',
 			url: 'https://agent.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		},
@@ -53,8 +64,12 @@ it('uses a stored token when editing the same authenticated endpoint', async () 
 		token: '',
 	});
 
-	expect(mockDiscover).toHaveBeenCalledWith('https://agent.example', 'secret');
-	expect(saved).toMatchObject({ id: 'saved', name: 'Updated', token: 'secret' });
+	expect(mockDiscover).toHaveBeenCalledWith(
+		'https://agent.example',
+		expect.objectContaining({ authType: 'bearer', credential: 'secret' }),
+		expect.any(AbortSignal)
+	);
+	expect(saved).toMatchObject({ id: 'saved', name: 'Updated', credential: 'secret' });
 	expect(getA2aAgents()).toEqual([saved]);
 });
 
@@ -64,7 +79,8 @@ it('does not forward a stored token when the endpoint changes', async () => {
 			id: 'saved',
 			name: 'Saved',
 			url: 'https://old.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		},
@@ -76,8 +92,13 @@ it('does not forward a stored token when the endpoint changes', async () => {
 		token: '',
 	});
 
-	expect(mockDiscover).toHaveBeenCalledWith('https://new.example', undefined);
-	expect(saved).not.toHaveProperty('token');
+	expect(mockDiscover).toHaveBeenCalledWith(
+		'https://new.example',
+		expect.objectContaining({ authType: 'none' }),
+		expect.any(AbortSignal)
+	);
+	expect(saved).not.toHaveProperty('credential');
+	expect(saved.authType).toBe('none');
 });
 
 it('rejects unknown update IDs before discovery', async () => {
@@ -93,7 +114,8 @@ it('tests transport compatibility and reuses stored edit credentials', async () 
 			id: 'saved',
 			name: 'Saved',
 			url: 'https://agent.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		},
@@ -101,7 +123,11 @@ it('tests transport compatibility and reuses stored edit credentials', async () 
 	await expect(
 		testA2aAgent({ id: 'saved', name: '', url: 'https://agent.example', token: '' })
 	).resolves.toMatchObject({ name: 'Remote', streaming: true });
-	expect(mockDiscover).toHaveBeenCalledWith('https://agent.example', 'secret');
+	expect(mockDiscover).toHaveBeenCalledWith(
+		'https://agent.example',
+		expect.objectContaining({ authType: 'bearer', credential: 'secret' }),
+		expect.any(AbortSignal)
+	);
 	expect(mockCreateFromAgentCard).toHaveBeenCalledWith(card);
 });
 
@@ -128,7 +154,8 @@ it('redacts the bearer token from public records', () => {
 			id: 'saved',
 			name: 'Saved',
 			url: 'https://agent.example',
-			token: 'secret',
+			authType: 'bearer',
+			credential: 'secret',
 			enabled: true,
 			skills: [],
 		})
@@ -136,7 +163,9 @@ it('redacts the bearer token from public records', () => {
 		id: 'saved',
 		name: 'Saved',
 		url: 'https://agent.example',
+		authType: 'bearer',
 		enabled: true,
 		skills: [],
+		hasCredential: true,
 	});
 });
