@@ -1,4 +1,5 @@
-import { TaskState, taskStateToJSON } from '@a2a-js/sdk';
+import { TaskState } from '@a2a-js/sdk';
+import { formatA2aTaskOutcome } from './format';
 
 export function a2aTaskOutcome(
 	taskId: string,
@@ -6,28 +7,13 @@ export function a2aTaskOutcome(
 	state: TaskState | undefined,
 	text: string
 ): string {
-	const reference = `${taskId || 'unknown'}${contextId ? ` (context ${contextId})` : ''}`;
-	const label =
-		state === undefined
-			? 'unknown'
-			: taskStateToJSON(state)
-					.replace(/^TASK_STATE_/, '')
-					.toLowerCase()
-					.replaceAll('_', ' ');
-	const content = text.trim();
+	const outcome = formatA2aTaskOutcome(taskId, contextId, state, text);
 	if (
 		state === TaskState.TASK_STATE_FAILED ||
 		state === TaskState.TASK_STATE_CANCELED ||
 		state === TaskState.TASK_STATE_REJECTED
 	) {
-		throw new Error(`Remote task ${reference} ${label}${content ? `: ${content}` : '.'}`);
+		throw new Error(outcome);
 	}
-	if (state === TaskState.TASK_STATE_INPUT_REQUIRED) {
-		return `Remote task ${reference} requires input${content ? `: ${content}` : '.'}`;
-	}
-	if (state === TaskState.TASK_STATE_AUTH_REQUIRED) {
-		return `Remote task ${reference} requires authentication${content ? `: ${content}` : '.'}`;
-	}
-	if (state === TaskState.TASK_STATE_COMPLETED) return content || `Remote task ${reference} is completed.`;
-	return `Remote task ${reference} is ${label}${content ? `: ${content}` : '.'}`;
+	return outcome;
 }

@@ -60,7 +60,13 @@ export default function A2aPage(): React.JSX.Element {
 				title="A2A agents"
 				description="Connect remote Agent2Agent-compatible agents and delegate work to them."
 				action={
-					<Button size="xs" onClick={() => setAdding(true)}>
+					<Button
+						size="xs"
+						onClick={() => {
+							setForm(empty);
+							setAdding(true);
+						}}
+					>
 						<Plus className="size-3" />
 						Add agent
 					</Button>
@@ -143,7 +149,14 @@ export default function A2aPage(): React.JSX.Element {
 								Enabled
 							</label>
 							<div className="flex justify-end gap-2">
-								<Button variant="outline" size="xs" onClick={() => setAdding(false)}>
+								<Button
+									variant="outline"
+									size="xs"
+									onClick={() => {
+										setForm(empty);
+										setAdding(false);
+									}}
+								>
 									Cancel
 								</Button>
 								<Button size="xs" disabled={busy || !form.url.trim()} onClick={() => void submit()}>

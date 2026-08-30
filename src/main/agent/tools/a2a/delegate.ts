@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { sendA2aMessage } from '../../a2a';
 import { tool } from '../tool';
 
 export const delegateA2aTool = tool({
@@ -31,6 +30,8 @@ export const delegateA2aTool = tool({
 			.optional()
 			.describe('Remote context ID when continuing an interrupted task.'),
 	}),
-	execute: ({ agentId, prompt, taskId, contextId }, signal) =>
-		sendA2aMessage(agentId, prompt, signal, taskId, contextId),
+	execute: async ({ agentId, prompt, taskId, contextId }, signal) => {
+		const { sendA2aMessage } = await import('../../a2a/send');
+		return sendA2aMessage(agentId, prompt, signal, taskId, contextId);
+	},
 });

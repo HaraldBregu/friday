@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { getA2aAgents } from '../../a2a';
+import { getA2aAgents } from '../../a2a/store';
 import { publicA2aAgent } from '../../a2a/public';
 import { tool } from '../tool';
 

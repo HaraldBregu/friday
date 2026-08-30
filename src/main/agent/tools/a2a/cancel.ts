@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { cancelA2aTask } from '../../a2a';
 import { tool } from '../tool';
 
 export const cancelA2aTaskTool = tool({
@@ -11,5 +10,8 @@ export const cancelA2aTaskTool = tool({
 		agentId: z.string().trim().min(1).max(200),
 		taskId: z.string().trim().min(1).max(200),
 	}),
-	execute: ({ agentId, taskId }, signal) => cancelA2aTask(agentId, taskId, signal),
+	execute: async ({ agentId, taskId }, signal) => {
+		const { cancelA2aTask } = await import('../../a2a/cancel');
+		return cancelA2aTask(agentId, taskId, signal);
+	},
 });

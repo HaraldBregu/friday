@@ -28,6 +28,21 @@ it('encrypts credentials outside the persisted A2A record', () => {
 	expect(openA2aAgent(sealed.record).agent.credential).toBe('sentinel-secret');
 });
 
+it('refuses to decrypt a credential after its endpoint metadata is changed', () => {
+	const sealed = sealA2aAgent({
+		id: 'agent',
+		name: 'Agent',
+		url: 'https://agent.example',
+		authType: 'bearer',
+		credential: 'sentinel-secret',
+		enabled: true,
+		skills: [],
+	});
+	const opened = openA2aAgent({ ...sealed.record, url: 'https://other.example' });
+	expect(opened.agent).not.toHaveProperty('credential');
+	expect(opened.encryptedCredentialUnreadable).toBe(true);
+});
+
 it('keeps credentials memory-only when OS encryption is unavailable', () => {
 	encryptionAvailable.mockReturnValue(false);
 	const sealed = sealA2aAgent({

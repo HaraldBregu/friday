@@ -80,6 +80,28 @@ it('pins authenticated interfaces to the configured HTTPS origin', async () => {
 	).rejects.toThrow('match the configured agent origin');
 });
 
+it('ignores unsupported and legacy interfaces when a supported v1.0 interface exists', async () => {
+	await expect(
+		createA2aClient(
+			{
+				...card,
+				supportedInterfaces: [
+					{ url: 'grpc.example:443', protocolBinding: 'GRPC', protocolVersion: '1.0', tenant: '' },
+					{ ...card.supportedInterfaces[0], protocolVersion: '0.3' },
+					{ ...card.supportedInterfaces[0], protocolBinding: 'HTTP+JSON' },
+				],
+			},
+			{ authType: 'api-key', credential: 'secret', apiKeyHeader: 'X-API-Key' },
+			'https://agent.example'
+		)
+	).resolves.toBeDefined();
+	expect(mockCreateFromAgentCard).toHaveBeenCalledWith(
+		expect.objectContaining({
+			supportedInterfaces: [expect.objectContaining({ protocolBinding: 'HTTP+JSON' })],
+		})
+	);
+});
+
 it('migrates an empty legacy token to no authentication when the endpoint changes', () => {
 	const existing = {
 		id: 'saved',

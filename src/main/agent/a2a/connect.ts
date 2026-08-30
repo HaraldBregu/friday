@@ -4,6 +4,7 @@ import type { A2aAgent } from '../../../shared/a2a_types';
 import { createA2aClient } from './client';
 import { discoverA2aAgent } from './discover';
 import { sanitizeA2aError } from './error';
+import { validateA2aAuthentication } from './validate';
 
 export async function connectA2aAgent(
 	url: string,
@@ -13,6 +14,7 @@ export async function connectA2aAgent(
 	const timeout = AbortSignal.timeout(15_000);
 	const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
 	try {
+		validateA2aAuthentication(authentication, url);
 		let card = await discoverA2aAgent(url, authentication, requestSignal);
 		let client = await createA2aClient(card, authentication, url);
 		if (authentication.credential && card.capabilities?.extendedAgentCard) {

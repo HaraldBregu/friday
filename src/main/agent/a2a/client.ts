@@ -4,6 +4,7 @@ import type { A2aAgent } from '../../../shared/a2a_types';
 import { createA2aFetch } from './fetch';
 
 const supportedOutputModes = new Set(['text/plain', 'application/json']);
+const supportedBindings = new Set(['jsonrpc', 'http+json']);
 
 export async function createA2aClient(
 	card: AgentCard,
@@ -20,23 +21,27 @@ export async function createA2aClient(
 	) {
 		throw new Error('Invalid A2A Agent Card: skills and supported interfaces are required.');
 	}
-	const discoveryOrigin = new URL(discoveryUrl).origin;
-	for (const supportedInterface of card.supportedInterfaces) {
-		let endpoint: URL;
-		try {
-			endpoint = new URL(supportedInterface.url);
-		} catch {
-			throw new Error('Invalid A2A Agent Card: interface URL must be absolute.');
-		}
-		if (!['http:', 'https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password) {
-			throw new Error('Invalid A2A Agent Card: interface URL must be HTTP(S) without credentials.');
-		}
-		if (authentication.credential && endpoint.protocol !== 'https:') {
-			throw new Error('Authenticated A2A interfaces must use HTTPS.');
-		}
-		if (authentication.credential && endpoint.origin !== discoveryOrigin) {
-			throw new Error('Authenticated A2A interfaces must match the configured agent origin.');
-		}
+	const supportedInterface = card.supportedInterfaces.find(
+		(item) =>
+			item.protocolVersion === '1.0' && supportedBindings.has(item.protocolBinding.toLowerCase())
+	);
+	if (!supportedInterface) {
+		throw new Error('A2A Agent Card does not advertise a supported v1.0 JSON-RPC or HTTP+JSON interface.');
+	}
+	let endpoint: URL;
+	try {
+		endpoint = new URL(supportedInterface.url);
+	} catch {
+		throw new Error('Invalid A2A Agent Card: selected interface URL must be absolute.');
+	}
+	if (!['http:', 'https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password) {
+		throw new Error('Invalid A2A Agent Card: selected interface must be HTTP(S) without credentials.');
+	}
+	if (endpoint.origin !== new URL(discoveryUrl).origin) {
+		throw new Error('A2A interface must match the configured agent origin.');
+	}
+	if (authentication.credential && endpoint.protocol !== 'https:') {
+		throw new Error('Authenticated A2A interfaces must use HTTPS.');
 	}
 	const requiredExtensions = card.capabilities?.extensions?.filter(
 		(extension) => extension.required
@@ -91,10 +96,11 @@ export async function createA2aClient(
 		'@a2a-js/sdk/client'
 	);
 	const fetchImpl = createA2aFetch(authentication);
+	const compatibleCard = { ...card, supportedInterfaces: [supportedInterface] };
 	return new ClientFactory({
 		transports: [
 			new JsonRpcTransportFactory({ fetchImpl }),
 			new RestTransportFactory({ fetchImpl }),
 		],
-	}).createFromAgentCard(card);
+	}).createFromAgentCard(compatibleCard);
 }

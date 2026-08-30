@@ -1,6 +1,6 @@
 import { connectA2aAgent } from './connect';
 import { sanitizeA2aError } from './error';
-import { a2aTaskOutcome } from './outcome';
+import { formatA2aTaskOutcome } from './format';
 import { assertA2aPartsSize } from './parts';
 import { resolveA2aAgent } from './remote';
 import { a2aText } from './text';
@@ -14,7 +14,7 @@ export async function getA2aTask(
 	try {
 		const { client } = await connectA2aAgent(remote.url, remote, signal);
 		const task = await client.getTask(
-			{ tenant: '', id: taskId, historyLength: 10 },
+			{ tenant: '', id: taskId, historyLength: 0 },
 			{ signal }
 		);
 		let receivedBytes = 0;
@@ -25,7 +25,7 @@ export async function getA2aTask(
 		assertA2aPartsSize(statusParts, receivedBytes);
 		const artifactText = a2aText(task.artifacts.flatMap((artifact) => artifact.parts));
 		const statusText = a2aText(statusParts);
-		return a2aTaskOutcome(
+		return formatA2aTaskOutcome(
 			task.id,
 			task.contextId,
 			task.status?.state,

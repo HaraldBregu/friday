@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { getA2aTask } from '../../a2a';
 import { tool } from '../tool';
 
 export const getA2aTaskTool = tool({
@@ -11,5 +10,8 @@ export const getA2aTaskTool = tool({
 		agentId: z.string().trim().min(1).max(200),
 		taskId: z.string().trim().min(1).max(200),
 	}),
-	execute: ({ agentId, taskId }, signal) => getA2aTask(agentId, taskId, signal),
+	execute: async ({ agentId, taskId }, signal) => {
+		const { getA2aTask } = await import('../../a2a/get');
+		return getA2aTask(agentId, taskId, signal);
+	},
 });

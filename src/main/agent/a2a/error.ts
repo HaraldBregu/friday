@@ -21,9 +21,7 @@ export function sanitizeA2aError(
 	const credential = authentication?.credential;
 	if (credential) {
 		message = message.replaceAll(credential, '[REDACTED]');
-		try {
-			message = message.replaceAll(encodeURIComponent(credential), '[REDACTED]');
-		} catch {}
+		message = message.replaceAll(encodeURIComponent(credential.toWellFormed()), '[REDACTED]');
 	}
 	const sanitized = new Error(message.slice(0, 2_000));
 	sanitized.name = name;

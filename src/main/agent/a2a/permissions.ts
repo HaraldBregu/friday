@@ -5,5 +5,7 @@ export function restrictA2aStorePermissions(storePath: string): void {
 	try {
 		chmodSync(path.dirname(storePath), 0o700);
 		chmodSync(storePath, 0o600);
-	} catch {}
+	} catch {
+		return;
+	}
 }
