@@ -1,4 +1,16 @@
 import type { AgentCard } from '@a2a-js/sdk';
+
+const mockCreateFromAgentCard = jest.fn();
+const mockClientFactory = jest.fn();
+const mockJsonRpcTransportFactory = jest.fn();
+const mockRestTransportFactory = jest.fn();
+
+jest.mock('@a2a-js/sdk/client', () => ({
+	ClientFactory: mockClientFactory,
+	JsonRpcTransportFactory: mockJsonRpcTransportFactory,
+	RestTransportFactory: mockRestTransportFactory,
+}));
+
 import { resolveA2aAuthentication } from '../../../../src/main/agent/a2a/authentication';
 import { createA2aClient } from '../../../../src/main/agent/a2a/client';
 
@@ -25,6 +37,13 @@ const card: AgentCard = {
 	skills: [],
 	signatures: [],
 };
+
+beforeEach(() => {
+	mockClientFactory.mockImplementation(() => ({ createFromAgentCard: mockCreateFromAgentCard }));
+	mockJsonRpcTransportFactory.mockImplementation(() => ({}));
+	mockRestTransportFactory.mockImplementation(() => ({}));
+	mockCreateFromAgentCard.mockResolvedValue({});
+});
 
 it('accepts a configured API key header declared by the Agent Card', async () => {
 	await expect(
