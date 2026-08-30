@@ -35,6 +35,34 @@ it('restores an unresolved structured input call as interrupted', () => {
 	});
 });
 
+it('restores an image tool without a result as stopped', () => {
+	const history: AgentHistoryMessage[] = [
+		{ role: 'user', content: 'Create an image.' },
+		{
+			role: 'assistant',
+			content: '',
+			contentBlocks: [
+				{
+					type: 'tool_use',
+					toolUseId: 'image',
+					toolName: 'create_image',
+					toolArgs: { prompt: 'A mountain' },
+				},
+			],
+		},
+		{ role: 'user', content: 'Continue without it.' },
+		{ role: 'assistant', content: 'Continuing.' },
+	];
+	const message = historyToChatMessages(history)[1];
+	expect(message?.role).toBe('agent');
+	if (!message || message.role !== 'agent') throw new Error('Expected restored assistant.');
+	expect(message.tools[0]).toMatchObject({
+		type: 'create_image',
+		state: 'output-error',
+		status: 'error',
+	});
+});
+
 it('does not render persisted attachment metadata in the thread', () => {
 	const history: AgentHistoryMessage[] = [
 		{

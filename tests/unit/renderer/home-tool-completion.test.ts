@@ -34,3 +34,74 @@ it('settles a tool still shown as running when its agent run completes', () => {
 	expect(completedMessage.state).toBe('completed');
 	expect(completedMessage.tools[0].state).toBe('output-available');
 });
+
+it('stops a running tool when its agent run is cancelled', () => {
+	const message: AgentMessage = {
+		id: 'agent-1',
+		role: 'agent',
+		type: 'agent',
+		content: '',
+		runId: 'run-1',
+		state: 'using_tools',
+		tools: [
+			{
+				toolCallId: 'image-1',
+				type: 'create_image',
+				state: 'input-available',
+				input: { prompt: 'A mountain' },
+			},
+		],
+	};
+	const state: AgentChatState = {
+		messages: [message],
+		activeAgentId: message.id,
+		activeRunId: message.runId,
+	};
+
+	const cancelled = agentChatReducer(state, {
+		type: 'cancel_active',
+		completedAtMs: 100,
+	});
+	const cancelledMessage = cancelled.messages[0] as AgentMessage;
+
+	expect(cancelledMessage.tools[0]).toMatchObject({
+		state: 'output-error',
+		status: 'error',
+	});
+});
+
+it('stops a running tool when its agent run fails', () => {
+	const message: AgentMessage = {
+		id: 'agent-1',
+		role: 'agent',
+		type: 'agent',
+		content: '',
+		runId: 'run-1',
+		state: 'using_tools',
+		tools: [
+			{
+				toolCallId: 'image-1',
+				type: 'create_image',
+				state: 'input-available',
+				input: { prompt: 'A mountain' },
+			},
+		],
+	};
+	const state: AgentChatState = {
+		messages: [message],
+		activeAgentId: message.id,
+		activeRunId: message.runId,
+	};
+
+	const failed = agentChatReducer(state, {
+		type: 'error_active',
+		errorText: 'Image generation failed.',
+		completedAtMs: 100,
+	});
+	const failedMessage = failed.messages[0] as AgentMessage;
+
+	expect(failedMessage.tools[0]).toMatchObject({
+		state: 'output-error',
+		status: 'error',
+	});
+});

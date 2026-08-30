@@ -99,10 +99,15 @@ function isTerminalRunState(state: AgentMessage['state']): boolean {
 	return state === 'completed' || state === 'cancelled' || state === 'error';
 }
 
-function settleRunningTools(tools: readonly AgentToolPart[]): AgentToolPart[] {
+function settleRunningTools(
+	tools: readonly AgentToolPart[],
+	failed = false
+): AgentToolPart[] {
 	return tools.map((tool) =>
 		tool.state === 'input-streaming' || tool.state === 'input-available'
-			? { ...tool, state: 'output-available' as const }
+			? failed
+				? { ...tool, state: 'output-error' as const, status: 'error' as const }
+				: { ...tool, state: 'output-available' as const }
 			: tool
 	);
 }
@@ -368,15 +373,18 @@ export function historyToChatMessages(history: AgentHistoryMessage[]): HomeChatM
 		if (!isAgentMessage(message)) return message;
 		return {
 			...message,
-			tools: message.tools.map((tool) =>
-				tool.type === 'ask' && tool.state === 'input-available'
-					? {
-							...tool,
-							state: 'output-error' as const,
-							output: { status: 'interrupted', answers: [] },
-							outputText: JSON.stringify({ status: 'interrupted', answers: [] }),
-						}
-					: tool
+			tools: settleRunningTools(
+				message.tools.map((tool) =>
+					tool.type === 'ask' && tool.state === 'input-available'
+						? {
+								...tool,
+								state: 'output-error' as const,
+								output: { status: 'interrupted', answers: [] },
+								outputText: JSON.stringify({ status: 'interrupted', answers: [] }),
+							}
+						: tool
+				),
+				true
 			),
 		};
 	});
@@ -472,14 +480,17 @@ export function agentChatReducer(state: AgentChatState, action: AgentChatAction)
 				errorText: 'Cancelled.',
 				pendingPermission: undefined,
 				pendingUserInput: undefined,
-				tools: message.pendingUserInput
-					? updateAgentToolPart(message.tools, message.pendingUserInput.toolCallId, {
-							type: 'ask',
-							state: 'output-error',
-							output: { status: 'interrupted', answers: [] },
-							outputText: JSON.stringify({ status: 'interrupted', answers: [] }),
-						})
-					: message.tools,
+				tools: settleRunningTools(
+					message.pendingUserInput
+						? updateAgentToolPart(message.tools, message.pendingUserInput.toolCallId, {
+								type: 'ask',
+								state: 'output-error',
+								output: { status: 'interrupted', answers: [] },
+								outputText: JSON.stringify({ status: 'interrupted', answers: [] }),
+							})
+						: message.tools,
+					true
+				),
 				startedAtMs: message.startedAtMs ?? action.completedAtMs,
 				completedAtMs: action.completedAtMs ?? message.completedAtMs,
 			}));
@@ -505,6 +516,7 @@ export function agentChatReducer(state: AgentChatState, action: AgentChatAction)
 				errorText: action.errorText,
 				pendingPermission: undefined,
 				pendingUserInput: undefined,
+				tools: settleRunningTools(message.tools, true),
 				startedAtMs: message.startedAtMs ?? action.completedAtMs,
 				completedAtMs: action.completedAtMs ?? message.completedAtMs,
 			}));
