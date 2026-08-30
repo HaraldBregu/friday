@@ -1,5 +1,6 @@
 import { safeStorage } from 'electron';
 import type { A2aAgent } from '../../../shared/a2a_types';
+import { isA2aSecureStorageAvailable } from './available';
 import type { A2aCredentialPayload, A2aStoredAgent } from './stored';
 
 export function openA2aAgent(
@@ -18,7 +19,7 @@ export function openA2aAgent(
 		hasPlaintextCredential = true;
 	}
 	if (typeof data.encryptedCredential === 'string') {
-		if (safeStorage.isEncryptionAvailable()) {
+		if (isA2aSecureStorageAvailable()) {
 			try {
 				const decrypted = safeStorage.decryptString(Buffer.from(data.encryptedCredential, 'base64'));
 				let parsed: unknown;

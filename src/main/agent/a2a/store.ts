@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { safeStorage } from 'electron';
 import Store from 'electron-store';
 import { userDataLocation } from '../../shared/user_data_location';
 import type { A2aAgent } from '../../../shared/a2a_types';
+import { isA2aSecureStorageAvailable } from './available';
 import { openA2aAgent } from './open';
 import { restrictA2aStorePermissions } from './permissions';
 import { preserveA2aCredential } from './preserve';
@@ -28,7 +28,7 @@ export const getA2aAgents = (): A2aAgent[] => {
 	const agents = records.map((record, index) => {
 		const opened = openA2aAgent(record, volatileCredentials.get(record.id));
 		if (opened.encryptedCredentialUnreadable) nextPreservedRecords.set(record.id, record);
-		if (opened.hasPlaintextCredential && safeStorage.isEncryptionAvailable()) {
+		if (opened.hasPlaintextCredential && isA2aSecureStorageAvailable()) {
 			migratedRecords[index] = sealA2aAgent(opened.agent).record;
 			migrated = true;
 		} else if (opened.hasPlaintextCredential) {
@@ -51,7 +51,7 @@ export const setA2aAgents = (agents: A2aAgent[]): void => {
 		const preservedRecord = preserved ? preserveA2aCredential(agent, preserved) : undefined;
 		if (
 			preservedRecord &&
-			(!safeStorage.isEncryptionAvailable() || !agent.credential)
+			(!isA2aSecureStorageAvailable() || !agent.credential)
 		) {
 			nextPreservedRecords.set(agent.id, preservedRecord);
 			return preservedRecord;

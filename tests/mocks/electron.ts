@@ -77,6 +77,7 @@ export const powerSaveBlocker = {
 
 export const safeStorage = {
 	isEncryptionAvailable: jest.fn(() => true),
+	getSelectedStorageBackend: jest.fn(() => 'gnome_libsecret'),
 	encryptString: jest.fn((value: string) => Buffer.from(value, 'utf8')),
 	decryptString: jest.fn((value: Buffer) => value.toString('utf8')),
 };
