@@ -209,7 +209,7 @@ it('redacts configured credentials from streamed terminal errors', async () => {
 			payload: {
 				$case: 'statusUpdate',
 				value: {
-					taskId: 'task-secret',
+					taskId: 'task-1',
 					contextId: 'ctx',
 					status: {
 						state: TaskState.TASK_STATE_FAILED,
@@ -224,7 +224,7 @@ it('redacts configured credentials from streamed terminal errors', async () => {
 	mockCreateFromAgentCard.mockResolvedValue({ sendMessageStream });
 
 	await expect(sendA2aMessage('target', 'work')).rejects.toThrow(
-		'Remote task task-secret (context ctx) is failed: credential [REDACTED] rejected'
+		'Remote task task-1 (context ctx) is failed: credential [REDACTED] rejected'
 	);
 });
 
