@@ -14,6 +14,7 @@ import {
 	type StoredProviderKind,
 } from '@shared/provider_types';
 import type { StorageConfig } from '@shared/storage_types';
+import { DEFAULT_STORAGE } from '../storage/defaults';
 import type { SearchEngineId, SearchSettings } from '@shared/search_types';
 import type { McpData } from '@shared/mcp_types';
 import {
@@ -97,19 +98,18 @@ function allCatalogItems(): ProviderCatalogItem[] {
 }
 
 function blankStorage(provider: PublicProvider): StorageConfig {
-	return {
-		id: provider.id,
-		name: provider.name,
-		endpoint: '',
-		region: 'us-east-1',
-		accessKeyId: '',
-		secretAccessKey: '',
-		bucket: '',
-		forcePathStyle: false,
-		paths: [],
-		syncEnabled: false,
-		syncCronExpression: '0 3 * * *',
-	};
+	return provider.id === 'supabase'
+		? { ...DEFAULT_STORAGE, name: provider.name }
+		: {
+				...DEFAULT_STORAGE,
+				id: provider.id,
+				name: provider.name,
+				endpoint: '',
+				region: 'us-east-1',
+				accessKeyId: '',
+				secretAccessKey: '',
+				forcePathStyle: false,
+			};
 }
 
 /** Catalog storage providers (saved config when one exists) plus saved configs outside the catalog. */
