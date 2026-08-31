@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { importJWK, SignJWT, type JWK } from 'jose';
+import type { JWK } from 'jose';
 import type { A2aAgent } from '../../../shared/a2a_types';
 
 export async function createA2aTokenProvider(
@@ -30,6 +30,7 @@ export async function createA2aTokenProvider(
 	} catch {
 		throw new Error('A2A OAuth private key must be a valid JWK.');
 	}
+	const { importJWK, SignJWT } = await import('jose');
 	const key = await importJWK(privateJwk, 'EdDSA');
 	let cached: { token: string; expiresAt: number } | undefined;
 	return async () => {
