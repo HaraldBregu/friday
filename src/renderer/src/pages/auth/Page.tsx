@@ -73,7 +73,16 @@ const AuthPage: React.FC = () => {
 
 	if (state.status === 'unconfigured') {
 		return (
-			<main className="flex h-full items-center justify-center bg-muted/30 px-6">
+			<main className="relative flex h-full items-center justify-center bg-muted/30 px-6">
+				<Button
+					type="button"
+					variant="link"
+					size="sm"
+					className="absolute right-4 top-3 z-10 text-muted-foreground"
+					onClick={skipSignIn}
+				>
+					Skip for now
+				</Button>
 				<Card className="w-full max-w-sm">
 					<CardHeader>
 						<CardTitle>Supabase is not configured</CardTitle>
@@ -81,14 +90,6 @@ const AuthPage: React.FC = () => {
 							Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then restart Friday.
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
-						<Button type="button" variant="outline" className="w-full" onClick={skipSignIn}>
-							Skip for now
-						</Button>
-						<p className="mt-2 text-center text-[10px] leading-4 text-muted-foreground">
-							Continue locally and sign in later from Account settings.
-						</p>
-					</CardContent>
 				</Card>
 			</main>
 		);
@@ -96,7 +97,17 @@ const AuthPage: React.FC = () => {
 
 	if (showConfirmation) {
 		return (
-			<main className="flex h-full items-center justify-center overflow-y-auto bg-muted/30 px-6 py-8">
+			<main className="relative flex h-full items-center justify-center overflow-y-auto bg-muted/30 px-6 py-8">
+				<Button
+					type="button"
+					variant="link"
+					size="sm"
+					className="absolute right-4 top-3 z-10 text-muted-foreground"
+					disabled={busy}
+					onClick={skipSignIn}
+				>
+					Skip for now
+				</Button>
 				<Card className="w-full max-w-sm">
 					<CardHeader className="items-center text-center">
 						<div className="mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -143,7 +154,19 @@ const AuthPage: React.FC = () => {
 	}
 
 	return (
-		<main className="flex h-full items-center justify-center overflow-y-auto bg-muted/30 px-6 py-8">
+		<main className="relative flex h-full items-center justify-center overflow-y-auto bg-muted/30 px-6 py-8">
+			{!recovery ? (
+				<Button
+					type="button"
+					variant="link"
+					size="sm"
+					className="absolute right-4 top-3 z-10 text-muted-foreground"
+					disabled={busy}
+					onClick={skipSignIn}
+				>
+					Skip for now
+				</Button>
+			) : null}
 			<div className="w-full max-w-sm">
 				<div className="mb-5 flex flex-col items-center text-center">
 					<div className="flex size-16 items-center justify-center rounded-2xl border border-border/70 bg-background shadow-sm">
@@ -270,16 +293,6 @@ const AuthPage: React.FC = () => {
 							<p className="mt-3 text-center text-[10px] leading-4 text-muted-foreground">
 								Secure system storage is unavailable, so this session will not persist after restart.
 							</p>
-						) : null}
-						{!recovery ? (
-							<div className="mt-4 flex flex-col gap-2 border-t pt-4">
-								<Button type="button" variant="outline" disabled={busy} onClick={skipSignIn}>
-									Skip for now
-								</Button>
-								<p className="text-center text-[10px] leading-4 text-muted-foreground">
-									Continue locally and sign in later from Account settings.
-								</p>
-							</div>
 						) : null}
 					</CardContent>
 				</Card>
