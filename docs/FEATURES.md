@@ -97,7 +97,7 @@ The Home editor provides two styled command modes:
 - `/plan` switches the current session into Plan mode. A completed plan can render an **Implement**
   action that returns to the normal interaction mode.
 - `/goal <objective>` creates a durable goal for the current conversation. `/goal pause`, `/goal
-  resume`, and `/goal clear` control its lifecycle. Bare `/goal` cannot currently be submitted from
+resume`, and `/goal clear` control its lifecycle. Bare `/goal` cannot currently be submitted from
   Home because the Goal mode requires following text.
 
 `/task_list`, `/create_task`, and `/delete_task` are expanded into agent instructions before the
