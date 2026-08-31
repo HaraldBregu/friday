@@ -46,13 +46,21 @@ The chat surface is the primary way users interact with Friday, so its setup, in
 
 ### First-run setup
 
-The first launch uses a three-step setup flow:
+The first launch uses a single `/start` flow with seven visible stages: **Welcome**, **Account**,
+**Model**, **Search**, **Storage**, **Database**, and **Models**. Account sign-in is optional; users
+can continue in local-only mode. After sign-in or local-only continuation, Friday checks for a
+stored Assistant provider and model. A complete configuration opens Home, while an incomplete one
+continues through setup.
 
-1. **Welcome** introduces Friday as a personal agent for everyday tasks, coding, and background work.
-2. **Providers** requires at least one provider API key. Each provider card links to its key or configuration page and supports connect, edit, cancel, and save states.
-3. **Models** selects models for Assistant, Voice, Transcription, Image, Video, and Audio. Only the Assistant selection is required to finish. Task and health provider/model selection are configured separately, later, on their own Settings pages rather than during first-run setup.
+The Model stage requires at least one saved model-provider API key. Search, S3-compatible object
+storage, and vector database connections are optional. The final Models stage offers Assistant,
+Voice, Transcription, Image, Video, Audio, realtime conversation, and search configuration, but
+only the Assistant selection is required to finish. Task and health model selection remain on their
+own Settings pages.
 
-When an Assistant provider and model are already stored, Friday skips setup and opens the chat screen. The same provider keys and service selections can be changed later in Settings.
+See [Start Page Flow](ui/START.md) for routing, authentication branches, navigation behavior,
+validation, persistence, and completion rules. The same provider keys and service selections can
+be changed later in Settings.
 
 Provider API keys are stored in Friday's local application data and are masked after saving. Requests and credentials are still sent to the configured provider as required for authentication and inference.
 
