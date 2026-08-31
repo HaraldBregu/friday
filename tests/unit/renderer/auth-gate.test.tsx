@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
+import AuthPage from '../../../src/renderer/src/pages/auth/Page';
 
 jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
 	LogoView: () => <span aria-label="Friday" />,
@@ -98,6 +99,29 @@ it('sends local-only users to setup when configuration is incomplete', async () 
 		getModelId: jest.fn(async () => ''),
 	} as never;
 	renderGate('/auth');
+	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
+});
+
+it('sends skipped sign-in to setup when configuration is incomplete', async () => {
+	const user = userEvent.setup();
+	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
+	window.agent = {
+		getProvider: jest.fn(async () => undefined),
+		getModelId: jest.fn(async () => ''),
+	} as never;
+	render(
+		<AuthProvider>
+			<MemoryRouter initialEntries={['/auth']}>
+				<StartupGate>
+					<Routes>
+						<Route path="/auth" element={<AuthPage />} />
+						<Route path="*" element={<Location />} />
+					</Routes>
+				</StartupGate>
+			</MemoryRouter>
+		</AuthProvider>
+	);
+	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 });
 
