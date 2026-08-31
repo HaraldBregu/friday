@@ -66,6 +66,12 @@ it('redirects a signed-out protected route to auth', async () => {
 	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
+it('redirects a signed-out user from start to auth', async () => {
+	window.auth = authApi({ status: 'signedOut', persistence: 'memory' });
+	renderGate('/start');
+	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
+});
+
 it('shows the start page while the session is loading', () => {
 	window.auth = {
 		...authApi({ status: 'loading', persistence: 'memory' }),
