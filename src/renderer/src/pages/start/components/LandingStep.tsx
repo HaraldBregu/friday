@@ -18,7 +18,7 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 				Welcome to Friday
 			</p>
 			<h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-foreground">
-				Your desktop AI copilot
+				The Personal Desktop AI Assistant
 			</h1>
 			<p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
 				Friday helps with everyday tasks, works across your tools, and keeps important context
