@@ -116,7 +116,7 @@ test('the leading /plan command activates Plan mode and requires prompt text', a
 	await expect(page.getByRole('button', { name: 'Send message' })).toBeEnabled();
 });
 
-test('wiki settings renders the complete configuration workflow', async ({}, testInfo) => {
+test('wiki settings renders the complete configuration workflow', async ({ browserName: _browserName }, testInfo) => {
 	await page.evaluate(() => {
 		window.location.hash = '#/settings/wiki';
 	});
