@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
 import { LogoView } from '@/components/app/base/logo-view';
 import { Button } from '@/components/ui/button';
@@ -20,10 +20,6 @@ const AuthPage: React.FC = () => {
 	const [error, setError] = useState('');
 	const [forgotSent, setForgotSent] = useState(false);
 	const [dismissedConfirmation, setDismissedConfirmation] = useState(false);
-
-	useEffect(() => {
-		if (state.status === 'confirmationRequired') setDismissedConfirmation(false);
-	}, [state.status]);
 
 	const recovery = state.status === 'recovery';
 	const showConfirmation = state.status === 'confirmationRequired' && !dismissedConfirmation;
@@ -60,7 +56,10 @@ const AuthPage: React.FC = () => {
 		setBusy(true);
 		try {
 			if (recovery) await window.auth.updatePassword(password);
-			else if (mode === 'signUp') await window.auth.signUp({ email, password });
+			else if (mode === 'signUp') {
+				setDismissedConfirmation(false);
+				await window.auth.signUp({ email, password });
+			}
 			else if (mode === 'forgot') {
 				await window.auth.requestPasswordReset(email);
 				setForgotSent(true);

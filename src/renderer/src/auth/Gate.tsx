@@ -8,25 +8,23 @@ import { isSetupComplete } from './setup';
 export function StartupGate({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const { state } = useAuth();
 	const location = useLocation();
-	const [setupComplete, setSetupComplete] = useState<boolean>();
+	const [setup, setSetup] = useState<{ userId: string; complete: boolean }>();
+	const setupComplete = setup?.userId === state.user?.id ? setup.complete : undefined;
 
 	useEffect(() => {
-		if (state.status !== 'signedIn') {
-			setSetupComplete(undefined);
-			return;
-		}
+		if (state.status !== 'signedIn' || !state.user) return;
 		let active = true;
 		void isSetupComplete()
 			.then((complete) => {
-				if (active) setSetupComplete(complete);
+				if (active) setSetup({ userId: state.user!.id, complete });
 			})
 			.catch(() => {
-				if (active) setSetupComplete(false);
+				if (active) setSetup({ userId: state.user!.id, complete: false });
 			});
 		return () => {
 			active = false;
 		};
-	}, [state.status, state.user?.id]);
+	}, [state.status, state.user]);
 
 	if (state.status === 'loading' || (state.status === 'signedIn' && setupComplete === undefined)) {
 		return (

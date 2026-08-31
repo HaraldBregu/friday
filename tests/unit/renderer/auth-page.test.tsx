@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 import AuthPage from '../../../src/renderer/src/pages/auth/Page';
