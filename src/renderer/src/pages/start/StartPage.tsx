@@ -10,7 +10,6 @@ import {
 	actionableProviderCatalog,
 	getErrorMessage,
 	getSelectedServiceModel,
-	MODEL_SERVICE_DEFINITIONS,
 	SETUP_STEPS,
 	STEP_COPY,
 } from './constants';
