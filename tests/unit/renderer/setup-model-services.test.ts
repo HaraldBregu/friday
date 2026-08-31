@@ -2,10 +2,10 @@ import { act, renderHook } from '@testing-library/react';
 import {
 	loadModelServiceState,
 	useSetupModelServices,
-} from '../../../src/renderer/src/pages/setup/hooks/useSetupModelServices';
-import { createInitialModelServiceState } from '../../../src/renderer/src/pages/setup/setupConstants';
-import type { ModelServiceDefinition } from '../../../src/renderer/src/pages/setup/setupTypes';
-import type { SetupState } from '../../../src/renderer/src/pages/setup/state/setupState';
+} from '../../../src/renderer/src/pages/start/hooks/useSetupModelServices';
+import { createInitialModelServiceState } from '../../../src/renderer/src/pages/start/setupConstants';
+import type { ModelServiceDefinition } from '../../../src/renderer/src/pages/start/setupTypes';
+import type { SetupState } from '../../../src/renderer/src/pages/start/state/setupState';
 
 const provider = { id: 'openai', name: 'OpenAI', baseUrl: 'https://api.openai.com/v1' };
 const model = { id: 'gpt-5', name: 'GPT-5' };

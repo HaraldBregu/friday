@@ -13,11 +13,11 @@ jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
 	LogoView: () => <span aria-label="Friday" />,
 }));
 
-jest.mock('../../../src/renderer/src/pages/setup/components/SetupProviderStep', () => ({
+jest.mock('../../../src/renderer/src/pages/start/components/SetupProviderStep', () => ({
 	SetupProviderStep: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));
 
-jest.mock('../../../src/renderer/src/pages/setup/components/SetupModelsStep', () => ({
+jest.mock('../../../src/renderer/src/pages/start/components/SetupModelsStep', () => ({
 	SetupModelsStep: () => <h1>Assistant setup</h1>,
 }));
 

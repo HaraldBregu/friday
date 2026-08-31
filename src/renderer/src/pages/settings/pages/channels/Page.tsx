@@ -19,7 +19,7 @@ import {
 	mergeProviders,
 	type ModelConfigurationState,
 } from '../../components/model-configuration-state';
-import type { ProviderModelGroup } from '../../../setup/setupTypes';
+import type { ProviderModelGroup } from '../../../start/setupTypes';
 import {
 	SettingsLoadingRows,
 	SettingsNotice,

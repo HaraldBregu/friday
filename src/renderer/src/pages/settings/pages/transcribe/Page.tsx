@@ -17,8 +17,8 @@ import {
 	mergeProviders,
 	type ModelConfigurationState,
 } from '../../components/model-configuration-state';
-import { getProviderCatalogItem } from '../../../setup/setupConstants';
-import type { ProviderModelGroup } from '../../../setup/setupTypes';
+import { getProviderCatalogItem } from '../../../start/setupConstants';
+import type { ProviderModelGroup } from '../../../start/setupTypes';
 import TranscribeTest from './TranscribeTest';
 
 type SpeechModeStateMap = Record<SttSelectionMode, ModelConfigurationState>;

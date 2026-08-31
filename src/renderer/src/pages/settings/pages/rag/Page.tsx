@@ -16,7 +16,7 @@ import type { RagConfiguration } from '../../../../../../shared/rag_types';
 import type { DatabaseConfiguration } from '../../../../../../shared/database_types';
 import type { CatalogService } from '../../../../../../shared/provider_types';
 import { defaultProviderId, modelsFor } from '@/lib/providers';
-import { getErrorMessage } from '../../../setup/setupConstants';
+import { getErrorMessage } from '../../../start/setupConstants';
 import {
 	SettingsLoadingRows,
 	SettingsField,

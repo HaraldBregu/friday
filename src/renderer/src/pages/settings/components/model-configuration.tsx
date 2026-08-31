@@ -4,7 +4,7 @@ import { AlertTriangle, Bot, ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ModelProviderSelect, toModelProviderGroups } from '@/components/model-provider-select';
 import { ProviderAvatar } from '@/components/provider-avatar';
-import { getProviderCatalogItem } from '../../setup/setupConstants';
+import { getProviderCatalogItem } from '../../start/setupConstants';
 import { SettingsLoadingRows, SettingsNotice, SettingsRow } from './index';
 import type { ModelConfigurationState } from './model-configuration-state';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
-import { SetupModelsStep } from '../../../src/renderer/src/pages/setup/components/SetupModelsStep';
-import type { ModelServiceStateMap } from '../../../src/renderer/src/pages/setup/setupTypes';
+import { SetupModelsStep } from '../../../src/renderer/src/pages/start/components/SetupModelsStep';
+import type { ModelServiceStateMap } from '../../../src/renderer/src/pages/start/setupTypes';
 
 jest.mock('@pages/settings/components/model-configuration', () => ({
 	ModelProviderConfiguration: ({
@@ -25,7 +25,7 @@ jest.mock('@pages/settings/components/model-configuration', () => ({
 	),
 }));
 
-jest.mock('../../../src/renderer/src/pages/setup/components/SetupSearch', () => ({
+jest.mock('../../../src/renderer/src/pages/start/components/SetupSearch', () => ({
 	SetupSearch: () => <div data-testid="setup-search">SetupSearch Engine</div>,
 }));
 

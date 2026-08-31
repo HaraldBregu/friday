@@ -42,7 +42,7 @@ import type {
 	StorageOperationStatus,
 	StorageSyncFolder,
 } from '../../../../../../shared/storage_types';
-import { getErrorMessage } from '../../../setup/setupConstants';
+import { getErrorMessage } from '../../../start/setupConstants';
 import {
 	SettingsLoadingRows,
 	SettingsNotice,

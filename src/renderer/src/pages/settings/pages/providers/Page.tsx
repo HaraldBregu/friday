@@ -34,8 +34,8 @@ import {
 	actionableSearchCatalog,
 	getErrorMessage,
 	MASKED_API_KEY_LABEL,
-} from '../../../setup/setupConstants';
-import type { ProviderCatalogItem, ProviderSetupEntry } from '../../../setup/setupTypes';
+} from '../../../start/setupConstants';
+import type { ProviderCatalogItem, ProviderSetupEntry } from '../../../start/setupTypes';
 import {
 	SettingsNotice,
 	SettingsPageHeader,

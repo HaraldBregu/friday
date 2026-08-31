@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SetupSearch } from '../../../src/renderer/src/pages/setup/components/SetupSearch';
+import { SetupSearch } from '../../../src/renderer/src/pages/start/components/SetupSearch';
 
 const searchApi = {
 	getSettings: jest.fn(),

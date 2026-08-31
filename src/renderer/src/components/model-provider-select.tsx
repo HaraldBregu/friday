@@ -9,7 +9,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { SettingsField } from '@pages/settings/components';
-import { getProviderCatalogItem } from '@pages/setup/setupConstants';
+import { getProviderCatalogItem } from '@pages/start/setupConstants';
 
 export interface ModelProviderGroup {
 	readonly id: string;

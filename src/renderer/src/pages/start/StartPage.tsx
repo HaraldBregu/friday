@@ -5,19 +5,19 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOnboarding } from '@/contexts/useOnboarding';
 import { cn } from '@/lib/utils';
-import { SetupModelsStep } from '@/pages/setup/components/SetupModelsStep';
-import { SetupProviderStep } from '@/pages/setup/components/SetupProviderStep';
-import { SetupStepProgress } from '@/pages/setup/components/SetupStepProgress';
+import { SetupModelsStep } from '@/pages/start/components/SetupModelsStep';
+import { SetupProviderStep } from '@/pages/start/components/SetupProviderStep';
+import { SetupStepProgress } from '@/pages/start/components/SetupStepProgress';
 import {
 	actionableProviderCatalog,
 	getErrorMessage,
 	getSelectedServiceModel,
 	SETUP_STEPS,
 	STEP_COPY,
-} from '@/pages/setup/setupConstants';
-import { useSetupModelServices } from '@/pages/setup/hooks/useSetupModelServices';
-import { createInitialSetupState, setupReducer } from '@/pages/setup/state/setupReducer';
-import type { OnboardingStep } from '@/pages/setup/setupTypes';
+} from '@/pages/start/setupConstants';
+import { useSetupModelServices } from '@/pages/start/hooks/useSetupModelServices';
+import { createInitialSetupState, setupReducer } from '@/pages/start/state/setupReducer';
+import type { OnboardingStep } from '@/pages/start/setupTypes';
 import { AuthStep } from './components/AuthStep';
 import { LandingStep } from './components/LandingStep';
 

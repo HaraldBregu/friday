@@ -9,7 +9,7 @@ import {
 	initialModelConfigurationState,
 	type ModelConfigurationState,
 } from '../../components/model-configuration-state';
-import type { ProviderModelGroup } from '../../../setup/setupTypes';
+import type { ProviderModelGroup } from '../../../start/setupTypes';
 
 const RUNTIME_PROVIDER_ID = 'openai';
 const DEFAULT_VOICE = 'marin';
