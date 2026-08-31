@@ -51,7 +51,7 @@ import {
 	SettingsRow,
 } from '../../components';
 import { ProviderCard } from './ProviderCard';
-import { SYNC_INTERVALS } from './constants';
+import { DEFAULT_SYNC_CRON_EXPRESSION, SYNC_INTERVALS } from './constants';
 import { DEFAULT_STORAGE } from './defaults';
 
 const BLANK_STORAGE: StorageConfig = { ...DEFAULT_STORAGE, id: '', name: '' };
