@@ -638,7 +638,7 @@ The main implementation areas behind this reference are:
 - [Video adapters](../src/main/models/adapters/ttv/)
 - [Audio adapters](../src/main/models/adapters/tta/)
 - [Messaging channels](../src/main/channels/)
-- [Desktop application services](../src/main/app/)
+- [Desktop application services](../src/main/)
 - [Security policy](../SECURITY.md)
 
 Feature claims in this document intentionally exclude unmounted demo components, legacy translation

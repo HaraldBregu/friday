@@ -157,6 +157,10 @@ active date range, and `HEALTH.md` checklist. Model changes save immediately; th
 and checklist use the page's Save action. Off, one-minute, 30-minute, and one-hour interval choices
 are available.
 
+The current Health UI uses calendar dates for the active range rather than times of day. Its target
+selector can choose none, the last active session, or preserve an already-stored custom target; it
+cannot introduce a new session ID.
+
 ## Providers and model services
 
 See [Provider Reference](../PROVIDERS.md) for exact runtime coverage and model IDs.
@@ -302,8 +306,14 @@ required. Filesystem policy should:
 - A2A deletion has no confirmation or inline failure handling.
 - Ordinary Settings links do not close the mobile sidebar sheet after navigation; **Return to
   Chat** does.
+- Some setting-specific search entries still route search-engine, storage-provider, and scheduled-
+  task queries to Cloud instead of their newer provider or task pages.
+- Some model selectors display the first catalog option as a fallback without persisting it until
+  the user makes an explicit change.
+- Staged pages do not warn before navigation with unsaved drafts.
 - Some optimistic application, assistant-option, channel, and folder actions do not surface a
   failure or restore the prior value.
+- Local-command MCP arguments are split on whitespace, so quoted arguments are not preserved.
 - Some Account, MCP, A2A, and provider copy remains hardcoded in English while most Settings copy
   uses the translation catalogs.
 
