@@ -5,7 +5,7 @@ import StartPage from '@/pages/start/StartPage';
 import { isSetupComplete } from './setup';
 
 export function StartupGate({ children }: { readonly children: ReactNode }): React.JSX.Element {
-	const { state, localOnly } = useAuth();
+	const { state, localOnly, started } = useAuth();
 	const location = useLocation();
 	const [setup, setSetup] = useState<{ userId: string; path: string; complete: boolean }>();
 	const userId = state.status === 'signedIn' ? state.user?.id : localOnly ? 'local' : undefined;
@@ -31,8 +31,12 @@ export function StartupGate({ children }: { readonly children: ReactNode }): Rea
 		};
 	}, [location.pathname, setup?.complete, setup?.path, setup?.userId, userId]);
 
+	if (!started) {
+		return location.pathname === '/start' ? <>{children}</> : <Navigate to="/start" replace />;
+	}
+
 	if ((state.status === 'loading' && !localOnly) || (userId && setupComplete === undefined)) {
-		return <StartPage />;
+		return <StartPage checking />;
 	}
 
 	if (state.status !== 'signedIn' && !localOnly) {

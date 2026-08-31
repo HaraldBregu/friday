@@ -6,6 +6,7 @@ import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 import AuthPage from '../../../src/renderer/src/pages/auth/Page';
+import StartPage from '../../../src/renderer/src/pages/start/StartPage';
 
 jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
 	LogoView: () => <span aria-label="Friday" />,
@@ -41,16 +42,13 @@ function renderGate(path: string): void {
 	render(
 		<AuthProvider>
 			<MemoryRouter initialEntries={[path]}>
-				<Routes>
-					<Route
-						path="*"
-						element={
-							<StartupGate>
-								<Location />
-							</StartupGate>
-						}
-					/>
-				</Routes>
+				<StartupGate>
+					<Routes>
+						<Route path="/start" element={<StartPage />} />
+						<Route path="/auth" element={<AuthPage />} />
+						<Route path="*" element={<Location />} />
+					</Routes>
+				</StartupGate>
 			</MemoryRouter>
 		</AuthProvider>
 	);
@@ -60,15 +58,20 @@ beforeEach(() => {
 	localStorage.clear();
 });
 
-it('redirects a signed-out protected route to auth', async () => {
+it('presents start before a signed-out protected route', async () => {
+	const user = userEvent.setup();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderGate('/home');
+	expect(await screen.findByRole('heading', { name: 'Your desktop AI copilot' })).toBeInTheDocument();
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
 it('redirects a signed-out user from start to auth', async () => {
+	const user = userEvent.setup();
 	window.auth = authApi({ status: 'signedOut', persistence: 'memory' });
 	renderGate('/start');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
@@ -79,10 +82,11 @@ it('shows the start page while the session is loading', () => {
 	};
 	renderGate('/start');
 	expect(screen.getByRole('heading', { name: 'Your desktop AI copilot' })).toBeInTheDocument();
-	expect(screen.getByRole('status')).toHaveTextContent('Preparing your workspace…');
+	expect(screen.getByRole('button', { name: 'Checking your session…' })).toBeDisabled();
 });
 
 it('redirects a configured signed-in user from start to home', async () => {
+	const user = userEvent.setup();
 	window.auth = authApi({
 		status: 'signedIn',
 		persistence: 'encrypted',
@@ -93,10 +97,12 @@ it('redirects a configured signed-in user from start to home', async () => {
 		getModelId: jest.fn(async () => 'model'),
 	} as never;
 	renderGate('/start');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
 
 it('redirects an unconfigured signed-in user from start to setup', async () => {
+	const user = userEvent.setup();
 	window.auth = authApi({
 		status: 'signedIn',
 		persistence: 'memory',
@@ -107,6 +113,7 @@ it('redirects an unconfigured signed-in user from start to setup', async () => {
 		getModelId: jest.fn(async () => ''),
 	} as never;
 	renderGate('/start');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 });
 
@@ -117,26 +124,18 @@ it('allows a signed-out user to continue in local-only mode', async () => {
 		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
 		getModelId: jest.fn(async () => 'model'),
 	} as never;
-	render(
-		<AuthProvider>
-			<MemoryRouter initialEntries={['/auth']}>
-				<StartupGate>
-					<Routes>
-						<Route path="/auth" element={<AuthPage />} />
-						<Route path="*" element={<Location />} />
-					</Routes>
-				</StartupGate>
-			</MemoryRouter>
-		</AuthProvider>
-	);
+	renderGate('/auth');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
 
 it('ignores a previously persisted local-only preference', async () => {
+	const user = userEvent.setup();
 	localStorage.setItem('friday-auth-local-only', 'true');
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderGate('/home');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
@@ -147,18 +146,8 @@ it('sends skipped sign-in to setup when configuration is incomplete', async () =
 		getProvider: jest.fn(async () => undefined),
 		getModelId: jest.fn(async () => ''),
 	} as never;
-	render(
-		<AuthProvider>
-			<MemoryRouter initialEntries={['/auth']}>
-				<StartupGate>
-					<Routes>
-						<Route path="/auth" element={<AuthPage />} />
-						<Route path="*" element={<Location />} />
-					</Routes>
-				</StartupGate>
-			</MemoryRouter>
-		</AuthProvider>
-	);
+	renderGate('/auth');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 });
@@ -171,18 +160,8 @@ it('rechecks configuration when setup finishes', async () => {
 		getProvider: jest.fn(async () => (configured ? ({ id: 'provider' } as never) : undefined)),
 		getModelId: jest.fn(async () => (configured ? 'model' : '')),
 	} as never;
-	render(
-		<AuthProvider>
-			<MemoryRouter initialEntries={['/auth']}>
-				<StartupGate>
-					<Routes>
-						<Route path="/auth" element={<AuthPage />} />
-						<Route path="*" element={<Location />} />
-					</Routes>
-				</StartupGate>
-			</MemoryRouter>
-		</AuthProvider>
-	);
+	renderGate('/auth');
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 	configured = true;
