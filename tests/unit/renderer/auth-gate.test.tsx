@@ -160,6 +160,29 @@ it.each(['/home', '/settings/account'])(
 	}
 );
 
+it.each(['/home', '/settings/account'])(
+	'restores %s after an authenticated app restart',
+	async (path) => {
+		window.auth = authApi({
+			status: 'signedIn',
+			persistence: 'encrypted',
+			user: { id: 'user-id', email: 'user@example.test' },
+		});
+		window.agent = {
+			getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
+			getModelId: jest.fn(async () => 'model'),
+		} as never;
+
+		renderFlow(path);
+
+		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
+		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
+		expect(
+			screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
+		).not.toBeInTheDocument();
+	}
+);
+
 it('preserves home when a skipped local-only session is refreshed', async () => {
 	const user = userEvent.setup();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
