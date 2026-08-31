@@ -18,6 +18,9 @@ import { agentLocation } from './shared/agent_location';
 import { EnvironmentManager } from './terminal/environment';
 import { PtyManager } from './terminal/manager';
 import { ShellDetector } from './terminal/shell';
+import { AuthService } from './cloud/auth';
+import { CloudService } from './cloud/cloud';
+import { loadCloudConfig } from './cloud/config';
 
 export interface MainServices {
 	appState: AppState;
@@ -33,6 +36,8 @@ export interface MainServices {
 	extensionStorage: ExtensionStorage;
 	storageOperations: StorageOperations;
 	terminalManager: PtyManager;
+	authService: AuthService;
+	cloudService: CloudService;
 }
 
 export interface BootstrapResult extends MainServices {}
@@ -68,6 +73,8 @@ export function bootstrapServices(): BootstrapResult {
 		new ShellDetector(),
 		new EnvironmentManager(logger)
 	);
+	const authService = new AuthService(loadCloudConfig());
+	const cloudService = new CloudService(authService);
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
 		coderService.cancelWindow((event.payload as { windowId: number }).windowId);
@@ -94,16 +101,27 @@ export function bootstrapServices(): BootstrapResult {
 		extensionStorage,
 		storageOperations,
 		terminalManager,
+		authService,
+		cloudService,
 	};
 }
 
 export async function cleanup(services: MainServices): Promise<void> {
-	const { logger, windowContextManager, channelRegistry, conversationService, terminalManager } =
-		services;
+	const {
+		logger,
+		windowContextManager,
+		channelRegistry,
+		conversationService,
+		terminalManager,
+		cloudService,
+		authService,
+	} = services;
 	logger.info('Bootstrap', 'Starting cleanup');
 	terminalManager.shutdown();
 	await conversationService.execute({ type: 'voice', action: 'stop-all' });
 	await windowContextManager.destroyAll();
+	await cloudService.destroy();
+	authService.destroy();
 	channelRegistry.destroy();
 	logger.destroy();
 	logger.info('Bootstrap', 'Cleanup complete');

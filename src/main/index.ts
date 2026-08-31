@@ -1,9 +1,24 @@
 import { app, BrowserWindow } from 'electron';
+import path from 'node:path';
+import { authLinks } from './cloud/links';
+
+if (process.defaultApp && process.argv[1]) {
+	app.setAsDefaultProtocolClient('friday', process.execPath, [path.resolve(process.argv[1])]);
+} else {
+	app.setAsDefaultProtocolClient('friday');
+}
+
+authLinks.pushArguments(process.argv);
+app.on('open-url', (event, url) => {
+	event.preventDefault();
+	authLinks.push(url);
+});
 
 if (!app.requestSingleInstanceLock()) {
 	app.quit();
 } else {
-	app.on('second-instance', () => {
+	app.on('second-instance', (_event, commandLine) => {
+		if (authLinks.pushArguments(commandLine)) return;
 		const existingWindow = BrowserWindow.getAllWindows().find((win) => !win.isDestroyed());
 		if (!existingWindow) return;
 		if (existingWindow.isMinimized()) existingWindow.restore();

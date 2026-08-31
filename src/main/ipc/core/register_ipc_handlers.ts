@@ -17,6 +17,8 @@ import { DataIpc } from '../data';
 import { RealtimeVoiceIpc } from '../realtime_voice';
 import { CoderIpc } from '../coder';
 import { TerminalIpc } from '../terminal';
+import { AuthIpc } from '../auth';
+import { CloudIpc } from '../cloud';
 import type { EventBus } from '../../event_bus';
 import type { MainServices } from '../../bootstrap';
 
@@ -33,6 +35,8 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		storageOperations,
 		terminalManager,
 		windowContextManager,
+		authService,
+		cloudService,
 	} = services;
 
 	const safeRegister = (name: string, register: () => void): void => {
@@ -56,6 +60,18 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		)
 	);
 	safeRegister('a2a', () => new A2aIpc().register({ extensionRegistry }, eventBus));
+	safeRegister('auth', () =>
+		new AuthIpc().register(
+			{ auth: authService, windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
+	safeRegister('cloud', () =>
+		new CloudIpc().register(
+			{ cloud: cloudService, windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('agent', () =>
 		new AgentIpc().register(
 			{ logger, agent: agentService, conversation: conversationService },

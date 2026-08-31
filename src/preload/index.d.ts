@@ -19,6 +19,8 @@ import type {
 	WindowApi,
 	DataApi,
 	TerminalApi,
+	AuthApi,
+	CloudApi,
 } from '../shared/api_types';
 
 declare global {
@@ -41,5 +43,7 @@ declare global {
 		wiki: WikiApi;
 		dataControls: DataApi;
 		terminalAPI: TerminalApi;
+		auth: AuthApi;
+		cloud: CloudApi;
 	}
 }

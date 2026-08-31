@@ -40,6 +40,7 @@ import { startRagSchedule, stopRagSchedule } from './agent/knowledge/rag';
 import { CHANNEL_PROVIDER_IDS } from '../shared';
 import { AppChannels } from '../shared/ipc_channels_definitions';
 import { startWiki, stopWiki } from './agent/knowledge/wiki';
+import { authLinks } from './cloud/links';
 
 // // DIAG: bump V8 old-space heap to confirm whether crashes (Chromium OOM,
 // // exception 0xE0000008) come from the V8/JS heap or from native/C++
@@ -168,6 +169,19 @@ const menuManager = new Menu({
 });
 
 app.whenReady().then(async () => {
+	await services.authService.initialize();
+	services.cloudService.initialize();
+	const unsubscribeAuthLinks = authLinks.subscribe(async (url) => {
+		try {
+			await services.authService.handleDeepLink(url);
+		} catch (error) {
+			logger.warn('Auth', 'Authentication callback failed', error);
+		} finally {
+			mainWindow.showOrCreate();
+		}
+	});
+	app.once('before-quit', unsubscribeAuthLinks);
+	await authLinks.flush();
 	setKeepAwake(getKeepAwake());
 	registerLocalResourceProtocolHandler(logger);
 	setupMediaPermissionHandlers(services.extensionRegistry);
@@ -204,7 +218,7 @@ app.whenReady().then(async () => {
 	});
 
 	// Create main window
-	mainWindow.create();
+	if (!mainWindow.getWindow()) mainWindow.create();
 
 	// Start enabled messaging channels (registry skips disabled/unconfigured ones)
 	for (const channel of CHANNEL_PROVIDER_IDS) {
