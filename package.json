@@ -214,7 +214,7 @@
 		"prettier": "^3.8.1",
 		"rimraf": "^6.0.1",
 		"shadcn-ui": "^0.9.5",
-		"supabase": "^2.116.0",
+		"supabase": "2.116.0",
 		"tailwindcss": "^4.3.3",
 		"ts-jest": "^29.4.12",
 		"typescript": "^5.9.2",
