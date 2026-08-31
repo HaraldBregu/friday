@@ -60,7 +60,7 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 		return () => {
 			requestId.current += 1;
 		};
-	}, [identity, refreshConfiguration, started, state.status]);
+	}, [identity, started, state.status]);
 
 	let phase: OnboardingPhase;
 	if (state.status === 'recovery') phase = 'auth';
