@@ -45,7 +45,18 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 			return;
 		}
 
-		void refreshConfiguration();
+		const currentRequest = ++requestId.current;
+		void isSetupComplete()
+			.then((complete) => {
+				if (requestId.current === currentRequest) {
+					setConfiguration({ identity, status: complete ? 'complete' : 'incomplete' });
+				}
+			})
+			.catch(() => {
+				if (requestId.current === currentRequest) {
+					setConfiguration({ identity, status: 'incomplete' });
+				}
+			});
 		return () => {
 			requestId.current += 1;
 		};
