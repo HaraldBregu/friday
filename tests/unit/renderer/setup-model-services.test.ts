@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
 import {
 	loadModelServiceState,
-	useModelServices,
-} from '../../../src/renderer/src/pages/start/hooks/useModelServices';
-import { createInitialModelServiceState } from '../../../src/renderer/src/pages/start/constants';
-import type { ModelServiceDefinition } from '../../../src/renderer/src/pages/start/types';
-import type { SetupState } from '../../../src/renderer/src/pages/start/state/types';
+	useSetupModelServices,
+} from '../../../src/renderer/src/pages/setup/hooks/useSetupModelServices';
+import { createInitialModelServiceState } from '../../../src/renderer/src/pages/setup/setupConstants';
+import type { ModelServiceDefinition } from '../../../src/renderer/src/pages/setup/setupTypes';
+import type { SetupState } from '../../../src/renderer/src/pages/setup/state/setupState';
 
 const provider = { id: 'openai', name: 'OpenAI', baseUrl: 'https://api.openai.com/v1' };
 const model = { id: 'gpt-5', name: 'GPT-5' };
@@ -88,7 +88,7 @@ describe('onboarding model service state', () => {
 			errorMessage: '',
 		};
 		const dispatch = jest.fn();
-		const { result } = renderHook(() => useModelServices(state, dispatch));
+		const { result } = renderHook(() => useSetupModelServices(state, dispatch));
 
 		await act(async () => {
 			await result.current.handleServiceChange('voice', voiceProvider.id, voiceModel.id);

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Search } from '../../../src/renderer/src/pages/start/components/Search';
+import { SetupSearch } from '../../../src/renderer/src/pages/setup/components/SetupSearch';
 
 const searchApi = {
 	getSettings: jest.fn(),
@@ -20,14 +20,14 @@ it('stays empty when a provider is configured but no search engine is selected',
 		engineId: null,
 		configured: { brave: true, tavily: false },
 	});
-	render(<Search />);
+	render(<SetupSearch />);
 
 	const trigger = await screen.findByRole('button', {
-		name: /Search Engine.*Select a search engine/,
+		name: /SetupSearch Engine.*Select a search engine/,
 	});
 	expect(trigger).not.toHaveTextContent('Brave');
 	await user.click(trigger);
-	expect(await screen.findByRole('combobox', { name: 'Search Engine' })).not.toHaveTextContent(
+	expect(await screen.findByRole('combobox', { name: 'SetupSearch Engine' })).not.toHaveTextContent(
 		'Brave'
 	);
 });
@@ -37,7 +37,7 @@ it('shows a configured search engine selection', async () => {
 		engineId: 'brave',
 		configured: { brave: true, tavily: false },
 	});
-	render(<Search />);
+	render(<SetupSearch />);
 
-	expect(await screen.findByRole('button', { name: /Search Engine.*Brave/ })).toBeInTheDocument();
+	expect(await screen.findByRole('button', { name: /SetupSearch Engine.*Brave/ })).toBeInTheDocument();
 });

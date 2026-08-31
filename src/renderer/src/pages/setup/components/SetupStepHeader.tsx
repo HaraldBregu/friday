@@ -1,11 +1,11 @@
 import React from 'react';
 
-type StepHeaderProps = {
+type SetupStepHeaderProps = {
 	readonly title: string;
 	readonly description: string;
 };
 
-export function StepHeader({ title, description }: StepHeaderProps): React.JSX.Element {
+export function SetupStepHeader({ title, description }: SetupStepHeaderProps): React.JSX.Element {
 	return (
 		<div>
 			<h1 className="text-2xl font-bold leading-tight tracking-normal text-foreground">{title}</h1>

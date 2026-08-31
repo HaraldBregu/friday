@@ -29,7 +29,7 @@ import {
 	initialModelConfigurationState,
 	type ModelConfigurationState,
 } from '../../components/model-configuration-state';
-import type { ProviderModelGroup } from '../../../start/types';
+import type { ProviderModelGroup } from '../../../setup/setupTypes';
 import { AgentMediaModelConfiguration } from './media';
 import RealtimeConversationConfiguration from './conversation';
 import { SEARCH_ENGINES } from '../search/catalog';

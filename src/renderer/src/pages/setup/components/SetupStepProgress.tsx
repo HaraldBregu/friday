@@ -1,12 +1,12 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { SETUP_STEPS, SETUP_STEP_TITLES } from '../constants';
+import { SETUP_STEPS, SETUP_STEP_TITLES } from '../setupConstants';
 
-type StepProgressProps = {
+type SetupStepProgressProps = {
 	readonly currentIndex: number;
 };
 
-export function StepProgress({ currentIndex }: StepProgressProps): React.JSX.Element {
+export function SetupStepProgress({ currentIndex }: SetupStepProgressProps): React.JSX.Element {
 	const currentStep = SETUP_STEPS[currentIndex];
 	const currentStepName = currentStep ? SETUP_STEP_TITLES[currentStep] : 'Setup';
 

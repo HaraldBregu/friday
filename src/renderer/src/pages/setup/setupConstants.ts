@@ -21,7 +21,7 @@ import type {
 	ProviderModelGroup,
 	ProviderOption,
 	SetupStep,
-} from './types';
+} from './setupTypes';
 
 type CatalogProvider = PublicProvider;
 

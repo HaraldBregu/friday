@@ -2,26 +2,26 @@ import React, { useReducer } from 'react';
 import { AlertCircle, ArrowRight, LoaderCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ModelsStep } from './components/ModelsStep';
-import { PresentationStep } from './components/PresentationStep';
-import { ProviderStep } from './components/ProviderStep';
-import { StepProgress } from './components/StepProgress';
+import { SetupModelsStep } from './components/SetupModelsStep';
+import { SetupPresentationStep } from './components/SetupPresentationStep';
+import { SetupProviderStep } from './components/SetupProviderStep';
+import { SetupStepProgress } from './components/SetupStepProgress';
 import {
 	actionableProviderCatalog,
 	getErrorMessage,
 	getSelectedServiceModel,
 	SETUP_STEPS,
 	STEP_COPY,
-} from './constants';
-import { useModelServices } from './hooks/useModelServices';
-import { createInitialSetupState, setupReducer } from './state/reducer';
+} from './setupConstants';
+import { useSetupModelServices } from './hooks/useSetupModelServices';
+import { createInitialSetupState, setupReducer } from './state/setupReducer';
 
-const StartPage: React.FC = () => {
+const SetupPage: React.FC = () => {
 	const navigate = useNavigate();
 	const [state, dispatch] = useReducer(setupReducer, undefined, createInitialSetupState);
 	const { step, serviceStates, loadingModels, savingConfig, errorMessage } = state;
 
-	const { handleServiceChange, handleSaveModels } = useModelServices(state, dispatch);
+	const { handleServiceChange, handleSaveModels } = useSetupModelServices(state, dispatch);
 
 	const stepIndex = SETUP_STEPS.indexOf(step);
 	const canContinueModels =
@@ -99,7 +99,7 @@ const StartPage: React.FC = () => {
 	function renderStepContent(): React.JSX.Element {
 		if (step === 'modelProvider') {
 			return (
-				<ProviderStep
+				<SetupProviderStep
 					section="models"
 					title={STEP_COPY.modelProvider.title}
 					description={STEP_COPY.modelProvider.description}
@@ -109,7 +109,7 @@ const StartPage: React.FC = () => {
 
 		if (step === 'search') {
 			return (
-				<ProviderStep
+				<SetupProviderStep
 					section="search"
 					title={STEP_COPY.search.title}
 					description={STEP_COPY.search.description}
@@ -119,7 +119,7 @@ const StartPage: React.FC = () => {
 
 		if (step === 'storage') {
 			return (
-				<ProviderStep
+				<SetupProviderStep
 					section="storage"
 					title={STEP_COPY.storage.title}
 					description={STEP_COPY.storage.description}
@@ -129,7 +129,7 @@ const StartPage: React.FC = () => {
 
 		if (step === 'database') {
 			return (
-				<ProviderStep
+				<SetupProviderStep
 					section="databases"
 					title={STEP_COPY.database.title}
 					description={STEP_COPY.database.description}
@@ -139,7 +139,7 @@ const StartPage: React.FC = () => {
 
 		if (step === 'models') {
 			return (
-				<ModelsStep
+				<SetupModelsStep
 					serviceStates={serviceStates}
 					loadingModels={loadingModels}
 					savingConfig={savingConfig}
@@ -148,7 +148,7 @@ const StartPage: React.FC = () => {
 			);
 		}
 
-		return <PresentationStep />;
+		return <SetupPresentationStep />;
 	}
 
 	return (
@@ -164,7 +164,7 @@ const StartPage: React.FC = () => {
 			</section>
 
 			<footer className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-2 border-t border-border bg-card/60 px-3 py-2 sm:px-5">
-				<StepProgress currentIndex={stepIndex} />
+				<SetupStepProgress currentIndex={stepIndex} />
 				<div className="flex items-center gap-2">
 					{step !== 'presentation' ? (
 						<Button type="button" variant="outline" size="xs" disabled={isBusy} onClick={handleBack}>
@@ -190,4 +190,4 @@ const StartPage: React.FC = () => {
 	);
 };
 
-export default StartPage;
+export default SetupPage;

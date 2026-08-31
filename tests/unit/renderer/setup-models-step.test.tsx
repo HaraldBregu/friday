@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
-import { ModelsStep } from '../../../src/renderer/src/pages/start/components/ModelsStep';
-import type { ModelServiceStateMap } from '../../../src/renderer/src/pages/start/types';
+import { SetupModelsStep } from '../../../src/renderer/src/pages/setup/components/SetupModelsStep';
+import type { ModelServiceStateMap } from '../../../src/renderer/src/pages/setup/setupTypes';
 
 jest.mock('@pages/settings/components/model-configuration', () => ({
 	ModelProviderConfiguration: ({
@@ -25,8 +25,8 @@ jest.mock('@pages/settings/components/model-configuration', () => ({
 	),
 }));
 
-jest.mock('../../../src/renderer/src/pages/start/components/Search', () => ({
-	Search: () => <div data-testid="setup-search">Search Engine</div>,
+jest.mock('../../../src/renderer/src/pages/setup/components/SetupSearch', () => ({
+	SetupSearch: () => <div data-testid="setup-search">SetupSearch Engine</div>,
 }));
 
 jest.mock('../../../src/renderer/src/pages/settings/pages/assistant/conversation', () => ({
@@ -62,7 +62,7 @@ const SERVICE_STATES: ModelServiceStateMap = {
 
 it('groups model services in one card', () => {
 	render(
-		<ModelsStep
+		<SetupModelsStep
 			serviceStates={SERVICE_STATES}
 			loadingModels={false}
 			savingConfig={false}

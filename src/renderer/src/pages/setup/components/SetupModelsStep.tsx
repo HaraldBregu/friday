@@ -2,11 +2,11 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ModelProviderConfiguration } from '@pages/settings/components/model-configuration';
 import RealtimeConversationConfiguration from '@pages/settings/pages/assistant/conversation';
-import { Search } from './Search';
-import { StepHeader } from './StepHeader';
-import { getProviderCatalogItem, MODEL_SERVICE_DEFINITIONS, STEP_COPY } from '../constants';
+import { SetupSearch } from './SetupSearch';
+import { SetupStepHeader } from './SetupStepHeader';
+import { getProviderCatalogItem, MODEL_SERVICE_DEFINITIONS, STEP_COPY } from '../setupConstants';
 import type { ModelConfigurationState } from '@pages/settings/components/model-configuration-state';
-import type { ModelServiceId, ModelServiceState, ModelServiceStateMap } from '../types';
+import type { ModelServiceId, ModelServiceState, ModelServiceStateMap } from '../setupTypes';
 
 const ASSISTANT_SERVICE_IDS = new Set<ModelServiceId>([
 	'assistant',
@@ -17,7 +17,7 @@ const ASSISTANT_SERVICE_IDS = new Set<ModelServiceId>([
 	'audio',
 ]);
 
-type ModelsStepProps = {
+type SetupModelsStepProps = {
 	readonly serviceStates: ModelServiceStateMap;
 	readonly loadingModels: boolean;
 	readonly savingConfig: boolean;
@@ -56,19 +56,19 @@ function getSelectionSummary(serviceState: ModelServiceState, fallback: string):
 		: fallback;
 }
 
-export function ModelsStep({
+export function SetupModelsStep({
 	serviceStates,
 	loadingModels,
 	savingConfig,
 	onServiceChange,
-}: ModelsStepProps): React.JSX.Element {
+}: SetupModelsStepProps): React.JSX.Element {
 	const assistantServices = MODEL_SERVICE_DEFINITIONS.filter((service) =>
 		ASSISTANT_SERVICE_IDS.has(service.id)
 	);
 
 	return (
 		<div className="mx-auto flex min-h-full w-full min-w-0 max-w-2xl flex-col justify-center px-4 py-8 sm:px-6">
-			<StepHeader title={STEP_COPY.models.title} description={STEP_COPY.models.description} />
+			<SetupStepHeader title={STEP_COPY.models.title} description={STEP_COPY.models.description} />
 
 			<div className="mt-8 grid min-w-0 gap-6">
 				<section aria-label="Model providers" className="min-w-0">
@@ -105,7 +105,7 @@ export function ModelsStep({
 									)}
 								</React.Fragment>
 							))}
-							<Search />
+							<SetupSearch />
 						</CardContent>
 					</Card>
 				</section>

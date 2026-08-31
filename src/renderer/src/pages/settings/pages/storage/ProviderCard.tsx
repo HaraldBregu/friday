@@ -35,7 +35,7 @@ import { cn } from '@/lib/utils';
 import { openExternalUrl } from '@/lib/external-links';
 import type { PublicProvider } from '@shared/provider_types';
 import type { StorageConfig } from '../../../../../../shared/storage_types';
-import { getErrorMessage, MASKED_API_KEY_LABEL } from '../../../start/constants';
+import { getErrorMessage, MASKED_API_KEY_LABEL } from '../../../setup/setupConstants';
 import { SettingsField, SettingsNotice, SettingsRow } from '../../components';
 
 type StringConfigKey =

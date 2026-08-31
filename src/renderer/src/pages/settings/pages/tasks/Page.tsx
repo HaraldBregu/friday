@@ -5,7 +5,7 @@ import { AlertTriangle, ListChecks } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Item, ItemActions, ItemContent, ItemTitle } from '@/components/ui/item';
 import { providerIdsFor, providerModels, providers } from '@/lib/providers';
-import type { ProviderModelGroup } from '../../../start/types';
+import type { ProviderModelGroup } from '../../../setup/setupTypes';
 import {
 	SettingsEmptyState,
 	SettingsLoadingRows,

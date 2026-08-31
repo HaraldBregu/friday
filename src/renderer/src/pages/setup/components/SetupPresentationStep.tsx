@@ -1,9 +1,9 @@
 import React from 'react';
 import { KeyRound, MessageSquareText, SlidersHorizontal } from 'lucide-react';
 import { LogoView } from '@/components/app/base/logo-view';
-import { STEP_COPY } from '../constants';
+import { STEP_COPY } from '../setupConstants';
 
-export function PresentationStep(): React.JSX.Element {
+export function SetupPresentationStep(): React.JSX.Element {
 	const { title, description } = STEP_COPY.presentation;
 
 	return (

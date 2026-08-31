@@ -1,6 +1,6 @@
-import { createInitialModelServiceState } from '../constants';
-import type { SetupAction } from './actions';
-import type { SetupState } from './types';
+import { createInitialModelServiceState } from '../setupConstants';
+import type { SetupAction } from './setupActions';
+import type { SetupState } from './setupState';
 
 export function createInitialSetupState(): SetupState {
 	return {

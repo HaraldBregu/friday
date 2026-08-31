@@ -1,6 +1,6 @@
 import type { Model } from '@/lib/compat';
 import type { PublicProvider } from '../../../../../shared';
-import type { ProviderModelGroup } from '../../start/types';
+import type { ProviderModelGroup } from '../../setup/setupTypes';
 
 export interface ModelConfigurationState {
 	readonly providers: PublicProvider[];

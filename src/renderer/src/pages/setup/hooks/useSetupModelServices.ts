@@ -5,10 +5,10 @@ import {
 	getErrorMessage,
 	getSelectedServiceModel,
 	MODEL_SERVICE_DEFINITIONS,
-} from '../constants';
-import type { ModelServiceDefinition, ModelServiceId, ModelServiceState } from '../types';
-import type { SetupAction } from '../state/actions';
-import type { SetupState } from '../state/types';
+} from '../setupConstants';
+import type { ModelServiceDefinition, ModelServiceId, ModelServiceState } from '../setupTypes';
+import type { SetupAction } from '../state/setupActions';
+import type { SetupState } from '../state/setupState';
 
 export async function loadModelServiceState(
 	service: ModelServiceDefinition
@@ -28,7 +28,7 @@ export async function loadModelServiceState(
 	};
 }
 
-export function useModelServices(state: SetupState, dispatch: Dispatch<SetupAction>) {
+export function useSetupModelServices(state: SetupState, dispatch: Dispatch<SetupAction>) {
 	const { step, serviceStates, savingConfig } = state;
 	const modelsLoadedRef = useRef(false);
 
@@ -59,7 +59,7 @@ export function useModelServices(state: SetupState, dispatch: Dispatch<SetupActi
 				modelsLoadedRef.current = true;
 			} catch (error) {
 				if (cancelled) return;
-				console.error('[useModelServices] Failed to load service configuration:', error);
+				console.error('[useSetupModelServices] Failed to load service configuration:', error);
 				dispatch({ type: 'LOAD_SERVICE_STATES', states: createInitialModelServiceState() });
 				dispatch({
 					type: 'SET_ERROR',
@@ -100,7 +100,7 @@ export function useModelServices(state: SetupState, dispatch: Dispatch<SetupActi
 			const saved = await service.saveSelection(selected.provider, selected.model);
 			if (!saved) throw new Error(`Could not save the selected ${service.title} model.`);
 		} catch (error) {
-			console.error('[useModelServices] Failed to save model service config:', error);
+			console.error('[useSetupModelServices] Failed to save model service config:', error);
 			dispatch({
 				type: 'SET_ERROR',
 				message: getErrorMessage(error, `Could not save the selected ${service.title} model.`),
@@ -126,7 +126,7 @@ export function useModelServices(state: SetupState, dispatch: Dispatch<SetupActi
 			}
 			return true;
 		} catch (error) {
-			console.error('[useModelServices] Failed to save model service config:', error);
+			console.error('[useSetupModelServices] Failed to save model service config:', error);
 			dispatch({
 				type: 'SET_ERROR',
 				message: getErrorMessage(error, 'Could not save your model selections.'),

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { providerIdsFor, providerModels, providers } from '@/lib/providers';
-import type { ProviderModelGroup } from '@pages/start/types';
+import type { ProviderModelGroup } from '@pages/setup/setupTypes';
 import {
 	SettingsLoadingRows,
 	SettingsNotice,

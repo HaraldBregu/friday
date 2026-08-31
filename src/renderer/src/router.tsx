@@ -29,7 +29,7 @@ import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
 
 const AuthPage = lazy(() => import('./pages/auth/Page'));
-const StartPage = lazy(() => import('./pages/start/StartPage'));
+const StartPage = lazy(() => import('./pages/setup/StartPage'));
 const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
 const SettingsOverviewPage = lazy(() => import('./pages/settings/pages/overview/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));

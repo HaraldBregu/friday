@@ -1,4 +1,4 @@
-import type { ModelServiceId, ModelServiceStateMap, SetupStep } from '../types';
+import type { ModelServiceId, ModelServiceStateMap, SetupStep } from '../setupTypes';
 
 export type SetupAction =
 	| { type: 'GO_TO_STEP'; step: SetupStep }
