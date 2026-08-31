@@ -78,7 +78,8 @@ it('shows the start page while the session is loading', () => {
 		getState: jest.fn(() => new Promise<AuthState>(() => undefined)),
 	};
 	renderGate('/start');
-	expect(screen.getByRole('status')).toHaveTextContent('Starting Friday…');
+	expect(screen.getByRole('heading', { name: 'Your desktop AI copilot' })).toBeInTheDocument();
+	expect(screen.getByRole('status')).toHaveTextContent('Preparing your workspace…');
 });
 
 it('redirects a configured signed-in user from start to home', async () => {
