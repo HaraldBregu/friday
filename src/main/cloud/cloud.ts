@@ -260,7 +260,7 @@ export class CloudService {
 	private requireUserId(): string {
 		const state = this.auth.getState();
 		if ((state.status !== 'signedIn' && state.status !== 'recovery') || !state.user) {
-			throw new Error('Sign in to use Friday Cloud.');
+			throw new Error('Sign in to use sync.');
 		}
 		return state.user.id;
 	}

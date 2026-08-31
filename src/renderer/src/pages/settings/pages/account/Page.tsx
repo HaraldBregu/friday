@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, LogIn, LogOut, UserRound } from 'lucide-react';
+import { AlertCircle, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -19,57 +19,64 @@ const AccountPage: React.FC = () => {
 
 	return (
 		<SettingsPageShell>
-			<SettingsPageHeader
-				title="Account"
-				description="Your Friday Cloud identity and session."
-				icon={UserRound}
-			/>
+			<SettingsPageHeader title="Account" description="Manage your sign-in status." />
 			<SettingsSection title="Identity">
 				<SettingsPanel>
-					<SettingsRow title="Email">
-						<SettingsValue>{localOnly ? 'Not signed in' : state.user?.email ?? 'Unavailable'}</SettingsValue>
+					<SettingsRow title="Status">
+						<SettingsValue>{localOnly ? 'Not signed in' : 'Signed in'}</SettingsValue>
 					</SettingsRow>
-					<SettingsRow title="Session storage">
-						<SettingsValue>
-							{localOnly
-								? 'Local only'
-								: state.persistence === 'encrypted'
-									? 'System encrypted'
-									: 'Memory only'}
-						</SettingsValue>
+					{!localOnly ? (
+						<SettingsRow title="Email">
+							<SettingsValue>{state.user?.email ?? 'Unavailable'}</SettingsValue>
+						</SettingsRow>
+					) : null}
+				</SettingsPanel>
+			</SettingsSection>
+			<SettingsSection title="Session">
+				<SettingsPanel>
+					<SettingsRow
+						title={localOnly ? 'Sign in' : 'Sign out'}
+						description={
+							localOnly
+								? 'Sign in to sync your data across devices.'
+								: 'You can continue using Friday on this device after signing out.'
+						}
+					>
+						{localOnly ? (
+							<Button type="button" size="xs" onClick={requireSignIn}>
+								Sign in
+							</Button>
+						) : (
+							<Button
+								type="button"
+								size="xs"
+								variant="outline"
+								disabled={busy}
+								onClick={() => {
+									setBusy(true);
+									setError('');
+									void window.auth
+										.signOut()
+										.catch((cause) =>
+											setError(
+												cause instanceof Error ? cause.message : 'Could not sign out.'
+											)
+										)
+										.finally(() => setBusy(false));
+								}}
+							>
+								{busy ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
+								Sign out
+							</Button>
+						)}
 					</SettingsRow>
 				</SettingsPanel>
 			</SettingsSection>
-			<SettingsNotice icon={AlertCircle}>
-				{localOnly
-					? 'Your chats and settings remain on this device until you sign in to Friday Cloud.'
-					: 'Signing out removes the cloud session, but local files remain linked to this account to prevent cross-account data exposure.'}
-			</SettingsNotice>
-			{error ? <SettingsNotice icon={AlertCircle} variant="destructive">{error}</SettingsNotice> : null}
-			{localOnly ? (
-				<Button type="button" className="self-start" onClick={requireSignIn}>
-					<LogIn aria-hidden="true" />
-					Sign in to Friday Cloud
-				</Button>
-			) : (
-				<Button
-					type="button"
-					variant="destructive"
-					className="self-start"
-					disabled={busy}
-					onClick={() => {
-						setBusy(true);
-						setError('');
-						void window.auth
-							.signOut()
-							.catch((cause) => setError(cause instanceof Error ? cause.message : 'Could not sign out.'))
-							.finally(() => setBusy(false));
-					}}
-				>
-					<LogOut aria-hidden="true" />
-					{busy ? 'Signing out…' : 'Sign out'}
-				</Button>
-			)}
+			{error ? (
+				<SettingsNotice icon={AlertCircle} variant="destructive">
+					{error}
+				</SettingsNotice>
+			) : null}
 		</SettingsPageShell>
 	);
 };

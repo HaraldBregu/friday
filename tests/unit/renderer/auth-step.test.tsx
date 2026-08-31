@@ -72,7 +72,7 @@ it('creates an account and shows the confirmation state', async () => {
 	});
 });
 
-it('keeps branding and local-only continuation out of the account content', async () => {
+it('keeps local-only continuation out of the account content', async () => {
 	render(
 		<AuthProvider>
 			<AuthStep />
@@ -80,7 +80,6 @@ it('keeps branding and local-only continuation out of the account content', asyn
 	);
 
 	expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
-	expect(screen.queryByText('Friday Cloud')).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Skip for now' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
 });

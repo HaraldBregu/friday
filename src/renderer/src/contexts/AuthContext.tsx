@@ -4,6 +4,7 @@ import React, {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 	type ReactNode,
 } from 'react';
@@ -22,11 +23,17 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const [state, setState] = useState<AuthState>(initialState);
 	const [localOnly, setLocalOnly] = useState(false);
+	const currentStatus = useRef<AuthState['status']>(initialState.status);
 	const applyState = useCallback((next: AuthState): void => {
-		setState(next);
-		if (next.status === 'signedIn' || next.status === 'recovery') {
+		const wasAuthenticated =
+			currentStatus.current === 'signedIn' || currentStatus.current === 'recovery';
+		if (wasAuthenticated && next.status === 'signedOut') {
+			setLocalOnly(true);
+		} else if (next.status === 'signedIn' || next.status === 'recovery') {
 			setLocalOnly(false);
 		}
+		currentStatus.current = next.status;
+		setState(next);
 	}, []);
 	const skipSignIn = useCallback((): void => {
 		setLocalOnly(true);

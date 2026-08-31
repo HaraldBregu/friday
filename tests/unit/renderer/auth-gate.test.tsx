@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
@@ -48,7 +48,11 @@ function authApi(initialState: AuthState, signedInState?: AuthState): AuthApi {
 		resendConfirmation: jest.fn(),
 		requestPasswordReset: jest.fn(),
 		updatePassword: jest.fn(),
-		signOut: jest.fn(),
+		signOut: jest.fn(async () => {
+			const next: AuthState = { status: 'signedOut', persistence: initialState.persistence };
+			listener?.(next);
+			return next;
+		}),
 		onStateChanged: jest.fn((callback) => {
 			listener = callback;
 			return jest.fn();
@@ -73,7 +77,26 @@ function renderFlow(path: string): void {
 									</>
 								}
 							/>
-							<Route path="/home" element={<Location />} />
+							<Route
+								path="/home"
+								element={
+									<>
+										<Location />
+										<Link to="/settings/account">Account settings</Link>
+									</>
+								}
+							/>
+							<Route
+								path="/settings/account"
+								element={
+									<>
+										<Location />
+										<button type="button" onClick={() => void window.auth.signOut()}>
+											Sign out
+										</button>
+									</>
+								}
+							/>
 							<Route path="*" element={<Location />} />
 						</Routes>
 					</StartupGate>
@@ -197,6 +220,34 @@ it('takes skipped sign-in to setup in place when configuration is incomplete', a
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	expect(localStorage.getItem('friday-auth-local-only')).toBeNull();
+});
+
+it('keeps a configured user in the app after signing out', async () => {
+	const user = userEvent.setup();
+	const pendingSetupCheck = new Promise<never>(() => undefined);
+	window.auth = authApi({
+		status: 'signedIn',
+		persistence: 'encrypted',
+		user: { id: 'user-id', email: 'user@example.test' },
+	});
+	window.agent = {
+		getProvider: jest
+			.fn()
+			.mockResolvedValueOnce({ id: 'provider' } as never)
+			.mockReturnValue(pendingSetupCheck),
+		getModelId: jest.fn().mockResolvedValueOnce('model').mockReturnValue(pendingSetupCheck),
+	} as never;
+	renderFlow('/start');
+
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
+	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
+	await user.click(screen.getByRole('link', { name: 'Account settings' }));
+	expect(screen.getByLabelText('Current route')).toHaveTextContent('/settings/account');
+
+	await user.click(screen.getByRole('button', { name: 'Sign out' }));
+	await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
+	expect(screen.getByLabelText('Current route')).toHaveTextContent('/settings/account');
+	expect(screen.queryByRole('heading', { name: 'Welcome back' })).not.toBeInTheDocument();
 });
 
 it('moves a successful sign-in to setup in place', async () => {

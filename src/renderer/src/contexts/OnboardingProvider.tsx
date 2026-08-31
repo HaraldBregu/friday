@@ -15,7 +15,9 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 	const requestId = useRef(0);
 	const identity = state.status === 'signedIn' ? state.user?.id : localOnly ? 'local' : undefined;
 	const configurationStatus =
-		configuration.identity === identity ? configuration.status : 'idle';
+		configuration.identity === identity || (localOnly && configuration.status === 'complete')
+			? configuration.status
+			: 'idle';
 
 	const refreshConfiguration = useCallback(async (): Promise<boolean> => {
 		if (!identity) {
