@@ -122,7 +122,7 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 		renderFlow(path);
 
 		expect(
-			await screen.findByRole('heading', { name: 'Your desktop AI copilot' })
+			await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
 		).toBeInTheDocument();
 		expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	}
@@ -155,7 +155,7 @@ it.each(['/home', '/settings/account'])(
 		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
 		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
 		expect(
-			screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
+			screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
 		).not.toBeInTheDocument();
 	}
 );
@@ -178,7 +178,7 @@ it('preserves home when a skipped local-only session is refreshed', async () => 
 	expect(await screen.findByLabelText('Current route')).toHaveTextContent('/home');
 	expect(window.agent.getProvider.mock.calls.length).toBeGreaterThan(1);
 	expect(
-		screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
+		screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
 	).not.toBeInTheDocument();
 });
 
@@ -193,7 +193,7 @@ it('moves from landing to auth and back without changing routes', async () => {
 
 	await user.click(screen.getByRole('button', { name: 'Back' }));
 	expect(
-		await screen.findByRole('heading', { name: 'Your desktop AI copilot' })
+		await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
 	).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 });
@@ -231,7 +231,7 @@ it('takes a configured signed-in user from landing to home', async () => {
 	renderFlow('/start');
 
 	expect(
-		await screen.findByRole('heading', { name: 'Your desktop AI copilot' })
+		await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
 	).toBeInTheDocument();
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
