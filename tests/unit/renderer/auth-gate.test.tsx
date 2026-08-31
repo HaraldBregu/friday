@@ -131,7 +131,7 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 it.each(['/home', '/settings/account'])(
 	'preserves %s when a configured signed-in session is refreshed',
 	async (path) => {
-		const user = userEvent.setup();
+		sessionStorage.setItem('friday-onboarding-started', 'true');
 		window.auth = authApi({
 			status: 'signedIn',
 			persistence: 'encrypted',
@@ -141,18 +141,9 @@ it.each(['/home', '/settings/account'])(
 			getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
 			getModelId: jest.fn(async () => 'model'),
 		} as never;
-		const firstRender = renderFlow('/start');
-
-		await user.click(await screen.findByRole('button', { name: 'Get started' }));
-		await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
-		if (path === '/settings/account') {
-			await user.click(screen.getByRole('link', { name: 'Account settings' }));
-		}
-		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
-		firstRender.unmount();
-
 		renderFlow(path);
-		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
+
+		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
 		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
 		expect(
 			screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
@@ -240,8 +231,7 @@ it('keeps the landing step disabled until the session resolves', async () => {
 	expect(await screen.findByRole('button', { name: 'Get started' })).toBeEnabled();
 });
 
-it('takes a configured signed-in user from landing to home', async () => {
-	const user = userEvent.setup();
+it('takes a restored configured signed-in user directly to home', async () => {
 	window.auth = authApi({
 		status: 'signedIn',
 		persistence: 'encrypted',
@@ -253,15 +243,10 @@ it('takes a configured signed-in user from landing to home', async () => {
 	} as never;
 	renderFlow('/start');
 
-	expect(
-		await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-	).toBeInTheDocument();
-	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 });
 
-it('takes an unconfigured signed-in user from landing to setup in place', async () => {
-	const user = userEvent.setup();
+it('takes a restored unconfigured signed-in user directly to setup', async () => {
 	window.auth = authApi({
 		status: 'signedIn',
 		persistence: 'memory',
@@ -269,7 +254,6 @@ it('takes an unconfigured signed-in user from landing to setup in place', async 
 	});
 	renderFlow('/start');
 
-	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 });
@@ -317,7 +301,6 @@ it('keeps a configured user in the app after signing out', async () => {
 	} as never;
 	renderFlow('/start');
 
-	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 	await user.click(screen.getByRole('link', { name: 'Account settings' }));
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/settings/account');
@@ -361,7 +344,6 @@ it('leaves setup for home after configuration is refreshed', async () => {
 	} as never;
 	renderFlow('/start');
 
-	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	configured = true;
 	await user.click(screen.getByRole('button', { name: 'Refresh configuration' }));
