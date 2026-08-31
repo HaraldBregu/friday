@@ -21,6 +21,12 @@
 			"icon": "./resources/icons/icon.png"
 		}
 	],
+	"protocols": [
+		{
+			"name": "Friday Authentication",
+			"schemes": ["friday"]
+		}
+	],
 	"publish": null,
 	"asar": true,
 	"asarUnpack": [

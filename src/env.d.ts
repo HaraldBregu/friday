@@ -1,7 +1,10 @@
 // env.d.ts
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {}
+interface ImportMetaEnv {
+	readonly MAIN_VITE_SUPABASE_URL?: string;
+	readonly MAIN_VITE_SUPABASE_PUBLISHABLE_KEY?: string;
+}
 
 interface ImportMeta {
 	readonly env: ImportMetaEnv;
