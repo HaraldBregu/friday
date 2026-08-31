@@ -20,6 +20,7 @@ import type {
 	ProviderCatalogItem,
 	ProviderModelGroup,
 	ProviderOption,
+	OnboardingStep,
 	SetupStep,
 } from './setupTypes';
 
@@ -169,7 +170,6 @@ export const MODEL_SERVICE_DEFINITIONS: readonly ModelServiceDefinition[] = [
 ];
 
 export const SETUP_STEPS: readonly SetupStep[] = [
-	'presentation',
 	'modelProvider',
 	'search',
 	'storage',
@@ -177,8 +177,11 @@ export const SETUP_STEPS: readonly SetupStep[] = [
 	'models',
 ];
 
-export const SETUP_STEP_TITLES: Record<SetupStep, string> = {
-	presentation: 'Welcome',
+export const ONBOARDING_STEPS: readonly OnboardingStep[] = ['landing', 'auth', ...SETUP_STEPS];
+
+export const ONBOARDING_STEP_TITLES: Record<OnboardingStep, string> = {
+	landing: 'Welcome',
+	auth: 'Account',
 	modelProvider: 'Model',
 	search: 'Search',
 	storage: 'Storage',
@@ -189,11 +192,6 @@ export const SETUP_STEP_TITLES: Record<SetupStep, string> = {
 export const MASKED_API_KEY_LABEL = 'sk-************' as const;
 
 export const STEP_COPY: Record<SetupStep, { title: string; description: string }> = {
-	presentation: {
-		title: "Hi, I'm Friday",
-		description:
-			"Your personal AI agent. I can help with everyday tasks, write code, and keep working in the background while you're away.",
-	},
 	modelProvider: {
 		title: 'Model API keys',
 		description:
