@@ -1,4 +1,4 @@
-export type A2aAuthType = 'none' | 'bearer' | 'api-key';
+export type A2aAuthType = 'none' | 'bearer' | 'api-key' | 'private-key-jwt';
 
 export interface A2aAgentInput {
 	id?: string;
@@ -7,6 +7,7 @@ export interface A2aAgentInput {
 	authType?: A2aAuthType;
 	credential?: string;
 	apiKeyHeader?: string;
+	clientId?: string;
 	token?: string;
 	enabled?: boolean;
 }
@@ -18,6 +19,7 @@ export interface A2aAgent {
 	authType: A2aAuthType;
 	credential?: string;
 	apiKeyHeader?: string;
+	clientId?: string;
 	enabled: boolean;
 	cardName?: string;
 	description?: string;
