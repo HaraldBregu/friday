@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
-import AuthPage from '../../../src/renderer/src/pages/auth/Page';
+import { AuthStep } from '../../../src/renderer/src/pages/start/components/AuthStep';
 
 jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
 	LogoView: () => <span aria-label="Friday" />,
@@ -34,7 +34,6 @@ function authApi(state: AuthState): AuthApi {
 }
 
 beforeEach(() => {
-	localStorage.clear();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 });
 
@@ -42,7 +41,7 @@ it('submits email and password to sign in', async () => {
 	const user = userEvent.setup();
 	render(
 		<AuthProvider>
-			<AuthPage />
+			<AuthStep onSkip={jest.fn()} />
 		</AuthProvider>
 	);
 	await user.type(screen.getByLabelText('Email'), 'user@example.test');
@@ -60,7 +59,7 @@ it('creates an account and shows the confirmation state', async () => {
 	const user = userEvent.setup();
 	render(
 		<AuthProvider>
-			<AuthPage />
+			<AuthStep onSkip={jest.fn()} />
 		</AuthProvider>
 	);
 	await user.click(screen.getByRole('button', { name: 'New to Friday? Create an account' }));
@@ -68,20 +67,24 @@ it('creates an account and shows the confirmation state', async () => {
 	await user.type(screen.getByLabelText('Password'), 'valid-password');
 	await user.type(screen.getByLabelText('Confirm password'), 'valid-password');
 	await user.click(screen.getByRole('button', { name: 'Create account' }));
-	await waitFor(() => expect(screen.getByText('Check your email')).toBeInTheDocument());
+	await waitFor(() =>
+		expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument()
+	);
 	expect(window.auth.signUp).toHaveBeenCalledWith({
 		email: 'new@example.test',
 		password: 'valid-password',
 	});
 });
 
-it('keeps skipped sign-in out of persistent storage', async () => {
+it('delegates skip to the onboarding owner', async () => {
 	const user = userEvent.setup();
+	const onSkip = jest.fn();
 	render(
 		<AuthProvider>
-			<AuthPage />
+			<AuthStep onSkip={onSkip} />
 		</AuthProvider>
 	);
+
 	await user.click(screen.getByRole('button', { name: 'Skip for now' }));
-	expect(localStorage.getItem('friday-auth-local-only')).toBeNull();
+	expect(onSkip).toHaveBeenCalledTimes(1);
 });

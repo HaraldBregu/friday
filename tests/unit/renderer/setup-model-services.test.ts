@@ -81,7 +81,7 @@ describe('onboarding model service state', () => {
 			modelGroups: [{ provider: transcriptionProvider, models: [transcriptionModel] }],
 		};
 		const state: SetupState = {
-			step: 'presentation',
+			step: 'modelProvider',
 			serviceStates,
 			loadingModels: false,
 			savingConfig: false,
