@@ -3,6 +3,7 @@ import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_
 import type { CloudConfig } from './config';
 import { publicAuthError } from './error';
 import { DeviceAccountBinding } from './binding';
+import { AuthSessionStorage, type AuthStorage } from './session';
 
 type Subscription = { unsubscribe: () => void };
 
@@ -16,7 +17,12 @@ export class AuthService {
 	private sessionListeners = new Set<(session: Session | null) => void>();
 	private state: AuthState = { status: 'loading', persistence: 'memory' };
 
-	constructor(private readonly config: CloudConfig | null) {}
+	constructor(
+		private readonly config: CloudConfig | null,
+		private readonly storage: AuthStorage | undefined = config
+			? new AuthSessionStorage()
+			: undefined
+	) {}
 
 	async initialize(): Promise<void> {
 		if (this.initialized) return;
@@ -29,7 +35,8 @@ export class AuthService {
 		this.client = createClient(this.config.url, this.config.publishableKey, {
 			auth: {
 				autoRefreshToken: true,
-				persistSession: false,
+				persistSession: true,
+				storage: this.storage,
 				detectSessionInUrl: false,
 				flowType: 'pkce',
 			},
@@ -207,7 +214,7 @@ export class AuthService {
 	}
 
 	private persistence(): 'encrypted' | 'memory' {
-		return 'memory';
+		return this.storage?.persistence ?? 'memory';
 	}
 
 	private setState(state: AuthState): void {
