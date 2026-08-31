@@ -26,6 +26,7 @@ const empty: A2aAgentInput = {
 	authType: 'none',
 	credential: '',
 	apiKeyHeader: 'X-API-Key',
+	clientId: '',
 	enabled: true,
 };
 
@@ -112,8 +113,9 @@ export default function A2aPage(): React.JSX.Element {
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="none">No authentication</SelectItem>
-										<SelectItem value="bearer">Bearer or OAuth token</SelectItem>
+										<SelectItem value="bearer">Bearer token</SelectItem>
 										<SelectItem value="api-key">API key header</SelectItem>
+										<SelectItem value="private-key-jwt">OAuth private_key_jwt</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
@@ -128,15 +130,27 @@ export default function A2aPage(): React.JSX.Element {
 									/>
 								</div>
 							)}
+							{form.authType === 'private-key-jwt' && (
+								<div className="grid gap-1">
+									<Label htmlFor="a2a-client-id">Client ID</Label>
+									<Input
+										id="a2a-client-id"
+										value={form.clientId ?? ''}
+										onChange={(event) => setForm({ ...form, clientId: event.target.value })}
+									/>
+								</div>
+							)}
 							{form.authType !== 'none' && (
 								<div className="grid gap-1">
-									<Label htmlFor="a2a-credential">Secret</Label>
+									<Label htmlFor="a2a-credential">
+										{form.authType === 'private-key-jwt' ? 'Private JWK' : 'Secret'}
+									</Label>
 									<Input
 										id="a2a-credential"
 										type="password"
 										value={form.credential ?? ''}
 										onChange={(event) => setForm({ ...form, credential: event.target.value })}
-										placeholder={form.id ? 'Leave blank to keep the current secret' : ''}
+										placeholder={form.id ? 'Leave blank to keep the current secret' : form.authType === 'private-key-jwt' ? '{"kty":"OKP",…}' : ''}
 									/>
 								</div>
 							)}
@@ -189,7 +203,7 @@ export default function A2aPage(): React.JSX.Element {
 										{agent.authType === 'none'
 											? 'No authentication'
 											: agent.hasCredential
-												? `${agent.authType === 'api-key' ? 'API key' : 'Bearer/OAuth'} configured`
+												? `${agent.authType === 'api-key' ? 'API key' : agent.authType === 'private-key-jwt' ? 'OAuth private key' : 'Bearer'} configured`
 												: 'Credential unavailable'}
 									</div>
 								</div>
@@ -205,6 +219,7 @@ export default function A2aPage(): React.JSX.Element {
 											url: agent.url,
 											authType: agent.authType,
 											apiKeyHeader: agent.apiKeyHeader,
+											clientId: agent.clientId,
 											credential: '',
 												enabled: agent.enabled,
 											});
