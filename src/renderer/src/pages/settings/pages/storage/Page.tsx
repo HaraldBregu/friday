@@ -51,21 +51,10 @@ import {
 	SettingsRow,
 } from '../../components';
 import { ProviderCard } from './ProviderCard';
-import { DEFAULT_SYNC_CRON_EXPRESSION, SYNC_INTERVALS } from './constants';
+import { SYNC_INTERVALS } from './constants';
+import { DEFAULT_STORAGE } from './defaults';
 
-const BLANK_STORAGE: StorageConfig = {
-	id: '',
-	name: '',
-	endpoint: '',
-	region: 'us-east-1',
-	accessKeyId: '',
-	secretAccessKey: '',
-	bucket: '',
-	forcePathStyle: false,
-	paths: [],
-	syncEnabled: false,
-	syncCronExpression: DEFAULT_SYNC_CRON_EXPRESSION,
-};
+const BLANK_STORAGE: StorageConfig = { ...DEFAULT_STORAGE, id: '', name: '' };
 
 interface StorageEntry {
 	key: string;
