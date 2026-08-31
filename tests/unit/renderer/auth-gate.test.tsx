@@ -175,8 +175,8 @@ it('preserves home when a skipped local-only session is refreshed', async () => 
 	firstRender.unmount();
 
 	renderFlow('/home');
-	await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
-	expect(screen.getByLabelText('Current route')).toHaveTextContent('/home');
+	expect(await screen.findByLabelText('Current route')).toHaveTextContent('/home');
+	expect(window.agent.getProvider).toHaveBeenCalledTimes(2);
 	expect(
 		screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
 	).not.toBeInTheDocument();
