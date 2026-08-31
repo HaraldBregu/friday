@@ -405,7 +405,7 @@ The finished page must not imply capabilities that are only planned, partial, or
 - Do not claim that every Skill metadata declaration is enforced at runtime.
 - Do not claim that Extensions are signed, verified, permission-isolated, or safe to install from untrusted sources.
 - Do not advertise extension hot reload, enable/disable controls, or preinstalled example extensions.
-- Do not market incomplete scheduled-agent execution, realtime voice conversation, or database features on this page.
+- Do not market incomplete scheduled-agent execution or database features on this page.
 - Do not invent download counts, supported-company logos, benchmarks, customer quotes, or awards.
 
 ## Acceptance criteria

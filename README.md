@@ -57,6 +57,7 @@ workspaces and one lockfile.
 On first launch, follow the [Start Page Flow](docs/ui/START.md) to sign in or continue local-only,
 save a model-provider API key, and select the provider and model for the assistant. Search, storage,
 database, speech, and media configuration are optional and can be completed later in Settings.
+See [Home UI](docs/ui/HOME.md) for the chat workspace's states and interactions.
 
 For Linux environments that require Electron sandbox changes, run:
 

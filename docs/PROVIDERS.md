@@ -64,20 +64,20 @@ manifest.
 | [Deepgram](https://console.deepgram.com)                                           | `deepgram`          | Speech to text, text to speech                            | Available                                                                                           |
 | [DeepSeek](https://platform.deepseek.com/api_keys)                                 | `deepseek`          | Chat                                                      | Available                                                                                           |
 | [ElevenLabs](https://elevenlabs.io/app/settings/api-keys)                          | `elevenlabs`        | Speech to text, text to speech, audio                     | Available                                                                                           |
-| [Google](https://aistudio.google.com/apikey)                                       | `google`            | Chat, text to speech, realtime voice, image, video, audio | Mixed: realtime voice and audio are catalog only                                                    |
+| [Google](https://aistudio.google.com/apikey)                                       | `google`            | Chat, text to speech, image, video, audio                 | Mixed: audio is catalog only                                                                        |
 | [Ideogram](https://ideogram.ai/manage-api)                                         | `ideogram`          | Image                                                     | Available                                                                                           |
 | [Jina AI](https://jina.ai/api-dashboard)                                           | `jina`              | Embeddings                                                | Available                                                                                           |
 | [Kimi](https://platform.moonshot.ai/console/api-keys)                              | `kimi`              | Chat                                                      | Available                                                                                           |
 | [Kling AI](https://app.klingai.com/global/dev)                                     | `kling`             | Video, audio                                              | Mixed: audio is catalog only                                                                        |
 | [MiniMax](https://platform.minimax.io/user-center/basic-information/interface-key) | `minimax`           | Chat, text to speech, video, audio                        | Mixed: audio is catalog only                                                                        |
 | [Mistral AI](https://console.mistral.ai/api-keys)                                  | `mistral`           | Chat, speech to text, text to speech                      | Available                                                                                           |
-| [OpenAI](https://platform.openai.com/api-keys)                                     | `openai`            | Chat, speech to text, text to speech, embeddings          | Available                                                                                           |
+| [OpenAI](https://platform.openai.com/api-keys)                                     | `openai`            | Chat, speech to text, text to speech, realtime voice, embeddings | Available                                                                                           |
 | [Pika](https://pika.art)                                                           | `pika`              | Video                                                     | Partial: the adapter uses fal.run while the manifest supplies Pika's URL                            |
 | [Pinecone](https://app.pinecone.io)                                                | `pinecone`          | Vector database                                           | Available for RAG                                                                                   |
-| [Qwen and Wan](https://modelstudio.console.alibabacloud.com)                       | `qwen`              | Chat, speech to text, realtime voice, image, video        | Mixed: realtime voice is catalog only                                                               |
+| [Qwen and Wan](https://modelstudio.console.alibabacloud.com)                       | `qwen`              | Chat, speech to text, image, video                        | Available                                                                                           |
 | [Reka AI](https://platform.reka.ai/apikeys)                                        | `reka`              | Chat                                                      | Available                                                                                           |
 | [Tavily](https://app.tavily.com/home)                                              | `tavily`            | Web search                                                | Available                                                                                           |
-| [xAI](https://console.x.ai)                                                        | `xai`               | Chat, speech to text, realtime voice, image, video        | Mixed: realtime voice is catalog only                                                               |
+| [xAI](https://console.x.ai)                                                        | `xai`               | Chat, speech to text, realtime voice, image, video        | Available                                                                                           |
 | [Z.ai](https://z.ai/manage-apikey/apikey-list)                                     | `zai`               | Chat                                                      | Available                                                                                           |
 
 ## Model and service catalog
@@ -131,13 +131,12 @@ Every model in this table has a runtime adapter.
 
 ### Realtime voice
 
-These models are catalog only. Friday has no realtime-voice IPC or execution service.
+Every model in this table has a runtime adapter and can power Home's realtime voice conversation.
 
-| Provider | Cataloged models                                                                                                |
-| -------- | --------------------------------------------------------------------------------------------------------------- |
-| Google   | Gemini 3.1 Flash Live Preview (`gemini-3.1-flash-live-preview`)                                                 |
-| Qwen     | Qwen Omni Realtime (`qwen-omni-realtime`); Qwen3.5 Omni (`qwen3.5-omni`); Qwen3 Omni Flash (`qwen3-omni-flash`) |
-| xAI      | Grok Voice Latest (`grok-voice-latest`)                                                                         |
+| Provider | Cataloged models                                                                       |
+| -------- | -------------------------------------------------------------------------------------- |
+| OpenAI   | GPT Realtime 2.1 (`gpt-realtime-2.1`); GPT Realtime 2.1 Mini (`gpt-realtime-2.1-mini`) |
+| xAI      | Grok Voice Latest (`grok-voice-latest`)                                        |
 
 ### Image
 

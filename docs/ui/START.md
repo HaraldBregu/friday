@@ -157,3 +157,5 @@ Account stage should tell the user that the signed-in session will not persist a
 - [Authentication behavior](../../src/renderer/src/pages/start/components/AuthStep.tsx)
 - [Start-flow tests](../../tests/unit/renderer/auth-gate.test.tsx)
 - [Model-step tests](../../tests/unit/renderer/setup-models-step.test.tsx)
+
+After configuration succeeds, continue with [Home UI](HOME.md).

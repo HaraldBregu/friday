@@ -44,6 +44,9 @@ Friday provides:
 
 The chat surface is the primary way users interact with Friday, so its setup, input, and rendering behavior are documented first.
 
+See [Home UI](ui/HOME.md) for the layout, session, composer, message, tool, and voice behavior
+contract.
+
 ### First-run setup
 
 The first launch uses a single `/start` flow with seven visible stages: **Welcome**, **Account**,
@@ -72,36 +75,45 @@ Provider API keys are stored in Friday's local application data and are masked a
 - `Cmd/Ctrl+/` focuses the prompt editor.
 - The send button becomes a stop button while a response is running. Stopping aborts the active run and rejects pending tool-approval requests.
 - Starting a new request for the same agent also cancels that agent's previous active request.
-- Empty conversations offer guided prompts for introductions, day planning, image generation, video generation, music composition, recurring tasks, and web search.
+- Empty conversations offer four guided prompts: schedule a task, create a sound, create an image,
+  and create a video. Selecting one fills the composer without sending it.
 
 ### Attachments
 
-- Multiple images and PDFs can be attached to one request.
-- Attachment chips show the filename and size and can be removed before sending.
-- Files are encoded locally and included as multimodal message blocks.
-- OpenAI receives images and files as data URLs; Anthropic receives image or PDF content blocks; other OpenAI-compatible providers receive the corresponding chat content representation.
-- The renderer does not impose a user-facing attachment-size limit. Provider limits still apply.
+- Multiple files can be attached to one request. Known text files are accepted independently;
+  supported binary types such as images and PDFs depend on the selected model's verified
+  capabilities.
+- Attachment chips show the filename, size, removal action, and any validation error.
+- The renderer enforces file count, type, individual size, aggregate text/binary size, and
+  model-specific media limits before Send is enabled.
+- Queued files are revalidated when the model changes, encoded locally, and included in the agent
+  request.
+- Submitted attachment metadata is not rendered in the user bubble or restored transcript.
 
 ### Slash commands
 
-Typing `/` opens a keyboard- and mouse-accessible command menu:
+The Home editor provides two styled command modes:
 
-- `/skill` selects and invokes an installed skill.
-- `/goal <objective>` creates a durable goal for the current conversation. Active goals continue only after tool-using turns, keep their usage budget in `goal.json`, and require an evidence audit before completion.
-- `/goal` shows the current thread goal; `/goal pause`, `/goal resume`, and `/goal clear` control its lifecycle.
-- `/task_list` asks for the scheduled-task list.
-- `/create_task` asks the agent to create a schedule.
-- `/delete_task` asks the agent to delete a schedule.
+- `/plan` switches the current session into Plan mode. A completed plan can render an **Implement**
+  action that returns to the normal interaction mode.
+- `/goal <objective>` creates a durable goal for the current conversation. `/goal pause`, `/goal
+  resume`, and `/goal clear` control its lifecycle. Bare `/goal` cannot currently be submitted from
+  Home because the Goal mode requires following text.
 
-Installed skill names become searchable entries after `/skill`. Task commands are expanded into agent instructions before the message is sent.
+`/task_list`, `/create_task`, and `/delete_task` are expanded into agent instructions before the
+message is sent. Home does not currently mount a general slash-command menu or searchable skill
+picker.
 
 ### Voice input and playback
 
 - With a streaming speech-to-text model, Friday captures mono PCM audio and appends partial and final transcript events live.
 - With a batch-only model, Friday records audio locally, submits it when recording stops, and appends the returned transcript.
-- Dictation includes microphone permission checks, elapsed time, mute, confirm, cancel, and error states.
+- Dictation includes microphone permission checks, elapsed time, a waveform, confirm, cancel, and
+  error states. The current dictation panel does not expose mute.
 - Assistant responses can be read aloud through the configured text-to-speech provider.
-- The empty-editor **voice conversation** control currently opens an animated conversation panel only. It does not start a realtime model, microphone-to-agent loop, or automatic spoken-response loop, so it is a placeholder rather than a working voice conversation mode.
+- With a supported OpenAI or xAI realtime model configured, the empty-composer voice action starts
+  a full-duplex session with microphone capture, assistant audio playback, transcript messages,
+  interruption, tool activity, permissions, and generated media in the normal conversation.
 
 ### Response rendering
 
@@ -116,7 +128,8 @@ Installed skill names become searchable entries after `/skill`. Task commands ar
 
 ### Sessions and conversation history
 
-- The title-bar history menu starts a new UUID-backed conversation or switches to an existing one.
+- The Home sidebar starts a new UUID-backed conversation or switches to an existing one. It also
+  supports context-menu rename and deletion.
 - Sessions are listed newest first and titled from the first user message, shortened to 60 characters.
 - Switching sessions restores its stored transcript; the Home view loads at most the last 50 stored messages before expanding tool results.
 - Stored transcripts remain complete. Model calls always retain the current run and add older complete turns within a 50-message, 120,000-serialized-character history budget.
@@ -371,7 +384,9 @@ Reka AI, xAI, and Z.ai. Exact model names, IDs, and support notes are maintained
 The built-in catalog contains 24 providers across models, search, vector database, and object
 storage. Model-provider entries include capability labels and an external setup link.
 
-Realtime-voice models are cataloged for Google, Qwen, and xAI, but there is no realtime-voice IPC or model execution service. Friday's current Voice API is text-to-speech, and Home's voice-conversation panel is not connected to these models.
+Realtime voice has IPC and execution adapters for supported OpenAI and xAI models. Home connects
+these models to microphone capture, assistant audio playback, transcripts, tools, and generated
+media in the current chat session.
 
 ### Speech services
 
