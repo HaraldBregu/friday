@@ -67,9 +67,10 @@ An account is optional. Outside password recovery, the footer should provide:
 - **Back**, which returns to Welcome;
 - **Skip and continue**, which uses Friday in local-only mode for the current session.
 
-If Supabase is not configured, the page should explain which environment variables are missing
-while leaving Back and local-only continuation available. Password recovery should take priority
-over the normal flow and hide the footer Back and Skip actions until recovery is complete.
+If Supabase is not configured, the page should explain which environment variables must be
+configured while leaving Back and local-only continuation available. Password recovery should
+take priority over the normal flow and hide the footer Back and Skip actions until recovery is
+complete.
 
 After a successful sign-in or local-only continuation, Friday should check the stored assistant
 configuration. A stored assistant provider and model ID count as complete and lead directly to
@@ -126,11 +127,11 @@ Voice, transcription, realtime conversation, search, and generated-media models 
 ## Back, completion, and errors
 
 - Back from a setup stage should move to the preceding setup stage.
-- Back from Model should return a local-only user to Account so they can sign in. For other users,
-  it should return to Welcome.
+- Back from Model should return a local-only user to Account so they can sign in. A signed-in user
+  should remain on Model because restored authenticated sessions skip Welcome and Account.
 - Controls that can repeat a save should be disabled while that save is running.
-- Save, load, and verification failures should keep the user on the current stage and show an
-  accessible inline error.
+- Provider-key validation and final save or verification failures should keep the user on the
+  current stage and show an accessible inline error.
 - Finish should save the selected services and recheck the required assistant provider and model.
   A successful check should navigate to `/home`; a failed check should keep the user on `/start`.
 
