@@ -9,7 +9,7 @@ export function StartupGate({ children }: { readonly children: ReactNode }): Rea
 	const { state } = useAuth();
 	const location = useLocation();
 	const [setup, setSetup] = useState<{ userId: string; complete: boolean }>();
-	const setupComplete = setup?.userId === state.user?.id ? setup.complete : undefined;
+	const setupComplete = setup && setup.userId === state.user?.id ? setup.complete : undefined;
 
 	useEffect(() => {
 		if (state.status !== 'signedIn' || !state.user) return;
