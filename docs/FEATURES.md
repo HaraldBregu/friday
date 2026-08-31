@@ -403,24 +403,24 @@ Media can be generated from the dedicated Settings studios or by agent tools dur
 
 ### Image adapters
 
-| Status       | Provider and models                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------ |
-| Available    | Black Forest Labs: FLUX.2, FLUX.1 Kontext Pro, FLUX1.1 Pro Ultra                                             |
-| Available    | Google: Gemini 3.1 Flash Image Preview, Gemini 3 Pro Image Preview                                           |
-| Available    | Ideogram: 3.0, 2a                                                                                            |
-| Available    | Qwen: Qwen Image, Qwen Image Edit                                                                            |
-| Available    | xAI: Grok Imagine Image, Grok Imagine Image Quality                                                          |
+| Status    | Provider and models                                                |
+| --------- | ------------------------------------------------------------------ |
+| Available | Black Forest Labs: FLUX.2, FLUX.1 Kontext Pro, FLUX1.1 Pro Ultra   |
+| Available | Google: Gemini 3.1 Flash Image Preview, Gemini 3 Pro Image Preview |
+| Available | Ideogram: 3.0, 2a                                                  |
+| Available | Qwen: Qwen Image, Qwen Image Edit                                  |
+| Available | xAI: Grok Imagine Image, Grok Imagine Image Quality                |
 
 ### Video adapters
 
-| Status       | Provider and models                                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Available    | Google: Veo 3.1, Veo 3.1 Fast                                                                                            |
-| Available    | Kling: 2.5 Turbo, 2.1 Master                                                                                             |
-| Available    | MiniMax: Hailuo 2.3, Hailuo 02                                                                                           |
-| Available    | Pika: 2.2                                                                                                                |
-| Available    | Qwen: Wan 2.5 T2V, Wan 2.2 T2V Plus                                                                                      |
-| Available    | xAI: Grok Imagine Video 1.5                                                                                              |
+| Status    | Provider and models                 |
+| --------- | ----------------------------------- |
+| Available | Google: Veo 3.1, Veo 3.1 Fast       |
+| Available | Kling: 2.5 Turbo, 2.1 Master        |
+| Available | MiniMax: Hailuo 2.3, Hailuo 02      |
+| Available | Pika: 2.2                           |
+| Available | Qwen: Wan 2.5 T2V, Wan 2.2 T2V Plus |
+| Available | xAI: Grok Imagine Video 1.5         |
 
 ### Audio adapters
 

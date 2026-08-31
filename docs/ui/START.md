@@ -36,15 +36,15 @@ add another progress item.
 
 ## Stage requirements
 
-| Stage    | Expected action                                      | Required to continue |
-| -------- | ---------------------------------------------------- | -------------------- |
-| Welcome  | Start the onboarding flow                            | Yes                  |
-| Account  | Sign in, create an account, or continue local-only   | No account required  |
-| Model    | Save an API key for a catalog model provider        | Yes                  |
-| Search   | Connect a web-search provider                        | No                   |
-| Storage  | Configure catalog or custom S3-compatible storage   | No                   |
-| Database | Connect a vector database                            | No                   |
-| Models   | Select the primary assistant provider and model      | Assistant only       |
+| Stage    | Expected action                                    | Required to continue |
+| -------- | -------------------------------------------------- | -------------------- |
+| Welcome  | Start the onboarding flow                          | Yes                  |
+| Account  | Sign in, create an account, or continue local-only | No account required  |
+| Model    | Save an API key for a catalog model provider       | Yes                  |
+| Search   | Connect a web-search provider                      | No                   |
+| Storage  | Configure catalog or custom S3-compatible storage  | No                   |
+| Database | Connect a vector database                          | No                   |
+| Models   | Select the primary assistant provider and model    | Assistant only       |
 
 ### 1. Welcome
 
