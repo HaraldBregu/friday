@@ -131,6 +131,7 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 it.each(['/home', '/settings/account'])(
 	'preserves %s when a configured signed-in session is refreshed',
 	async (path) => {
+		const user = userEvent.setup();
 		window.auth = authApi({
 			status: 'signedIn',
 			persistence: 'encrypted',
@@ -140,9 +141,18 @@ it.each(['/home', '/settings/account'])(
 			getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
 			getModelId: jest.fn(async () => 'model'),
 		} as never;
-		renderFlow(path);
+		const firstRender = renderFlow('/start');
 
-		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
+		await user.click(await screen.findByRole('button', { name: 'Get started' }));
+		await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
+		if (path === '/settings/account') {
+			await user.click(screen.getByRole('link', { name: 'Account settings' }));
+		}
+		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
+		firstRender.unmount();
+
+		renderFlow(path);
+		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
 		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
 		expect(
 			screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
