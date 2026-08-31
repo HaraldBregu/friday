@@ -42,7 +42,6 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 	useEffect(() => {
 		if ((!started && state.status !== 'recovery') || !identity) {
 			requestId.current += 1;
-			setConfiguration({ status: 'idle' });
 			return;
 		}
 
