@@ -13,8 +13,8 @@ const MAIN_ENTRY = path.resolve(dirname, '../../out/main/index.js');
 export async function launchApp(): Promise<{ app: ElectronApplication; page: Page }> {
 	const app = await electron.launch({
 		args: [
-			MAIN_ENTRY,
 			`--user-data-dir=${path.join(os.tmpdir(), `friday-e2e-${process.pid}`)}`,
+			MAIN_ENTRY,
 		],
 		// ponytail: force production renderer (loadFile) even if a dev URL leaked into env
 		env: { ...process.env, NODE_ENV: 'production', ELECTRON_RENDERER_URL: '' },
