@@ -5,6 +5,10 @@ import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 
+jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
+	LogoView: () => <span aria-label="Friday" />,
+}));
+
 function Location(): React.JSX.Element {
 	return <p>{useLocation().pathname}</p>;
 }

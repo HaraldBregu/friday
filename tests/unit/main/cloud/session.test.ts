@@ -7,6 +7,7 @@ const encrypt = safeStorage.encryptString as jest.Mock;
 const decrypt = safeStorage.decryptString as jest.Mock;
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	encryptionAvailable.mockReturnValue(true);
 	selectedBackend.mockReturnValue('gnome_libsecret');
 	encrypt.mockImplementation((value: string) => Buffer.from(value, 'utf8'));

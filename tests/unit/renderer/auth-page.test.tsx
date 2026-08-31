@@ -5,6 +5,10 @@ import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 import AuthPage from '../../../src/renderer/src/pages/auth/Page';
 
+jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
+	LogoView: () => <span aria-label="Friday" />,
+}));
+
 function authApi(state: AuthState): AuthApi {
 	let listener: ((next: AuthState) => void) | undefined;
 	return {
