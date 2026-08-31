@@ -2,14 +2,14 @@ import { createClient, type AuthChangeEvent, type Session, type SupabaseClient }
 import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_types';
 import type { CloudConfig } from './config';
 import { publicAuthError } from './error';
-import { EncryptedSessionStorage } from './session';
+import { MemorySessionStorage } from './session';
 import { DeviceAccountBinding } from './binding';
 
 type Subscription = { unsubscribe: () => void };
 
 export class AuthService {
 	private client?: SupabaseClient;
-	private storage?: EncryptedSessionStorage;
+	private storage?: MemorySessionStorage;
 	private binding?: DeviceAccountBinding;
 	private subscription?: Subscription;
 	private session: Session | null = null;
@@ -27,7 +27,7 @@ export class AuthService {
 			this.setState({ status: 'unconfigured', persistence: 'memory' });
 			return;
 		}
-		this.storage = new EncryptedSessionStorage();
+		this.storage = new MemorySessionStorage();
 		this.binding = new DeviceAccountBinding();
 		this.client = createClient(this.config.url, this.config.publishableKey, {
 			auth: {
@@ -214,7 +214,7 @@ export class AuthService {
 	}
 
 	private persistence(): 'encrypted' | 'memory' {
-		return this.storage?.persistent ? 'encrypted' : 'memory';
+		return 'memory';
 	}
 
 	private setState(state: AuthState): void {
