@@ -37,7 +37,7 @@ const AccountPage: React.FC = () => {
 				</SettingsPanel>
 			</SettingsSection>
 			<SettingsNotice icon={AlertCircle}>
-				Signing out removes the cloud session from this device. Existing local Friday files remain on the device.
+				Signing out removes the cloud session, but local files remain linked to this account to prevent cross-account data exposure.
 			</SettingsNotice>
 			{error ? <SettingsNotice icon={AlertCircle} variant="destructive">{error}</SettingsNotice> : null}
 			<Button

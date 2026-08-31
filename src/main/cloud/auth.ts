@@ -3,12 +3,14 @@ import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_
 import type { CloudConfig } from './config';
 import { publicAuthError } from './error';
 import { EncryptedSessionStorage } from './session';
+import { DeviceAccountBinding } from './binding';
 
 type Subscription = { unsubscribe: () => void };
 
 export class AuthService {
 	private client?: SupabaseClient;
 	private storage?: EncryptedSessionStorage;
+	private binding?: DeviceAccountBinding;
 	private subscription?: Subscription;
 	private session: Session | null = null;
 	private initialized = false;
@@ -26,6 +28,7 @@ export class AuthService {
 			return;
 		}
 		this.storage = new EncryptedSessionStorage();
+		this.binding = new DeviceAccountBinding();
 		this.client = createClient(this.config.url, this.config.publishableKey, {
 			auth: {
 				storage: this.storage,
@@ -74,6 +77,7 @@ export class AuthService {
 		const { data, error } = await this.getClient().auth.signInWithPassword(credentials);
 		if (error) throw publicAuthError(error);
 		this.applySession('SIGNED_IN', data.session);
+		if (this.state.status !== 'signedIn') throw this.accountMismatchError();
 		return this.getState();
 	}
 
@@ -89,7 +93,10 @@ export class AuthService {
 			},
 		});
 		if (error) throw publicAuthError(error);
-		if (data.session) this.applySession('SIGNED_IN', data.session);
+		if (data.session) {
+			this.applySession('SIGNED_IN', data.session);
+			if (this.state.status !== 'signedIn') throw this.accountMismatchError();
+		}
 		else {
 			this.setState({
 				status: 'confirmationRequired',
@@ -148,6 +155,9 @@ export class AuthService {
 		const { data, error } = await this.getClient().auth.exchangeCodeForSession(code);
 		if (error) throw publicAuthError(error);
 		this.applySession(recovery ? 'PASSWORD_RECOVERY' : 'SIGNED_IN', data.session);
+		if (this.state.status !== (recovery ? 'recovery' : 'signedIn')) {
+			throw this.accountMismatchError();
+		}
 		return this.getState();
 	}
 
@@ -159,6 +169,13 @@ export class AuthService {
 	}
 
 	private applySession(event: AuthChangeEvent, session: Session | null): void {
+		if (session && !this.binding?.accept(session.user.id)) {
+			this.session = null;
+			this.storage?.clear();
+			this.setState({ status: 'signedOut', persistence: this.persistence() });
+			queueMicrotask(() => void this.client?.auth.signOut({ scope: 'local' }));
+			return;
+		}
 		this.session = session;
 		this.sessionListeners.forEach((listener) => listener(session));
 		if (!session) {
@@ -186,5 +203,13 @@ export class AuthService {
 	private setState(state: AuthState): void {
 		this.state = state;
 		this.stateListeners.forEach((listener) => listener(this.getState()));
+	}
+
+	private accountMismatchError(): Error {
+		const error = new Error(
+			'This local Friday profile belongs to another account. Use that account or a separate operating-system profile.'
+		);
+		error.name = 'AccountMismatchError';
+		return error;
 	}
 }
