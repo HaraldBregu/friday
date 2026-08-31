@@ -8,9 +8,13 @@ type ConfigurationState = {
 	status: 'idle' | 'checking' | 'incomplete' | 'complete';
 };
 
+const ONBOARDING_STARTED_SESSION_KEY = 'friday-onboarding-started';
+
 export function OnboardingProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const { state, localOnly } = useAuth();
-	const [started, setStarted] = useState(false);
+	const [started, setStarted] = useState(
+		() => window.sessionStorage.getItem(ONBOARDING_STARTED_SESSION_KEY) === 'true'
+	);
 	const [configuration, setConfiguration] = useState<ConfigurationState>({ status: 'idle' });
 	const requestId = useRef(0);
 	const identity = state.status === 'signedIn' ? state.user?.id : localOnly ? 'local' : undefined;
@@ -76,8 +80,14 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 	const value = useMemo<OnboardingContextValue>(
 		() => ({
 			phase,
-			start: () => setStarted(true),
-			restart: () => setStarted(false),
+			start: () => {
+				window.sessionStorage.setItem(ONBOARDING_STARTED_SESSION_KEY, 'true');
+				setStarted(true);
+			},
+			restart: () => {
+				window.sessionStorage.removeItem(ONBOARDING_STARTED_SESSION_KEY);
+				setStarted(false);
+			},
 			refreshConfiguration,
 		}),
 		[phase, refreshConfiguration]
