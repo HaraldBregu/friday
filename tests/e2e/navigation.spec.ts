@@ -19,7 +19,7 @@ test.afterAll(async () => {
  * renders "This page crashed" — so its absence is the smoke signal.
  */
 const routes = [
-	'/setup',
+	'/start',
 	'/home',
 	'/settings',
 	'/settings/general/persona',
@@ -62,11 +62,12 @@ for (const route of routes) {
 	});
 }
 
-test('the start route enters the current onboarding flow', async () => {
+test('the start route mounts the unified onboarding flow', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/start';
 	});
-	await expect(page).not.toHaveURL(/#\/start$/);
+	await expect(page).toHaveURL(/#\/start$/);
+	await expect(page.locator('#root')).not.toBeEmpty();
 	await expect(page.getByText('errorBoundary.notFoundTitle')).toHaveCount(0);
 });
 

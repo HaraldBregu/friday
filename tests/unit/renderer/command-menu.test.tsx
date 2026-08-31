@@ -39,7 +39,7 @@ it.each(['/home', '/home/session/1', '/settings', '/settings/providers/models'])
 	}
 );
 
-it.each(['/setup', '/homepage', '/settings-old'])(
+it.each(['/start', '/homepage', '/settings-old'])(
 	'does not open command search on %s',
 	(path) => {
 		render(

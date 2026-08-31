@@ -35,7 +35,7 @@ it.each(['/home', '/settings/general'])(
 
 it('preserves vertical motion on routes without a split pane', () => {
 	render(
-		<MemoryRouter initialEntries={['/setup']}>
+		<MemoryRouter initialEntries={['/start']}>
 			<PageTransition>Page</PageTransition>
 		</MemoryRouter>
 	);

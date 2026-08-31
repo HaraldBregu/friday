@@ -74,7 +74,7 @@ it('does not open the titlebar menu from a button', () => {
 	expect(showContextMenu).not.toHaveBeenCalled();
 });
 
-it.each(['/settings', '/setup'])('opens the titlebar menu while viewing %s', (path) => {
+it.each(['/settings', '/start'])('opens the titlebar menu while viewing %s', (path) => {
 	const { container } = render(
 		<MemoryRouter initialEntries={[path]}>
 			<TitleBar />
@@ -84,6 +84,17 @@ it.each(['/settings', '/setup'])('opens the titlebar menu while viewing %s', (pa
 	fireEvent.contextMenu(container.querySelector('[data-slot="titlebar"]') as Element);
 
 	expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
+});
+
+it('hides application navigation during onboarding', () => {
+	render(
+		<MemoryRouter initialEntries={['/start']}>
+			<TitleBar />
+		</MemoryRouter>
+	);
+
+	expect(screen.queryByRole('button', { name: 'settings.title' })).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'titleBar.home' })).not.toBeInTheDocument();
 });
 
 it('shows the settings icon on Home', async () => {
