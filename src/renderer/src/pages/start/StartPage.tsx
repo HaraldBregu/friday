@@ -179,7 +179,7 @@ const StartPage: React.FC = () => {
 							Back
 						</Button>
 						<Button type="button" size="sm" onClick={skipSignIn}>
-							Continue
+							Skip and continue
 							<ArrowRight className="size-3.5" aria-hidden="true" />
 						</Button>
 					</div>
