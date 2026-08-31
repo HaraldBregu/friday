@@ -81,25 +81,33 @@ it('redirects a configured signed-in user from auth to home', async () => {
 });
 
 it('allows a signed-out user to continue in local-only mode', async () => {
-	localStorage.setItem('friday-auth-local-only', 'true');
+	const user = userEvent.setup();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	window.agent = {
 		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
 		getModelId: jest.fn(async () => 'model'),
 	} as never;
-	renderGate('/home');
+	render(
+		<AuthProvider>
+			<MemoryRouter initialEntries={['/auth']}>
+				<StartupGate>
+					<Routes>
+						<Route path="/auth" element={<AuthPage />} />
+						<Route path="*" element={<Location />} />
+					</Routes>
+				</StartupGate>
+			</MemoryRouter>
+		</AuthProvider>
+	);
+	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
 
-it('sends local-only users to setup when configuration is incomplete', async () => {
+it('ignores a previously persisted local-only preference', async () => {
 	localStorage.setItem('friday-auth-local-only', 'true');
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
-	window.agent = {
-		getProvider: jest.fn(async () => undefined),
-		getModelId: jest.fn(async () => ''),
-	} as never;
-	renderGate('/auth');
-	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
+	renderGate('/home');
+	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
 it('sends skipped sign-in to setup when configuration is incomplete', async () => {
@@ -128,13 +136,24 @@ it('sends skipped sign-in to setup when configuration is incomplete', async () =
 it('rechecks configuration when setup finishes', async () => {
 	const user = userEvent.setup();
 	let configured = false;
-	localStorage.setItem('friday-auth-local-only', 'true');
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	window.agent = {
 		getProvider: jest.fn(async () => (configured ? ({ id: 'provider' } as never) : undefined)),
 		getModelId: jest.fn(async () => (configured ? 'model' : '')),
 	} as never;
-	renderGate('/setup');
+	render(
+		<AuthProvider>
+			<MemoryRouter initialEntries={['/auth']}>
+				<StartupGate>
+					<Routes>
+						<Route path="/auth" element={<AuthPage />} />
+						<Route path="*" element={<Location />} />
+					</Routes>
+				</StartupGate>
+			</MemoryRouter>
+		</AuthProvider>
+	);
+	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
 	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 	configured = true;
 	await user.click(screen.getByRole('button', { name: 'Finish setup' }));

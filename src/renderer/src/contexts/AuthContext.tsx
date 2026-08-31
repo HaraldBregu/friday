@@ -16,26 +16,22 @@ interface AuthContextValue {
 	requireSignIn: () => void;
 }
 
-const LOCAL_ONLY_KEY = 'friday-auth-local-only';
 const initialState: AuthState = { status: 'loading', persistence: 'memory' };
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const [state, setState] = useState<AuthState>(initialState);
-	const [localOnly, setLocalOnly] = useState(() => localStorage.getItem(LOCAL_ONLY_KEY) === 'true');
+	const [localOnly, setLocalOnly] = useState(false);
 	const applyState = useCallback((next: AuthState): void => {
 		setState(next);
 		if (next.status === 'signedIn' || next.status === 'recovery') {
-			localStorage.removeItem(LOCAL_ONLY_KEY);
 			setLocalOnly(false);
 		}
 	}, []);
 	const skipSignIn = useCallback((): void => {
-		localStorage.setItem(LOCAL_ONLY_KEY, 'true');
 		setLocalOnly(true);
 	}, []);
 	const requireSignIn = useCallback((): void => {
-		localStorage.removeItem(LOCAL_ONLY_KEY);
 		setLocalOnly(false);
 	}, []);
 

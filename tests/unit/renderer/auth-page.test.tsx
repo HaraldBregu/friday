@@ -75,7 +75,7 @@ it('creates an account and shows the confirmation state', async () => {
 	});
 });
 
-it('persists local-only mode when sign-in is skipped', async () => {
+it('keeps skipped sign-in out of persistent storage', async () => {
 	const user = userEvent.setup();
 	render(
 		<AuthProvider>
@@ -83,5 +83,5 @@ it('persists local-only mode when sign-in is skipped', async () => {
 		</AuthProvider>
 	);
 	await user.click(screen.getByRole('button', { name: 'Skip for now' }));
-	expect(localStorage.getItem('friday-auth-local-only')).toBe('true');
+	expect(localStorage.getItem('friday-auth-local-only')).toBeNull();
 });
