@@ -54,7 +54,7 @@ continues through setup.
 
 The Model stage requires at least one saved model-provider API key. Search, S3-compatible object
 storage, and vector database connections are optional. The final Models stage offers Assistant,
-Voice, Transcription, Image, Video, Audio, realtime conversation, and search configuration, but
+Voice, Transcription, Image, Audio, Video, realtime conversation, and search configuration, but
 only the Assistant selection is required to finish. Task and health model selection remain on their
 own Settings pages.
 
