@@ -93,6 +93,7 @@ select throws_ok(
 		)
 	$$,
 	'42501',
+	'new row violates row-level security policy for table "chat_sessions"',
 	'another user cannot spoof chat ownership'
 );
 
@@ -109,6 +110,7 @@ select throws_ok(
 		)
 	$$,
 	'23503',
+	'insert or update on table "chat_messages" violates foreign key constraint "chat_messages_session_owner_fkey"',
 	'a cross-owner session relationship is rejected'
 );
 
