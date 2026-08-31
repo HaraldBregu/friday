@@ -87,12 +87,13 @@ it.each(['/settings', '/start'])('opens the titlebar menu while viewing %s', (pa
 });
 
 it('hides application navigation during onboarding', () => {
-	render(
+	const { container } = render(
 		<MemoryRouter initialEntries={['/start']}>
 			<TitleBar />
 		</MemoryRouter>
 	);
 
+	expect(container.querySelector('[data-slot="titlebar"]')).toHaveClass('bg-background');
 	expect(screen.queryByRole('button', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'titleBar.home' })).not.toBeInTheDocument();
 });

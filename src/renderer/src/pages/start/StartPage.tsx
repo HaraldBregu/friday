@@ -4,20 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOnboarding } from '@/contexts/useOnboarding';
-import { cn } from '@/lib/utils';
-import { SetupModelsStep } from '@/pages/start/components/SetupModelsStep';
-import { SetupProviderStep } from '@/pages/start/components/SetupProviderStep';
-import { SetupStepProgress } from '@/pages/start/components/SetupStepProgress';
+import { SetupModelsStep } from './components/SetupModelsStep';
+import { SetupProviderStep } from './components/SetupProviderStep';
+import { SetupStepProgress } from './components/SetupStepProgress';
 import {
 	actionableProviderCatalog,
 	getErrorMessage,
 	getSelectedServiceModel,
 	SETUP_STEPS,
 	STEP_COPY,
-} from '@/pages/start/setupConstants';
-import { useSetupModelServices } from '@/pages/start/hooks/useSetupModelServices';
-import { createInitialSetupState, setupReducer } from '@/pages/start/state/setupReducer';
-import type { OnboardingStep } from '@/pages/start/setupTypes';
+} from './setupConstants';
+import { useSetupModelServices } from './hooks/useSetupModelServices';
+import { createInitialSetupState, setupReducer } from './state/setupReducer';
+import type { OnboardingStep } from './setupTypes';
 import { AuthStep } from './components/AuthStep';
 import { LandingStep } from './components/LandingStep';
 
@@ -162,12 +161,7 @@ const StartPage: React.FC = () => {
 
 	return (
 		<main className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground">
-			<section
-				className={cn(
-					'min-h-0 flex-1 overflow-y-auto px-4 sm:px-6',
-					phase === 'landing' || phase === 'checking' ? 'bg-background' : 'bg-muted/40'
-				)}
-			>
+			<section className="min-h-0 flex-1 overflow-y-auto bg-background px-4 sm:px-6">
 				{content}
 				{phase === 'setup' && errorMessage ? (
 					<div className="mx-auto mb-4 flex max-w-2xl items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-destructive" role="alert">

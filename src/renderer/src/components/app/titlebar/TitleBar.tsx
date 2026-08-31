@@ -96,7 +96,7 @@ export const TitleBar = React.memo(function TitleBar({
 	return (
 		<TitleBarProvider value={{ isMac, isFullScreen }}>
 			<TitleBarContainer
-				className={className}
+				className={cn(className, isOnboarding && 'bg-background')}
 				style={style}
 				onContextMenu={(event) => {
 					if (event.target instanceof Element && event.target.closest('button, a')) {
