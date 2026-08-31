@@ -4,10 +4,6 @@ import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 import { AuthStep } from '../../../src/renderer/src/pages/start/components/AuthStep';
 
-jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
-	LogoView: () => <span aria-label="Friday" />,
-}));
-
 function authApi(state: AuthState): AuthApi {
 	let listener: ((next: AuthState) => void) | undefined;
 	return {
@@ -83,6 +79,7 @@ it('keeps local-only continuation out of the account content', () => {
 		</AuthProvider>
 	);
 
+	expect(screen.queryByText('Friday Cloud')).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Skip for now' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
 });

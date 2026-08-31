@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
-import { LogoView } from '@/components/app/base/logo-view';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -140,14 +139,6 @@ export function AuthStep(): React.JSX.Element {
 	return (
 		<div className="flex min-h-full items-center justify-center px-6 py-8">
 			<div className="w-full max-w-sm">
-				<div className="mb-5 flex flex-col items-center text-center">
-					<div className="flex size-16 items-center justify-center rounded-2xl border border-border/70 bg-background shadow-sm">
-						<LogoView className="size-14 rounded-xl" />
-					</div>
-					<p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
-						Friday Cloud
-					</p>
-				</div>
 				<Card>
 					<CardHeader>
 						<h1 className="text-base font-medium leading-snug">{title}</h1>
