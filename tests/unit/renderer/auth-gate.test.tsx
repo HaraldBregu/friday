@@ -155,7 +155,7 @@ it('takes a configured signed-in user from landing to home', async () => {
 	expect(
 		await screen.findByRole('heading', { name: 'Your desktop AI copilot' })
 	).toBeInTheDocument();
-	await user.click(screen.getByRole('button', { name: 'Get started' }));
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 });
 
