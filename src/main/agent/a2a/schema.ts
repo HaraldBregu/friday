@@ -5,8 +5,9 @@ export const a2aAgentInputSchema = z
 		id: z.string().trim().min(1).max(200).optional(),
 		name: z.string().max(200),
 		url: z.string().trim().min(1).max(2048),
-		authType: z.enum(['none', 'bearer', 'api-key']).optional(),
+		authType: z.enum(['none', 'bearer', 'api-key', 'private-key-jwt']).optional(),
 		credential: z.string().max(8192).optional(),
+		clientId: z.string().trim().min(1).max(200).optional(),
 		apiKeyHeader: z
 			.string()
 			.trim()
