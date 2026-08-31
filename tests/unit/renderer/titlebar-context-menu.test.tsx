@@ -93,7 +93,9 @@ it('hides application navigation during onboarding', () => {
 		</MemoryRouter>
 	);
 
-	expect(container.querySelector('[data-slot="titlebar"]')).toHaveClass('bg-background');
+	const titleBar = container.querySelector('[data-slot="titlebar"]');
+	expect(titleBar).toHaveClass('bg-background');
+	expect(titleBar).not.toHaveClass('bg-transparent');
 	expect(screen.queryByRole('button', { name: 'settings.title' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'titleBar.home' })).not.toBeInTheDocument();
 });
