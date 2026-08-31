@@ -22,6 +22,8 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 		configuration.identity === identity || (localOnly && configuration.status === 'complete')
 			? configuration.status
 			: 'idle';
+	const active =
+		started || state.status === 'signedIn' || (localOnly && configuration.status === 'complete');
 
 	const refreshConfiguration = useCallback(async (): Promise<boolean> => {
 		if (!identity) {
@@ -46,7 +48,7 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 	}, [identity]);
 
 	useEffect(() => {
-		if ((!started && state.status !== 'signedIn') || !identity) {
+		if (!active || !identity) {
 			requestId.current += 1;
 			return;
 		}
@@ -66,12 +68,12 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 		return () => {
 			requestId.current += 1;
 		};
-	}, [identity, started, state.status]);
+	}, [active, identity]);
 
 	let phase: OnboardingPhase;
 	if (state.status === 'recovery') phase = 'auth';
 	else if (state.status === 'loading' && !localOnly) phase = 'checking';
-	else if (!started && state.status !== 'signedIn') phase = 'landing';
+	else if (!active) phase = 'landing';
 	else if (!identity) phase = 'auth';
 	else if (configurationStatus === 'complete') phase = 'ready';
 	else if (configurationStatus === 'incomplete') phase = 'setup';
