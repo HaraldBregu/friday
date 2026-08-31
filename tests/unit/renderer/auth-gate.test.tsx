@@ -66,7 +66,16 @@ it('redirects a signed-out protected route to auth', async () => {
 	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
 });
 
-it('redirects a configured signed-in user from auth to home', async () => {
+it('shows the start page while the session is loading', () => {
+	window.auth = {
+		...authApi({ status: 'loading', persistence: 'memory' }),
+		getState: jest.fn(() => new Promise<AuthState>(() => undefined)),
+	};
+	renderGate('/start');
+	expect(screen.getByRole('status')).toHaveTextContent('Starting Friday…');
+});
+
+it('redirects a configured signed-in user from start to home', async () => {
 	window.auth = authApi({
 		status: 'signedIn',
 		persistence: 'encrypted',
@@ -76,8 +85,22 @@ it('redirects a configured signed-in user from auth to home', async () => {
 		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
 		getModelId: jest.fn(async () => 'model'),
 	} as never;
-	renderGate('/auth');
+	renderGate('/start');
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
+});
+
+it('redirects an unconfigured signed-in user from start to setup', async () => {
+	window.auth = authApi({
+		status: 'signedIn',
+		persistence: 'memory',
+		user: { id: 'user-id', email: 'user@example.test' },
+	});
+	window.agent = {
+		getProvider: jest.fn(async () => undefined),
+		getModelId: jest.fn(async () => ''),
+	} as never;
+	renderGate('/start');
+	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
 });
 
 it('allows a signed-out user to continue in local-only mode', async () => {

@@ -25,6 +25,7 @@ import {
 } from './contexts/chat-session';
 import { cn } from './lib/utils';
 import HomePage from './pages/home/Page';
+import StartPage from './pages/start/StartPage';
 import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
 
@@ -200,7 +201,11 @@ const routes: RouteObject[] = [
 			},
 			{
 				index: true,
-				element: <Navigate to="/setup" replace />,
+				element: <Navigate to="/start" replace />,
+			},
+			{
+				path: 'start',
+				element: <StartPage />,
 			},
 			{
 				path: 'setup',
@@ -209,10 +214,6 @@ const routes: RouteObject[] = [
 						<SetupPage />
 					</RouteWrapper>
 				),
-			},
-			{
-				path: 'start',
-				element: <Navigate to="/setup" replace />,
 			},
 			{
 				path: 'config',

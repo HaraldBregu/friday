@@ -62,7 +62,7 @@ for (const route of routes) {
 	});
 }
 
-test('the legacy start route enters the current onboarding flow', async () => {
+test('the start route enters the current onboarding flow', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/start';
 	});
