@@ -62,6 +62,14 @@ for (const route of routes) {
 	});
 }
 
+test('the legacy start route enters the current onboarding flow', async () => {
+	await page.evaluate(() => {
+		window.location.hash = '#/start';
+	});
+	await expect(page).not.toHaveURL(/#\/start$/);
+	await expect(page.getByText('errorBoundary.notFoundTitle')).toHaveCount(0);
+});
+
 test('Command+, opens the settings page', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/home';

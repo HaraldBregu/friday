@@ -1969,6 +1969,8 @@
 		"rootMessage": "L'applicazione ha incontrato un errore imprevisto. Per favore riavvia.",
 		"routeTitle": "Questa pagina si è bloccata",
 		"routeMessage": "Si è verificato un errore durante il rendering di questa pagina.",
+		"notFoundTitle": "Pagina non trovata",
+		"notFoundMessage": "La pagina richiesta non esiste.",
 		"featureTitle": "Qualcosa è andato storto",
 		"tryAgain": "Riprova",
 		"tryAgainButton": "Riprova",

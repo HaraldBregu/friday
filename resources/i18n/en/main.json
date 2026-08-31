@@ -1970,6 +1970,8 @@
 		"rootMessage": "The application encountered an unexpected error. Please restart.",
 		"routeTitle": "This page crashed",
 		"routeMessage": "An error occurred while rendering this page.",
+		"notFoundTitle": "Page not found",
+		"notFoundMessage": "The page you requested does not exist.",
 		"featureTitle": "Something went wrong",
 		"tryAgain": "Try again",
 		"tryAgainButton": "Try Again",

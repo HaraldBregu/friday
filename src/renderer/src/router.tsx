@@ -211,6 +211,10 @@ const routes: RouteObject[] = [
 				),
 			},
 			{
+				path: 'start',
+				element: <Navigate to="/setup" replace />,
+			},
+			{
 				path: 'config',
 				element: <Navigate to="/setup" replace />,
 			},
