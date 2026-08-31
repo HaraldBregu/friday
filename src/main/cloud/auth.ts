@@ -2,14 +2,12 @@ import { createClient, type AuthChangeEvent, type Session, type SupabaseClient }
 import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_types';
 import type { CloudConfig } from './config';
 import { publicAuthError } from './error';
-import { MemorySessionStorage } from './session';
 import { DeviceAccountBinding } from './binding';
 
 type Subscription = { unsubscribe: () => void };
 
 export class AuthService {
 	private client?: SupabaseClient;
-	private storage?: MemorySessionStorage;
 	private binding?: DeviceAccountBinding;
 	private subscription?: Subscription;
 	private session: Session | null = null;
@@ -27,13 +25,11 @@ export class AuthService {
 			this.setState({ status: 'unconfigured', persistence: 'memory' });
 			return;
 		}
-		this.storage = new MemorySessionStorage();
 		this.binding = new DeviceAccountBinding();
 		this.client = createClient(this.config.url, this.config.publishableKey, {
 			auth: {
-				storage: this.storage,
 				autoRefreshToken: true,
-				persistSession: true,
+				persistSession: false,
 				detectSessionInUrl: false,
 				flowType: 'pkce',
 			},
@@ -55,7 +51,6 @@ export class AuthService {
 			}
 			const { data, error } = result;
 			if (error) {
-				this.storage.clear();
 				this.applySession('SIGNED_OUT', null);
 				return;
 			}
@@ -155,7 +150,6 @@ export class AuthService {
 			const { error } = await this.client.auth.signOut({ scope: 'local' });
 			if (error) throw publicAuthError(error);
 		}
-		this.storage?.clear();
 		this.applySession('SIGNED_OUT', null);
 		return this.getState();
 	}
@@ -188,7 +182,6 @@ export class AuthService {
 	private applySession(event: AuthChangeEvent, session: Session | null): void {
 		if (session && !this.binding?.accept(session.user.id)) {
 			this.session = null;
-			this.storage?.clear();
 			this.setState({ status: 'signedOut', persistence: this.persistence() });
 			queueMicrotask(() => void this.client?.auth.signOut({ scope: 'local' }));
 			return;
