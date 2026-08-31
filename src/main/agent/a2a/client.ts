@@ -2,13 +2,14 @@ import type { AgentCard } from '@a2a-js/sdk';
 import type { Client } from '@a2a-js/sdk/client';
 import type { A2aAgent } from '../../../shared/a2a_types';
 import { createA2aFetch } from './fetch';
+import { createA2aTokenProvider } from './oauth';
 
 const supportedOutputModes = new Set(['text/plain', 'application/json']);
 const supportedBindings = new Set(['jsonrpc', 'http+json']);
 
 export async function createA2aClient(
 	card: AgentCard,
-	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader'>,
+	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader' | 'clientId'>,
 	discoveryUrl: string
 ): Promise<Client> {
 	if (!card || typeof card.name !== 'string' || !card.name.trim()) {
@@ -77,7 +78,7 @@ export async function createA2aClient(
 			break;
 		}
 		if (
-			authentication.authType === 'bearer' &&
+			(authentication.authType === 'bearer' || authentication.authType === 'private-key-jwt') &&
 			((scheme?.$case === 'httpAuthSecurityScheme' &&
 				scheme.value.scheme.toLowerCase() === 'bearer') ||
 				scheme?.$case === 'oauth2SecurityScheme' ||
@@ -95,7 +96,19 @@ export async function createA2aClient(
 	const { ClientFactory, JsonRpcTransportFactory, RestTransportFactory } = await import(
 		'@a2a-js/sdk/client'
 	);
-	const fetchImpl = createA2aFetch(authentication);
+	let tokenProvider: (() => Promise<string>) | undefined;
+	if (authentication.authType === 'private-key-jwt') {
+		const oauthScheme = Object.values(card.securitySchemes ?? {}).find(
+			(item) => item.scheme?.$case === 'oauth2SecurityScheme'
+		)?.scheme;
+		const metadataUrl =
+			oauthScheme?.$case === 'oauth2SecurityScheme'
+				? oauthScheme.value.oauth2MetadataUrl
+				: undefined;
+		if (!metadataUrl) throw new Error('A2A Agent Card does not advertise OAuth metadata.');
+		tokenProvider = await createA2aTokenProvider(metadataUrl, endpoint.href, authentication);
+	}
+	const fetchImpl = createA2aFetch(authentication, tokenProvider);
 	const compatibleCard = { ...card, supportedInterfaces: [supportedInterface] };
 	return new ClientFactory({
 		transports: [
