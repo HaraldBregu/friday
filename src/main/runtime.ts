@@ -168,9 +168,9 @@ const menuManager = new Menu({
 	},
 });
 
-app.whenReady().then(async () => {
-	await services.authService.initialize();
+app.whenReady().then(() => {
 	services.cloudService.initialize();
+	const authInitialization = services.authService.initialize();
 	const unsubscribeAuthLinks = authLinks.subscribe(async (url) => {
 		try {
 			await services.authService.handleDeepLink(url);
@@ -181,7 +181,7 @@ app.whenReady().then(async () => {
 		}
 	});
 	app.once('before-quit', unsubscribeAuthLinks);
-	await authLinks.flush();
+	void authInitialization.then(() => authLinks.flush());
 	setKeepAwake(getKeepAwake());
 	registerLocalResourceProtocolHandler(logger);
 	setupMediaPermissionHandlers(services.extensionRegistry);

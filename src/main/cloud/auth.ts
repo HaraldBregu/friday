@@ -41,13 +41,30 @@ export class AuthService {
 		this.subscription = this.client.auth.onAuthStateChange((event, session) => {
 			this.applySession(event, session);
 		}).data.subscription;
-		const { data, error } = await this.client.auth.getSession();
-		if (error) {
-			this.storage.clear();
+		let restoreTimeout: ReturnType<typeof setTimeout> | undefined;
+		try {
+			const result = await Promise.race([
+				this.client.auth.getSession(),
+				new Promise<null>((resolve) => {
+					restoreTimeout = setTimeout(() => resolve(null), 10_000);
+				}),
+			]);
+			if (!result) {
+				this.applySession('SIGNED_OUT', null);
+				return;
+			}
+			const { data, error } = result;
+			if (error) {
+				this.storage.clear();
+				this.applySession('SIGNED_OUT', null);
+				return;
+			}
+			this.applySession('INITIAL_SESSION', data.session);
+		} catch {
 			this.applySession('SIGNED_OUT', null);
-			return;
+		} finally {
+			if (restoreTimeout) clearTimeout(restoreTimeout);
 		}
-		this.applySession('INITIAL_SESSION', data.session);
 	}
 
 	getState(): AuthState {
