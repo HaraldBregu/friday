@@ -26,7 +26,6 @@ const empty: A2aAgentInput = {
 	authType: 'none',
 	credential: '',
 	apiKeyHeader: 'X-API-Key',
-	clientId: '',
 	enabled: true,
 };
 
