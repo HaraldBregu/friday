@@ -8,24 +8,29 @@ import { isSetupComplete } from './setup';
 export function StartupGate({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const { state, localOnly } = useAuth();
 	const location = useLocation();
-	const [setup, setSetup] = useState<{ userId: string; complete: boolean }>();
+	const [setup, setSetup] = useState<{ userId: string; path: string; complete: boolean }>();
 	const userId = state.status === 'signedIn' ? state.user?.id : localOnly ? 'local' : undefined;
-	const setupComplete = setup && setup.userId === userId ? setup.complete : undefined;
+	const setupComplete =
+		setup && setup.userId === userId && (setup.complete || setup.path === location.pathname)
+			? setup.complete
+			: undefined;
 
 	useEffect(() => {
 		if (!userId) return;
+		if (setup?.userId === userId && (setup.complete || setup.path === location.pathname)) return;
 		let active = true;
+		const path = location.pathname;
 		void isSetupComplete()
 			.then((complete) => {
-				if (active) setSetup({ userId, complete });
+				if (active) setSetup({ userId, path, complete });
 			})
 			.catch(() => {
-				if (active) setSetup({ userId, complete: false });
+				if (active) setSetup({ userId, path, complete: false });
 			});
 		return () => {
 			active = false;
 		};
-	}, [userId]);
+	}, [location.pathname, setup?.complete, setup?.path, setup?.userId, userId]);
 
 	if ((state.status === 'loading' && !localOnly) || (userId && setupComplete === undefined)) {
 		return (
@@ -46,10 +51,10 @@ export function StartupGate({ children }: { readonly children: ReactNode }): Rea
 	}
 
 	if (!setupComplete) {
-		return location.pathname === '/start' ? <>{children}</> : <Navigate to="/start" replace />;
+		return location.pathname === '/setup' ? <>{children}</> : <Navigate to="/setup" replace />;
 	}
 
-	if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/start') {
+	if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/setup') {
 		return <Navigate to="/home" replace />;
 	}
 

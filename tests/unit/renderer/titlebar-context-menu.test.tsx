@@ -74,7 +74,7 @@ it('does not open the titlebar menu from a button', () => {
 	expect(showContextMenu).not.toHaveBeenCalled();
 });
 
-it.each(['/settings', '/start'])('opens the titlebar menu while viewing %s', (path) => {
+it.each(['/settings', '/setup'])('opens the titlebar menu while viewing %s', (path) => {
 	const { container } = render(
 		<MemoryRouter initialEntries={[path]}>
 			<TitleBar />

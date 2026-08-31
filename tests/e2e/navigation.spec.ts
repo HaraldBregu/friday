@@ -19,7 +19,7 @@ test.afterAll(async () => {
  * renders "This page crashed" — so its absence is the smoke signal.
  */
 const routes = [
-	'/start',
+	'/setup',
 	'/home',
 	'/settings',
 	'/settings/general/persona',

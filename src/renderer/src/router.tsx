@@ -29,7 +29,7 @@ import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
 
 const AuthPage = lazy(() => import('./pages/auth/Page'));
-const StartPage = lazy(() => import('./pages/setup/StartPage'));
+const SetupPage = lazy(() => import('./pages/setup/SetupPage'));
 const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
 const SettingsOverviewPage = lazy(() => import('./pages/settings/pages/overview/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));
@@ -200,19 +200,19 @@ const routes: RouteObject[] = [
 			},
 			{
 				index: true,
-				element: <Navigate to="/start" replace />,
+				element: <Navigate to="/setup" replace />,
 			},
 			{
-				path: 'start',
+				path: 'setup',
 				element: (
 					<RouteWrapper>
-						<StartPage />
+						<SetupPage />
 					</RouteWrapper>
 				),
 			},
 			{
 				path: 'config',
-				element: <Navigate to="/start" replace />,
+				element: <Navigate to="/setup" replace />,
 			},
 			{
 				path: 'home',

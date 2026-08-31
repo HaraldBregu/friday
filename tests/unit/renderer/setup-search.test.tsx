@@ -23,11 +23,11 @@ it('stays empty when a provider is configured but no search engine is selected',
 	render(<SetupSearch />);
 
 	const trigger = await screen.findByRole('button', {
-		name: /SetupSearch Engine.*Select a search engine/,
+		name: /Search Engine.*Select a search engine/,
 	});
 	expect(trigger).not.toHaveTextContent('Brave');
 	await user.click(trigger);
-	expect(await screen.findByRole('combobox', { name: 'SetupSearch Engine' })).not.toHaveTextContent(
+	expect(await screen.findByRole('combobox', { name: 'Search Engine' })).not.toHaveTextContent(
 		'Brave'
 	);
 });
@@ -39,5 +39,5 @@ it('shows a configured search engine selection', async () => {
 	});
 	render(<SetupSearch />);
 
-	expect(await screen.findByRole('button', { name: /SetupSearch Engine.*Brave/ })).toBeInTheDocument();
+	expect(await screen.findByRole('button', { name: /Search Engine.*Brave/ })).toBeInTheDocument();
 });

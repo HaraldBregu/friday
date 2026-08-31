@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
@@ -10,7 +11,16 @@ jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
 }));
 
 function Location(): React.JSX.Element {
-	return <p>{useLocation().pathname}</p>;
+	const location = useLocation();
+	const navigate = useNavigate();
+	return (
+		<>
+			<p>{location.pathname}</p>
+			<button type="button" onClick={() => navigate('/home')}>
+				Finish setup
+			</button>
+		</>
+	);
 }
 
 function authApi(state: AuthState): AuthApi {
@@ -88,5 +98,21 @@ it('sends local-only users to setup when configuration is incomplete', async () 
 		getModelId: jest.fn(async () => ''),
 	} as never;
 	renderGate('/auth');
-	await waitFor(() => expect(screen.getByText('/start')).toBeInTheDocument());
+	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
+});
+
+it('rechecks configuration when setup finishes', async () => {
+	const user = userEvent.setup();
+	let configured = false;
+	localStorage.setItem('friday-auth-local-only', 'true');
+	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
+	window.agent = {
+		getProvider: jest.fn(async () => (configured ? ({ id: 'provider' } as never) : undefined)),
+		getModelId: jest.fn(async () => (configured ? 'model' : '')),
+	} as never;
+	renderGate('/setup');
+	await waitFor(() => expect(screen.getByText('/setup')).toBeInTheDocument());
+	configured = true;
+	await user.click(screen.getByRole('button', { name: 'Finish setup' }));
+	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });

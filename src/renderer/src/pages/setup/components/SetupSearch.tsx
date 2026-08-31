@@ -36,7 +36,7 @@ export function SetupSearch(): React.JSX.Element {
 			<CollapsibleTrigger className="group flex w-full items-center gap-3 px-3 py-2.5 text-left">
 				<div className="min-w-0 flex-1">
 					<div className="truncate text-[13px] font-medium leading-4 text-foreground">
-						SetupSearch Engine
+						Search Engine
 					</div>
 					<p className="mt-0.5 truncate text-[11px] leading-4 text-muted-foreground">
 						{selectedEngine?.name ?? 'Select a search engine'}
@@ -60,7 +60,7 @@ export function SetupSearch(): React.JSX.Element {
 								.catch(() => undefined);
 						}}
 					>
-						<SelectTrigger className="w-full text-xs" aria-label="SetupSearch Engine">
+						<SelectTrigger className="w-full text-xs" aria-label="Search Engine">
 							<SelectValue placeholder="Connect a search provider first" />
 						</SelectTrigger>
 						<SelectContent>
