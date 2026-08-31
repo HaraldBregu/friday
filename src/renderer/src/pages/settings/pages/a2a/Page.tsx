@@ -149,7 +149,13 @@ export default function A2aPage(): React.JSX.Element {
 										type="password"
 										value={form.credential ?? ''}
 										onChange={(event) => setForm({ ...form, credential: event.target.value })}
-										placeholder={form.id ? 'Leave blank to keep the current secret' : form.authType === 'private-key-jwt' ? '{"kty":"OKP",…}' : ''}
+										placeholder={
+											form.id
+												? 'Leave blank to keep the current secret'
+												: form.authType === 'private-key-jwt'
+													? '{"kty":"OKP",…}'
+													: ''
+										}
 									/>
 								</div>
 							)}
@@ -214,12 +220,12 @@ export default function A2aPage(): React.JSX.Element {
 										onClick={() => {
 											setForm({
 												id: agent.id,
-											name: agent.name,
-											url: agent.url,
-											authType: agent.authType,
-											apiKeyHeader: agent.apiKeyHeader,
-											clientId: agent.clientId,
-											credential: '',
+												name: agent.name,
+												url: agent.url,
+												authType: agent.authType,
+												apiKeyHeader: agent.apiKeyHeader,
+												clientId: agent.clientId,
+												credential: '',
 												enabled: agent.enabled,
 											});
 											setAdding(true);

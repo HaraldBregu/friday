@@ -16,9 +16,14 @@ export const a2aAgentInputSchema = z
 			.regex(/^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/)
 			.refine(
 				(value) =>
-					!['a2a-extensions', 'a2a-version', 'connection', 'content-length', 'host', 'transfer-encoding'].includes(
-						value.toLowerCase()
-					),
+					![
+						'a2a-extensions',
+						'a2a-version',
+						'connection',
+						'content-length',
+						'host',
+						'transfer-encoding',
+					].includes(value.toLowerCase()),
 				'A2A API key header is reserved or unsafe.'
 			)
 			.optional(),

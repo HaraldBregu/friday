@@ -8,7 +8,8 @@ export function validateA2aAuthentication(
 		throw new Error('Invalid stored A2A authentication type.');
 	}
 	if (authentication.authType === 'none') {
-		if (authentication.credential) throw new Error('Unauthenticated A2A agents cannot store credentials.');
+		if (authentication.credential)
+			throw new Error('Unauthenticated A2A agents cannot store credentials.');
 		return;
 	}
 	if (!authentication.credential) throw new Error('A2A authentication credential is unavailable.');
@@ -28,9 +29,14 @@ export function validateA2aAuthentication(
 			throw new Error('Invalid stored A2A API key header.');
 		}
 		if (
-			['a2a-extensions', 'a2a-version', 'connection', 'content-length', 'host', 'transfer-encoding'].includes(
-				header.toLowerCase()
-			)
+			[
+				'a2a-extensions',
+				'a2a-version',
+				'connection',
+				'content-length',
+				'host',
+				'transfer-encoding',
+			].includes(header.toLowerCase())
 		) {
 			throw new Error('Stored A2A API key header is reserved or unsafe.');
 		}

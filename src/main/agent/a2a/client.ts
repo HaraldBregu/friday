@@ -27,7 +27,9 @@ export async function createA2aClient(
 			item.protocolVersion === '1.0' && supportedBindings.has(item.protocolBinding.toLowerCase())
 	);
 	if (!supportedInterface) {
-		throw new Error('A2A Agent Card does not advertise a supported v1.0 JSON-RPC or HTTP+JSON interface.');
+		throw new Error(
+			'A2A Agent Card does not advertise a supported v1.0 JSON-RPC or HTTP+JSON interface.'
+		);
 	}
 	let endpoint: URL;
 	try {
@@ -36,7 +38,9 @@ export async function createA2aClient(
 		throw new Error('Invalid A2A Agent Card: selected interface URL must be absolute.');
 	}
 	if (!['http:', 'https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password) {
-		throw new Error('Invalid A2A Agent Card: selected interface must be HTTP(S) without credentials.');
+		throw new Error(
+			'Invalid A2A Agent Card: selected interface must be HTTP(S) without credentials.'
+		);
 	}
 	if (endpoint.origin !== new URL(discoveryUrl).origin) {
 		throw new Error('A2A interface must match the configured agent origin.');
@@ -93,9 +97,8 @@ export async function createA2aClient(
 			`A2A agent authentication requirements are not satisfied by configured ${authentication.authType} authentication.`
 		);
 	}
-	const { ClientFactory, JsonRpcTransportFactory, RestTransportFactory } = await import(
-		'@a2a-js/sdk/client'
-	);
+	const { ClientFactory, JsonRpcTransportFactory, RestTransportFactory } =
+		await import('@a2a-js/sdk/client');
 	let tokenProvider: (() => Promise<string>) | undefined;
 	if (authentication.authType === 'private-key-jwt') {
 		const oauthScheme = Object.values(card.securitySchemes ?? {}).find(

@@ -13,8 +13,12 @@ export async function createA2aTokenProvider(
 		throw new Error('A2A OAuth metadata must use the configured HTTPS origin.');
 	}
 	const metadataResponse = await fetch(metadataTarget, { redirect: 'error' });
-	if (!metadataResponse.ok) throw new Error(`A2A OAuth discovery failed: ${await metadataResponse.text()}`);
-	const metadata = (await metadataResponse.json()) as { issuer?: unknown; token_endpoint?: unknown };
+	if (!metadataResponse.ok)
+		throw new Error(`A2A OAuth discovery failed: ${await metadataResponse.text()}`);
+	const metadata = (await metadataResponse.json()) as {
+		issuer?: unknown;
+		token_endpoint?: unknown;
+	};
 	if (metadata.issuer !== origin || typeof metadata.token_endpoint !== 'string') {
 		throw new Error('A2A OAuth metadata does not match the configured agent.');
 	}
@@ -23,7 +27,8 @@ export async function createA2aTokenProvider(
 		throw new Error('A2A OAuth token endpoint must use the configured HTTPS origin.');
 	}
 	const clientId = authentication.clientId;
-	if (!clientId || !authentication.credential) throw new Error('A2A OAuth credentials are unavailable.');
+	if (!clientId || !authentication.credential)
+		throw new Error('A2A OAuth credentials are unavailable.');
 	let privateJwk: JWK;
 	try {
 		privateJwk = JSON.parse(authentication.credential) as JWK;
@@ -60,7 +65,8 @@ export async function createA2aTokenProvider(
 		});
 		if (!response.ok) throw new Error(`A2A OAuth token request failed: ${await response.text()}`);
 		const value = (await response.json()) as { access_token?: unknown; expires_in?: unknown };
-		if (typeof value.access_token !== 'string') throw new Error('A2A OAuth response omitted access_token.');
+		if (typeof value.access_token !== 'string')
+			throw new Error('A2A OAuth response omitted access_token.');
 		const expiresIn = typeof value.expires_in === 'number' ? value.expires_in : 300;
 		cached = { token: value.access_token, expiresAt: Date.now() + expiresIn * 1000 };
 		return cached.token;

@@ -23,7 +23,8 @@ export function resolveA2aAuthentication(
 	const canReuse =
 		existing?.url === url &&
 		existing.authType === authType &&
-		(authType !== 'api-key' || existing.apiKeyHeader?.toLowerCase() === apiKeyHeader?.toLowerCase());
+		(authType !== 'api-key' ||
+			existing.apiKeyHeader?.toLowerCase() === apiKeyHeader?.toLowerCase());
 	const credential = suppliedCredential || (canReuse ? existing.credential : undefined);
 	if (!credential) throw new Error(`A credential is required for A2A ${authType} authentication.`);
 	const clientId =
