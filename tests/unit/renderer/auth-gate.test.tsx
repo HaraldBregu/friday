@@ -57,8 +57,10 @@ it('redirects a configured signed-in user from auth to home', async () => {
 		persistence: 'encrypted',
 		user: { id: 'user-id', email: 'user@example.test' },
 	});
-	window.agent.getProvider = jest.fn(async () => ({ id: 'provider' }) as never);
-	window.agent.getModelId = jest.fn(async () => 'model');
+	window.agent = {
+		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
+		getModelId: jest.fn(async () => 'model'),
+	} as never;
 	renderGate('/auth');
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
