@@ -35,13 +35,13 @@ workspace below the application title bar.
 
 The visible sidebar is grouped as follows:
 
-| Group | Destinations |
-| --- | --- |
-| General | Account, General, System, Cloud |
-| Assistant | Assistant, Coder, Skills, Background tasks, MCP servers, Bots, RAG, LLM Wiki, Health, Permissions |
-| Providers | Models, Search engines, Databases, Storage |
-| Channels | Channels |
-| Integrations | A2A agents, Extensions |
+| Group        | Destinations                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| General      | Account, General, System, Cloud                                                                   |
+| Assistant    | Assistant, Coder, Skills, Background tasks, MCP servers, Bots, RAG, LLM Wiki, Health, Permissions |
+| Providers    | Models, Search engines, Databases, Storage                                                        |
+| Channels     | Channels                                                                                          |
+| Integrations | A2A agents, Extensions                                                                            |
 
 The `/settings` overview is intentionally shorter than the sidebar. It links to General, System,
 Cloud, Assistant, Coder, Skills, Background tasks, MCP servers, Models, Search engines, Databases,
