@@ -55,6 +55,8 @@ import {
 	DataChannels,
 	WindowChannels,
 	TerminalChannels,
+	AuthChannels,
+	CloudChannels,
 } from './ipc_channels_definitions';
 type ProviderStoreRecord = StoredProvider | StoredBotProvider;
 
@@ -1007,6 +1009,53 @@ export interface TerminalEventChannelMap {
 	[TerminalChannels.exit]: { data: import('./terminal').TerminalExitEvent };
 }
 
+export interface AuthInvokeChannelMap {
+	[AuthChannels.getState]: { args: []; result: import('./auth_types').AuthState };
+	[AuthChannels.signIn]: {
+		args: [credentials: import('./auth_types').AuthCredentials];
+		result: import('./auth_types').AuthState;
+	};
+	[AuthChannels.signUp]: {
+		args: [input: import('./auth_types').SignUpInput];
+		result: import('./auth_types').AuthState;
+	};
+	[AuthChannels.resendConfirmation]: { args: [email: string]; result: void };
+	[AuthChannels.requestPasswordReset]: { args: [email: string]; result: void };
+	[AuthChannels.updatePassword]: {
+		args: [password: string];
+		result: import('./auth_types').AuthState;
+	};
+	[AuthChannels.signOut]: { args: []; result: import('./auth_types').AuthState };
+}
+
+export interface CloudInvokeChannelMap {
+	[CloudChannels.listSessions]: {
+		args: [];
+		result: import('./cloud_types').CloudChatSession[];
+	};
+	[CloudChannels.upsertSession]: {
+		args: [input: import('./cloud_types').CloudChatSessionInput];
+		result: import('./cloud_types').CloudChatSession;
+	};
+	[CloudChannels.deleteSession]: { args: [sessionId: string]; result: void };
+	[CloudChannels.listMessages]: {
+		args: [sessionId: string];
+		result: import('./cloud_types').CloudChatMessage[];
+	};
+	[CloudChannels.upsertMessage]: {
+		args: [input: import('./cloud_types').CloudChatMessageInput];
+		result: import('./cloud_types').CloudChatMessage;
+	};
+	[CloudChannels.uploadFile]: {
+		args: [input: import('./cloud_types').CloudFileUpload];
+		result: import('./cloud_types').CloudFile;
+	};
+	[CloudChannels.downloadFile]: { args: [fileId: string]; result: ArrayBuffer };
+	[CloudChannels.deleteFile]: { args: [fileId: string]; result: void };
+	[CloudChannels.watchSession]: { args: [sessionId: string]; result: void };
+	[CloudChannels.unwatchSession]: { args: [sessionId: string]; result: void };
+}
+
 export interface InvokeChannelMap
 	extends
 		AppInvokeChannelMap,
@@ -1033,7 +1082,9 @@ export interface InvokeChannelMap
 		TextInvokeChannelMap,
 		VideoInvokeChannelMap,
 		ExtensionsInvokeChannelMap,
-		TerminalInvokeChannelMap {}
+		TerminalInvokeChannelMap,
+		AuthInvokeChannelMap,
+		CloudInvokeChannelMap {}
 
 export interface SendChannelMap extends WindowSendChannelMap, TerminalSendChannelMap {}
 
@@ -1051,6 +1102,14 @@ export interface StorageEventChannelMap {
 	};
 }
 
+export interface AuthEventChannelMap {
+	[AuthChannels.stateChanged]: { data: import('./auth_types').AuthState };
+}
+
+export interface CloudEventChannelMap {
+	[CloudChannels.sessionChanged]: { data: import('./cloud_types').CloudChange };
+}
+
 export interface EventChannelMap
 	extends
 		AppEventChannelMap,
@@ -1061,4 +1120,6 @@ export interface EventChannelMap
 		WindowEventChannelMap,
 		RealtimeVoiceEventChannelMap,
 		SttEventChannelMap,
-		TerminalEventChannelMap {}
+		TerminalEventChannelMap,
+		AuthEventChannelMap,
+		CloudEventChannelMap {}

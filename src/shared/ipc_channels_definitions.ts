@@ -196,6 +196,31 @@ export const AppChannels = {
 	deleteExtensionStoreFile: 'app:extension-store:file:delete',
 } as const;
 
+export const AuthChannels = {
+	getState: 'auth:state:get',
+	signIn: 'auth:sign-in',
+	signUp: 'auth:sign-up',
+	resendConfirmation: 'auth:confirmation:resend',
+	requestPasswordReset: 'auth:password:reset-request',
+	updatePassword: 'auth:password:update',
+	signOut: 'auth:sign-out',
+	stateChanged: 'auth:state:changed',
+} as const;
+
+export const CloudChannels = {
+	listSessions: 'cloud:sessions:list',
+	upsertSession: 'cloud:sessions:upsert',
+	deleteSession: 'cloud:sessions:delete',
+	listMessages: 'cloud:messages:list',
+	upsertMessage: 'cloud:messages:upsert',
+	uploadFile: 'cloud:files:upload',
+	downloadFile: 'cloud:files:download',
+	deleteFile: 'cloud:files:delete',
+	watchSession: 'cloud:session:watch',
+	unwatchSession: 'cloud:session:unwatch',
+	sessionChanged: 'cloud:session:changed',
+} as const;
+
 export const EmbeddingChannels = {
 	createEmbedding: 'embedding:create-embedding',
 	getModelId: 'embedding:get-model-id',

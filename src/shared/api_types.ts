@@ -117,6 +117,8 @@ import type {
 export type { DataApi } from './data_types';
 export type { A2aApi } from './a2a_types';
 export type { TerminalApi } from './terminal';
+export type { AuthApi } from './auth_types';
+export type { CloudApi } from './cloud_types';
 
 export interface WindowApi {
 	minimize: () => void;

@@ -14,3 +14,5 @@ export * from './stt_types';
 export * from './stt_transcription';
 export * from './wiki_types';
 export * from './data_types';
+export * from './auth_types';
+export * from './cloud_types';
