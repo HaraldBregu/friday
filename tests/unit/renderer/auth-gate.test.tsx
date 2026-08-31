@@ -64,7 +64,7 @@ it('presents start before a signed-out protected route', async () => {
 	renderGate('/home');
 	expect(await screen.findByRole('heading', { name: 'Your desktop AI copilot' })).toBeInTheDocument();
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
+	expect(await screen.findByText('Welcome back')).toBeInTheDocument();
 });
 
 it('redirects a signed-out user from start to auth', async () => {
@@ -72,7 +72,7 @@ it('redirects a signed-out user from start to auth', async () => {
 	window.auth = authApi({ status: 'signedOut', persistence: 'memory' });
 	renderGate('/start');
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
+	expect(await screen.findByText('Welcome back')).toBeInTheDocument();
 });
 
 it('shows the start page while the session is loading', () => {
@@ -136,7 +136,7 @@ it('ignores a previously persisted local-only preference', async () => {
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderGate('/home');
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await waitFor(() => expect(screen.getByText('/auth')).toBeInTheDocument());
+	expect(await screen.findByText('Welcome back')).toBeInTheDocument();
 });
 
 it('sends skipped sign-in to setup when configuration is incomplete', async () => {
