@@ -46,7 +46,7 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 	}, [identity]);
 
 	useEffect(() => {
-		if ((!started && state.status !== 'recovery') || !identity) {
+		if ((!started && state.status !== 'signedIn') || !identity) {
 			requestId.current += 1;
 			return;
 		}
@@ -70,8 +70,8 @@ export function OnboardingProvider({ children }: { readonly children: ReactNode 
 
 	let phase: OnboardingPhase;
 	if (state.status === 'recovery') phase = 'auth';
-	else if (!started) phase = 'landing';
 	else if (state.status === 'loading' && !localOnly) phase = 'checking';
+	else if (!started && state.status !== 'signedIn') phase = 'landing';
 	else if (!identity) phase = 'auth';
 	else if (configurationStatus === 'complete') phase = 'ready';
 	else if (configurationStatus === 'incomplete') phase = 'setup';
