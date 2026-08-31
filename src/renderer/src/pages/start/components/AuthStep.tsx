@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 type Mode = 'signIn' | 'signUp' | 'forgot';
 
-export function AuthStep({ onSkip }: { readonly onSkip: () => void }): React.JSX.Element {
+export function AuthStep(): React.JSX.Element {
 	const { state } = useAuth();
 	const [mode, setMode] = useState<Mode>('signIn');
 	const [email, setEmail] = useState('');
@@ -72,16 +72,7 @@ export function AuthStep({ onSkip }: { readonly onSkip: () => void }): React.JSX
 
 	if (state.status === 'unconfigured') {
 		return (
-			<div className="relative flex min-h-full items-center justify-center px-6 py-8">
-				<Button
-					type="button"
-					variant="link"
-					size="sm"
-					className="absolute right-4 top-3 z-10 text-muted-foreground"
-					onClick={onSkip}
-				>
-					Skip for now
-				</Button>
+			<div className="flex min-h-full items-center justify-center px-6 py-8">
 				<Card className="w-full max-w-sm">
 					<CardHeader>
 						<h1 className="text-base font-medium leading-snug">Supabase is not configured</h1>
@@ -96,17 +87,7 @@ export function AuthStep({ onSkip }: { readonly onSkip: () => void }): React.JSX
 
 	if (showConfirmation) {
 		return (
-			<div className="relative flex min-h-full items-center justify-center px-6 py-8">
-				<Button
-					type="button"
-					variant="link"
-					size="sm"
-					className="absolute right-4 top-3 z-10 text-muted-foreground"
-					disabled={busy}
-					onClick={onSkip}
-				>
-					Skip for now
-				</Button>
+			<div className="flex min-h-full items-center justify-center px-6 py-8">
 				<Card className="w-full max-w-sm">
 					<CardHeader className="items-center text-center">
 						<div className="mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -157,19 +138,7 @@ export function AuthStep({ onSkip }: { readonly onSkip: () => void }): React.JSX
 	}
 
 	return (
-		<div className="relative flex min-h-full items-center justify-center px-6 py-8">
-			{!recovery ? (
-				<Button
-					type="button"
-					variant="link"
-					size="sm"
-					className="absolute right-4 top-3 z-10 text-muted-foreground"
-					disabled={busy}
-					onClick={onSkip}
-				>
-					Skip for now
-				</Button>
-			) : null}
+		<div className="flex min-h-full items-center justify-center px-6 py-8">
 			<div className="w-full max-w-sm">
 				<div className="mb-5 flex flex-col items-center text-center">
 					<div className="flex size-16 items-center justify-center rounded-2xl border border-border/70 bg-background shadow-sm">

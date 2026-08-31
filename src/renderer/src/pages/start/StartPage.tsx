@@ -152,7 +152,7 @@ const StartPage: React.FC = () => {
 
 	const content =
 		phase === 'auth' ? (
-			<AuthStep onSkip={skipSignIn} />
+			<AuthStep />
 		) : phase === 'setup' ? (
 			renderSetupStep()
 		) : (
@@ -174,9 +174,15 @@ const StartPage: React.FC = () => {
 			<footer className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-2 border-t border-border bg-card/60 px-3 py-2 sm:px-5">
 				<SetupStepProgress currentStep={currentStep} />
 				{phase === 'auth' && authState.status !== 'recovery' ? (
-					<Button type="button" variant="outline" size="xs" onClick={restart}>
-						Back
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button type="button" variant="outline" size="xs" onClick={restart}>
+							Back
+						</Button>
+						<Button type="button" size="sm" onClick={skipSignIn}>
+							Continue
+							<ArrowRight className="size-3.5" aria-hidden="true" />
+						</Button>
+					</div>
 				) : null}
 				{phase === 'setup' ? (
 					<div className="flex items-center gap-2">

@@ -41,7 +41,7 @@ it('submits email and password to sign in', async () => {
 	const user = userEvent.setup();
 	render(
 		<AuthProvider>
-			<AuthStep onSkip={jest.fn()} />
+			<AuthStep />
 		</AuthProvider>
 	);
 	await user.type(screen.getByLabelText('Email'), 'user@example.test');
@@ -59,7 +59,7 @@ it('creates an account and shows the confirmation state', async () => {
 	const user = userEvent.setup();
 	render(
 		<AuthProvider>
-			<AuthStep onSkip={jest.fn()} />
+			<AuthStep />
 		</AuthProvider>
 	);
 	await user.click(screen.getByRole('button', { name: 'New to Friday? Create an account' }));
@@ -76,15 +76,13 @@ it('creates an account and shows the confirmation state', async () => {
 	});
 });
 
-it('delegates skip to the onboarding owner', async () => {
-	const user = userEvent.setup();
-	const onSkip = jest.fn();
+it('keeps local-only continuation out of the account content', () => {
 	render(
 		<AuthProvider>
-			<AuthStep onSkip={onSkip} />
+			<AuthStep />
 		</AuthProvider>
 	);
 
-	await user.click(screen.getByRole('button', { name: 'Skip for now' }));
-	expect(onSkip).toHaveBeenCalledTimes(1);
+	expect(screen.queryByRole('button', { name: 'Skip for now' })).not.toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
 });

@@ -183,7 +183,7 @@ it('takes skipped sign-in to home when configuration is complete', async () => {
 	renderFlow('/start');
 
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
+	await user.click(await screen.findByRole('button', { name: 'Continue' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 });
 
@@ -193,7 +193,7 @@ it('takes skipped sign-in to setup in place when configuration is incomplete', a
 	renderFlow('/start');
 
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await user.click(await screen.findByRole('button', { name: 'Skip for now' }));
+	await user.click(await screen.findByRole('button', { name: 'Continue' }));
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	expect(localStorage.getItem('friday-auth-local-only')).toBeNull();
