@@ -1,24 +1,26 @@
 # Start Page Flow
 
 The start page is Friday's single entry point for first-run onboarding and incomplete assistant
-configuration. It should keep the user on `/start` until Friday has a stored assistant provider and
-model, then open `/home`.
+configuration. Visible onboarding should remain on `/start` until Friday has a stored assistant
+provider and model, then open `/home`. A restored signed-in user should be checked automatically
+and should not have to repeat Welcome or Account.
 
 ## Flow at a glance
 
 ```text
 Open Friday
-  -> Welcome
-  -> Account or local-only mode
-  -> Check assistant configuration
-       -> complete: Home
-       -> incomplete: Model API keys
-            -> Search Engine
-            -> Object Storage
-            -> Vector Databases
-            -> Assistant setup
-            -> verify configuration
-            -> Home
+  -> Restore authentication
+       -> signed in: check assistant configuration
+       -> signed out: Welcome -> Account or local-only mode -> check assistant configuration
+       -> password recovery: Account -> check assistant configuration
+  -> configuration complete: Home
+  -> configuration incomplete: Model API keys
+       -> Search Engine
+       -> Object Storage
+       -> Vector Databases
+       -> Assistant setup
+       -> verify configuration
+       -> Home
 ```
 
 The footer presents seven visible stages: **Welcome**, **Account**, **Model**, **Search**,
@@ -28,17 +30,16 @@ add another progress item.
 ## Entry and routing
 
 - `/`, `/auth`, `/setup`, and `/config` should resolve to `/start`.
-- An application route should redirect to `/start` while onboarding is incomplete.
+- An application route should show a neutral loading surface while readiness is checked, then
+  remain available when setup is complete or redirect to `/start` when setup is incomplete.
 - Every onboarding stage should remain on `/start`; changing a stage must not add browser history.
 - A ready user who opens an onboarding route should be redirected to `/home`.
-- While Friday checks readiness from an application route, it should show a neutral loading surface
-  instead of briefly rendering protected application content.
 
 ## Stage requirements
 
 | Stage    | Expected action                                    | Required to continue |
 | -------- | -------------------------------------------------- | -------------------- |
-| Welcome  | Start the onboarding flow                          | Yes                  |
+| Welcome  | Start the onboarding flow                          | For signed-out users |
 | Account  | Sign in, create an account, or continue local-only | No account required  |
 | Model    | Save an API key for a catalog model provider       | Yes                  |
 | Search   | Connect a web-search provider                      | No                   |
@@ -48,13 +49,13 @@ add another progress item.
 
 ### 1. Welcome
 
-The first stage should introduce Friday and provide one primary **Get started** action. While the
-authentication state is unresolved, that action should be disabled and labeled **Checking your
-session…**.
+For a signed-out user, the first stage should introduce Friday and provide one primary **Get
+started** action. While the authentication state is unresolved, that action should be disabled and
+labeled **Checking your session…**.
 
-Selecting **Get started** records that onboarding has started for the current renderer session. If
-the user is already signed in, Friday can skip Account and check the assistant configuration
-immediately.
+Selecting **Get started** records that onboarding has started for the current renderer session. A
+restored signed-in user should skip Welcome and Account, check the assistant configuration
+automatically, and go directly to Home or the Model stage.
 
 ### 2. Account
 

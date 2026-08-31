@@ -50,7 +50,8 @@ The first launch uses a single `/start` flow with seven visible stages: **Welcom
 **Model**, **Search**, **Storage**, **Database**, and **Models**. Account sign-in is optional; users
 can continue in local-only mode. After sign-in or local-only continuation, Friday checks for a
 stored Assistant provider and model. A complete configuration opens Home, while an incomplete one
-continues through setup.
+continues through setup. A restored signed-in user runs this check automatically and skips Welcome
+and Account.
 
 The Model stage requires at least one saved model-provider API key. Search, S3-compatible object
 storage, and vector database connections are optional. The final Models stage offers Assistant,
