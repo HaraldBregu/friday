@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react';
-import { Plus, Settings2 } from 'lucide-react';
+import { Plus, Settings2, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { SPLIT_ITEM_ACTIVE_CLASS, SPLIT_ITEM_CLASS } from '@/components/app/base/page';
@@ -7,6 +7,7 @@ import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/AuthContext';
 import { DEFAULT_CHAT_SESSION_ID, useChatSession } from '@/contexts/chat-session';
 import type { AgentSessionSummary } from '@/lib/compat';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ interface HomeSidebarProps {
 
 export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const { t } = useTranslation();
+	const { state: authState } = useAuth();
 	const { sessionId, setSessionId } = useChatSession();
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -66,6 +68,11 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	};
 
 	const currentSessionId = sessionId === DEFAULT_CHAT_SESSION_ID ? sessions[0]?.id : sessionId;
+	const authenticatedUser = authState.status === 'signedIn' ? authState.user : undefined;
+	const accountLabel =
+		authenticatedUser?.displayName?.trim() ||
+		authenticatedUser?.email.split('@')[0] ||
+		t('settings.title');
 
 	return (
 		<div data-slot="home-sidebar" className="flex h-full min-h-0 flex-col">
@@ -202,17 +209,21 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 				<div className="flex min-w-0 items-center gap-1">
 					<Link
 						to="/settings"
-						aria-label={t('settings.title')}
-						title={t('settings.title')}
+						aria-label={accountLabel}
+						title={accountLabel}
 						className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
 					>
 						<span
 							className="flex size-6 shrink-0 items-center justify-center rounded-full bg-orange-600 text-white"
 							aria-hidden="true"
 						>
-							<Settings2 className="size-3" strokeWidth={1.8} />
+							{authenticatedUser ? (
+								<User className="size-3" strokeWidth={1.8} />
+							) : (
+								<Settings2 className="size-3" strokeWidth={1.8} />
+							)}
 						</span>
-						<span className="min-w-0 truncate text-sm font-medium">{t('settings.title')}</span>
+						<span className="min-w-0 truncate text-sm font-medium">{accountLabel}</span>
 					</Link>
 				</div>
 			</footer>

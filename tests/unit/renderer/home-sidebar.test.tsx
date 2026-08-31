@@ -8,6 +8,13 @@ import {
 } from '../../../src/renderer/src/components/app/base/page';
 import { ChatSessionContext } from '../../../src/renderer/src/contexts/chat-session';
 import { HomeSidebar } from '../../../src/renderer/src/pages/home/Sidebar';
+import type { AuthState } from '../../../src/shared/auth_types';
+
+const mockUseAuth = jest.fn();
+
+jest.mock('../../../src/renderer/src/contexts/AuthContext', () => ({
+	useAuth: () => mockUseAuth(),
+}));
 
 jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
@@ -19,6 +26,12 @@ const deleteSession = jest.fn();
 const showContextMenu = jest.fn();
 
 beforeEach(() => {
+	mockUseAuth.mockReturnValue({
+		state: { status: 'signedOut', persistence: 'encrypted' },
+		localOnly: false,
+		skipSignIn: jest.fn(),
+		requireSignIn: jest.fn(),
+	});
 	window.localStorage.clear();
 	document.documentElement.style.removeProperty('--app-sidebar-width');
 	Object.defineProperty(window, 'PointerEvent', {
@@ -90,9 +103,54 @@ it('loads chat history, marks the latest default session, and switches sessions'
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
 	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute('href', '/settings');
 	expect(screen.getByText('settings.title')).toBeInTheDocument();
+	expect(screen.getByRole('link', { name: 'settings.title' }).querySelector('.lucide-settings-2'))
+		.toBeInTheDocument();
 	expect(
 		screen.queryByRole('button', { name: 'settings.modelServices.voiceName' })
 	).not.toBeInTheDocument();
+});
+
+it.each<[AuthState, string]>([
+	[
+		{
+			status: 'signedIn',
+			persistence: 'encrypted',
+			user: { id: 'user-1', email: 'ada@example.com', displayName: 'Ada Lovelace' },
+		},
+		'Ada Lovelace',
+	],
+	[
+		{
+			status: 'signedIn',
+			persistence: 'encrypted',
+			user: { id: 'user-2', email: 'grace@example.com' },
+		},
+		'grace',
+	],
+])('shows the authenticated user in the sidebar as %s', async (state, username) => {
+	listSessions.mockResolvedValue([]);
+	mockUseAuth.mockReturnValue({
+		state,
+		localOnly: false,
+		skipSignIn: jest.fn(),
+		requireSignIn: jest.fn(),
+	});
+
+	render(
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'home', setSessionId: jest.fn() }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
+	);
+
+	const accountLink = screen.getByRole('link', { name: username });
+	expect(accountLink).toHaveAttribute('href', '/settings');
+	expect(within(accountLink).getByText(username)).toBeInTheDocument();
+	expect(accountLink.querySelector('.lucide-user')).toBeInTheDocument();
+	await screen.findByText('settings.chatHistory.empty');
 });
 
 it('renames a chat from its context menu without item action buttons', async () => {
