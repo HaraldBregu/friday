@@ -34,6 +34,7 @@ function authApi(state: AuthState): AuthApi {
 }
 
 beforeEach(() => {
+	localStorage.clear();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 });
 
@@ -72,4 +73,15 @@ it('creates an account and shows the confirmation state', async () => {
 		email: 'new@example.test',
 		password: 'valid-password',
 	});
+});
+
+it('persists local-only mode when sign-in is skipped', async () => {
+	const user = userEvent.setup();
+	render(
+		<AuthProvider>
+			<AuthPage />
+		</AuthProvider>
+	);
+	await user.click(screen.getByRole('button', { name: 'Skip for now' }));
+	expect(localStorage.getItem('friday-auth-local-only')).toBe('true');
 });

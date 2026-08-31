@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 type Mode = 'signIn' | 'signUp' | 'forgot';
 
 const AuthPage: React.FC = () => {
-	const { state } = useAuth();
+	const { state, skipSignIn } = useAuth();
 	const [mode, setMode] = useState<Mode>('signIn');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -81,6 +81,14 @@ const AuthPage: React.FC = () => {
 							Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then restart Friday.
 						</CardDescription>
 					</CardHeader>
+					<CardContent>
+						<Button type="button" variant="outline" className="w-full" onClick={skipSignIn}>
+							Skip for now
+						</Button>
+						<p className="mt-2 text-center text-[10px] leading-4 text-muted-foreground">
+							Continue locally and sign in later from Account settings.
+						</p>
+					</CardContent>
 				</Card>
 			</main>
 		);
@@ -262,6 +270,16 @@ const AuthPage: React.FC = () => {
 							<p className="mt-3 text-center text-[10px] leading-4 text-muted-foreground">
 								Secure system storage is unavailable, so this session will not persist after restart.
 							</p>
+						) : null}
+						{!recovery ? (
+							<div className="mt-4 flex flex-col gap-2 border-t pt-4">
+								<Button type="button" variant="outline" disabled={busy} onClick={skipSignIn}>
+									Skip for now
+								</Button>
+								<p className="text-center text-[10px] leading-4 text-muted-foreground">
+									Continue locally and sign in later from Account settings.
+								</p>
+							</div>
 						) : null}
 					</CardContent>
 				</Card>

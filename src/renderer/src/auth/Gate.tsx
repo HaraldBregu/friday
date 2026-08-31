@@ -6,27 +6,28 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isSetupComplete } from './setup';
 
 export function StartupGate({ children }: { readonly children: ReactNode }): React.JSX.Element {
-	const { state } = useAuth();
+	const { state, localOnly } = useAuth();
 	const location = useLocation();
 	const [setup, setSetup] = useState<{ userId: string; complete: boolean }>();
-	const setupComplete = setup && setup.userId === state.user?.id ? setup.complete : undefined;
+	const userId = state.status === 'signedIn' ? state.user?.id : localOnly ? 'local' : undefined;
+	const setupComplete = setup && setup.userId === userId ? setup.complete : undefined;
 
 	useEffect(() => {
-		if (state.status !== 'signedIn' || !state.user) return;
+		if (!userId) return;
 		let active = true;
 		void isSetupComplete()
 			.then((complete) => {
-				if (active) setSetup({ userId: state.user!.id, complete });
+				if (active) setSetup({ userId, complete });
 			})
 			.catch(() => {
-				if (active) setSetup({ userId: state.user!.id, complete: false });
+				if (active) setSetup({ userId, complete: false });
 			});
 		return () => {
 			active = false;
 		};
-	}, [state.status, state.user]);
+	}, [userId]);
 
-	if (state.status === 'loading' || (state.status === 'signedIn' && setupComplete === undefined)) {
+	if ((state.status === 'loading' && !localOnly) || (userId && setupComplete === undefined)) {
 		return (
 			<main className="app-translucent-window flex h-screen items-center justify-center bg-background text-foreground">
 				<div className="flex flex-col items-center gap-3" role="status" aria-live="polite">
@@ -40,7 +41,7 @@ export function StartupGate({ children }: { readonly children: ReactNode }): Rea
 		);
 	}
 
-	if (state.status !== 'signedIn') {
+	if (state.status !== 'signedIn' && !localOnly) {
 		return location.pathname === '/auth' ? <>{children}</> : <Navigate to="/auth" replace />;
 	}
 

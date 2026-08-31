@@ -45,6 +45,10 @@ function renderGate(path: string): void {
 	);
 }
 
+beforeEach(() => {
+	localStorage.clear();
+});
+
 it('redirects a signed-out protected route to auth', async () => {
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderGate('/home');
@@ -62,5 +66,16 @@ it('redirects a configured signed-in user from auth to home', async () => {
 		getModelId: jest.fn(async () => 'model'),
 	} as never;
 	renderGate('/auth');
+	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
+});
+
+it('allows a signed-out user to continue in local-only mode', async () => {
+	localStorage.setItem('friday-auth-local-only', 'true');
+	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
+	window.agent = {
+		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
+		getModelId: jest.fn(async () => 'model'),
+	} as never;
+	renderGate('/home');
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
