@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOnboarding } from '@/contexts/useOnboarding';
+import { cn } from '@/lib/utils';
 import { SetupModelsStep } from '@/pages/setup/components/SetupModelsStep';
 import { SetupProviderStep } from '@/pages/setup/components/SetupProviderStep';
 import { SetupStepProgress } from '@/pages/setup/components/SetupStepProgress';
@@ -161,7 +162,12 @@ const StartPage: React.FC = () => {
 
 	return (
 		<main className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground">
-			<section className="min-h-0 flex-1 overflow-y-auto bg-muted/40 px-4 sm:px-6">
+			<section
+				className={cn(
+					'min-h-0 flex-1 overflow-y-auto px-4 sm:px-6',
+					phase === 'landing' || phase === 'checking' ? 'bg-background' : 'bg-muted/40'
+				)}
+			>
 				{content}
 				{phase === 'setup' && errorMessage ? (
 					<div className="mx-auto mb-4 flex max-w-2xl items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-destructive" role="alert">
