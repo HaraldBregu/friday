@@ -21,5 +21,6 @@ const render = (): void => {
 	);
 };
 
-void loadModels().then(render);
-window.app.onModelsChanged(() => void loadModels().then(render));
+render();
+void loadModels().then(render).catch(() => undefined);
+window.app.onModelsChanged(() => void loadModels().then(render).catch(() => undefined));

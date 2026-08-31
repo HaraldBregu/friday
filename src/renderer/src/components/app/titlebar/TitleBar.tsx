@@ -51,6 +51,7 @@ export const TitleBar = React.memo(function TitleBar({
 
 	const isHome = location.pathname === '/home';
 	const isStart = location.pathname === '/start';
+	const isAuth = location.pathname === '/auth';
 	const isSettings = location.pathname.startsWith('/settings');
 	const settingsLabel = t('settings.title', 'Settings');
 	const homeButtonLabel = t('titleBar.home', 'Home');
@@ -80,7 +81,7 @@ export const TitleBar = React.memo(function TitleBar({
 			<GradientSphere size={18} className="pointer-events-none" />
 			Friday
 		</Button>
-	) : !isStart ? (
+	) : !isStart && !isAuth ? (
 		<Button
 			type="button"
 			variant="ghost"
@@ -133,7 +134,7 @@ export const TitleBar = React.memo(function TitleBar({
 					)}
 					{!isMac && searchButton}
 					{!isMac && routeButton}
-					{!isHome && !isStart && !isSettings && (
+					{!isHome && !isStart && !isSettings && !isAuth && (
 						<Button
 							type="button"
 							variant="default"

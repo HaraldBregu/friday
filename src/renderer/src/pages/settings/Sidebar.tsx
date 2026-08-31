@@ -14,7 +14,7 @@ import { AGENTS } from '@/lib/compat';
 const SETTINGS_SIDEBAR_GROUPS = [
 	{
 		id: 'general',
-		items: SETTINGS_NAVIGATION.slice(0, 3),
+		items: SETTINGS_NAVIGATION.slice(0, 4),
 	},
 	{
 		id: 'assistant',
@@ -23,24 +23,24 @@ const SETTINGS_SIDEBAR_GROUPS = [
 			...SETTINGS_MODEL_SERVICE_ITEMS.filter(
 				(item) => item.id === AGENTS.assistant || item.id === AGENTS.coder
 			),
-			...SETTINGS_NAVIGATION.slice(12, 13),
-			...SETTINGS_NAVIGATION.slice(3, 4),
-			...SETTINGS_NAVIGATION.slice(8, 12),
-			...SETTINGS_NAVIGATION.slice(13, 15),
+			...SETTINGS_NAVIGATION.slice(13, 14),
+			...SETTINGS_NAVIGATION.slice(4, 5),
+			...SETTINGS_NAVIGATION.slice(9, 13),
+			...SETTINGS_NAVIGATION.slice(14, 16),
 		],
 	},
 	{
 		id: 'providers',
 		titleKey: 'settings.tabs.providers',
-		items: SETTINGS_NAVIGATION.slice(4, 8),
+		items: SETTINGS_NAVIGATION.slice(5, 9),
 	},
 	{
 		id: 'channels',
-		items: SETTINGS_NAVIGATION.slice(15, 16),
+		items: SETTINGS_NAVIGATION.slice(16, 17),
 	},
 	{
 		id: 'integrations',
-		items: SETTINGS_NAVIGATION.slice(16),
+		items: SETTINGS_NAVIGATION.slice(17),
 	},
 ] as const;
 

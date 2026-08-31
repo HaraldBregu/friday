@@ -26,8 +26,11 @@ import {
 import { cn } from './lib/utils';
 import HomePage from './pages/home/Page';
 import { usePageContext } from './components/app/base/page';
+import { StartupGate } from './auth/Gate';
 
+const AuthPage = lazy(() => import('./pages/auth/Page'));
 const StartPage = lazy(() => import('./pages/start/StartPage'));
+const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
 const SettingsOverviewPage = lazy(() => import('./pages/settings/pages/overview/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));
 const TasksPage = lazy(() => import('./pages/settings/pages/tasks/Page'));
@@ -176,13 +179,25 @@ function RootRouteComponent(): React.JSX.Element {
 
 const routes: RouteObject[] = [
 	{
-		element: <RootRouteComponent />,
+		element: (
+			<StartupGate>
+				<RootRouteComponent />
+			</StartupGate>
+		),
 		errorElement: (
 			<div className="app-translucent-window flex h-screen flex-col text-foreground">
 				<RouteErrorElement />
 			</div>
 		),
 		children: [
+			{
+				path: 'auth',
+				element: (
+					<RouteWrapper>
+						<AuthPage />
+					</RouteWrapper>
+				),
+			},
 			{
 				index: true,
 				element: <Navigate to="/start" replace />,
@@ -215,6 +230,14 @@ const routes: RouteObject[] = [
 					</RouteWrapper>
 				),
 				children: [
+					{
+						path: 'account',
+						element: (
+							<SettingsRouteWrapper>
+								<AccountPage />
+							</SettingsRouteWrapper>
+						),
+					},
 					{
 						index: true,
 						element: (

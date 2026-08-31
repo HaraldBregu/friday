@@ -5,3 +5,4 @@ export type {
 	SidebarState,
 	AppContextValue,
 } from './AppContext';
+export { AuthProvider, useAuth } from './AuthContext';

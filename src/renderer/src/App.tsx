@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { AppProvider } from './contexts';
+import { AppProvider, AuthProvider } from './contexts';
 import { ErrorBoundary } from './components/app/base/ErrorBoundary';
 import { initRecorderCapture } from './lib/recorder';
 import { router } from './router';
@@ -13,9 +13,11 @@ const App: React.FC = () => {
 	return (
 		<ErrorBoundary level="root">
 			<AppProvider>
-				<PageProvider>
-					<RouterProvider router={router} />
-				</PageProvider>
+				<AuthProvider>
+					<PageProvider>
+						<RouterProvider router={router} />
+					</PageProvider>
+				</AuthProvider>
 			</AppProvider>
 		</ErrorBoundary>
 	);

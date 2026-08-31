@@ -24,6 +24,7 @@ import {
 	Sparkles,
 	Video,
 	Volume2,
+	UserRound,
 	type LucideIcon,
 } from 'lucide-react';
 import { AGENTS, type AgentId } from '@/lib/compat';
@@ -342,6 +343,12 @@ export const SETTINGS_DETAIL_ITEMS: readonly SettingsDetailItem[] = [
 ] as const;
 
 export const SETTINGS_NAVIGATION: readonly SettingsNavigationItem[] = [
+	{
+		path: '/settings/account',
+		labelKey: 'settings.tabs.account',
+		descriptionKey: 'settings.overview.descriptions.account',
+		icon: UserRound,
+	},
 	{
 		path: '/settings/general',
 		labelKey: 'settings.tabs.general',

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useReducer } from 'react';
 import { AlertCircle, ArrowRight, LoaderCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,27 +19,8 @@ import { createInitialSetupState, setupReducer } from './state/reducer';
 
 const StartPage: React.FC = () => {
 	const navigate = useNavigate();
-	const [checkingSetup, setCheckingSetup] = useState(true);
 	const [state, dispatch] = useReducer(setupReducer, undefined, createInitialSetupState);
 	const { step, serviceStates, loadingModels, savingConfig, errorMessage } = state;
-
-	useEffect(() => {
-		let cancelled = false;
-		void MODEL_SERVICE_DEFINITIONS[0]
-			.getSelection()
-			.catch(() => undefined)
-			.then((selection) => {
-				if (cancelled) return;
-				if (selection) {
-					navigate('/home', { replace: true });
-				} else {
-					setCheckingSetup(false);
-				}
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [navigate]);
 
 	const { handleServiceChange, handleSaveModels } = useModelServices(state, dispatch);
 
@@ -169,10 +150,6 @@ const StartPage: React.FC = () => {
 		}
 
 		return <PresentationStep />;
-	}
-
-	if (checkingSetup) {
-		return <main className="h-full bg-background" />;
 	}
 
 	return (
