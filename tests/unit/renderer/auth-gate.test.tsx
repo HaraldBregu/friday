@@ -60,8 +60,8 @@ function authApi(initialState: AuthState, signedInState?: AuthState): AuthApi {
 	};
 }
 
-function renderFlow(path: string): void {
-	render(
+function renderFlow(path: string): ReturnType<typeof render> {
+	return render(
 		<AuthProvider>
 			<OnboardingProvider>
 				<MemoryRouter initialEntries={[path]}>
@@ -108,6 +108,7 @@ function renderFlow(path: string): void {
 
 beforeEach(() => {
 	localStorage.clear();
+	sessionStorage.clear();
 	window.agent = {
 		getProvider: jest.fn(async () => undefined),
 		getModelId: jest.fn(async () => ''),
@@ -126,6 +127,50 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 		expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	}
 );
+
+it.each(['/home', '/settings/account'])(
+	'preserves %s when a configured signed-in session is refreshed',
+	async (path) => {
+		window.auth = authApi({
+			status: 'signedIn',
+			persistence: 'encrypted',
+			user: { id: 'user-id', email: 'user@example.test' },
+		});
+		window.agent = {
+			getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
+			getModelId: jest.fn(async () => 'model'),
+		} as never;
+		renderFlow(path);
+
+		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
+		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
+		expect(
+			screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
+		).not.toBeInTheDocument();
+	}
+);
+
+it('preserves home when a skipped local-only session is refreshed', async () => {
+	const user = userEvent.setup();
+	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
+	window.agent = {
+		getProvider: jest.fn(async () => ({ id: 'provider' }) as never),
+		getModelId: jest.fn(async () => 'model'),
+	} as never;
+	const firstRender = renderFlow('/start');
+
+	await user.click(await screen.findByRole('button', { name: 'Get started' }));
+	await user.click(await screen.findByRole('button', { name: 'Skip and continue' }));
+	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
+	firstRender.unmount();
+
+	renderFlow('/home');
+	await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalledTimes(2));
+	expect(screen.getByLabelText('Current route')).toHaveTextContent('/home');
+	expect(
+		screen.queryByRole('heading', { name: 'Your desktop AI copilot' })
+	).not.toBeInTheDocument();
+});
 
 it('moves from landing to auth and back without changing routes', async () => {
 	const user = userEvent.setup();
