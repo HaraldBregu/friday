@@ -12,8 +12,6 @@ import type { AuthState } from '../../../shared/auth_types';
 interface AuthContextValue {
 	state: AuthState;
 	localOnly: boolean;
-	started: boolean;
-	start: () => void;
 	skipSignIn: () => void;
 	requireSignIn: () => void;
 }
@@ -24,7 +22,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const [state, setState] = useState<AuthState>(initialState);
 	const [localOnly, setLocalOnly] = useState(false);
-	const [started, setStarted] = useState(false);
 	const applyState = useCallback((next: AuthState): void => {
 		setState(next);
 		if (next.status === 'signedIn' || next.status === 'recovery') {
@@ -33,9 +30,6 @@ export function AuthProvider({ children }: { readonly children: ReactNode }): Re
 	}, []);
 	const skipSignIn = useCallback((): void => {
 		setLocalOnly(true);
-	}, []);
-	const start = useCallback((): void => {
-		setStarted(true);
 	}, []);
 	const requireSignIn = useCallback((): void => {
 		setLocalOnly(false);
@@ -61,8 +55,8 @@ export function AuthProvider({ children }: { readonly children: ReactNode }): Re
 	}, [applyState]);
 
 	const value = useMemo(
-		() => ({ state, localOnly, started, start, skipSignIn, requireSignIn }),
-		[state, localOnly, started, start, skipSignIn, requireSignIn]
+		() => ({ state, localOnly, skipSignIn, requireSignIn }),
+		[state, localOnly, skipSignIn, requireSignIn]
 	);
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

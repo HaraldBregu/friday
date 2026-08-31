@@ -6,3 +6,6 @@ export type {
 	AppContextValue,
 } from './AppContext';
 export { AuthProvider, useAuth } from './AuthContext';
+export { OnboardingProvider } from './OnboardingProvider';
+export { useOnboarding } from './useOnboarding';
+export type { OnboardingContextValue, OnboardingPhase } from './onboarding';
