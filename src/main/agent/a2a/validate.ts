@@ -1,10 +1,10 @@
 import type { A2aAgent } from '../../../shared/a2a_types';
 
 export function validateA2aAuthentication(
-	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader'>,
+	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader' | 'clientId'>,
 	url: string
 ): void {
-	if (!['none', 'bearer', 'api-key'].includes(authentication.authType)) {
+	if (!['none', 'bearer', 'api-key', 'private-key-jwt'].includes(authentication.authType)) {
 		throw new Error('Invalid stored A2A authentication type.');
 	}
 	if (authentication.authType === 'none') {
@@ -12,6 +12,9 @@ export function validateA2aAuthentication(
 		return;
 	}
 	if (!authentication.credential) throw new Error('A2A authentication credential is unavailable.');
+	if (authentication.authType === 'private-key-jwt' && !authentication.clientId) {
+		throw new Error('A2A OAuth client ID is unavailable.');
+	}
 	let target: URL;
 	try {
 		target = new URL(url);
