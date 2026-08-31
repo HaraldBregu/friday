@@ -79,3 +79,14 @@ it('allows a signed-out user to continue in local-only mode', async () => {
 	renderGate('/home');
 	await waitFor(() => expect(screen.getByText('/home')).toBeInTheDocument());
 });
+
+it('sends local-only users to setup when configuration is incomplete', async () => {
+	localStorage.setItem('friday-auth-local-only', 'true');
+	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
+	window.agent = {
+		getProvider: jest.fn(async () => undefined),
+		getModelId: jest.fn(async () => ''),
+	} as never;
+	renderGate('/auth');
+	await waitFor(() => expect(screen.getByText('/start')).toBeInTheDocument());
+});
