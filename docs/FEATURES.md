@@ -314,7 +314,11 @@ Friday persists cron schedule records with:
 - A separate provider and model selection for scheduled work.
 - Startup reconciliation that reloads and reschedules persisted records.
 
-The Tasks settings screen selects the task provider/model and lists each schedule's name, prompt or message, cron expression, and enabled state. Schedule creation and management are driven through the agent and slash commands rather than direct Settings forms.
+The Tasks settings screen selects the task provider/model and lists each schedule's name, prompt or
+message, cron expression, and enabled state. Task details expose metadata, **Run now**, confirmed
+deletion, and, for agent tasks, enabled state and a tool allowlist. Creating a task or editing its
+name, schedule, prompt, action type, or effort remains agent-driven rather than a direct Settings
+form.
 
 Scheduled agent actions run as background agents with the full tool catalog by default. A non-empty persisted tool allowlist narrows the tools available to that schedule; a blank allowlist keeps the full catalog.
 
@@ -449,16 +453,12 @@ Media can be generated from the dedicated Settings studios or by agent tools dur
 
 The audio catalog presents four providers, but only ElevenLabs currently has an executable adapter.
 
-### Unified media library
+### Media output in Settings
 
-The Library settings screen lists agent-generated images, videos, and audio newest first in a grid:
-
-- Images appear as thumbnails.
-- Videos and audio are playable.
-- Each item shows its filename and creation date.
-- Right-click opens the type-specific native file menu.
-
-The library currently has no search, filter, refresh, or delete toolbar.
+There is no unified image, video, and audio Library route in Settings. Image and Video service
+pages show the result of the current generation request. The Audio service page additionally lists
+saved generated audio with its filename and creation date, provides playback, and opens the native
+audio file menu on right-click. It has no search, filter, refresh, or delete toolbar.
 
 ## 5. Messaging channels
 
@@ -506,13 +506,22 @@ The Channels screen configures both adapters with enable state, token, DM policy
 
 ### Settings navigation
 
-- The Settings overview groups pages as: **General** (General, System, Cloud), **Primary** (Assistant, Skills, RAG, Wiki, Tasks, MCP), **Providers** (Models, Search, Databases, Storage, Channels), and **Integrations** (Extensions).
-- The **Cloud** page contains **Object Storage Configuration** for S3-compatible providers.
+See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and page behavior.
+
+- The Settings overview groups pages as: **General** (General, System, Cloud), **Assistant**
+  (Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search, Databases,
+  Storage), **Channels**, and **Integrations** (A2A, Extensions).
+- Account, Bots, RAG, LLM Wiki, Health, and Permissions are available in the sidebar but omitted
+  from the shorter overview. Dedicated model-service and API-key pages are available through
+  Assistant, route search, or direct links.
+- The **Cloud** page selects a saved S3-compatible provider and configures folders, schedules,
+  backup, and restore. Provider credentials are managed under **Providers → Storage**.
 - Deep pages use breadcrumbs.
 - `Cmd/Ctrl+F` opens a route and setting search palette.
 - Unknown routes show a 404 recovery view; route failures show retry, restart, or Home actions.
 - Page transitions respect the operating system's reduced-motion preference.
-- The Search settings page configures the same Brave/Tavily engine and API key used by the agent's web search tool; it is not a separate local-search feature.
+- **Providers → Search** stores Brave or Tavily credentials, while Assistant selects the active
+  configured engine used by the agent's web search tool. It is not a separate local-search feature.
 
 ### Extensions
 
@@ -521,14 +530,19 @@ Extensions are standalone mini-app windows:
 - Each extension lives in its own folder under the app's local data directory with a `manifest.json` declaring a title, description, and entry point.
 - The application menu and a `window.extensions` API can list installed extensions and open each one in its own `BrowserWindow`.
 - The main process watches extension folders and supports hot-reload.
-- The Extensions settings page lists installed extensions with title, description, and category, but has no install, remove, or enable/disable control yet.
+- The Extensions settings page opens the extensions folder, refreshes discovery, imports extension
+  packages, shows list/detail metadata, opens an extension, and deletes it from the list.
 
-**Partial:** the extension-loading backend is fully implemented; the Settings UI is view-only.
+**Partial:** the extension-loading backend and import/removal UI are implemented, but Settings has
+no enable/disable control.
 
 ### Cloud storage sync
 
-- The Storage settings page configures S3-compatible remote storage: endpoint, region, access key, secret key, bucket, path style, selected local paths, and a sync interval, so chosen local folders back up to a bucket on a schedule.
-- A Database entry appears in Settings navigation as "coming soon." It has no page, route, or backend service yet.
+- **Providers → Storage** configures S3-compatible remote providers: endpoint, region, access key,
+  secret key, bucket, and path style. **Cloud** selects a saved profile, local paths, and a sync
+  interval so chosen folders back up to the bucket on a schedule.
+- **Providers → Databases** connects cataloged vector-database providers. Assistant RAG then
+  selects the saved database, embedding model, index, and source folders.
 
 ### Application preferences
 
@@ -627,4 +641,8 @@ The main implementation areas behind this reference are:
 - [Desktop application services](../src/main/app/)
 - [Security policy](../SECURITY.md)
 
-Feature claims in this document intentionally exclude unmounted demo components, legacy translation strings without a current route, the disabled tray "Apps" placeholder, inactive browser-style navigation controls, the `documentReader` and `embedding` service identifiers (reserved names with no Settings surface or backend consumer), the "coming soon" Database settings entry, and package manifest entries that do not have a corresponding current implementation.
+Feature claims in this document intentionally exclude unmounted demo components, legacy translation
+strings without a current route, the disabled tray "Apps" placeholder, inactive browser-style
+navigation controls, the `documentReader` service identifier (a reserved name with no Settings
+surface or backend consumer), and package manifest entries that do not have a corresponding current
+implementation.

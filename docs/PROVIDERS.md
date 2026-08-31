@@ -23,12 +23,16 @@ A manifest is not proof that a service is executable. The provider-specific fact
 
 ## Configure a provider
 
-1. Open **Settings → Providers → API Keys** and save the key for each model provider you plan to
-   use.
+See [Settings UI](ui/SETTINGS.md) for the complete Settings navigation and persistence behavior.
+
+1. Open **Settings → Providers → Models** and connect each model provider you plan to use. The
+   searchable **API Keys** deep page can edit the same model-provider credentials.
 2. Choose the provider and model on the relevant Assistant, RAG, Voice, Transcription, Image,
    Video, or Audio settings page.
-3. Configure Brave or Tavily under **Settings → Providers → Search**, Pinecone under the RAG
-   settings, and object storage under **Settings → Providers → Storage**.
+3. Configure Brave or Tavily under **Settings → Providers → Search**. Connect Pinecone under
+   **Settings → Providers → Databases**, then select its database and index under
+   **Settings → Assistant → RAG**. Configure object storage under **Settings → Providers →
+   Storage**, then select folders and sync behavior under **Settings → Cloud**.
 4. Run the test offered by the settings page, when present, before relying on the provider in an
    agent run.
 
@@ -194,8 +198,9 @@ manifest supplies the provider and model entry.
 ## Custom and plugin providers
 
 Friday merges bundled manifests with provider folders from its application-data `providers`
-directory. A local provider with the same normalized ID overrides the bundled manifest. Settings
-can open this directory or import a provider folder, and the catalog watches it for changes.
+directory. A local provider with the same normalized ID overrides the bundled manifest, and the
+catalog watches the directory for changes. The current Settings UI does not open this directory or
+import provider folders.
 
 Provider plugins use the same folder shape. See [Friday plugins](PLUGINS.md) for the complete plugin
 layout.

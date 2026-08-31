@@ -4,7 +4,7 @@ Friday's LLM Wiki is a persistent knowledge-compilation layer inside the existin
 
 ## Enable and configure the wiki
 
-Open **Settings → Wiki** and configure:
+Open **Settings → Assistant → LLM Wiki** and configure:
 
 - a text-model provider and model;
 - a raw source folder;

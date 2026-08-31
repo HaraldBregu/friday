@@ -30,7 +30,7 @@ Home should use a split layout with a session sidebar and a chat workspace below
 title bar.
 
 - The title-bar area should provide the sidebar toggle, global route/settings search, and access to
-  Settings.
+  [Settings](SETTINGS.md).
 - On desktop, the sidebar should be collapsible and resizable by pointer or keyboard. Its saved
   width should be restored from local storage.
 - On mobile, the same sidebar should open in a left-side sheet.
@@ -160,7 +160,7 @@ readable summary in the transcript.
 
 ## Sidebar and sessions
 
-The sidebar should contain **New chat**, chat history, and a Settings link.
+The sidebar should contain **New chat**, chat history, and a [Settings](SETTINGS.md) link.
 
 - Persist the selected session ID in local storage.
 - Poll session summaries every 1.5 seconds and refresh after session, message, or run changes.

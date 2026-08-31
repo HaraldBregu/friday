@@ -153,8 +153,9 @@ Task details should show the schedule metadata and provide:
 Task creation and cron editing are not direct Settings forms; they remain agent-driven.
 
 Health should configure its provider and model, interval, output target, direct-message policy,
-active date range, and `HEALTH.md` checklist. These values should be saved together. Off, one-minute,
-30-minute, and one-hour interval choices are available.
+active date range, and `HEALTH.md` checklist. Model changes save immediately; the remaining values
+and checklist use the page's Save action. Off, one-minute, 30-minute, and one-hour interval choices
+are available.
 
 ## Providers and model services
 
@@ -234,8 +235,8 @@ compatibility, allowed tools, resources, loaded instructions, and diagnostics. I
 download and confirmed deletion.
 
 Extensions should open the extensions folder, refresh discovery, import extensions, and show each
-extension's category and detail metadata. The list should allow confirmed deletion; the detail page
-should open the extension in its own window.
+extension's category and detail metadata. The list should allow deletion and surface a failed delete;
+the detail page should open the extension in its own window.
 
 Extensions do not currently expose enable/disable controls in Settings.
 
@@ -297,7 +298,12 @@ required. Filesystem policy should:
   a saved-output library.
 - Data-control **Purge** does not show a renderer confirmation dialog; it immediately performs the
   backend preview-token and purge sequence.
+- Permissions **Reset** and extension deletion are immediate and do not request confirmation.
 - A2A deletion has no confirmation or inline failure handling.
+- Ordinary Settings links do not close the mobile sidebar sheet after navigation; **Return to
+  Chat** does.
+- Some optimistic application, assistant-option, channel, and folder actions do not surface a
+  failure or restore the prior value.
 - Some Account, MCP, A2A, and provider copy remains hardcoded in English while most Settings copy
   uses the translation catalogs.
 
