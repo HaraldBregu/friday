@@ -3,8 +3,8 @@
   "providerName": "Supabase",
   "apiKeyUrl": "https://supabase.com/dashboard/project/_/settings/storage",
   "images_url": "/images",
-  "icon_dark_url": "/images/fallback_lobehub/supabase-color.png",
-  "icon_light_url": "/images/fallback_lobehub/supabase-color.png",
+  "icon_dark_url": "/images/fallback_lobehub/png_dark/supabase-color.png",
+  "icon_light_url": "/images/fallback_lobehub/png_light/supabase-color.png",
   "services": [
     {
       "id": "object-storage",
