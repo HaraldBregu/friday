@@ -34,7 +34,6 @@ export function ProviderAvatar({
 						providerId === 'reka' ||
 						providerId === 'tavily') &&
 						'p-0',
-					providerId === 'cloudflare' && 'p-0.5',
 					className
 				)}
 			>
