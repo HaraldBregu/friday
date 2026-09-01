@@ -68,9 +68,10 @@ export class SupabaseProviderCloud implements ProviderCloudPort {
 	}
 
 	async updateVault(vaultId: string, envelope: ProviderKeyEnvelope): Promise<void> {
+		const { key_version: _keyVersion, ...rewrappedKey } = this.envelope(envelope);
 		const { error } = await this.client()
 			.from('provider_vaults')
-			.update(this.envelope(envelope))
+			.update(rewrappedKey)
 			.eq('vault_id', vaultId);
 		if (error) throw publicCloudError(error);
 	}
