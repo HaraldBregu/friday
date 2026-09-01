@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { isFriday, win } from '@friday/sdk';
 
 import { Configuration } from '@/components/configuration';
@@ -25,23 +25,35 @@ export default function App() {
 				? `Coder · ${coder.activeProject?.name ?? 'Agent instructions'}`
 				: [coder.activeProject?.name, activeSession?.title].filter(Boolean).join(' · ') || 'Coder';
 
-	useLayoutEffect(() => {
+	const syncTitlebar = useCallback((open: boolean): void => {
 		if (!isFriday()) return;
 		win.setTitlebarOptions({
 			title,
 			leftButtons: [
 				{
 					id: 'toggle-sidebar',
-					label: coder.leftOpen ? 'Collapse project navigation' : 'Expand project navigation',
+					label: open ? 'Collapse project navigation' : 'Expand project navigation',
 					icon: 'panel-left',
-					expanded: coder.leftOpen,
+					expanded: open,
 				},
 			],
 			rightButtons: [],
-			sidebarOpen: coder.leftOpen,
+			sidebarOpen: open,
 			sidebarWidth: 288,
 		});
-	}, [coder.leftOpen, title]);
+	}, [title]);
+
+	const setSidebarVisibility = useCallback(
+		(open: boolean): void => {
+			syncTitlebar(open);
+			coder.setLeftOpen(open);
+		},
+		[coder.setLeftOpen, syncTitlebar]
+	);
+
+	useLayoutEffect(() => {
+		syncTitlebar(coder.leftOpen);
+	}, [coder.leftOpen, syncTitlebar]);
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -51,9 +63,9 @@ export default function App() {
 	useEffect(() => {
 		if (!isFriday()) return;
 		return win.onTitlebarButtonClick((buttonId) => {
-			if (buttonId === 'toggle-sidebar') coder.setLeftOpen((open) => !open);
+			if (buttonId === 'toggle-sidebar') setSidebarVisibility(!coder.leftOpen);
 		});
-	}, [coder.setLeftOpen]);
+	}, [coder.leftOpen, setSidebarVisibility]);
 
 	const openPage = (nextPage: 'workspace' | 'configuration' | 'instructions'): boolean => {
 		if (nextPage !== 'instructions' && !canLeaveInstructions(page, instructionsDirty)) {
@@ -66,7 +78,7 @@ export default function App() {
 
 	return (
 		<TooltipProvider>
-			<SidebarProvider open={coder.leftOpen} onOpenChange={coder.setLeftOpen}>
+			<SidebarProvider open={coder.leftOpen} onOpenChange={setSidebarVisibility}>
 				<main className="flex h-full min-h-0 w-full bg-background text-foreground">
 					<Sidebar aria-label="Coder workspaces and sessions">
 						<ProjectSidebar

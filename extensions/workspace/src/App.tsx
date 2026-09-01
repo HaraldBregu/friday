@@ -144,23 +144,35 @@ export default function App() {
 		}
 	}, [theme]);
 
-	useLayoutEffect(() => {
+	const syncTitlebar = useCallback((open: boolean, width: number): void => {
 		if (!isFriday()) return;
 		win.setTitlebarOptions({
 			title: 'Workspace',
 			leftButtons: [
 				{
 					id: 'toggle-sidebar',
-					label: sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar',
+					label: open ? 'Collapse sidebar' : 'Expand sidebar',
 					icon: 'panel-left',
-					expanded: sidebarOpen,
+					expanded: open,
 				},
 			],
 			rightButtons: [],
-			sidebarOpen,
-			sidebarWidth,
+			sidebarOpen: open,
+			sidebarWidth: width,
 		});
-	}, [sidebarOpen, sidebarWidth]);
+	}, []);
+
+	const setSidebarVisibility = useCallback(
+		(open: boolean): void => {
+			syncTitlebar(open, sidebarWidth);
+			setSidebarOpen(open);
+		},
+		[sidebarWidth, syncTitlebar]
+	);
+
+	useLayoutEffect(() => {
+		syncTitlebar(sidebarOpen, sidebarWidth);
+	}, [sidebarOpen, sidebarWidth, syncTitlebar]);
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -170,9 +182,9 @@ export default function App() {
 	useEffect(() => {
 		if (!isFriday()) return;
 		return win.onTitlebarButtonClick((buttonId) => {
-			if (buttonId === 'toggle-sidebar') setSidebarOpen((open) => !open);
+			if (buttonId === 'toggle-sidebar') setSidebarVisibility(!sidebarOpen);
 		});
-	}, []);
+	}, [setSidebarVisibility, sidebarOpen]);
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -623,7 +635,7 @@ export default function App() {
 		<TooltipProvider delayDuration={400}>
 			<SidebarProvider
 				className="flex h-dvh min-h-[520px] overflow-hidden bg-background text-foreground"
-				onOpenChange={setSidebarOpen}
+				onOpenChange={setSidebarVisibility}
 				open={sidebarOpen}
 				onContextMenu={(event) => {
 					showNativeContextMenu(
