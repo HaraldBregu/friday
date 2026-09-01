@@ -39,13 +39,13 @@ The visible sidebar is grouped as follows:
 | ------------ | ------------------------------------------------------------------------------------------------- |
 | General      | Account, General, System, Cloud                                                                   |
 | Assistant    | Assistant, Coder, Skills, Background tasks, MCP servers, Bots, RAG, LLM Wiki, Health, Permissions |
-| Providers    | Models, Search engines, Databases                                                                 |
+| Providers    | Models, Search engines                                                                            |
 | Channels     | Channels                                                                                          |
 | Integrations | A2A agents, Extensions                                                                            |
 
 The `/settings` overview is intentionally shorter than the sidebar. It links to General, System,
-Cloud, Assistant, Coder, Skills, Background tasks, MCP servers, Models, Search engines, Databases,
-Channels, A2A agents, and Extensions. Account, Bots, RAG, LLM Wiki, Health, and
+Cloud, Assistant, Coder, Skills, Background tasks, MCP servers, Models, Search engines, Channels,
+A2A agents, and Extensions. Account, Bots, RAG, LLM Wiki, Health, and
 Permissions remain available from the sidebar or route search.
 
 ## Route search and deep pages

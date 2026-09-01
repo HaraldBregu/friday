@@ -509,7 +509,7 @@ The Channels screen configures both adapters with enable state, token, DM policy
 See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and page behavior.
 
 - The Settings overview groups pages as: **General** (General, System, Cloud), **Assistant**
-  (Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search, Databases),
+	(Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search),
   **Channels**, and **Integrations** (A2A, Extensions).
 - Account, Bots, RAG, LLM Wiki, Health, and Permissions are available in the sidebar but omitted
   from the shorter overview. Dedicated model-service and API-key pages are available through
