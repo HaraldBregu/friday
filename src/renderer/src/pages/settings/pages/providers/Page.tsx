@@ -13,7 +13,6 @@ import type { McpData } from '@shared/mcp_types';
 import { mcps } from '@/lib/providers';
 import {
 	actionableBotCatalog,
-	actionableDatabaseCatalog,
 	actionableProviderCatalog,
 	actionableSearchCatalog,
 	getErrorMessage,
@@ -31,8 +30,8 @@ import { CustomMcpCard } from '../mcp/components/CustomMcpCard';
 import { McpServerForm } from '../mcp/components/McpServerForm';
 import { useMcpServers } from '../mcp/hooks/useMcpServers';
 
-type ProviderKind = StoredProviderKind | 'search';
-export type ProviderSetupSection = 'models' | 'search' | 'databases' | 'mcp' | 'bots';
+type ProviderKind = Exclude<StoredProviderKind, 'databases'> | 'search';
+export type ProviderSetupSection = 'models' | 'search' | 'mcp' | 'bots';
 
 const SECTION_HEADERS: Record<ProviderSetupSection, { titleKey: string; descriptionKey: string }> =
 	{
@@ -43,10 +42,6 @@ const SECTION_HEADERS: Record<ProviderSetupSection, { titleKey: string; descript
 		search: {
 			titleKey: 'settings.tabs.searchEngines',
 			descriptionKey: 'settings.overview.descriptions.searchEngine',
-		},
-		databases: {
-			titleKey: 'settings.tabs.databases',
-			descriptionKey: 'settings.overview.descriptions.database',
 		},
 		mcp: {
 			titleKey: 'settings.tabs.mcp',
@@ -64,7 +59,6 @@ const FEATURED_PROVIDER_IDS = ['openai', 'anthropic', 'deepseek', 'elevenlabs'] 
 function allCatalogItems(): ProviderCatalogItem[] {
 	return [
 		...actionableProviderCatalog(),
-		...actionableDatabaseCatalog(),
 		...actionableSearchCatalog(),
 		...actionableBotCatalog(),
 	];
@@ -95,7 +89,7 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	useEffect(() => {
 		let cancelled = false;
 
-		void Promise.all([window.provider.list(), window.provider.listBots()])
+		void Promise.all([window.provider.list('models'), window.provider.listBots()])
 			.then(([storedProviders, storedBots]) => {
 				if (cancelled) return;
 				const savedStatus: Record<string, boolean> = Object.fromEntries(
@@ -175,7 +169,10 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 		openExternalUrl(provider.apiConfigurationUrl);
 	};
 
-	const saveProviderEntry = async (providerId: string, kind: StoredProviderKind): Promise<void> => {
+	const saveProviderEntry = async (
+		providerId: string,
+		kind: Exclude<StoredProviderKind, 'databases'>
+	): Promise<void> => {
 		const entry = providerEntries.find((item) => item.providerId === providerId);
 		const apiKey = entry?.apiKey.trim() ?? '';
 		if (!entry || !apiKey) return;
@@ -355,7 +352,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 		modelCatalog.filter((provider) => provider.id === id)
 	);
 	const otherProviders = modelCatalog.filter((provider) => !featuredIds.has(provider.id));
-	const databaseCatalog = actionableDatabaseCatalog();
 	const searchCatalog = actionableSearchCatalog();
 	const botCatalog = actionableBotCatalog();
 	const mcpCatalog = mcps();
@@ -409,15 +405,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 								)}
 							</div>
 						)}
-					</SettingsSection>
-				)}
-
-			{(section === undefined || section === 'databases') &&
-				(!embedded || databaseCatalog.length > 0) && (
-					<SettingsSection title={t('settings.overview.groups.vectorDatabases')}>
-						<div className="space-y-3 pb-4">
-							{databaseCatalog.map((provider) => renderProviderCard(provider, 'databases'))}
-						</div>
 					</SettingsSection>
 				)}
 

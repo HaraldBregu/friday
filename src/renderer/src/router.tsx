@@ -386,14 +386,6 @@ const routes: RouteObject[] = [
 								),
 							},
 							{
-								path: 'databases',
-								element: (
-									<SettingsRouteWrapper>
-										<ProvidersPage section="databases" />
-									</SettingsRouteWrapper>
-								),
-							},
-							{
 								path: 'mcp',
 								children: [
 									{

@@ -39,7 +39,6 @@ const SETTINGS_OVERVIEW_GROUPS = [
 		paths: [
 			'/settings/providers/models',
 			'/settings/providers/search',
-			'/settings/providers/databases',
 		],
 	},
 	{

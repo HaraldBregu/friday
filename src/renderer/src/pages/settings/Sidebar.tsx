@@ -23,24 +23,24 @@ const SETTINGS_SIDEBAR_GROUPS = [
 			...SETTINGS_MODEL_SERVICE_ITEMS.filter(
 				(item) => item.id === AGENTS.assistant || item.id === AGENTS.coder
 			),
-			...SETTINGS_NAVIGATION.slice(12, 13),
+			...SETTINGS_NAVIGATION.slice(11, 12),
 			...SETTINGS_NAVIGATION.slice(4, 5),
-			...SETTINGS_NAVIGATION.slice(8, 12),
-			...SETTINGS_NAVIGATION.slice(13, 15),
+			...SETTINGS_NAVIGATION.slice(7, 11),
+			...SETTINGS_NAVIGATION.slice(12, 14),
 		],
 	},
 	{
 		id: 'providers',
 		titleKey: 'settings.tabs.providers',
-		items: SETTINGS_NAVIGATION.slice(5, 8),
+		items: SETTINGS_NAVIGATION.slice(5, 7),
 	},
 	{
 		id: 'channels',
-		items: SETTINGS_NAVIGATION.slice(15, 16),
+		items: SETTINGS_NAVIGATION.slice(14, 15),
 	},
 	{
 		id: 'integrations',
-		items: SETTINGS_NAVIGATION.slice(16),
+		items: SETTINGS_NAVIGATION.slice(15),
 	},
 ] as const;
 

@@ -13,8 +13,6 @@ import {
 } from '@/components/ui/select';
 import type { RagMatch } from '../../../../../../main/agent/knowledge/rag';
 import type { RagConfiguration } from '../../../../../../shared/rag_types';
-import type { DatabaseConfiguration } from '../../../../../../shared/database_types';
-import type { CatalogService } from '../../../../../../shared/provider_types';
 import { defaultProviderId, modelsFor } from '@/lib/providers';
 import { getErrorMessage } from '../../../start/setupConstants';
 import {
@@ -32,14 +30,6 @@ import { DataControls } from '../../components/data';
 
 const VALUE_SEPARATOR = '\u001F';
 
-function databaseKey(entry: CatalogService): string {
-	return `${entry.provider.id}${VALUE_SEPARATOR}${entry.id}`;
-}
-
-function databaseLabel(entry: CatalogService): string {
-	return `${entry.provider.name} / ${entry.name || entry.id}`;
-}
-
 const RagPage: React.FC = () => {
 	const { t } = useTranslation();
 	const embeddingModels = useMemo(() => modelsFor('embedding'), []);
@@ -51,32 +41,10 @@ const RagPage: React.FC = () => {
 	const [query, setQuery] = useState('');
 	const [searching, setSearching] = useState(false);
 	const [matches, setMatches] = useState<RagMatch[] | null>(null);
-	const [databases, setDatabases] = useState<CatalogService[] | null>(null);
-	const [databaseConfiguration, setDatabaseConfiguration] = useState<DatabaseConfiguration>({
-		providerId: undefined,
-		databaseId: undefined,
-	});
 	const [embeddingProviderId, setEmbeddingProviderId] = useState('');
 	const [embeddingModelId, setEmbeddingModelId] = useState('');
 	const [loadingEmbeddingModel, setLoadingEmbeddingModel] = useState(true);
 	const [savingEmbeddingModel, setSavingEmbeddingModel] = useState(false);
-
-	useEffect(() => {
-		let cancelled = false;
-		void Promise.all([window.app.databases(), window.database.getConfiguration()]).then(
-			([entries, configuration]) => {
-				if (cancelled) return;
-				setDatabases([...entries]);
-				setDatabaseConfiguration(configuration);
-			},
-			(err) => {
-				if (!cancelled) setError(getErrorMessage(err, t('settings.vectorDb.errors.load')));
-			}
-		);
-		return () => {
-			cancelled = true;
-		};
-	}, [t]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -214,23 +182,6 @@ const RagPage: React.FC = () => {
 		}
 	};
 
-	const selectDatabase = async (value: string | null): Promise<void> => {
-		const entry = databases?.find((item) => databaseKey(item) === value);
-		if (!entry) return;
-		const next = {
-			...databaseConfiguration,
-			providerId: entry.provider.id,
-			databaseId: entry.id,
-		};
-		setDatabaseConfiguration(next);
-		setError(null);
-		try {
-			setDatabaseConfiguration(await window.database.saveConfiguration(next));
-		} catch (err) {
-			setError(getErrorMessage(err, t('settings.vectorDb.errors.save')));
-		}
-	};
-
 	const selectEmbeddingModel = async (value: string | null): Promise<void> => {
 		if (!value) return;
 		const [providerId = '', modelId = ''] = value.split(VALUE_SEPARATOR);
@@ -252,11 +203,6 @@ const RagPage: React.FC = () => {
 		}
 	};
 
-	const selectedDatabase = databases?.find(
-		(entry) =>
-			entry.id === databaseConfiguration.databaseId &&
-			entry.provider.id === databaseConfiguration.providerId
-	);
 	const selectedEmbeddingModel = embeddingModels.find(
 		(entry) => entry.provider.id === embeddingProviderId && entry.id === embeddingModelId
 	);
@@ -328,40 +274,6 @@ const RagPage: React.FC = () => {
 			<SettingsSection title={t('settings.rag.configurationTitle')}>
 				<SettingsPanel>
 					<div className="grid gap-4 px-3 py-3">
-						<SettingsField
-							id="rag-vector-database"
-							label={t('settings.vectorDb.defaultTitle')}
-							description={t('settings.vectorDb.databaseDescription')}
-						>
-							{!databases ? (
-								<SettingsLoadingRows rows={1} className="p-0" />
-							) : databases.length === 0 ? (
-								<SettingsNotice>{t('settings.vectorDb.empty')}</SettingsNotice>
-							) : (
-								<Select
-									value={selectedDatabase ? databaseKey(selectedDatabase) : null}
-									onValueChange={(value) => void selectDatabase(value)}
-								>
-									<SelectTrigger
-										id="rag-vector-database"
-										size="sm"
-										className="w-56 max-w-full text-xs"
-									>
-										<SelectValue placeholder={t('settings.vectorDb.databasePlaceholder')}>
-											{selectedDatabase && databaseLabel(selectedDatabase)}
-										</SelectValue>
-									</SelectTrigger>
-									<SelectContent>
-										{databases.map((entry) => (
-											<SelectItem key={databaseKey(entry)} value={databaseKey(entry)}>
-												{databaseLabel(entry)}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							)}
-						</SettingsField>
-
 						<SettingsField
 							id="rag-embedding-model"
 							label={t('settings.rag.embeddingModelTitle')}
