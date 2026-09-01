@@ -25,6 +25,9 @@ const CodeMirrorEditor = lazy(() =>
 const MarkdownPreview = lazy(() =>
 	import('@/components/markdown').then(({ MarkdownPreview }) => ({ default: MarkdownPreview }))
 );
+const ExcalidrawEditor = lazy(() => import('@/components/excalidraw'));
+const MermaidEditor = lazy(() => import('@/components/mermaid'));
+const TldrawEditor = lazy(() => import('@/components/tldraw'));
 const viewerFallback = (
 	<div className="flex min-h-full items-center justify-center gap-2 text-sm text-muted-foreground">
 		<LoaderCircle className="h-4 w-4 animate-spin" /> Loading viewer...
@@ -34,6 +37,7 @@ const viewerFallback = (
 interface FileViewerProps {
 	canSave: boolean;
 	content: string;
+	isDark: boolean;
 	kind: WorkspaceFileKind;
 	onChange: (content: string) => void;
 	onSave: () => Promise<boolean>;
@@ -44,6 +48,7 @@ interface FileViewerProps {
 export function FileViewer({
 	canSave,
 	content,
+	isDark,
 	kind,
 	onChange,
 	onSave,
@@ -80,6 +85,37 @@ export function FileViewer({
 					</Suspense>
 				</TabsContent>
 			</>
+		);
+	}
+
+	if (kind === 'mermaid') {
+		return (
+			<Suspense fallback={viewerFallback}>
+				<MermaidEditor
+					canSave={canSave}
+					content={content}
+					isDark={isDark}
+					onChange={onChange}
+					onSave={onSave}
+					path={path}
+				/>
+			</Suspense>
+		);
+	}
+
+	if (kind === 'excalidraw') {
+		return (
+			<Suspense fallback={viewerFallback}>
+				<ExcalidrawEditor content={content} isDark={isDark} onChange={onChange} path={path} />
+			</Suspense>
+		);
+	}
+
+	if (kind === 'tldraw') {
+		return (
+			<Suspense fallback={viewerFallback}>
+				<TldrawEditor content={content} isDark={isDark} onChange={onChange} />
+			</Suspense>
 		);
 	}
 

@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta
 			http-equiv="Content-Security-Policy"
-			content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' local-resource: data:; media-src 'self' local-resource:; frame-src 'self' local-resource:; connect-src 'self' local-resource: ws:; object-src 'none'; base-uri 'none'"
+			content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' local-resource: data: blob: https:; media-src 'self' local-resource: data: blob: https:; frame-src 'self' local-resource: data: blob: https:; connect-src 'self' local-resource: data: blob: https: ws: wss:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'"
 		/>
 		<meta name="theme-color" content="#0f172a" />
 		<title>Workspace</title>
