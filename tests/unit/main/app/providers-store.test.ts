@@ -20,7 +20,6 @@ jest.mock('electron-store', () =>
 
 jest.mock('../../../../src/main/models', () => ({
 	loadDatabases: () => [],
-	loadStorages: () => [],
 }));
 
 import {
@@ -31,17 +30,12 @@ import {
 	setProvider,
 	deleteProvider,
 	clearProviders,
-	deleteStorageConfig,
-	getStorageConfiguration,
-	getSelectedStorageId,
-	getStorages,
-	saveStorageConfig,
-	setSelectedStorageId,
+	getStorageSettings,
+	saveStorageSettings,
 	setTaskConfiguration,
 } from '../../../../src/main/settings_store';
 import { getDatabaseConfiguration } from '../../../../src/main/database/database_store';
 import type { StoredProvider } from '../../../../src/shared/provider_types';
-import type { StorageConfig } from '../../../../src/shared/storage_types';
 
 function provider(id: string, name: string): StoredProvider {
 	return { id, name, apiKey: 'k', baseUrl: 'https://api' };
@@ -105,63 +99,24 @@ describe('providers in app settings', () => {
 	});
 });
 
-describe('storages in app settings', () => {
-	const storage = (id: string): StorageConfig => ({
-		id,
-		name: id,
-		endpoint: 'https://storage.example.com',
-		region: 'us-east-1',
-		accessKeyId: 'access',
-		secretAccessKey: 'secret',
-		bucket: 'friday',
-		forcePathStyle: true,
-		paths: ['/data/agent'],
-		syncEnabled: true,
-		syncCronExpression: '0 3 * * *',
-	});
-
-	beforeEach(() => {
-		getStorages().forEach((entry) => deleteStorageConfig(entry.id));
-	});
-
+describe('storage sync in app settings', () => {
 	it('round-trips folder sync and cron settings', () => {
-		saveStorageConfig(storage('backup'));
-
-		expect(getStorages()).toEqual([storage('backup')]);
-		expect(getSelectedStorageId()).toBe('backup');
-	});
-
-	it('stores storage providers in the storage configuration', () => {
-		saveStorageConfig(storage('backup'));
-
-		expect(getStorageConfiguration().providerId).toBe('backup');
-	});
-
-	it('persists the selected storage and falls back after deletion', () => {
-		saveStorageConfig(storage('first'));
-		saveStorageConfig({
-			...storage('second'),
-			paths: ['/data/second'],
-			syncCronExpression: '0 4 * * *',
-		});
-		setSelectedStorageId('second');
-
-		expect(getSelectedStorageId()).toBe('second');
-		expect(getStorageConfiguration()).toMatchObject({
-			paths: ['/data/second'],
-			syncCronExpression: '0 4 * * *',
-		});
-		deleteStorageConfig('second');
-		expect(getSelectedStorageId()).toBe('first');
-		expect(getStorageConfiguration()).toMatchObject({
+		const settings = {
 			paths: ['/data/agent'],
+			syncEnabled: true,
 			syncCronExpression: '0 3 * * *',
-		});
+		};
+		saveStorageSettings(settings);
+		expect(getStorageSettings()).toEqual(settings);
 	});
 
-	it('rejects an invalid enabled cron schedule', () => {
+	it('rejects an invalid cron schedule', () => {
 		expect(() =>
-			saveStorageConfig({ ...storage('backup'), syncCronExpression: 'not cron' })
+			saveStorageSettings({
+				paths: ['/data/agent'],
+				syncEnabled: true,
+				syncCronExpression: 'not cron',
+			})
 		).toThrow('valid cron expression');
 	});
 });

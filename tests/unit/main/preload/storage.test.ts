@@ -14,17 +14,17 @@ beforeEach(() => {
 	invoke.mockResolvedValue({ success: true, data: [] });
 });
 
-it('queries operation statuses through the typed storage channel', async () => {
-	await storage.getOperationStatuses();
+it('queries operation status through the typed storage channel', async () => {
+	await storage.getOperationStatus();
 
-	expect(invoke).toHaveBeenCalledWith(StorageChannels.getOperationStatuses);
+	expect(invoke).toHaveBeenCalledWith(StorageChannels.getOperationStatus);
 });
 
 it('subscribes and removes the exact operation status event handler', () => {
 	const callback = jest.fn();
 	const unsubscribe = storage.onOperationStatusChanged(callback);
 	const handler = on.mock.calls[0][1];
-	const status = { storageId: 'backup', revision: 1 };
+	const status = { revision: 1 };
 
 	handler({}, status);
 	expect(callback).toHaveBeenCalledWith(status);

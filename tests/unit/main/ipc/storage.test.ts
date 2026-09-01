@@ -1,24 +1,19 @@
 const registerCommandWithEvent = jest.fn();
 const registerQueryWithEvent = jest.fn();
-const getStorages = jest.fn();
-const getStorageConfiguration = jest.fn();
+const getStorageSettings = jest.fn();
 
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
 	registerCommandWithEvent,
 	registerQueryWithEvent,
 }));
 jest.mock('../../../../src/main/storage', () => ({
-	deleteStorageConfig: jest.fn(),
-	getStorageConfiguration,
-	getStorages,
+	getStorageSettings,
 	pickFolders: jest.fn(),
 	pullFiles: jest.fn(),
 	pushFiles: jest.fn(),
 	rescheduleStorageSync: jest.fn(),
-	saveStorageConfig: jest.fn(),
-	saveStorageConfiguration: jest.fn(),
+	saveStorageSettings: jest.fn(),
 	syncFolders: jest.fn(),
-	testConnection: jest.fn(),
 	withStorageLock: jest.fn(),
 }));
 
@@ -27,7 +22,7 @@ import { StorageChannels } from '../../../../src/shared/ipc_channels_definitions
 
 const extensionRegistry = { has: jest.fn() };
 const storageOperations = {
-	getStatuses: jest.fn(),
+	getStatus: jest.fn(),
 	isRunning: jest.fn(),
 	backup: jest.fn(),
 	restore: jest.fn(),
@@ -37,7 +32,7 @@ const event = { sender: { id: 1 } };
 beforeEach(() => {
 	jest.clearAllMocks();
 	extensionRegistry.has.mockReturnValue(false);
-	storageOperations.getStatuses.mockReturnValue([]);
+	storageOperations.getStatus.mockReturnValue(undefined);
 	storageOperations.isRunning.mockReturnValue(false);
 	new StorageIpc().register(
 		{
@@ -49,36 +44,36 @@ beforeEach(() => {
 });
 
 it('reads authoritative operation status and starts manual backups in main', () => {
-	storageOperations.getStatuses.mockReturnValue([{ storageId: 'backup', state: 'running' }]);
-	storageOperations.backup.mockReturnValue({ storageId: 'backup', state: 'running' });
+	storageOperations.getStatus.mockReturnValue({ state: 'running' });
+	storageOperations.backup.mockReturnValue({ state: 'running' });
 	const query = registerQueryWithEvent.mock.calls.find(
-		([channel]) => channel === StorageChannels.getOperationStatuses
+		([channel]) => channel === StorageChannels.getOperationStatus
 	)?.[1];
 	const command = registerCommandWithEvent.mock.calls.find(
 		([channel]) => channel === StorageChannels.backup
 	)?.[1];
 
-	expect(query(event)).toEqual([{ storageId: 'backup', state: 'running' }]);
-	expect(command(event, 'backup')).toEqual({ storageId: 'backup', state: 'running' });
-	expect(storageOperations.backup).toHaveBeenCalledWith('backup', 'manual');
+	expect(query(event)).toEqual({ state: 'running' });
+	expect(command(event)).toEqual({ state: 'running' });
+	expect(storageOperations.backup).toHaveBeenCalledWith('manual');
 });
 
-it('allows the app renderer to read storage profiles', () => {
-	getStorages.mockReturnValue([{ id: 'backup' }]);
+it('allows the app renderer to read storage sync settings', () => {
+	getStorageSettings.mockReturnValue({ paths: [] });
 	const handler = registerQueryWithEvent.mock.calls.find(
-		([channel]) => channel === StorageChannels.getStorages
+		([channel]) => channel === StorageChannels.getSettings
 	)?.[1];
-	expect(handler(event)).toEqual([{ id: 'backup' }]);
+	expect(handler(event)).toEqual({ paths: [] });
 });
 
 it('rejects cloud storage access from extension views', () => {
 	extensionRegistry.has.mockReturnValue(true);
 	const query = registerQueryWithEvent.mock.calls.find(
-		([channel]) => channel === StorageChannels.getStorageConfiguration
+		([channel]) => channel === StorageChannels.getSettings
 	)?.[1];
 	const command = registerCommandWithEvent.mock.calls.find(
 		([channel]) => channel === StorageChannels.backup
 	)?.[1];
 	expect(() => query(event)).toThrow('unavailable to extension views');
-	expect(() => command(event, 'backup')).toThrow('unavailable to extension views');
+	expect(() => command(event)).toThrow('unavailable to extension views');
 });
