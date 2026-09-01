@@ -109,7 +109,7 @@ export function WorkspaceViewer({
 				showNativeContextMenu(
 					event,
 					[
-						...(editable
+						...(kind === 'markdown'
 							? [
 									{
 										id: markdownMode === 'source' ? 'show-preview' : 'show-source',
@@ -118,7 +118,7 @@ export function WorkspaceViewer({
 									{ type: 'separator' } as const,
 								]
 							: []),
-						...(kind === 'markdown'
+						...(editable
 							? [
 									{
 										id: 'save',

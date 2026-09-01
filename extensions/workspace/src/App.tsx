@@ -190,6 +190,7 @@ export default function App() {
 		): Promise<boolean> {
 			if (
 				!filePath ||
+				selectedKind === null ||
 				!editableWorkspaceKinds.has(selectedKind) ||
 				!isFriday() ||
 				(deletingScopeRef.current
