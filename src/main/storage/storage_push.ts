@@ -1,16 +1,16 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import type { StoragePushResult } from '../../shared/storage_types';
+import type { AuthService } from '../cloud/auth';
 import { describeStorageError } from './storage_error';
 import { putObject } from './storage_put';
 import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
-import { getStorage } from './storage_store';
+import { getStorageSettings } from './storage_store';
 import { walkFiles } from './storage_walk';
 
-export async function pushFiles(id: string): Promise<StoragePushResult> {
-	const storage = getStorage(id);
-	if (!storage) throw new Error('Storage is not configured.');
+export async function pushFiles(auth: AuthService): Promise<StoragePushResult> {
+	const storage = getStorageSettings();
 	const paths = normalizeStoragePaths(storage.paths);
 	const uploaded: string[] = [];
 	const failed: StoragePushResult['failed'] = [];
@@ -18,7 +18,7 @@ export async function pushFiles(id: string): Promise<StoragePushResult> {
 	const uploadFile = async (filePath: string, key: string): Promise<void> => {
 		try {
 			const data = await fs.readFile(filePath);
-			await putObject(id, key, data);
+			await putObject(auth, key, data);
 			uploaded.push(filePath);
 		} catch (error) {
 			failed.push({ path: filePath, error: describeStorageError(error) });

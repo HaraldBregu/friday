@@ -3,17 +3,12 @@ import { StorageChannels } from '../shared/ipc_channels_definitions';
 import type { StorageApi } from './index.d';
 
 export const storage: StorageApi = {
-	getStorages: () => typedInvokeUnwrap(StorageChannels.getStorages),
-	getStorageConfiguration: () => typedInvokeUnwrap(StorageChannels.getStorageConfiguration),
-	saveStorageConfiguration: (configuration) =>
-		typedInvokeUnwrap(StorageChannels.saveStorageConfiguration, configuration),
-	saveStorageConfig: (config) => typedInvokeUnwrap(StorageChannels.saveStorageConfig, config),
-	deleteStorageConfig: (id) => typedInvokeUnwrap(StorageChannels.deleteStorageConfig, id),
-	testConnection: (config) => typedInvokeUnwrap(StorageChannels.testConnection, config),
+	getSettings: () => typedInvokeUnwrap(StorageChannels.getSettings),
+	saveSettings: (settings) => typedInvokeUnwrap(StorageChannels.saveSettings, settings),
 	syncFolders: () => typedInvokeUnwrap(StorageChannels.syncFolders),
 	pickFolders: () => typedInvokeUnwrap(StorageChannels.pickFolders),
-	getOperationStatuses: () => typedInvokeUnwrap(StorageChannels.getOperationStatuses),
+	getOperationStatus: () => typedInvokeUnwrap(StorageChannels.getOperationStatus),
 	onOperationStatusChanged: (callback) => typedOn(StorageChannels.operationStatusChanged, callback),
-	backup: (id) => typedInvokeUnwrap(StorageChannels.backup, id),
-	restore: (id) => typedInvokeUnwrap(StorageChannels.restore, id),
+	backup: () => typedInvokeUnwrap(StorageChannels.backup),
+	restore: () => typedInvokeUnwrap(StorageChannels.restore),
 };

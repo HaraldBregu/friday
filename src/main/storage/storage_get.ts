@@ -1,9 +1,14 @@
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { storageClient } from './storage_client';
+import type { AuthService } from '../cloud/auth';
 
-export async function getObject(id: string, key: string): Promise<Uint8Array> {
-	const { client, bucket } = storageClient(id);
-	const response = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-	if (!response.Body) throw new Error(`Object not found: ${key}`);
-	return response.Body.transformToByteArray();
+export async function getObject(auth: AuthService, key: string): Promise<Uint8Array> {
+	const state = auth.getState();
+	if ((state.status !== 'signedIn' && state.status !== 'recovery') || !state.user) {
+		throw new Error('Sign in to use sync.');
+	}
+	const { data, error } = await auth
+		.getClient()
+		.storage.from('user-files')
+		.download(`${state.user.id}/backups/${key}`);
+	if (error) throw error;
+	return new Uint8Array(await data.arrayBuffer());
 }

@@ -261,15 +261,11 @@ export const ProviderChannels = {
 export const ProviderStoreChannels = ProviderChannels;
 
 export const StorageChannels = {
-	getStorages: 'storage:get-all',
-	getStorageConfiguration: 'storage:configuration:get',
-	saveStorageConfiguration: 'storage:configuration:save',
-	saveStorageConfig: 'storage:save',
-	deleteStorageConfig: 'storage:delete',
-	testConnection: 'storage:test-connection',
+	getSettings: 'storage:settings:get',
+	saveSettings: 'storage:settings:save',
 	syncFolders: 'storage:sync-folders',
 	pickFolders: 'storage:pick-folders',
-	getOperationStatuses: 'storage:operation-status:get-all',
+	getOperationStatus: 'storage:operation-status:get',
 	operationStatusChanged: 'storage:operation-status:changed',
 	backup: 'storage:backup',
 	restore: 'storage:restore',

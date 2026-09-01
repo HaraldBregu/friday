@@ -5,12 +5,10 @@ import type {
 	StoredProvider,
 	StoredProviderKind,
 } from '../shared/provider_types';
-import type { StorageConfig, StorageConfiguration } from '../shared/storage_types';
+import type { StorageSyncSettings } from '../shared/storage_types';
 import { userDataLocation } from './shared/user_data_location';
 import { DEFAULT_SYNC_CRON_EXPRESSION } from './storage/storage_sync_types';
-import { normalizeStorageConfig } from './storage/storage_config';
-import { normalizeStorageConfiguration } from './storage/storage_configuration';
-import { loadStorages } from './models';
+import { normalizeStorageSettings } from './storage/storage_config';
 import { migrateMcpStoreFromProviders } from './mcp/mcp_store_state';
 import type { PersistedTaskState } from './tasks/tasks_types';
 import type { AppLanguage, AppTheme } from '../shared/app_types';
@@ -19,9 +17,6 @@ import {
 	setModelProvidersState,
 	getDatabaseProvidersState,
 	setDatabaseProvidersState,
-	getStorageProvidersState,
-	setStorageProvidersState,
-	type StoredStorage,
 } from './providers/providers_index';
 import { getRagConfiguration, saveRagConfiguration } from './agent/knowledge/rag/rag_store';
 
@@ -30,14 +25,12 @@ export type AppSettingsState = {
 	keepAwake: boolean;
 	language: AppLanguage;
 	theme: AppTheme;
-	cloud: StorageConfiguration;
+	cloud: StorageSyncSettings;
 };
 
 const APP_SETTINGS_STORE_NAME = 'app';
 
-const DEFAULT_STORAGE_CONFIGURATION: StorageConfiguration = {
-	providerId: undefined,
-	storageId: undefined,
+const DEFAULT_STORAGE_SETTINGS: StorageSyncSettings = {
 	paths: [],
 	syncEnabled: false,
 	syncCronExpression: DEFAULT_SYNC_CRON_EXPRESSION,
@@ -50,7 +43,7 @@ const DEFAULT_APP_SETTINGS: AppSettingsState = {
 	keepAwake: false,
 	language: 'en',
 	theme: 'system',
-	cloud: DEFAULT_STORAGE_CONFIGURATION,
+	cloud: DEFAULT_STORAGE_SETTINGS,
 };
 
 const settingsDirectory = path.resolve(userDataLocation(), 'settings');
@@ -67,7 +60,7 @@ type LegacyAppSettingsState = AppSettingsState & {
 	modelSelections?: {
 		embedding?: { providerId: string; modelId: string };
 	};
-	storageConfiguration?: StorageConfiguration;
+	storageConfiguration?: StorageSyncSettings;
 };
 
 const persistedSettings = { ...store.store } as LegacyAppSettingsState;
@@ -228,158 +221,17 @@ export function getResolvedProvider(providerId: string | undefined): ResolvedPro
 	};
 }
 
-function toStorageConfig(
-	stored: StoredStorage,
-	legacy: StorageConfiguration = getStorageConfiguration()
-): StorageConfig {
-	const fallback = legacy.providerId === stored.id ? legacy : DEFAULT_STORAGE_CONFIGURATION;
-	return {
-		id: stored.id,
-		name: stored.name,
-		endpoint: stored.endpoint,
-		region: stored.region,
-		accessKeyId: stored.accessKeyId,
-		secretAccessKey: stored.secretAccessKey,
-		bucket: stored.bucket,
-		forcePathStyle: stored.forcePathStyle === true,
-		paths: Array.isArray(stored.paths) ? stored.paths : fallback.paths,
-		syncEnabled:
-			typeof stored.syncEnabled === 'boolean' ? stored.syncEnabled : fallback.syncEnabled,
-		syncCronExpression:
-			typeof stored.syncCronExpression === 'string'
-				? stored.syncCronExpression
-				: fallback.syncCronExpression,
-	};
-}
-
-function toStoredStorage(config: StorageConfig): StoredStorage {
-	return {
-		id: config.id,
-		name: config.name,
-		endpoint: config.endpoint,
-		region: config.region,
-		accessKeyId: config.accessKeyId,
-		secretAccessKey: config.secretAccessKey,
-		bucket: config.bucket,
-		forcePathStyle: config.forcePathStyle,
-		paths: config.paths,
-		syncEnabled: config.syncEnabled,
-		syncCronExpression: config.syncCronExpression,
-		baseUrl: loadStorages().find((entry) => entry.provider.id === config.id)?.url ?? '',
-	};
-}
-
-export function getStorages(): StorageConfig[] {
-	const configuration = getStorageConfiguration();
-	return getStoredStorages().map((storage) => toStorageConfig(storage, configuration));
-}
-
-export function getStorage(id: string): StorageConfig | undefined {
-	const storage = getStoredStorages().find((storage) => storage.id === id);
-	return storage ? toStorageConfig(storage) : undefined;
-}
-
-export function saveStorageConfig(config: StorageConfig): StorageConfig {
-	const normalized = normalizeStorageConfig(config);
-	const saved = toStoredStorage({
-		...normalized,
-		id: normalized.id || crypto.randomUUID(),
-	});
-	const storages = getStoredStorages();
-	const index = storages.findIndex((storage) => storage.id === saved.id);
-	setStorageProvidersState(
-		index >= 0
-			? storages.map((storage, i) => (i === index ? saved : storage))
-			: [...storages, saved]
-	);
-	const current = getStorageConfiguration();
-	if (!current.providerId || current.providerId === saved.id) {
-		saveStorageConfiguration({
-			...current,
-			providerId: saved.id,
-			paths: saved.paths ?? [],
-			syncEnabled: saved.syncEnabled ?? false,
-			syncCronExpression: saved.syncCronExpression ?? DEFAULT_SYNC_CRON_EXPRESSION,
-		});
-	}
-	return toStorageConfig(saved, getStorageConfiguration());
-}
-
-export function deleteStorageConfig(id: string): void {
-	const configuration = getStorageConfiguration();
-	const storages = getStoredStorages().filter((storage) => storage.id !== id);
-	setStorageProvidersState(storages);
-	if (configuration.providerId === id) {
-		const next = storages[0]
-			? toStorageConfig(storages[0], DEFAULT_STORAGE_CONFIGURATION)
-			: undefined;
-		saveStorageConfiguration({
-			providerId: next?.id,
-			storageId: undefined,
-			paths: next?.paths ?? [],
-			syncEnabled: next?.syncEnabled ?? false,
-			syncCronExpression: next?.syncCronExpression ?? DEFAULT_SYNC_CRON_EXPRESSION,
-		});
-	}
-}
-
-export function getSelectedStorageId(): string | undefined {
-	return getStorageConfiguration().providerId;
-}
-
-export function setSelectedStorageId(id: string): void {
-	const storage = getStorage(id);
-	if (!storage) throw new Error(`Storage not found: ${id}`);
-	saveStorageConfiguration({
-		providerId: storage.id,
-		storageId: undefined,
-		paths: storage.paths,
-		syncEnabled: storage.syncEnabled,
-		syncCronExpression: storage.syncCronExpression,
-	});
-}
-
-export function getStorageConfiguration(): StorageConfiguration {
-	const configuration = {
-		...DEFAULT_STORAGE_CONFIGURATION,
+export function getStorageSettings(): StorageSyncSettings {
+	return normalizeStorageSettings({
+		...DEFAULT_STORAGE_SETTINGS,
 		...store.get('cloud'),
-	};
-	if (
-		configuration.providerId &&
-		!getStoredStorages().some((storage) => storage.id === configuration.providerId)
-	) {
-		configuration.providerId = undefined;
-		configuration.storageId = undefined;
-	}
-	return configuration;
+	});
 }
 
-export function saveStorageConfiguration(
-	configuration: StorageConfiguration
-): StorageConfiguration {
-	const normalized = normalizeStorageConfiguration(configuration);
-	if (
-		normalized.providerId &&
-		!getStoredStorages().some((storage) => storage.id === normalized.providerId)
-	) {
-		throw new Error(`Storage not found: ${normalized.providerId}`);
-	}
-	const saved: StorageConfiguration = {
-		providerId: normalized.providerId,
-		storageId: normalized.providerId
-			? loadStorages().find((entry) => entry.provider.id === normalized.providerId)?.id
-			: undefined,
-		paths: normalized.paths,
-		syncEnabled: normalized.syncEnabled,
-		syncCronExpression: normalized.syncCronExpression,
-	};
+export function saveStorageSettings(settings: StorageSyncSettings): StorageSyncSettings {
+	const saved = normalizeStorageSettings(settings);
 	store.set('cloud', saved);
 	return saved;
-}
-
-function getStoredStorages(): StoredStorage[] {
-	const providers = getStorageProvidersState();
-	return Array.isArray(providers) ? providers : [];
 }
 
 export function getTaskConfiguration(): PersistedTaskState {

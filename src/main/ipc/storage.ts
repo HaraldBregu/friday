@@ -4,15 +4,11 @@ import type { EventBus } from '../event_bus';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import { StorageChannels } from '../../shared/ipc_channels_definitions';
 import {
-	deleteStorageConfig,
-	getStorageConfiguration,
-	getStorages,
+	getStorageSettings,
 	pickFolders,
 	rescheduleStorageSync,
-	saveStorageConfig,
-	saveStorageConfiguration,
+	saveStorageSettings,
 	syncFolders,
-	testConnection,
 } from '../storage';
 import type { StorageOperations } from '../storage';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
@@ -31,40 +27,18 @@ export class StorageIpc implements IpcModule<StorageIpcDeps> {
 				throw new Error('Cloud storage is unavailable to extension views.');
 			}
 		};
-		registerQueryWithEvent(StorageChannels.getStorages, (event) => {
+		registerQueryWithEvent(StorageChannels.getSettings, (event) => {
 			assertAppRenderer(event);
-			return getStorages();
+			return getStorageSettings();
 		});
-		registerQueryWithEvent(StorageChannels.getStorageConfiguration, (event) => {
+		registerCommandWithEvent(StorageChannels.saveSettings, (event, settings) => {
 			assertAppRenderer(event);
-			return getStorageConfiguration();
-		});
-		registerCommandWithEvent(StorageChannels.saveStorageConfiguration, (event, configuration) => {
-			assertAppRenderer(event);
-			const saved = saveStorageConfiguration(configuration);
-			rescheduleStorageSync();
-			return saved;
-		});
-		registerCommandWithEvent(StorageChannels.saveStorageConfig, (event, config) => {
-			assertAppRenderer(event);
-			if (config.id && storageOperations.isRunning(config.id)) {
+			if (storageOperations.isRunning()) {
 				throw new Error('Storage settings cannot change while a cloud operation is running.');
 			}
-			const saved = saveStorageConfig(config);
+			const saved = saveStorageSettings(settings);
 			rescheduleStorageSync();
 			return saved;
-		});
-		registerCommandWithEvent(StorageChannels.deleteStorageConfig, (event, id) => {
-			assertAppRenderer(event);
-			if (storageOperations.isRunning(id)) {
-				throw new Error('Storage settings cannot change while a cloud operation is running.');
-			}
-			deleteStorageConfig(id);
-			rescheduleStorageSync();
-		});
-		registerCommandWithEvent(StorageChannels.testConnection, (event, config) => {
-			assertAppRenderer(event);
-			return testConnection(config);
 		});
 		registerQueryWithEvent(StorageChannels.syncFolders, (event) => {
 			assertAppRenderer(event);
@@ -74,17 +48,17 @@ export class StorageIpc implements IpcModule<StorageIpcDeps> {
 			assertAppRenderer(event);
 			return pickFolders();
 		});
-		registerQueryWithEvent(StorageChannels.getOperationStatuses, (event) => {
+		registerQueryWithEvent(StorageChannels.getOperationStatus, (event) => {
 			assertAppRenderer(event);
-			return storageOperations.getStatuses();
+			return storageOperations.getStatus();
 		});
-		registerCommandWithEvent(StorageChannels.backup, (event, id) => {
+		registerCommandWithEvent(StorageChannels.backup, (event) => {
 			assertAppRenderer(event);
-			return storageOperations.backup(id, 'manual');
+			return storageOperations.backup('manual');
 		});
-		registerCommandWithEvent(StorageChannels.restore, (event, id) => {
+		registerCommandWithEvent(StorageChannels.restore, (event) => {
 			assertAppRenderer(event);
-			return storageOperations.restore(id);
+			return storageOperations.restore();
 		});
 	}
 }

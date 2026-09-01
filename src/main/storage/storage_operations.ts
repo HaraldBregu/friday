@@ -8,54 +8,41 @@ import type {
 } from '../../shared/storage_types';
 import { describeStorageError } from './storage_error';
 import { withStorageLock } from './storage_lock';
-import { pullFiles } from './storage_pull';
-import { pushFiles } from './storage_push';
 import { preventStorageSuspension } from './storage_suspension';
 
 type StorageTransferResult = StoragePushResult | StoragePullResult;
 
 export interface StorageOperationDependencies {
-	backup: (storageId: string) => Promise<StoragePushResult>;
-	restore: (storageId: string) => Promise<StoragePullResult>;
-	lock: <T>(storageId: string, operation: () => Promise<T>) => Promise<T>;
+	backup: () => Promise<StoragePushResult>;
+	restore: () => Promise<StoragePullResult>;
+	lock: <T>(operation: () => Promise<T>) => Promise<T>;
 	preventSuspension: () => () => void;
 }
 
-const defaultDependencies: StorageOperationDependencies = {
-	backup: pushFiles,
-	restore: pullFiles,
-	lock: withStorageLock,
-	preventSuspension: preventStorageSuspension,
-};
-
 export class StorageOperations {
-	private readonly statuses = new Map<string, StorageOperationStatus>();
+	private status?: StorageOperationStatus;
 	private readonly tasks = new Map<string, Promise<StorageOperationStatus>>();
 	private revision = 0;
 
 	constructor(
 		private readonly onStatusChanged: (status: StorageOperationStatus) => void,
-		private readonly dependencies: StorageOperationDependencies = defaultDependencies
+		private readonly dependencies: StorageOperationDependencies
 	) {}
 
-	getStatuses(): StorageOperationStatus[] {
-		return [...this.statuses.values()];
+	getStatus(): StorageOperationStatus | undefined {
+		return this.status;
 	}
 
-	getStatus(storageId: string): StorageOperationStatus | undefined {
-		return this.statuses.get(storageId);
+	isRunning(): boolean {
+		return this.status?.state === 'running';
 	}
 
-	isRunning(storageId: string): boolean {
-		return this.statuses.get(storageId)?.state === 'running';
+	backup(trigger: StorageOperationTrigger): StorageOperationStatus {
+		return this.start('backup', trigger);
 	}
 
-	backup(storageId: string, trigger: StorageOperationTrigger): StorageOperationStatus {
-		return this.start(storageId, 'backup', trigger);
-	}
-
-	restore(storageId: string): StorageOperationStatus {
-		return this.start(storageId, 'restore', 'manual');
+	restore(): StorageOperationStatus {
+		return this.start('restore', 'manual');
 	}
 
 	wait(operationId: string): Promise<StorageOperationStatus | undefined> {
@@ -63,11 +50,10 @@ export class StorageOperations {
 	}
 
 	private start(
-		storageId: string,
 		operation: StorageOperation,
 		trigger: StorageOperationTrigger
 	): StorageOperationStatus {
-		const current = this.statuses.get(storageId);
+		const current = this.status;
 		if (current?.state === 'running') {
 			if (current.operation === operation) return current;
 			throw new Error('A cloud operation is already running for this storage.');
@@ -75,7 +61,6 @@ export class StorageOperations {
 
 		const status: StorageOperationStatus = {
 			operationId: randomUUID(),
-			storageId,
 			operation,
 			trigger,
 			state: 'running',
@@ -97,12 +82,8 @@ export class StorageOperations {
 		try {
 			const result: StorageTransferResult =
 				running.operation === 'backup'
-					? await this.dependencies.lock(running.storageId, () =>
-							this.dependencies.backup(running.storageId)
-						)
-					: await this.dependencies.lock(running.storageId, () =>
-							this.dependencies.restore(running.storageId)
-						);
+					? await this.dependencies.lock(this.dependencies.backup)
+					: await this.dependencies.lock(this.dependencies.restore);
 			const transferred = 'uploaded' in result ? result.uploaded.length : result.downloaded.length;
 			return this.finish(running, result, transferred);
 		} catch (error) {
@@ -135,7 +116,7 @@ export class StorageOperations {
 	}
 
 	private publish(status: StorageOperationStatus): StorageOperationStatus {
-		this.statuses.set(status.storageId, status);
+		this.status = status;
 		this.onStatusChanged(status);
 		return status;
 	}

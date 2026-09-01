@@ -1,11 +1,10 @@
 import cron, { type ScheduledTask } from 'node-cron';
-import { isAutoSyncable, runProviderSync } from './storage_auto_sync';
-import type { StorageConfig } from '../../shared/storage_types';
-import { getStorages } from './storage_store';
+import { isAutoSyncable, runStorageSync } from './storage_auto_sync';
+import { getStorageSettings } from './storage_store';
 import type { StorageSyncLogger } from './storage_sync_types';
 import type { StorageOperations } from './storage_operations';
 
-const tasks = new Map<string, ScheduledTask>();
+let task: ScheduledTask | undefined;
 let syncLogger: StorageSyncLogger | undefined;
 let syncOperations: StorageOperations | undefined;
 
@@ -16,8 +15,8 @@ export function startStorageSync(logger: StorageSyncLogger, operations: StorageO
 }
 
 export function stopStorageSync(): void {
-	for (const task of tasks.values()) task.destroy();
-	tasks.clear();
+	task?.destroy();
+	task = undefined;
 	syncLogger = undefined;
 	syncOperations = undefined;
 }
@@ -27,36 +26,23 @@ export function rescheduleStorageSync(): void {
 }
 
 function scheduleAll(): void {
-	for (const task of tasks.values()) task.destroy();
-	tasks.clear();
+	task?.destroy();
+	task = undefined;
 	const logger = syncLogger;
 	const operations = syncOperations;
 	if (!logger || !operations) return;
-	for (const storage of getStorages()) scheduleStorage(storage, logger, operations);
-}
-
-function scheduleStorage(
-	storage: StorageConfig,
-	logger: StorageSyncLogger,
-	operations: StorageOperations
-): void {
+	const storage = getStorageSettings();
 	if (!isAutoSyncable(storage)) return;
 	if (!cron.validate(storage.syncCronExpression)) {
-		logger.error('Storage', `Invalid sync schedule for "${storage.name}"`);
+		logger.error('Storage', 'Invalid sync schedule');
 		return;
 	}
-	logger.info(
-		'Storage',
-		`Auto sync "${storage.name}" scheduled with ${storage.syncCronExpression}`
-	);
-	tasks.set(
-		storage.id,
-		cron.schedule(
-			storage.syncCronExpression,
-			async () => {
-				await runProviderSync(storage, logger, operations);
-			},
-			{ noOverlap: true }
-		)
+	logger.info('Storage', `Auto sync scheduled with ${storage.syncCronExpression}`);
+	task = cron.schedule(
+		storage.syncCronExpression,
+		async () => {
+			await runStorageSync(storage, logger, operations);
+		},
+		{ noOverlap: true }
 	);
 }

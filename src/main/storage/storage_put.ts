@@ -1,19 +1,21 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { storageClient } from './storage_client';
+import type { AuthService } from '../cloud/auth';
 
 export async function putObject(
-	id: string,
+	auth: AuthService,
 	key: string,
 	data: Uint8Array,
 	contentType?: string
 ): Promise<void> {
-	const { client, bucket } = storageClient(id);
-	await client.send(
-		new PutObjectCommand({
-			Bucket: bucket,
-			Key: key,
-			Body: data,
-			...(contentType ? { ContentType: contentType } : {}),
-		})
-	);
+	const state = auth.getState();
+	if ((state.status !== 'signedIn' && state.status !== 'recovery') || !state.user) {
+		throw new Error('Sign in to use sync.');
+	}
+	const { error } = await auth
+		.getClient()
+		.storage.from('user-files')
+		.upload(`${state.user.id}/backups/${key}`, data, {
+			upsert: true,
+			...(contentType ? { contentType } : {}),
+		});
+	if (error) throw error;
 }

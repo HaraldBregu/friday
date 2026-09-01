@@ -1,8 +1,4 @@
 export {
-	getStorages,
-	getStorage,
-	getStorageConfiguration,
-	saveStorageConfig,
-	saveStorageConfiguration,
-	deleteStorageConfig,
+	getStorageSettings,
+	saveStorageSettings,
 } from '../settings_store';

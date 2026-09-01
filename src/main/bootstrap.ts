@@ -10,7 +10,13 @@ import { Agent } from './agent/agent';
 import { Conversation } from './agent/conversation';
 import { ExecSandbox } from './agent/sandbox';
 import { createRealtimeVoiceManager } from './agent/realtime_voice';
-import { StorageOperations } from './storage';
+import {
+	StorageOperations,
+	pullFiles,
+	pushFiles,
+	withStorageLock,
+} from './storage';
+import { preventStorageSuspension } from './storage/storage_suspension';
 import { StorageChannels } from '../shared/ipc_channels_definitions';
 import { Coder, CoderProjectStore, CoderStore } from './coder';
 import { getProvider } from './settings_store';
@@ -65,15 +71,23 @@ export function bootstrapServices(): BootstrapResult {
 	const windowContextManager = new WindowContextManager(logger, eventBus);
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
 	const conversationService = new Conversation(agentService, realtimeVoiceManager);
-	const storageOperations = new StorageOperations((status) => {
-		eventBus.broadcastToWindows(StorageChannels.operationStatusChanged, status);
-	});
+	const authService = new AuthService(loadCloudConfig());
+	const storageOperations = new StorageOperations(
+		(status) => {
+			eventBus.broadcastToWindows(StorageChannels.operationStatusChanged, status);
+		},
+		{
+			backup: () => pushFiles(authService),
+			restore: () => pullFiles(authService),
+			lock: withStorageLock,
+			preventSuspension: preventStorageSuspension,
+		}
+	);
 	const terminalManager = new PtyManager(
 		logger,
 		new ShellDetector(),
 		new EnvironmentManager(logger)
 	);
-	const authService = new AuthService(loadCloudConfig());
 	const cloudService = new CloudService(authService);
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);

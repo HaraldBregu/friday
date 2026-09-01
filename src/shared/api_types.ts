@@ -8,11 +8,9 @@ import type { StoredProvider as Provider } from './provider_types';
 import type { StoredBotProvider as BotProvider } from './channels_types';
 import type { SearchEngineId, SearchEngineInput, SearchSettings } from './search_types';
 import type {
-	StorageConfig,
-	StorageConfiguration,
 	StorageOperationStatus,
 	StorageSyncFolder,
-	StorageTestResult,
+	StorageSyncSettings,
 } from './storage_types';
 import type { DatabaseConfiguration } from './database_types';
 import type {
@@ -283,18 +281,14 @@ export interface ProviderApi {
 }
 
 export interface StorageApi {
-	getStorages: () => Promise<StorageConfig[]>;
-	getStorageConfiguration: () => Promise<StorageConfiguration>;
-	saveStorageConfiguration: (configuration: StorageConfiguration) => Promise<StorageConfiguration>;
-	saveStorageConfig: (config: StorageConfig) => Promise<StorageConfig>;
-	deleteStorageConfig: (id: string) => Promise<void>;
-	testConnection: (config: StorageConfig) => Promise<StorageTestResult>;
+	getSettings: () => Promise<StorageSyncSettings>;
+	saveSettings: (settings: StorageSyncSettings) => Promise<StorageSyncSettings>;
 	syncFolders: () => Promise<StorageSyncFolder[]>;
 	pickFolders: () => Promise<string[]>;
-	getOperationStatuses: () => Promise<StorageOperationStatus[]>;
+	getOperationStatus: () => Promise<StorageOperationStatus | undefined>;
 	onOperationStatusChanged: (callback: (status: StorageOperationStatus) => void) => () => void;
-	backup: (id: string) => Promise<StorageOperationStatus>;
-	restore: (id: string) => Promise<StorageOperationStatus>;
+	backup: () => Promise<StorageOperationStatus>;
+	restore: () => Promise<StorageOperationStatus>;
 }
 
 export interface DatabaseApi {

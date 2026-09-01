@@ -641,29 +641,13 @@ export interface DataInvokeChannelMap {
 }
 
 export interface StorageInvokeChannelMap {
-	[StorageChannels.getStorages]: {
+	[StorageChannels.getSettings]: {
 		args: [];
-		result: import('./storage_types').StorageConfig[];
+		result: import('./storage_types').StorageSyncSettings;
 	};
-	[StorageChannels.getStorageConfiguration]: {
-		args: [];
-		result: import('./storage_types').StorageConfiguration;
-	};
-	[StorageChannels.saveStorageConfiguration]: {
-		args: [configuration: import('./storage_types').StorageConfiguration];
-		result: import('./storage_types').StorageConfiguration;
-	};
-	[StorageChannels.saveStorageConfig]: {
-		args: [config: import('./storage_types').StorageConfig];
-		result: import('./storage_types').StorageConfig;
-	};
-	[StorageChannels.deleteStorageConfig]: {
-		args: [id: string];
-		result: void;
-	};
-	[StorageChannels.testConnection]: {
-		args: [config: import('./storage_types').StorageConfig];
-		result: import('./storage_types').StorageTestResult;
+	[StorageChannels.saveSettings]: {
+		args: [settings: import('./storage_types').StorageSyncSettings];
+		result: import('./storage_types').StorageSyncSettings;
 	};
 	[StorageChannels.syncFolders]: {
 		args: [];
@@ -673,16 +657,16 @@ export interface StorageInvokeChannelMap {
 		args: [];
 		result: string[];
 	};
-	[StorageChannels.getOperationStatuses]: {
+	[StorageChannels.getOperationStatus]: {
 		args: [];
-		result: import('./storage_types').StorageOperationStatus[];
+		result: import('./storage_types').StorageOperationStatus | undefined;
 	};
 	[StorageChannels.backup]: {
-		args: [id: string];
+		args: [];
 		result: import('./storage_types').StorageOperationStatus;
 	};
 	[StorageChannels.restore]: {
-		args: [id: string];
+		args: [];
 		result: import('./storage_types').StorageOperationStatus;
 	};
 }
