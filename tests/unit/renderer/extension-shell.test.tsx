@@ -39,6 +39,8 @@ const stopOptions = jest.fn();
 const stopSidebarWidth = jest.fn();
 
 beforeEach(() => {
+	stopOptions.mockClear();
+	stopSidebarWidth.mockClear();
 	Object.defineProperty(window, 'win', {
 		configurable: true,
 		value: {
