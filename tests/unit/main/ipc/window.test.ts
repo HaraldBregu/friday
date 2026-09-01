@@ -128,10 +128,11 @@ it('forwards titlebar options to the owning shell and button clicks to its exten
 				id: 'toggle-sidebar',
 				label: 'Collapse sidebar',
 				icon: 'panel-left',
-				pressed: true,
+				expanded: true,
 			},
 		],
 		rightButtons: [],
+		sidebarOpen: true,
 		sidebarWidth: 240,
 	};
 

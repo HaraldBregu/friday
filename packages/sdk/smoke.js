@@ -307,11 +307,20 @@ assert.equal(await win.showContextMenu([{ id: 'open', label: 'Open' }]), 'open')
 assert.equal(await win.isMaximized(), true);
 win.setTitlebarOptions({
 	title: 'Workspace',
-	leftButtons: [{ id: 'toggle-sidebar', label: 'Toggle sidebar', icon: 'panel-left' }],
+	leftButtons: [
+		{
+			id: 'toggle-sidebar',
+			label: 'Collapse sidebar',
+			icon: 'panel-left',
+			expanded: true,
+		},
+	],
 	rightButtons: [],
+	sidebarOpen: true,
 	sidebarWidth: 240,
 });
 assert.equal(globalThis.__titlebarOptions.title, 'Workspace');
+assert.equal(globalThis.__titlebarOptions.sidebarOpen, true);
 let titlebarButtonId;
 const stopTitlebarButtonClick = win.onTitlebarButtonClick((buttonId) => {
 	titlebarButtonId = buttonId;

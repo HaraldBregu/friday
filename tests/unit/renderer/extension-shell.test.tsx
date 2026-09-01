@@ -10,17 +10,20 @@ jest.mock('../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar',
 		title,
 		leftButtons,
 		rightButtons,
+		sidebarOpen,
 		sidebarWidth,
 	}: {
 		title: string;
 		leftButtons: Array<{ id: string }>;
 		rightButtons: Array<{ id: string }>;
+		sidebarOpen?: boolean;
 		sidebarWidth: number | null;
 	}) => (
 		<div
 			data-sidebar-width={sidebarWidth ?? ''}
 			data-left-buttons={leftButtons.map((button) => button.id).join(',')}
 			data-right-buttons={rightButtons.map((button) => button.id).join(',')}
+			data-sidebar-open={sidebarOpen}
 			data-testid="extension-titlebar"
 		>
 			{title}
@@ -33,6 +36,7 @@ let titlebarOptionsChanged: (options: {
 	title?: string;
 	leftButtons?: Array<{ id: string }>;
 	rightButtons?: Array<{ id: string }>;
+	sidebarOpen?: boolean;
 	sidebarWidth?: number | null;
 } | null) => void;
 const stopOptions = jest.fn();
@@ -86,7 +90,8 @@ it('renders the extension title, buttons, and animated sidebar width from one sn
 			title: 'Workspace',
 			leftButtons: [{ id: 'toggle-sidebar' }],
 			rightButtons: [{ id: 'settings' }],
-			sidebarWidth: 0,
+			sidebarOpen: false,
+			sidebarWidth: 240,
 		})
 	);
 
@@ -94,7 +99,8 @@ it('renders the extension title, buttons, and animated sidebar width from one sn
 	expect(titlebar).toHaveTextContent('Workspace');
 	expect(titlebar).toHaveAttribute('data-left-buttons', 'toggle-sidebar');
 	expect(titlebar).toHaveAttribute('data-right-buttons', 'settings');
-	expect(titlebar).toHaveAttribute('data-sidebar-width', '0');
+	expect(titlebar).toHaveAttribute('data-sidebar-open', 'false');
+	expect(titlebar).toHaveAttribute('data-sidebar-width', '240');
 });
 
 it('restores manifest defaults and unsubscribes when the shell unmounts', () => {

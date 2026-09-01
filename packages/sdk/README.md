@@ -115,9 +115,15 @@ const maximized = await win.isMaximized();
 win.setTitlebarOptions({
 	title: 'Workspace',
 	leftButtons: [
-		{ id: 'toggle-sidebar', label: 'Toggle sidebar', icon: 'panel-left' },
+		{
+			id: 'toggle-sidebar',
+			label: 'Collapse sidebar',
+			icon: 'panel-left',
+			expanded: true,
+		},
 	],
 	rightButtons: [],
+	sidebarOpen: true,
 	sidebarWidth: 240,
 });
 const stopTitlebarActions = win.onTitlebarButtonClick((buttonId) => {
@@ -153,11 +159,13 @@ the registered Coder extension. It exposes the narrow preload bridge; shell sele
 and process lifecycle remain in the Electron main process. It is not exposed by `connect()`.
 
 Extension titlebars are rendered by the Friday host. In-app extensions can provide a centered title,
-left and right button descriptors, and an optional sidebar surface width with
+left and right button descriptors, and optional sidebar state with
 `win.setTitlebarOptions()`. Button IDs are returned through `win.onTitlebarButtonClick()` so the
 extension remains the owner of its application state. Passing `null` restores the manifest title and
 removes extension-provided controls. Icons are selected from the exported
 `EXTENSION_TITLEBAR_BUTTON_ICONS` list; arbitrary markup is not accepted across the window boundary.
+Keep `sidebarWidth` at the expanded width and update `sidebarOpen` when showing or hiding it so the
+host titlebar uses the same off-canvas transition as the extension sidebar.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.
