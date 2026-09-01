@@ -134,9 +134,9 @@ export function WorkspaceViewer({
 							{ id: 'copy-path', label: 'Copy Path' },
 						],
 						{
-								save: async () => {
-									await onSave();
-								},
+							save: async () => {
+								await onSave();
+							},
 							'show-preview': () => onMarkdownModeChange('preview'),
 							'show-source': () => onMarkdownModeChange('source'),
 							rename: onRename,
