@@ -1,3 +1,4 @@
+import { shell } from 'electron';
 import type { AuthCredentials, SignUpInput } from '../../shared/auth_types';
 import { AuthChannels } from '../../shared/ipc_channels_definitions';
 import type { AuthService } from '../cloud/auth';
@@ -27,6 +28,10 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		registerCommandWithEvent(AuthChannels.signIn, (event, value) => {
 			trusted.assert(event);
 			return auth.signIn(this.credentials(value));
+		});
+		registerCommandWithEvent(AuthChannels.signInWithGoogle, async (event) => {
+			trusted.assert(event);
+			await shell.openExternal(await auth.signInWithGoogle());
 		});
 		registerCommandWithEvent(AuthChannels.signUp, (event, value) => {
 			trusted.assert(event);

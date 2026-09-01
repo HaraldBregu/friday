@@ -1029,6 +1029,7 @@ export interface AuthInvokeChannelMap {
 		args: [credentials: import('./auth_types').AuthCredentials];
 		result: import('./auth_types').AuthState;
 	};
+	[AuthChannels.signInWithGoogle]: { args: []; result: void };
 	[AuthChannels.signUp]: {
 		args: [input: import('./auth_types').SignUpInput];
 		result: import('./auth_types').AuthState;

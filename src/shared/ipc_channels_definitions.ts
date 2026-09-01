@@ -200,6 +200,7 @@ export const AppChannels = {
 export const AuthChannels = {
 	getState: 'auth:state:get',
 	signIn: 'auth:sign-in',
+	signInWithGoogle: 'auth:sign-in:google',
 	signUp: 'auth:sign-up',
 	resendConfirmation: 'auth:confirmation:resend',
 	requestPasswordReset: 'auth:password:reset-request',

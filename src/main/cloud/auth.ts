@@ -100,6 +100,19 @@ export class AuthService {
 		return this.getState();
 	}
 
+	async signInWithGoogle(): Promise<string> {
+		if (!this.config) throw new Error('Supabase is not configured.');
+		const { data, error } = await this.getClient().auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				redirectTo: this.config.redirectUrl,
+				skipBrowserRedirect: true,
+			},
+		});
+		if (error) throw publicAuthError(error);
+		return data.url;
+	}
+
 	async signUp(input: SignUpInput): Promise<AuthState> {
 		if (!this.config) throw new Error('Supabase is not configured.');
 		const { email, password, displayName } = input;

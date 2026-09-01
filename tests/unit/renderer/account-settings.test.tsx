@@ -16,6 +16,7 @@ it('shows a compact account session and switches to local use after sign-out', a
 	const auth: AuthApi = {
 		getState: jest.fn(async () => signedIn),
 		signIn: jest.fn(),
+		signInWithGoogle: jest.fn(),
 		signUp: jest.fn(),
 		resendConfirmation: jest.fn(),
 		requestPasswordReset: jest.fn(),

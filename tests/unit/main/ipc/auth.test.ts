@@ -6,7 +6,7 @@ jest.mock('../../../../src/main/ipc/core/gateway', () => ({
 	registerQueryWithEvent,
 }));
 
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 import { AuthIpc } from '../../../../src/main/ipc/auth';
 import { AuthChannels } from '../../../../src/shared/ipc_channels_definitions';
 
@@ -18,6 +18,7 @@ const state = {
 const auth = {
 	getState: jest.fn(() => state),
 	signIn: jest.fn(async () => state),
+	signInWithGoogle: jest.fn(),
 	signUp: jest.fn(async () => state),
 	resendConfirmation: jest.fn(async () => undefined),
 	requestPasswordReset: jest.fn(async () => undefined),
@@ -58,6 +59,15 @@ it('returns only the public token-free auth projection to a trusted launcher', a
 			password: 'valid-password',
 		})
 	).resolves.toEqual(state);
+});
+
+it('opens the Supabase Google authorization URL in the system browser', async () => {
+	const url = 'https://project.supabase.co/auth/v1/authorize?provider=google';
+	auth.signInWithGoogle.mockResolvedValueOnce(url);
+
+	await command(AuthChannels.signInWithGoogle)(event);
+
+	expect(shell.openExternal).toHaveBeenCalledWith(url);
 });
 
 it('rejects child-frame callers before invoking auth', () => {

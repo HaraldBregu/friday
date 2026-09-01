@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
+import googleIcon from '@resources/providers/google/images/fallback_lobehub/svg/google-color.svg';
 
 type Mode = 'signIn' | 'signUp' | 'forgot';
 
@@ -16,6 +17,7 @@ export function AuthStep(): React.JSX.Element {
 	const [confirmation, setConfirmation] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [busy, setBusy] = useState(false);
+	const [googleBusy, setGoogleBusy] = useState(false);
 	const [error, setError] = useState('');
 	const [forgotSent, setForgotSent] = useState(false);
 	const [dismissedConfirmation, setDismissedConfirmation] = useState(false);
@@ -68,6 +70,20 @@ export function AuthStep(): React.JSX.Element {
 			setBusy(false);
 		}
 	};
+
+	const signInWithGoogle = async (): Promise<void> => {
+		setError('');
+		setGoogleBusy(true);
+		try {
+			await window.auth.signInWithGoogle();
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : 'Google sign-in failed.');
+		} finally {
+			setGoogleBusy(false);
+		}
+	};
+
+	const disabled = busy || googleBusy;
 
 	if (state.status === 'unconfigured') {
 		return (
@@ -155,6 +171,31 @@ export function AuthStep(): React.JSX.Element {
 							</div>
 						) : (
 							<form className="flex flex-col gap-3" onSubmit={submit}>
+								{!recovery && mode !== 'forgot' ? (
+									<>
+										<Button
+											type="button"
+											variant="outline"
+											size="lg"
+											disabled={disabled}
+											onClick={() => void signInWithGoogle()}
+										>
+											{googleBusy ? (
+												<LoaderCircle className="animate-spin" aria-hidden="true" />
+											) : (
+												<img src={googleIcon} alt="" className="size-4" aria-hidden="true" />
+											)}
+											{mode === 'signUp' ? 'Sign up with Google' : 'Sign in with Google'}
+										</Button>
+										<div className="flex items-center gap-3" aria-hidden="true">
+											<span className="h-px flex-1 bg-border" />
+											<span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+												or
+											</span>
+											<span className="h-px flex-1 bg-border" />
+										</div>
+									</>
+								) : null}
 								{!recovery ? (
 									<div className="flex flex-col gap-1.5">
 										<Label htmlFor="auth-email">Email</Label>
@@ -165,7 +206,7 @@ export function AuthStep(): React.JSX.Element {
 											autoFocus
 											required
 											value={email}
-											disabled={busy}
+											disabled={disabled}
 											onChange={(event) => setEmail(event.target.value)}
 										/>
 									</div>
@@ -190,7 +231,7 @@ export function AuthStep(): React.JSX.Element {
 												minLength={8}
 												required
 												value={password}
-												disabled={busy}
+												disabled={disabled}
 												onChange={(event) => setPassword(event.target.value)}
 											/>
 											<Button
@@ -216,7 +257,7 @@ export function AuthStep(): React.JSX.Element {
 											minLength={8}
 											required
 											value={confirmation}
-											disabled={busy}
+										disabled={disabled}
 											onChange={(event) => setConfirmation(event.target.value)}
 										/>
 									</div>
@@ -227,7 +268,7 @@ export function AuthStep(): React.JSX.Element {
 										<span>{error}</span>
 									</div>
 								) : null}
-								<Button type="submit" size="lg" disabled={busy}>
+								<Button type="submit" size="lg" disabled={disabled}>
 									{busy ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
 									{recovery
 										? 'Update password'

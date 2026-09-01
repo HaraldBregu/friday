@@ -32,6 +32,7 @@ export interface SignUpInput extends AuthCredentials {
 export interface AuthApi {
 	getState: () => Promise<AuthState>;
 	signIn: (credentials: AuthCredentials) => Promise<AuthState>;
+	signInWithGoogle: () => Promise<void>;
 	signUp: (input: SignUpInput) => Promise<AuthState>;
 	resendConfirmation: (email: string) => Promise<void>;
 	requestPasswordReset: (email: string) => Promise<void>;

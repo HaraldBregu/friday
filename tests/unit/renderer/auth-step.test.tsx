@@ -9,6 +9,7 @@ function authApi(state: AuthState): AuthApi {
 	return {
 		getState: jest.fn(async () => state),
 		signIn: jest.fn(async () => state),
+		signInWithGoogle: jest.fn(async () => undefined),
 		signUp: jest.fn(async (input) => {
 			const next: AuthState = {
 				status: 'confirmationRequired',
@@ -49,6 +50,19 @@ it('submits email and password to sign in', async () => {
 			password: 'valid-password',
 		})
 	);
+});
+
+it('starts Google sign-in', async () => {
+	const user = userEvent.setup();
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+
+	await user.click(screen.getByRole('button', { name: 'Sign in with Google' }));
+
+	expect(window.auth.signInWithGoogle).toHaveBeenCalledTimes(1);
 });
 
 it('creates an account and shows the confirmation state', async () => {

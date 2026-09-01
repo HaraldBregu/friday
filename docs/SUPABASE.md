@@ -1,6 +1,6 @@
 # Supabase
 
-Friday uses Supabase for email/password authentication, cloud chat metadata, private file
+Friday uses Supabase for email/password and Google authentication, cloud chat metadata, private file
 storage, and per-chat Realtime events. The Supabase client runs only in Electron's main
 process. The renderer receives token-free data through validated IPC handlers.
 
@@ -26,6 +26,25 @@ MAIN_VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
 
 Friday uses `@supabase/supabase-js`. Do not add `@supabase/server`; that package targets
 stateless HTTP servers and Edge Functions, not Electron's persistent main process.
+
+## Configure Google sign-in
+
+Create a **Web application** OAuth client in the Google Auth Platform console. Configure the
+`openid`, email, and profile scopes, then add the Supabase callback URL shown on the project's
+Google provider page as an authorized redirect URI. Hosted projects normally use:
+
+```text
+https://your-project-ref.supabase.co/auth/v1/callback
+```
+
+Enable Google in **Supabase Dashboard → Authentication → Providers**, and save the OAuth client ID
+and secret there. Keep `friday://auth/callback` in Supabase's redirect allow list; Friday opens the
+Supabase authorization URL in the system browser and exchanges the returned PKCE code in the main
+process.
+
+For local Supabase development, Google must instead authorize
+`http://127.0.0.1:54321/auth/v1/callback`. Follow Supabase's local-provider configuration and keep
+the client secret in `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`, never in this repository.
 
 ## Run Supabase locally
 
@@ -67,9 +86,10 @@ npx supabase db push
 Then verify these hosted-project settings in the Supabase dashboard:
 
 1. Add `friday://auth/callback` to the Auth redirect allow list.
-2. Keep email/password sign-up enabled and require email confirmation for production.
-3. Disable Realtime public-channel access so the migration's private-channel policies apply.
-4. Run the application, create an account, confirm its email, and verify sign-in and sign-out.
+2. Enable the Google provider with its Web OAuth client ID and secret.
+3. Keep email/password sign-up enabled and require email confirmation for production.
+4. Disable Realtime public-channel access so the migration's private-channel policies apply.
+5. Verify email/password and Google sign-in, callback handling, and sign-out in the application.
 
 ## Local data boundary
 

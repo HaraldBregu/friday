@@ -44,6 +44,7 @@ function authApi(initialState: AuthState, signedInState?: AuthState): AuthApi {
 			listener?.(next);
 			return next;
 		}),
+		signInWithGoogle: jest.fn(),
 		signUp: jest.fn(),
 		resendConfirmation: jest.fn(),
 		requestPasswordReset: jest.fn(),

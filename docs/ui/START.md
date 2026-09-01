@@ -59,8 +59,8 @@ automatically, and go directly to Home or the Model stage.
 
 ### 2. Account
 
-The Account stage should default to sign-in and also support account creation, email confirmation,
-confirmation-email resend, password-reset requests, and password recovery.
+The Account stage should default to sign-in and also support Google sign-in, account creation,
+email confirmation, confirmation-email resend, password-reset requests, and password recovery.
 
 An account is optional. Outside password recovery, the footer should provide:
 
