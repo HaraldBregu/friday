@@ -15,7 +15,7 @@ import type {
 	SttTranscriptionRequest,
 	SttTranscriptionResult,
 } from './stt_transcription';
-import type { PublicProvider, StoredProvider } from './provider_types';
+import type { PublicProvider } from './provider_types';
 import type { ProviderModel } from './model_types';
 import type { EmbeddingRequest, EmbeddingResult } from './embedding_types';
 import type { ImageRequest, ImageResult } from './image_types';
@@ -28,7 +28,7 @@ import type {
 	RecorderCaptureResult,
 	RecorderCommand,
 } from './recorder_types';
-import type { ChannelModelKind, ChannelModelSelection, StoredBotProvider } from './channels_types';
+import type { ChannelModelKind, ChannelModelSelection } from './channels_types';
 import {
 	AgentChannels,
 	CoderChannels,
@@ -58,7 +58,6 @@ import {
 	AuthChannels,
 	CloudChannels,
 } from './ipc_channels_definitions';
-type ProviderStoreRecord = StoredProvider | StoredBotProvider;
 
 export interface CoderInvokeChannelMap {
 	[CoderChannels.getSettings]: { args: []; result: import('./coder_types').CoderSettings };
@@ -557,16 +556,51 @@ export interface AppInvokeChannelMap {
 
 export interface ProviderInvokeChannelMap {
 	[ProviderChannels.get]: {
-		args: [id: string];
-		result: ProviderStoreRecord | undefined;
+		args: [
+			id: string,
+			kind: Exclude<import('./provider_types').ProviderCredentialKind, 'search_engines'>,
+		];
+		result: import('./provider_types').ProviderCredentialSummary | undefined;
 	};
 	[ProviderChannels.set]: {
-		args: [provider: ProviderStoreRecord, kind?: import('./provider_types').StoredProviderKind];
-		result: ProviderStoreRecord;
+		args: [input: import('./provider_types').ProviderCredentialSaveInput];
+		result: import('./provider_types').ProviderCredentialSummary;
 	};
 	[ProviderChannels.list]: {
+		args: [kind?: Exclude<import('./provider_types').ProviderCredentialKind, 'search_engines'>];
+		result: import('./provider_types').ProviderCredentialSummary[];
+	};
+	[ProviderChannels.getBot]: {
+		args: [id: string];
+		result: import('./channels_types').BotCredentialSummary | undefined;
+	};
+	[ProviderChannels.setBot]: {
+		args: [input: import('./channels_types').BotCredentialSaveInput];
+		result: import('./channels_types').BotCredentialSummary;
+	};
+	[ProviderChannels.listBots]: {
 		args: [];
-		result: ProviderStoreRecord[];
+		result: import('./channels_types').BotCredentialSummary[];
+	};
+	[ProviderChannels.vaultStatus]: {
+		args: [];
+		result: import('./provider_types').ProviderVaultStatus;
+	};
+	[ProviderChannels.setupVault]: {
+		args: [passphrase: string];
+		result: import('./provider_types').ProviderVaultStatus;
+	};
+	[ProviderChannels.unlockVault]: {
+		args: [passphrase: string];
+		result: import('./provider_types').ProviderVaultStatus;
+	};
+	[ProviderChannels.changeVaultPassphrase]: {
+		args: [passphrase: string];
+		result: import('./provider_types').ProviderVaultStatus;
+	};
+	[ProviderChannels.syncVault]: {
+		args: [];
+		result: import('./provider_types').ProviderVaultStatus;
 	};
 }
 

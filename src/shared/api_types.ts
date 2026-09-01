@@ -1,11 +1,13 @@
 import type {
 	CatalogService,
 	CatalogWebSearch,
+	ProviderCredentialKind,
+	ProviderCredentialSaveInput,
+	ProviderCredentialSummary,
+	ProviderVaultStatus,
 	PublicProvider,
-	StoredProviderKind,
 } from './provider_types';
-import type { StoredProvider as Provider } from './provider_types';
-import type { StoredBotProvider as BotProvider } from './channels_types';
+import type { BotCredentialSaveInput, BotCredentialSummary } from './channels_types';
 import type { SearchEngineId, SearchEngineInput, SearchSettings } from './search_types';
 import type {
 	StorageOperationStatus,
@@ -273,9 +275,22 @@ export interface McpApi {
 }
 
 export interface ProviderApi {
-	get: (id: string) => Promise<ProviderStoreRecord | undefined>;
-	set: (provider: ProviderStoreRecord, kind?: StoredProviderKind) => Promise<ProviderStoreRecord>;
-	list: () => Promise<ProviderStoreRecord[]>;
+	get: (
+		id: string,
+		kind: Exclude<ProviderCredentialKind, 'search_engines'>
+	) => Promise<ProviderCredentialSummary | undefined>;
+	set: (input: ProviderCredentialSaveInput) => Promise<ProviderCredentialSummary>;
+	list: (
+		kind?: Exclude<ProviderCredentialKind, 'search_engines'>
+	) => Promise<ProviderCredentialSummary[]>;
+	getBot: (id: string) => Promise<BotCredentialSummary | undefined>;
+	setBot: (input: BotCredentialSaveInput) => Promise<BotCredentialSummary>;
+	listBots: () => Promise<BotCredentialSummary[]>;
+	vaultStatus: () => Promise<ProviderVaultStatus>;
+	setupVault: (passphrase: string) => Promise<ProviderVaultStatus>;
+	unlockVault: (passphrase: string) => Promise<ProviderVaultStatus>;
+	changeVaultPassphrase: (passphrase: string) => Promise<ProviderVaultStatus>;
+	syncVault: () => Promise<ProviderVaultStatus>;
 	getModelProviders: () => Promise<PublicProvider[]>;
 	getDatabaseProviders: () => Promise<PublicProvider[]>;
 }
@@ -439,7 +454,6 @@ export interface ModelsApi {
 	};
 }
 
-type ProviderStoreRecord = Provider | BotProvider;
 
 export interface AppApi extends ExtensionStorageApi {
 	models: () => Promise<CatalogModel[]>;

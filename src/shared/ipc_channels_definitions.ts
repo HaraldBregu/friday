@@ -256,6 +256,14 @@ export const ProviderChannels = {
 	get: 'provider-store:get',
 	set: 'provider-store:set',
 	list: 'provider-store:list',
+	getBot: 'provider-store:bot:get',
+	setBot: 'provider-store:bot:set',
+	listBots: 'provider-store:bot:list',
+	vaultStatus: 'provider-store:vault:status',
+	setupVault: 'provider-store:vault:setup',
+	unlockVault: 'provider-store:vault:unlock',
+	changeVaultPassphrase: 'provider-store:vault:change-passphrase',
+	syncVault: 'provider-store:vault:sync',
 } as const;
 
 export const ProviderStoreChannels = ProviderChannels;

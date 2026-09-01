@@ -31,6 +31,22 @@ export interface StoredBotProvider extends StoredProvider {
 	ttsModelId?: string;
 }
 
+export interface BotCredentialSaveInput {
+	id: string;
+	apiKey: string;
+	allowFrom?: string[];
+	groupAllowFrom?: string[];
+	dmPolicy?: ChannelDmPolicy;
+	sttProviderId?: string;
+	sttModelId?: string;
+	ttsProviderId?: string;
+	ttsModelId?: string;
+}
+
+export type BotCredentialSummary = Omit<StoredBotProvider, 'apiKey'> & {
+	configured: boolean;
+};
+
 export type ChannelModelKind = 'llm' | 'stt' | 'tts';
 
 export interface ChannelModelSelection {
