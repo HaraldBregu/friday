@@ -8,6 +8,7 @@ import { TitleBarRightContainer } from './TitleBarRightContainer';
 import { ExtensionWindowControls } from './ExtensionWindowControls';
 import { ExtensionTitlebarButton } from './ExtensionTitlebarButton';
 import { useExtensionWindowState } from './hooks/useExtensionWindowState';
+import { cn } from '@/lib/utils';
 import type { ExtensionTitlebarButton as ExtensionTitlebarButtonDescriptor } from '../../../../../shared/window_types';
 
 const isMac =
@@ -18,6 +19,7 @@ interface ExtensionTitleBarProps {
 	title: string;
 	leftButtons?: ExtensionTitlebarButtonDescriptor[];
 	rightButtons?: ExtensionTitlebarButtonDescriptor[];
+	sidebarOpen?: boolean;
 	sidebarWidth?: number | null;
 }
 
@@ -25,18 +27,32 @@ export function ExtensionTitleBar({
 	title,
 	leftButtons = [],
 	rightButtons = [],
+	sidebarOpen,
 	sidebarWidth = null,
 }: ExtensionTitleBarProps): React.JSX.Element {
 	const isMaximized = useExtensionWindowState();
+	const sidebarOffset = sidebarOpen && sidebarWidth !== null ? sidebarWidth : 0;
 
 	return (
 		<TitleBarContainer className="relative">
 			{sidebarWidth !== null ? (
 				<div
 					data-slot="extension-titlebar-sidebar"
+					data-state={sidebarOpen === undefined ? undefined : sidebarOpen ? 'expanded' : 'collapsed'}
 					aria-hidden="true"
-					className="pointer-events-none absolute inset-y-0 left-0 overflow-hidden border-r border-b border-sidebar-border/50 bg-sidebar transition-[width] duration-200 ease-linear"
-					style={{ width: sidebarWidth }}
+					className={cn(
+						'pointer-events-none absolute inset-y-0 left-0 overflow-hidden border-r border-sidebar-border bg-sidebar duration-200 ease-linear motion-reduce:transition-none',
+						sidebarOpen === undefined ? 'transition-[width]' : 'transition-transform'
+					)}
+					style={{
+						width: sidebarWidth,
+						transform:
+							sidebarOpen === undefined
+								? undefined
+								: sidebarOpen
+									? 'translateX(0)'
+									: 'translateX(-100%)',
+					}}
 				/>
 			) : null}
 			<TitleBarLeftContainer isMac={isMac}>
@@ -57,7 +73,10 @@ export function ExtensionTitleBar({
 					<ExtensionTitlebarButton key={button.id} button={button} />
 				))}
 			</TitleBarLeftContainer>
-			<TitleBarCenterContainer>
+			<TitleBarCenterContainer
+				className="transition-[left] duration-200 ease-linear motion-reduce:transition-none"
+				style={{ left: sidebarOffset }}
+			>
 				<TitleBarCenterContainerTitle
 					className={
 						isMac ? 'max-w-[calc(100%-180px)] truncate' : 'max-w-[calc(100%-380px)] truncate'

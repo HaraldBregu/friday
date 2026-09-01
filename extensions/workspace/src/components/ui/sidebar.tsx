@@ -84,7 +84,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         className={cn(
-          "group relative h-full w-(--sidebar-width) shrink-0 transition-[width] duration-200 ease-linear",
+          "group relative h-full w-(--sidebar-width) shrink-0 transition-[width] duration-200 ease-linear motion-reduce:transition-none",
           "data-[collapsible=offcanvas]:w-0",
           className,
         )}
@@ -94,14 +94,14 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <div
           data-slot="sidebar-container"
           className={cn(
-            "absolute inset-y-0 left-0 z-10 flex h-full w-(--sidebar-width) transition-transform duration-200 ease-linear",
+            "absolute inset-y-0 left-0 z-10 flex h-full w-(--sidebar-width) transition-transform duration-200 ease-linear motion-reduce:transition-none",
             "group-data-[collapsible=offcanvas]:-translate-x-full",
           )}
         >
           <div
             data-sidebar="sidebar"
             data-slot="sidebar-inner"
-            className="relative flex size-full flex-col border-r border-sidebar-border/70 bg-sidebar text-sidebar-foreground"
+            className="relative flex size-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
           >
             {children}
           </div>

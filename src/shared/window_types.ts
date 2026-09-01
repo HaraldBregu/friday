@@ -42,6 +42,7 @@ export interface ExtensionTitlebarButton {
 	label: string;
 	icon: ExtensionTitlebarButtonIcon;
 	disabled?: boolean;
+	expanded?: boolean;
 	pressed?: boolean;
 }
 
@@ -49,5 +50,6 @@ export interface ExtensionTitlebarOptions {
 	title?: string;
 	leftButtons?: ExtensionTitlebarButton[];
 	rightButtons?: ExtensionTitlebarButton[];
+	sidebarOpen?: boolean;
 	sidebarWidth?: number | null;
 }

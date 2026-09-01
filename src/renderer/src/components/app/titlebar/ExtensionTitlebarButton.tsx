@@ -11,10 +11,11 @@ export function ExtensionTitlebarButton({
 		<Button
 			type="button"
 			variant="ghost"
-			size="icon"
-			className="size-8 rounded-md text-muted-foreground data-[pressed=true]:bg-accent data-[pressed=true]:text-foreground"
+			size="icon-sm"
+			className="text-muted-foreground data-[pressed=true]:bg-accent data-[pressed=true]:text-foreground"
 			data-pressed={button.pressed}
 			aria-label={button.label}
+			aria-expanded={button.expanded}
 			aria-pressed={button.pressed}
 			title={button.label}
 			disabled={button.disabled}

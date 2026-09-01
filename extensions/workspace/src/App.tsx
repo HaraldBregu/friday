@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+	type PointerEvent,
+} from 'react';
 
 import {
 	agent,
@@ -136,7 +144,7 @@ export default function App() {
 		}
 	}, [theme]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!isFriday()) return;
 		win.setTitlebarOptions({
 			title: 'Workspace',
@@ -145,14 +153,19 @@ export default function App() {
 					id: 'toggle-sidebar',
 					label: sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar',
 					icon: 'panel-left',
-					pressed: sidebarOpen,
+					expanded: sidebarOpen,
 				},
 			],
 			rightButtons: [],
-			sidebarWidth: sidebarOpen ? sidebarWidth : 0,
+			sidebarOpen,
+			sidebarWidth,
 		});
-		return () => win.setTitlebarOptions(null);
 	}, [sidebarOpen, sidebarWidth]);
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		return () => win.setTitlebarOptions(null);
+	}, []);
 
 	useEffect(() => {
 		if (!isFriday()) return;

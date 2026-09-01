@@ -27,6 +27,7 @@ export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Elemen
 				title={options?.title ?? title}
 				leftButtons={options?.leftButtons ?? []}
 				rightButtons={options?.rightButtons ?? []}
+				sidebarOpen={options?.sidebarOpen}
 				sidebarWidth={options ? (options.sidebarWidth ?? null) : sidebarWidth}
 			/>
 		</div>

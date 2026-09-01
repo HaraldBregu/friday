@@ -48,15 +48,23 @@ export function Sidebar({ className, ...props }: ComponentProps<'aside'>) {
 	const context = useContext(SidebarContext);
 	if (!context) throw new Error('Sidebar must be rendered inside SidebarProvider.');
 	return (
-		<aside
-			id="coder-sidebar"
-			data-state={context.open ? 'expanded' : 'collapsed'}
+		<div
 			className={cn(
-				'flex w-72 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 data-[state=collapsed]:w-12',
-				className
+				'relative h-full w-72 shrink-0 transition-[width] duration-200 ease-linear motion-reduce:transition-none',
+				!context.open && 'w-0'
 			)}
-			{...props}
-		/>
+		>
+			<aside
+				id="coder-sidebar"
+				data-state={context.open ? 'expanded' : 'collapsed'}
+				className={cn(
+					'absolute inset-y-0 left-0 flex w-72 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-200 ease-linear motion-reduce:transition-none',
+					!context.open && '-translate-x-full',
+					className
+				)}
+				{...props}
+			/>
+		</div>
 	);
 }
 

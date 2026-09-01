@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { isFriday, win } from '@friday/sdk';
 
 import { Configuration } from '@/components/configuration';
@@ -25,7 +25,7 @@ export default function App() {
 				? `Coder · ${coder.activeProject?.name ?? 'Agent instructions'}`
 				: [coder.activeProject?.name, activeSession?.title].filter(Boolean).join(' · ') || 'Coder';
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (!isFriday()) return;
 		win.setTitlebarOptions({
 			title,
@@ -34,14 +34,19 @@ export default function App() {
 					id: 'toggle-sidebar',
 					label: coder.leftOpen ? 'Collapse project navigation' : 'Expand project navigation',
 					icon: 'panel-left',
-					pressed: coder.leftOpen,
+					expanded: coder.leftOpen,
 				},
 			],
 			rightButtons: [],
-			sidebarWidth: coder.leftOpen ? 288 : 48,
+			sidebarOpen: coder.leftOpen,
+			sidebarWidth: 288,
 		});
-		return () => win.setTitlebarOptions(null);
 	}, [coder.leftOpen, title]);
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		return () => win.setTitlebarOptions(null);
+	}, []);
 
 	useEffect(() => {
 		if (!isFriday()) return;
