@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
 import {
-	getProviderApiConfigurationUrl,
 	type StoredProvider,
 	type StoredProviderKind,
 } from '@shared/provider_types';
