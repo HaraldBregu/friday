@@ -90,6 +90,7 @@ import type {
 	CameraPermissionSettings,
 	SystemPreferencePaneId,
 	AppLanguage,
+	AppLaunchState,
 	AppThemeData,
 	AppTheme,
 } from './app_types';
@@ -462,6 +463,7 @@ export interface AppApi extends ExtensionStorageApi {
 	unfurlUrl: (url: string) => Promise<import('./app_types').UrlMetadata>;
 	setTrayEnabled: (enabled: boolean) => Promise<void>;
 	getTrayEnabled: () => Promise<boolean>;
+	getLaunchState: () => Promise<AppLaunchState>;
 	onTrayEnabledChanged: (callback: (enabled: boolean) => void) => () => void;
 	setKeepAwake: (enabled: boolean) => Promise<void>;
 	getKeepAwake: () => Promise<boolean>;

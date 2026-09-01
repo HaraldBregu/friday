@@ -152,6 +152,7 @@ export const AppChannels = {
 	openSystemPreference: 'app:open-system-preference',
 	setTrayEnabled: 'app:set-tray-enabled',
 	getTrayEnabled: 'app:get-tray-enabled',
+	getLaunchState: 'app:get-launch-state',
 	trayEnabledChanged: 'app:tray-enabled-changed',
 	setKeepAwake: 'app:set-keep-awake',
 	getKeepAwake: 'app:get-keep-awake',

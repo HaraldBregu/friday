@@ -41,6 +41,7 @@ import {
 	setLanguage as setStoredLanguage,
 	getTheme as getStoredTheme,
 	setTheme as setStoredTheme,
+	getLaunchState as getStoredLaunchState,
 } from '../settings_store';
 import { AppChannels } from '../../shared/ipc_channels_definitions';
 import {
@@ -513,6 +514,13 @@ export class AppIpc implements IpcModule {
 			wrapSimpleHandler(() => {
 				return getStoredTrayEnabled();
 			}, AppChannels.getTrayEnabled)
+		);
+
+		ipcMain.handle(
+			AppChannels.getLaunchState,
+			wrapSimpleHandler(() => {
+				return getStoredLaunchState();
+			}, AppChannels.getLaunchState)
 		);
 
 		ipcMain.handle(

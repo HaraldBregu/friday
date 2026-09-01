@@ -13,6 +13,7 @@ import {
 	setLanguage as setStoredLanguage,
 	getTheme,
 	setTheme as setStoredTheme,
+	recordAppLaunch,
 } from './settings_store';
 import type { AppLanguage } from '../shared/app_types';
 import { Menu } from './menu';
@@ -169,6 +170,7 @@ const menuManager = new Menu({
 });
 
 app.whenReady().then(() => {
+	recordAppLaunch();
 	services.cloudService.initialize();
 	const authInitialization = services.authService.initialize();
 	const unsubscribeAuthLinks = authLinks.subscribe(async (url) => {

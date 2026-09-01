@@ -47,6 +47,11 @@ export interface AppThemeData {
 	readonly colors: AppThemeColors;
 }
 
+export interface AppLaunchState {
+	readonly launchCount: number;
+	readonly isFirstLaunch: boolean;
+}
+
 export interface UrlMetadata {
 	readonly title: string;
 	readonly description: string;

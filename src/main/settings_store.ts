@@ -11,7 +11,7 @@ import { DEFAULT_SYNC_CRON_EXPRESSION } from './storage/storage_sync_types';
 import { normalizeStorageSettings } from './storage/storage_config';
 import { migrateMcpStoreFromProviders } from './mcp/mcp_store_state';
 import type { PersistedTaskState } from './tasks/tasks_types';
-import type { AppLanguage, AppTheme } from '../shared/app_types';
+import type { AppLanguage, AppLaunchState, AppTheme } from '../shared/app_types';
 import {
 	getModelProvidersState,
 	setModelProvidersState,
@@ -25,6 +25,7 @@ export type AppSettingsState = {
 	keepAwake: boolean;
 	language: AppLanguage;
 	theme: AppTheme;
+	launchCount: number;
 	cloud: StorageSyncSettings;
 };
 
@@ -43,6 +44,7 @@ const DEFAULT_APP_SETTINGS: AppSettingsState = {
 	keepAwake: false,
 	language: 'en',
 	theme: 'system',
+	launchCount: 0,
 	cloud: DEFAULT_STORAGE_SETTINGS,
 };
 
@@ -146,6 +148,17 @@ export function getTheme(): AppTheme {
 
 export function setTheme(theme: AppTheme): void {
 	store.set('theme', theme);
+}
+
+export function recordAppLaunch(): AppLaunchState {
+	const launchCount = store.get('launchCount') + 1;
+	store.set('launchCount', launchCount);
+	return { launchCount, isFirstLaunch: launchCount === 1 };
+}
+
+export function getLaunchState(): AppLaunchState {
+	const launchCount = store.get('launchCount');
+	return { launchCount, isFirstLaunch: launchCount === 1 };
 }
 
 function readProviders(kind: StoredProviderKind): StoredProvider[] {

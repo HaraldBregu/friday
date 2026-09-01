@@ -21,6 +21,7 @@ export type {
 } from '../../src/shared/terminal';
 export type {
 	AppLanguage,
+	AppLaunchState,
 	AppTheme,
 	AppThemeColors,
 	AppThemeData,

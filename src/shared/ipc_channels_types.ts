@@ -405,6 +405,10 @@ export interface AppInvokeChannelMap {
 		args: [];
 		result: boolean;
 	};
+	[AppChannels.getLaunchState]: {
+		args: [];
+		result: import('./app_types').AppLaunchState;
+	};
 	[AppChannels.setLanguage]: {
 		args: [language: import('./app_types').AppLanguage];
 		result: void;
