@@ -153,7 +153,6 @@
 				"agent": "Agent",
 				"modelServices": "Models",
 				"mlModels": "ML Models",
-				"vectorDatabases": "Database",
 				"connectors": "Connectors",
 				"channels": "Channels",
 				"automation": "Automation",
@@ -180,7 +179,6 @@
 				"bots": "Bot platforms and tokens",
 				"providers": "API keys and providers",
 				"searchEngine": "Web search provider and API key",
-				"database": "Structured data storage",
 				"cron": "Scheduled agent tasks",
 				"heartbeat": "Periodic agent checks",
 				"health": "Periodic health checks",
@@ -188,7 +186,6 @@
 				"extensions": "Installed extension apps",
 				"rag": "Document search and index",
 				"wiki": "Assistant knowledge and notes",
-				"vectorDb": "Pinecone vector database",
 				"plugins": "Installable app plugins",
 				"configurationDescription": "Configure models, storage, and integrations"
 			}
@@ -207,8 +204,6 @@
 			"providers": "Providers",
 			"searchEngine": "Search engine",
 			"searchEngines": "Search Engine",
-			"database": "Database",
-			"databases": "Databases",
 			"media": "Media",
 			"devices": "Devices",
 			"tools": "Tools",
@@ -225,7 +220,7 @@
 			"plugins": "Plugins",
 			"rag": "RAG",
 			"wiki": "LLM Wiki",
-			"vectorDb": "Database"
+			"wiki": "LLM Wiki"
 		},
 		"breadcrumb": {
 			"label": "Settings navigation",
@@ -939,7 +934,6 @@
 			"mlModelsDescription": "Configure your main AI model and provider.",
 			"showOtherProviders": "Show other models",
 			"hideOtherProviders": "Hide other models",
-			"vectorDatabasesDescription": "Set up vector database for embeddings and retrieval.",
 			"modelsDescription": "Choose a model service to configure its provider and model.",
 			"registeredProviders": "Registered Providers",
 			"manageNote": "Manage provider API keys from the Models page in the main navigation.",
@@ -1452,7 +1446,7 @@
 			"embeddingModelDescription": "Model used to embed RAG documents for vector search.",
 			"configurationTitle": "Configuration",
 			"indexName": "Index name",
-			"indexNameDescription": "Local knowledge index name, also used by the optional Pinecone mirror.",
+			"indexNameDescription": "Local knowledge index name, also used by the Pinecone mirror.",
 			"indexNamePlaceholder": "friday",
 			"documentsDescription": "Text files in selected folders and subfolders are chunked, embedded, and stored locally.",
 			"sourceFolder": "Source folders",
@@ -1565,24 +1559,6 @@
 			"runError": "Unable to generate the wiki.",
 			"cancelError": "Unable to cancel wiki generation."
 		},
-		"vectorDb": {
-			"description": "Vector database used by RAG to store and search embeddings.",
-			"connectionTitle": "Connection",
-			"defaultTitle": "Vector database",
-			"database": "Database",
-			"databaseDescription": "Database used to store and search embeddings.",
-			"databasePlaceholder": "Select a database...",
-			"apiKey": "API key",
-			"apiKeyDescription": "The key is used to create the index and upsert vectors.",
-			"apiKeyPlaceholder": "Paste your API key...",
-			"empty": "No database provider is available.",
-			"save": "Save",
-			"saved": "API key saved.",
-			"errors": {
-				"load": "Unable to load the database configuration.",
-				"save": "Unable to save the database configuration."
-			}
-		}
 	},
 	"dialogs": {
 		"title": "Native Dialogs",

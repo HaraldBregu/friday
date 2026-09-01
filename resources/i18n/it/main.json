@@ -153,7 +153,6 @@
 				"agent": "Agente",
 				"modelServices": "Modelli",
 				"mlModels": "Modelli",
-				"vectorDatabases": "Database",
 				"connectors": "Connettori",
 				"channels": "Canali",
 				"automation": "Automazione",
@@ -180,7 +179,6 @@
 				"bots": "Piattaforme bot e token",
 				"providers": "Provider, chiavi e servizi",
 				"searchEngine": "Ricerca web e chiave API",
-				"database": "Archivio dati strutturati",
 				"cron": "Attivita agente programmate",
 				"heartbeat": "Controlli periodici agente",
 				"health": "Controlli salute periodici",
@@ -188,7 +186,6 @@
 				"extensions": "Estensioni app installate",
 				"rag": "Ricerca e indice documenti",
 				"wiki": "Note e conoscenza assistant",
-				"vectorDb": "Database vettoriale Pinecone",
 				"plugins": "Estensioni dell'app",
 				"configurationDescription": "Configura modelli, archiviazione e integrazioni"
 			}
@@ -207,8 +204,6 @@
 			"providers": "Provider",
 			"searchEngine": "Motore di ricerca",
 			"searchEngines": "Ricerca",
-			"database": "Database",
-			"databases": "Database",
 			"media": "Media",
 			"devices": "Dispositivi",
 			"tools": "Strumenti",
@@ -225,7 +220,7 @@
 			"plugins": "Plugin",
 			"rag": "RAG",
 			"wiki": "LLM Wiki",
-			"vectorDb": "Database"
+			"wiki": "LLM Wiki"
 		},
 		"breadcrumb": {
 			"label": "Navigazione impostazioni",
@@ -938,7 +933,6 @@
 			"mlModelsDescription": "Configura il tuo modello AI principale e il provider.",
 			"showOtherProviders": "Mostra altri modelli",
 			"hideOtherProviders": "Nascondi altri modelli",
-			"vectorDatabasesDescription": "Configura il database vettoriale per embedding e recupero.",
 			"modelsDescription": "Scegli un servizio modello per configurarne provider e modello.",
 			"registeredProviders": "Provider Registrati",
 			"manageNote": "Gestisci le chiavi API dei provider dalla pagina Modelli nella navigazione principale.",
@@ -1451,7 +1445,7 @@
 			"embeddingModelDescription": "Modello usato per incorporare i documenti RAG per la ricerca vettoriale.",
 			"configurationTitle": "Configurazione",
 			"indexName": "Nome indice",
-			"indexNameDescription": "Nome dell'indice locale, usato anche dal mirror Pinecone facoltativo.",
+			"indexNameDescription": "Nome dell'indice locale, usato anche dal mirror Pinecone.",
 			"indexNamePlaceholder": "friday",
 			"documentsDescription": "I file di testo nelle cartelle e sottocartelle selezionate vengono suddivisi, incorporati e salvati localmente.",
 			"sourceFolder": "Cartelle sorgente",
@@ -1564,24 +1558,6 @@
 			"runError": "Impossibile generare la Wiki.",
 			"cancelError": "Impossibile annullare la generazione della Wiki."
 		},
-		"vectorDb": {
-			"description": "Database vettoriale usato dal RAG per salvare e cercare gli embedding.",
-			"connectionTitle": "Connessione",
-			"defaultTitle": "Database vettoriale",
-			"database": "Database",
-			"databaseDescription": "Database usato per salvare e cercare gli embedding.",
-			"databasePlaceholder": "Seleziona un database...",
-			"apiKey": "Chiave API",
-			"apiKeyDescription": "La chiave viene usata per creare l'indice e caricare i vettori.",
-			"apiKeyPlaceholder": "Incolla la tua chiave API...",
-			"empty": "Nessun provider di database disponibile.",
-			"save": "Salva",
-			"saved": "Chiave API salvata.",
-			"errors": {
-				"load": "Impossibile caricare la configurazione del database.",
-				"save": "Impossibile salvare la configurazione del database."
-			}
-		}
 	},
 	"dialogs": {
 		"title": "Finestre di Dialogo Native",

@@ -167,14 +167,14 @@ See [Provider Reference](../PROVIDERS.md) for exact runtime coverage and model I
 
 ### Provider connections
 
-- **Models**, **Search engines**, **Databases**, and **Bots** should list their catalog providers as
+- **Models**, **Search engines**, and **Bots** should list their catalog providers as
   connection cards with external setup links, password inputs, and connected state.
 - Unsupported catalog entries should be disabled as **Soon**.
 - The searchable **API Keys** deep page should provide the model-provider credential list. The
   visible Models page can connect the same model credentials inline.
 
-Pinecone and other vector-database credentials belong under **Providers → Databases**. RAG then
-selects a saved database and configures its index separately.
+Pinecone is an internal RAG dependency configured with `PINECONE_API_KEY` in the main-process
+environment. It should not appear as a provider, credential card, or database selection.
 
 ### Model service pages
 
@@ -213,8 +213,8 @@ private backup path; folder selections and schedules remain local application se
 
 ### RAG
 
-RAG should configure enablement, consent for the selected remote embedding model, vector database,
-embedding model, index name, and one or more source folders. It should support indexing now,
+RAG should configure enablement, consent for the selected remote embedding model, embedding model,
+index name, and one or more source folders. It should support indexing now,
 scheduled indexing presets, an inline retrieval test with scored matches, and export or purge
 controls for local and remote RAG scopes.
 

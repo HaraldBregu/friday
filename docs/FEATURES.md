@@ -49,15 +49,15 @@ contract.
 
 ### First-run setup
 
-The first launch uses a single `/start` flow with six visible stages: **Welcome**, **Account**,
-**Model**, **Search**, **Database**, and **Models**. Account sign-in is optional; users
+The first launch uses a single `/start` flow with five visible stages: **Welcome**, **Account**,
+**Model**, **Search**, and **Models**. Account sign-in is optional; users
 can continue in local-only mode. After sign-in or local-only continuation, Friday checks for a
 stored Assistant provider and model. A complete configuration opens Home, while an incomplete one
 continues through setup. A restored signed-in user runs this check automatically and skips Welcome
 and Account.
 
-The Model stage requires at least one saved model-provider API key. Search and vector database
-connections are optional. The final Models stage offers Assistant,
+The Model stage requires at least one saved model-provider API key. Search is optional. The final
+Models stage offers Assistant,
 Voice, Transcription, Image, Audio, Video, realtime conversation, and search configuration, but
 only the Assistant selection is required to finish. Task and health model selection remain on their
 own Settings pages.
@@ -385,7 +385,7 @@ The chat catalog includes Anthropic, DeepSeek, Google, Kimi, MiniMax, Mistral, O
 Reka AI, xAI, and Z.ai. Exact model names, IDs, and support notes are maintained in
 [Provider Reference](PROVIDERS.md#chat-and-research).
 
-The built-in catalog contains 23 providers across models, search, and vector databases.
+The built-in catalog contains 22 provider manifests.
 Model-provider entries include capability labels and an external setup link.
 
 Realtime voice has IPC and execution adapters for supported OpenAI and xAI models. Home connects
@@ -541,8 +541,8 @@ no enable/disable control.
 - **Cloud** selects local paths and a sync interval so chosen folders back up to the signed-in
   account's private Supabase storage on a schedule. Backup objects use the account-scoped
   `user-files/<user-id>/backups/` path.
-- **Providers → Databases** connects cataloged vector-database providers. Assistant RAG then
-  selects the saved database, embedding model, index, and source folders.
+- Assistant RAG uses Pinecone as its environment-configured remote vector mirror and does not
+  expose a vector-database provider or database picker.
 
 ### Application preferences
 
