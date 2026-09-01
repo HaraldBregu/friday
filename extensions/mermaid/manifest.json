@@ -1,9 +1,0 @@
-{
-	"title": "Mermaid",
-	"description": "Create, edit, preview, and export Mermaid diagrams with layouts, themes, icons, math, and ZenUML support.",
-	"metadata": {
-		"version": "1.0.0",
-		"category": "utility",
-		"entry": "dist/index.html"
-	}
-}

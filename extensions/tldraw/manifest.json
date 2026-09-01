@@ -1,9 +1,0 @@
-{
-	"title": "Tldraw",
-	"description": "Create diagrams, whiteboards, and visual notes on a persistent infinite canvas.",
-	"metadata": {
-		"version": "1.0.0",
-		"category": "utility",
-		"entry": "dist/index.html"
-	}
-}

@@ -1,9 +1,0 @@
-{
-	"title": "Excalidraw",
-	"description": "Create freeform drawings, wireframes, and visual notes on an infinite Excalidraw canvas.",
-	"metadata": {
-		"version": "1.0.0",
-		"category": "utility",
-		"entry": "dist/index.html"
-	}
-}
