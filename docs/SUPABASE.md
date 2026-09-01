@@ -29,7 +29,8 @@ stateless HTTP servers and Edge Functions, not Electron's persistent main proces
 
 ## Configure Google sign-in
 
-Create a **Web application** OAuth client in the Google Auth Platform console. Configure the
+Follow Supabase's [Google Auth guide](https://supabase.com/docs/guides/auth/social-login/auth-google)
+to create a **Web application** OAuth client in the Google Auth Platform console. Configure the
 `openid`, email, and profile scopes, then add the Supabase callback URL shown on the project's
 Google provider page as an authorized redirect URI. Hosted projects normally use:
 
@@ -43,8 +44,17 @@ Supabase authorization URL in the system browser and exchanges the returned PKCE
 process.
 
 For local Supabase development, Google must instead authorize
-`http://127.0.0.1:54321/auth/v1/callback`. Follow Supabase's local-provider configuration and keep
-the client secret in `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`, never in this repository.
+`http://127.0.0.1:54321/auth/v1/callback`. Keep the client secret in
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`, never in this repository, and add this configuration
+to `supabase/config.toml` while testing Google locally:
+
+```toml
+[auth.external.google]
+enabled = true
+client_id = "your-google-web-client-id"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+skip_nonce_check = false
+```
 
 ## Run Supabase locally
 

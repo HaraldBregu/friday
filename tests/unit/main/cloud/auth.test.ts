@@ -10,12 +10,14 @@ const createClientMock = createClient as jest.Mock;
 const unsubscribe = jest.fn();
 const getSession = jest.fn(async () => ({ data: { session: null }, error: null }));
 const onAuthStateChange = jest.fn(() => ({ data: { subscription: { unsubscribe } } }));
+const exchangeCodeForSession = jest.fn();
 const signInWithOAuth = jest.fn();
 const stopAutoRefresh = jest.fn();
 
 beforeEach(() => {
 	createClientMock.mockReturnValue({
 		auth: {
+			exchangeCodeForSession,
 			getSession,
 			onAuthStateChange,
 			signInWithOAuth,
@@ -129,4 +131,42 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 	await expect(service.signInWithGoogle()).rejects.toThrow(
 		'Supabase returned an invalid authentication URL.'
 	);
+});
+
+it('exchanges a Google callback code for a token-free signed-in state', async () => {
+	const session = {
+		access_token: 'access-secret',
+		refresh_token: 'refresh-secret',
+		user: {
+			id: 'google-user-id',
+			email: 'user@gmail.com',
+			user_metadata: {},
+		},
+	};
+	exchangeCodeForSession.mockResolvedValueOnce({ data: { session }, error: null });
+	const service = new AuthService(
+		{
+			url: 'https://project.supabase.co',
+			publishableKey: 'sb_publishable_test',
+			redirectUrl: 'friday://auth/callback',
+		},
+		{
+			persistence: 'encrypted',
+			getItem: jest.fn(() => null),
+			setItem: jest.fn(),
+			removeItem: jest.fn(),
+		}
+	);
+
+	await service.initialize();
+
+	await expect(
+		service.handleDeepLink('friday://auth/callback?code=google-authorization-code')
+	).resolves.toEqual({
+		status: 'signedIn',
+		persistence: 'encrypted',
+		user: { id: 'google-user-id', email: 'user@gmail.com' },
+	});
+	expect(exchangeCodeForSession).toHaveBeenCalledWith('google-authorization-code');
+	expect(JSON.stringify(service.getState())).not.toMatch(/access-secret|refresh-secret/);
 });
