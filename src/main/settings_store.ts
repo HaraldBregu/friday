@@ -60,13 +60,11 @@ type LegacyAppSettingsState = AppSettingsState & {
 	modelSelections?: {
 		embedding?: { providerId: string; modelId: string };
 	};
-	storageConfiguration?: StorageSyncSettings;
 };
 
 const persistedSettings = { ...store.store } as LegacyAppSettingsState;
 const legacyDatabase = persistedSettings.databaseConfiguration;
 const legacyEmbedding = persistedSettings.modelSelections?.embedding;
-const legacyStorageConfiguration = persistedSettings.storageConfiguration;
 if (legacyDatabase || legacyEmbedding) {
 	const configuration = getRagConfiguration();
 	const hasRagDatabase = Boolean(configuration.databaseProviderId && configuration.databaseId);
@@ -102,8 +100,6 @@ if (legacyDatabase || legacyEmbedding) {
 migrateMcpStoreFromProviders();
 delete persistedSettings.databaseConfiguration;
 delete persistedSettings.modelSelections;
-if (legacyStorageConfiguration) persistedSettings.cloud = legacyStorageConfiguration;
-delete persistedSettings.storageConfiguration;
 store.store = {
 	...DEFAULT_APP_SETTINGS,
 	...persistedSettings,
