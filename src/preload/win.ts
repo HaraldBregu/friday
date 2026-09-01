@@ -3,6 +3,7 @@ import { WindowChannels } from '../shared/ipc_channels_definitions';
 import type { WindowApi } from './index.d';
 
 let titlebarSidebarOpen: boolean | undefined;
+let titlebarSidebarTransitionStartedAt: number | undefined;
 
 export const win: WindowApi = {
 	minimize: (): void => {
@@ -35,6 +36,7 @@ export const win: WindowApi = {
 	setTitlebarOptions: (options): void => {
 		if (options === null) {
 			titlebarSidebarOpen = undefined;
+			titlebarSidebarTransitionStartedAt = undefined;
 			typedSend(WindowChannels.titlebarOptionsSet, options);
 			return;
 		}
@@ -43,9 +45,17 @@ export const win: WindowApi = {
 			options.sidebarOpen !== undefined &&
 			titlebarSidebarOpen !== options.sidebarOpen;
 		titlebarSidebarOpen = options.sidebarOpen;
+		if (sidebarChanged) titlebarSidebarTransitionStartedAt = Date.now();
+		const transitionStartedAt =
+			titlebarSidebarTransitionStartedAt !== undefined &&
+			Date.now() - titlebarSidebarTransitionStartedAt <= 200
+				? titlebarSidebarTransitionStartedAt
+				: undefined;
 		typedSend(
 			WindowChannels.titlebarOptionsSet,
-			sidebarChanged ? { ...options, sidebarTransitionStartedAt: Date.now() } : options
+			transitionStartedAt === undefined
+				? options
+				: { ...options, sidebarTransitionStartedAt: transitionStartedAt }
 		);
 	},
 	onTitlebarOptionsChanged: (callback): (() => void) => {
