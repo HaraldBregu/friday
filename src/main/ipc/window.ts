@@ -10,6 +10,8 @@ import { wrapIpcHandler } from './core/error_handler';
 import { WindowChannels } from '../../shared/ipc_channels_definitions';
 import type { LoggerService } from '../shared';
 import type { ContextMenuDescriptor, ContextMenuRole } from '../../shared/window_types';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import { openExtensionWindows } from '../extensions/extension_render';
 
 const contextMenuRoles = new Set<ContextMenuRole>([
 	'undo',
@@ -26,6 +28,7 @@ const maxContextMenuTextLength = 120;
 
 export interface WindowIpcDeps {
 	logger: LoggerService;
+	extensionRegistry: ExtensionRegistry;
 }
 
 /**
@@ -48,7 +51,7 @@ export interface WindowIpcDeps {
 export class WindowIpc implements IpcModule<WindowIpcDeps> {
 	readonly name = 'window';
 
-	register({ logger }: WindowIpcDeps, _eventBus: EventBus): void {
+	register({ logger, extensionRegistry }: WindowIpcDeps, _eventBus: EventBus): void {
 		// --- Send handlers (fire-and-forget) ---
 
 		ipcMain.on(WindowChannels.minimize, (event) => {
@@ -81,6 +84,24 @@ export class WindowIpc implements IpcModule<WindowIpcDeps> {
 					menu.popup({ window: win });
 				}
 			}
+		});
+
+		ipcMain.on(WindowChannels.titlebarSidebarWidthSet, (event, width) => {
+			if (
+				width !== null &&
+				(typeof width !== 'number' || !Number.isFinite(width) || width < 0 || width > 800)
+			) {
+				return;
+			}
+			let extensionId: string;
+			try {
+				extensionId = extensionRegistry.resolve(event.sender);
+			} catch {
+				return;
+			}
+			const extensionWindow = openExtensionWindows.get(extensionId)?.window;
+			if (!extensionWindow || extensionWindow.isDestroyed()) return;
+			extensionWindow.webContents.send(WindowChannels.titlebarSidebarWidthChanged, width);
 		});
 
 		// --- Query handlers (invoke/handle) ---

@@ -92,6 +92,7 @@ export default function App() {
 	const [deleteError, setDeleteError] = useState('');
 	const [deleting, setDeleting] = useState(false);
 	const [sidebarWidth, setSidebarWidth] = useState(sidebarDefaultWidth);
+	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const selectedPathRef = useRef<string | null>(null);
 	const selectedContentRef = useRef('');
 	const saveInFlightRef = useRef<Promise<boolean> | null>(null);
@@ -135,6 +136,12 @@ export default function App() {
 			root.style.setProperty(`--${name}`, value);
 		}
 	}, [theme]);
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		win.setTitlebarSidebarWidth(sidebarOpen ? sidebarWidth : null);
+		return () => win.setTitlebarSidebarWidth(null);
+	}, [sidebarOpen, sidebarWidth]);
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -585,6 +592,8 @@ export default function App() {
 		<TooltipProvider delayDuration={400}>
 			<SidebarProvider
 				className="flex h-dvh min-h-[520px] overflow-hidden bg-background text-foreground"
+				onOpenChange={setSidebarOpen}
+				open={sidebarOpen}
 				onContextMenu={(event) => {
 					showNativeContextMenu(
 						event,

@@ -13,13 +13,25 @@ const isMac =
 
 interface ExtensionTitleBarProps {
 	title: string;
+	sidebarWidth?: number | null;
 }
 
-export function ExtensionTitleBar({ title }: ExtensionTitleBarProps): React.JSX.Element {
+export function ExtensionTitleBar({
+	title,
+	sidebarWidth = null,
+}: ExtensionTitleBarProps): React.JSX.Element {
 	const isMaximized = useExtensionWindowState();
 
 	return (
 		<TitleBarContainer className="relative">
+			{sidebarWidth !== null ? (
+				<div
+					data-slot="extension-titlebar-sidebar"
+					aria-hidden="true"
+					className="pointer-events-none absolute inset-y-0 left-0 border-r border-b border-sidebar-border/50 bg-sidebar"
+					style={{ width: sidebarWidth }}
+				/>
+			) : null}
 			<TitleBarLeftContainer isMac={isMac}>
 				{!isMac ? (
 					<Button

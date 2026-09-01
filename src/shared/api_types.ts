@@ -130,6 +130,8 @@ export interface WindowApi {
 	onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void;
 	isFullScreen: () => Promise<boolean>;
 	onFullScreenChange: (callback: (isFullScreen: boolean) => void) => () => void;
+	setTitlebarSidebarWidth: (width: number | null) => void;
+	onTitlebarSidebarWidthChanged: (callback: (width: number | null) => void) => () => void;
 }
 
 export interface AgentApi {

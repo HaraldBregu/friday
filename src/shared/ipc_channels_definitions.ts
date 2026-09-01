@@ -379,6 +379,8 @@ export const WindowChannels = {
 	isFullScreen: 'window:is-fullscreen',
 	maximizeChange: 'window:maximize-change',
 	fullScreenChange: 'window:fullscreen-change',
+	titlebarSidebarWidthSet: 'window:titlebar-sidebar-width:set',
+	titlebarSidebarWidthChanged: 'window:titlebar-sidebar-width:changed',
 	popupMenu: 'window:popup-menu',
 	showContextMenu: 'window:context-menu:show',
 } as const;

@@ -981,11 +981,13 @@ export interface WindowSendChannelMap {
 	[WindowChannels.maximize]: { args: [] };
 	[WindowChannels.close]: { args: [] };
 	[WindowChannels.popupMenu]: { args: [] };
+	[WindowChannels.titlebarSidebarWidthSet]: { args: [width: number | null] };
 }
 
 export interface WindowEventChannelMap {
 	[WindowChannels.maximizeChange]: { data: boolean };
 	[WindowChannels.fullScreenChange]: { data: boolean };
+	[WindowChannels.titlebarSidebarWidthChanged]: { data: number | null };
 }
 
 export interface TerminalInvokeChannelMap {

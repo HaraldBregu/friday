@@ -30,4 +30,10 @@ export const win: WindowApi = {
 	onFullScreenChange: (callback: (isFullScreen: boolean) => void): (() => void) => {
 		return typedOn(WindowChannels.fullScreenChange, callback);
 	},
+	setTitlebarSidebarWidth: (width: number | null): void => {
+		typedSend(WindowChannels.titlebarSidebarWidthSet, width);
+	},
+	onTitlebarSidebarWidthChanged: (callback: (width: number | null) => void): (() => void) => {
+		return typedOn(WindowChannels.titlebarSidebarWidthChanged, callback);
+	},
 } satisfies WindowApi;

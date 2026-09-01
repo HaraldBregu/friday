@@ -4,7 +4,13 @@ import type { IpcMainInvokeEvent, MenuItemConstructorOptions } from 'electron';
 import type { EventBus } from '../../../../src/main/event_bus';
 import { WindowIpc } from '../../../../src/main/ipc/window';
 import type { LoggerService } from '../../../../src/main/shared';
+import { openExtensionWindows } from '../../../../src/main/extensions/extension_render';
+import type { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
 import { WindowChannels } from '../../../../src/shared/ipc_channels_definitions';
+
+const extensionRegistry = {
+	resolve: jest.fn(() => 'workspace'),
+} as unknown as ExtensionRegistry;
 
 it('shows a native context menu and returns the selected item id', async () => {
 	const fromWebContents = jest.fn(() => ({}));
@@ -28,7 +34,7 @@ it('shows a native context menu and returns the selected item id', async () => {
 	);
 
 	new WindowIpc().register(
-		{ logger: { info: jest.fn() } as unknown as LoggerService },
+		{ logger: { info: jest.fn() } as unknown as LoggerService, extensionRegistry },
 		{} as EventBus
 	);
 	const handler = (ipcMain.handle as jest.Mock).mock.calls.find(
@@ -55,4 +61,25 @@ it('shows a native context menu and returns the selected item id', async () => {
 		error: { message: 'Unsupported context menu role: reload' },
 	});
 	errorLog.mockRestore();
+});
+
+it('forwards extension sidebar widths to the matching titlebar shell', () => {
+	const send = jest.fn();
+	const host = {
+		isDestroyed: jest.fn(() => false),
+		webContents: { send },
+	};
+	(openExtensionWindows as Map<string, unknown>).set('workspace', { window: host });
+	new WindowIpc().register(
+		{ logger: { info: jest.fn() } as unknown as LoggerService, extensionRegistry },
+		{} as EventBus
+	);
+	const listener = (ipcMain.on as jest.Mock).mock.calls.find(
+		([channel]) => channel === WindowChannels.titlebarSidebarWidthSet
+	)?.[1];
+
+	listener({ sender: {} }, 240);
+
+	expect(send).toHaveBeenCalledWith(WindowChannels.titlebarSidebarWidthChanged, 240);
+	(openExtensionWindows as Map<string, unknown>).delete('workspace');
 });
