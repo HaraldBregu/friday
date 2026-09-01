@@ -3,7 +3,6 @@ import { CHANNEL_DM_POLICIES } from '../../shared/channels_types';
 import type {
 	ProviderCredentialKind,
 	ProviderCredentialSaveInput,
-	ProviderCredentialSummary,
 } from '../../shared/provider_types';
 import { ProviderStoreChannels } from '../../shared/ipc_channels_definitions';
 import {
