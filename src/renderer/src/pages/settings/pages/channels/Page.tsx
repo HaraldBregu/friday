@@ -231,12 +231,12 @@ const ChannelsPage: React.FC = () => {
 	useEffect(() => {
 		let mounted = true;
 
-		void Promise.all([window.app.channels(), window.provider.list()])
+		void Promise.all([window.app.channels(), window.provider.listBots()])
 			.then(([services, stored]) => {
 				if (!mounted) return;
 				setChannels(services);
 				setConfigured(
-					new Set(stored.filter((entry) => entry.apiKey.trim()).map((entry) => entry.id))
+					new Set(stored.filter((entry) => entry.configured).map((entry) => entry.id))
 				);
 			})
 			.catch((error) => {

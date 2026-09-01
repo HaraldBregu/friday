@@ -49,13 +49,13 @@ const StartPage: React.FC = () => {
 
 	function handleContinueModelProvider(): void {
 		void window.provider
-			.list()
+			.list('models')
 			.then((storedProviders) => {
 				const modelProviderIds = new Set(
 					actionableProviderCatalog().map((provider) => provider.id)
 				);
 				const hasSavedKey = storedProviders.some(
-					(provider) => modelProviderIds.has(provider.id) && provider.apiKey.trim().length > 0
+					(provider) => modelProviderIds.has(provider.id) && provider.configured
 				);
 				if (hasSavedKey) {
 					dispatch({ type: 'GO_TO_STEP', step: 'search' });

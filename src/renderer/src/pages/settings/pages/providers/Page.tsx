@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
-import { type StoredProvider, type StoredProviderKind } from '@shared/provider_types';
+import type { StoredProviderKind } from '@shared/provider_types';
 import type { SearchEngineId, SearchSettings } from '@shared/search_types';
 import type { McpData } from '@shared/mcp_types';
 import { botProviders, bots, databaseProviders, databases, mcps, providers } from '@/lib/providers';
@@ -87,6 +87,7 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	);
 	const [savingProviderId, setSavingProviderId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [vaultWarning, setVaultWarning] = useState<string | null>(null);
 	const [searchSettings, setSearchSettings] = useState<SearchSettings | null>(null);
 	const [addingCustomMcp, setAddingCustomMcp] = useState(false);
 	const { servers: mcpServers, load: loadMcpServers } = useMcpServers();
@@ -94,12 +95,14 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	useEffect(() => {
 		let cancelled = false;
 
-		void window.provider
-			.list()
-			.then((storedProviders) => {
+		void Promise.all([window.provider.list(), window.provider.listBots()])
+			.then(([storedProviders, storedBots]) => {
 				if (cancelled) return;
 				const savedStatus: Record<string, boolean> = Object.fromEntries(
-					storedProviders.map((provider) => [provider.id, provider.apiKey.trim().length > 0])
+					[...storedProviders, ...storedBots].map((provider) => [
+						provider.id,
+						provider.configured,
+					])
 				);
 				const hasSavedProvider = allCatalogItems().some((provider) => savedStatus[provider.id]);
 
@@ -127,6 +130,12 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 				if (cancelled) return;
 				setError(getErrorMessage(err, 'Could not check saved provider access.'));
 			});
+		void window.provider.vaultStatus().then(
+			(status) => {
+				if (!cancelled) setVaultWarning(status.warning ?? null);
+			},
+			() => undefined
+		);
 
 		void window.search.getSettings().then(
 			(settings) => {
@@ -166,31 +175,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 		openExternalUrl(provider.apiConfigurationUrl);
 	};
 
-	const toStoredProvider = (
-		providerId: string,
-		apiKey: string,
-		kind: StoredProviderKind
-	): StoredProvider | undefined => {
-		const catalog =
-			kind === 'databases' ? databaseProviders() : kind === 'bots' ? botProviders() : providers();
-		const provider = catalog.find((item) => item.id === providerId);
-		if (!provider) return undefined;
-
-		const baseUrl =
-			kind === 'databases'
-				? (databases().find((entry) => entry.provider.id === providerId)?.url ?? '')
-				: kind === 'bots'
-					? (bots().find((entry) => entry.provider.id === providerId)?.url ?? '')
-					: provider.baseUrl;
-
-		return {
-			id: provider.id,
-			name: provider.name,
-			apiKey,
-			baseUrl,
-		};
-	};
-
 	const saveProviderEntry = async (providerId: string, kind: StoredProviderKind): Promise<void> => {
 		const entry = providerEntries.find((item) => item.providerId === providerId);
 		const apiKey = entry?.apiKey.trim() ?? '';
@@ -199,9 +183,8 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 		setSavingProviderId(providerId);
 		setError(null);
 		try {
-			const provider = toStoredProvider(providerId, apiKey, kind);
-			if (!provider) throw new Error('Unknown provider.');
-			await window.provider.set(provider, kind);
+			if (kind === 'bots') await window.provider.setBot({ id: providerId, apiKey });
+			else await window.provider.set({ id: providerId, apiKey, kind });
 			updateProviderEntry(providerId, { apiKey: '', apiKeySaved: true, editing: false });
 		} catch (err) {
 			setError(getErrorMessage(err, 'Could not save provider API key.'));
@@ -407,6 +390,9 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 				<SettingsNotice variant="destructive" icon={AlertTriangle}>
 					{error}
 				</SettingsNotice>
+			)}
+			{vaultWarning && (
+				<SettingsNotice icon={AlertTriangle}>{vaultWarning}</SettingsNotice>
 			)}
 			{(section === undefined || section === 'models') &&
 				(!embedded || modelCatalog.length > 0) && (

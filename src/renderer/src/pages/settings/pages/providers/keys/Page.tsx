@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
-import type { StoredProvider } from '../../../../../../../shared/provider_types';
 import { providers } from '@/lib/providers';
 import {
 	actionableProviderCatalog,
@@ -39,11 +38,11 @@ const ProvidersPage: React.FC = () => {
 		let cancelled = false;
 
 		void window.provider
-			.list()
+			.list('models')
 			.then((storedProviders) => {
 				if (cancelled) return;
 				const savedStatus: Record<string, boolean> = Object.fromEntries(
-					storedProviders.map((provider) => [provider.id, provider.apiKey.trim().length > 0])
+					storedProviders.map((provider) => [provider.id, provider.configured])
 				);
 				const hasSavedProvider = actionableProviderCatalog().some(
 					(provider) => savedStatus[provider.id]
@@ -97,18 +96,6 @@ const ProvidersPage: React.FC = () => {
 		openExternalUrl(provider.apiConfigurationUrl);
 	};
 
-	const toStoredProvider = (providerId: string, apiKey: string): StoredProvider | undefined => {
-		const provider = providers().find((item) => item.id === providerId);
-		if (!provider) return undefined;
-
-		return {
-			id: provider.id,
-			name: provider.name,
-			apiKey,
-			baseUrl: provider.baseUrl,
-		};
-	};
-
 	const saveProviderEntry = async (providerId: string): Promise<void> => {
 		const entry = providerEntries.find((item) => item.providerId === providerId);
 		const apiKey = entry?.apiKey.trim() ?? '';
@@ -117,9 +104,7 @@ const ProvidersPage: React.FC = () => {
 		setSavingProviderId(providerId);
 		setError(null);
 		try {
-			const provider = toStoredProvider(providerId, apiKey);
-			if (!provider) throw new Error('Unknown provider.');
-			await window.provider.set(provider);
+			await window.provider.set({ kind: 'models', id: providerId, apiKey });
 			updateProviderEntry(providerId, { apiKey: '', apiKeySaved: true, editing: false });
 		} catch (err) {
 			setError(getErrorMessage(err, 'Could not save provider API key.'));
