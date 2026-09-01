@@ -12,6 +12,15 @@ const extensionRegistry = {
 	resolve: jest.fn(() => 'workspace'),
 } as unknown as ExtensionRegistry;
 
+beforeEach(() => {
+	(extensionRegistry.resolve as jest.Mock).mockReturnValue('workspace');
+	(openExtensionWindows as Map<string, unknown>).clear();
+});
+
+afterEach(() => {
+	(openExtensionWindows as Map<string, unknown>).clear();
+});
+
 it('shows a native context menu and returns the selected item id', async () => {
 	const fromWebContents = jest.fn(() => ({}));
 	let builtTemplate: MenuItemConstructorOptions[] = [];
@@ -82,4 +91,103 @@ it('forwards extension sidebar widths to the matching titlebar shell', () => {
 
 	expect(send).toHaveBeenCalledWith(WindowChannels.titlebarSidebarWidthChanged, 240);
 	(openExtensionWindows as Map<string, unknown>).delete('workspace');
+});
+
+it('forwards titlebar options to the owning shell and button clicks to its extension', () => {
+	const shellSend = jest.fn();
+	const shellContents = { send: shellSend };
+	const extensionSend = jest.fn();
+	const extensionContents = {
+		isDestroyed: jest.fn(() => false),
+		send: extensionSend,
+	};
+	const host = {
+		isDestroyed: jest.fn(() => false),
+		webContents: shellContents,
+	};
+	(openExtensionWindows as Map<string, unknown>).set('workspace', {
+		window: host,
+		ready: true,
+		contents: extensionContents,
+		titlebarOptions: null,
+	});
+	new WindowIpc().register(
+		{ logger: { info: jest.fn() } as unknown as LoggerService, extensionRegistry },
+		{} as EventBus
+	);
+	const setOptions = (ipcMain.on as jest.Mock).mock.calls.find(
+		([channel]) => channel === WindowChannels.titlebarOptionsSet
+	)?.[1];
+	const clickButton = (ipcMain.on as jest.Mock).mock.calls.find(
+		([channel]) => channel === WindowChannels.titlebarButtonClick
+	)?.[1];
+	const options = {
+		title: 'Workspace',
+		leftButtons: [
+			{
+				id: 'toggle-sidebar',
+				label: 'Collapse sidebar',
+				icon: 'panel-left',
+				pressed: true,
+			},
+		],
+		rightButtons: [],
+		sidebarWidth: 240,
+	};
+
+	setOptions({ sender: extensionContents }, options);
+
+	expect(shellSend).toHaveBeenCalledWith(WindowChannels.titlebarOptionsChanged, options);
+	clickButton({ sender: extensionContents }, 'toggle-sidebar');
+	expect(extensionSend).not.toHaveBeenCalled();
+	clickButton({ sender: shellContents }, 'toggle-sidebar');
+	expect(extensionSend).toHaveBeenCalledWith(
+		WindowChannels.titlebarButtonClicked,
+		'toggle-sidebar'
+	);
+});
+
+it('rejects malformed titlebar options and unknown button ids', () => {
+	const shellSend = jest.fn();
+	const shellContents = { send: shellSend };
+	const extensionSend = jest.fn();
+	const extensionContents = {
+		isDestroyed: jest.fn(() => false),
+		send: extensionSend,
+	};
+	(openExtensionWindows as Map<string, unknown>).set('workspace', {
+		window: { isDestroyed: jest.fn(() => false), webContents: shellContents },
+		ready: true,
+		contents: extensionContents,
+		titlebarOptions: null,
+	});
+	new WindowIpc().register(
+		{ logger: { info: jest.fn() } as unknown as LoggerService, extensionRegistry },
+		{} as EventBus
+	);
+	const setOptions = (ipcMain.on as jest.Mock).mock.calls.find(
+		([channel]) => channel === WindowChannels.titlebarOptionsSet
+	)?.[1];
+	const clickButton = (ipcMain.on as jest.Mock).mock.calls.find(
+		([channel]) => channel === WindowChannels.titlebarButtonClick
+	)?.[1];
+
+	setOptions(
+		{ sender: extensionContents },
+		{
+			title: 'Workspace',
+			leftButtons: [{ id: 'toggle', label: 'Toggle', icon: 'arbitrary-svg' }],
+		}
+	);
+	expect(shellSend).not.toHaveBeenCalled();
+
+	setOptions(
+		{ sender: extensionContents },
+		{
+			title: 'Workspace',
+			leftButtons: [{ id: 'toggle', label: 'Toggle', icon: 'panel-left' }],
+		}
+	);
+	clickButton({ sender: shellContents }, 'unknown');
+	expect(extensionSend).not.toHaveBeenCalled();
 });

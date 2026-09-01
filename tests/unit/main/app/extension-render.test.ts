@@ -1,6 +1,9 @@
 import type { BrowserWindow, WebContentsView } from 'electron';
 import { closeExtension } from '../../../../src/main/extensions/extension_close';
-import { render } from '../../../../src/main/extensions/extension_render';
+import {
+	openExtensionWindows,
+	render,
+} from '../../../../src/main/extensions/extension_render';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 
 jest.mock('../../../../src/main/translucency', () => ({
@@ -112,6 +115,10 @@ describe('extension renderer', () => {
 			height: 592,
 		});
 		expect(harness.load).toHaveBeenCalledTimes(1);
+		expect(openExtensionWindows.get('project-order')).toMatchObject({
+			contents: harness.viewWebContents,
+			titlebarOptions: null,
+		});
 		expect(harness.win.contentView.addChildView.mock.invocationCallOrder[0]).toBeLessThan(
 			harness.load.mock.invocationCallOrder[0]
 		);
@@ -128,6 +135,7 @@ describe('extension renderer', () => {
 		expect(harness.win.setTitle).toHaveBeenCalledWith('Project');
 
 		harness.handlers.get('closed')?.();
+		expect(openExtensionWindows.has('project-order')).toBe(false);
 	});
 
 	it('keeps a failed extension view hidden and closes its shell', async () => {
