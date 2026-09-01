@@ -35,7 +35,7 @@ Friday provides:
 - Image and PDF attachments for multimodal requests, and live or recorded speech-to-text input with text-to-speech playback.
 - Independent provider and model selection for chat, transcription, speech, image, video, audio, scheduled work, and health checks.
 - Local skills, remote HTTP MCP servers, local stdio MCP servers, and standalone extension windows.
-- Persistent schedules, periodic `HEALTH.md` checks, and S3-compatible cloud storage sync for local folders.
+- Persistent schedules, periodic `HEALTH.md` checks, and Supabase-backed cloud storage sync for local folders.
 - Telegram and Discord bot connections with sender policies.
 - Local configuration, conversation history, memory, generated-media storage, and operational logs.
 - Windows, macOS, and Linux packaging; partial English and Italian localization; light, dark, and system themes.
@@ -49,15 +49,15 @@ contract.
 
 ### First-run setup
 
-The first launch uses a single `/start` flow with seven visible stages: **Welcome**, **Account**,
-**Model**, **Search**, **Storage**, **Database**, and **Models**. Account sign-in is optional; users
+The first launch uses a single `/start` flow with six visible stages: **Welcome**, **Account**,
+**Model**, **Search**, **Database**, and **Models**. Account sign-in is optional; users
 can continue in local-only mode. After sign-in or local-only continuation, Friday checks for a
 stored Assistant provider and model. A complete configuration opens Home, while an incomplete one
 continues through setup. A restored signed-in user runs this check automatically and skips Welcome
 and Account.
 
-The Model stage requires at least one saved model-provider API key. Search, S3-compatible object
-storage, and vector database connections are optional. The final Models stage offers Assistant,
+The Model stage requires at least one saved model-provider API key. Search and vector database
+connections are optional. The final Models stage offers Assistant,
 Voice, Transcription, Image, Audio, Video, realtime conversation, and search configuration, but
 only the Assistant selection is required to finish. Task and health model selection remain on their
 own Settings pages.
@@ -385,8 +385,8 @@ The chat catalog includes Anthropic, DeepSeek, Google, Kimi, MiniMax, Mistral, O
 Reka AI, xAI, and Z.ai. Exact model names, IDs, and support notes are maintained in
 [Provider Reference](PROVIDERS.md#chat-and-research).
 
-The built-in catalog contains 24 providers across models, search, vector database, and object
-storage. Model-provider entries include capability labels and an external setup link.
+The built-in catalog contains 23 providers across models, search, and vector databases.
+Model-provider entries include capability labels and an external setup link.
 
 Realtime voice has IPC and execution adapters for supported OpenAI and xAI models. Home connects
 these models to microphone capture, assistant audio playback, transcripts, tools, and generated
@@ -509,13 +509,13 @@ The Channels screen configures both adapters with enable state, token, DM policy
 See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and page behavior.
 
 - The Settings overview groups pages as: **General** (General, System, Cloud), **Assistant**
-  (Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search, Databases,
-  Storage), **Channels**, and **Integrations** (A2A, Extensions).
+  (Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search, Databases),
+  **Channels**, and **Integrations** (A2A, Extensions).
 - Account, Bots, RAG, LLM Wiki, Health, and Permissions are available in the sidebar but omitted
   from the shorter overview. Dedicated model-service and API-key pages are available through
   Assistant, route search, or direct links.
-- The **Cloud** page selects a saved S3-compatible provider and configures folders, schedules,
-  backup, and restore. Provider credentials are managed under **Providers → Storage**.
+- The **Cloud** page configures folders, schedules, backup, and restore for the signed-in account's
+  private Supabase storage. It has no storage-provider selection or storage credentials.
 - Deep pages use breadcrumbs.
 - `Cmd/Ctrl+F` opens a route and setting search palette.
 - Unknown routes show a 404 recovery view; route failures show retry, restart, or Home actions.
@@ -538,9 +538,9 @@ no enable/disable control.
 
 ### Cloud storage sync
 
-- **Providers → Storage** configures S3-compatible remote providers: endpoint, region, access key,
-  secret key, bucket, and path style. **Cloud** selects a saved profile, local paths, and a sync
-  interval so chosen folders back up to the bucket on a schedule.
+- **Cloud** selects local paths and a sync interval so chosen folders back up to the signed-in
+  account's private Supabase storage on a schedule. Backup objects use the account-scoped
+  `user-files/<user-id>/backups/` path.
 - **Providers → Databases** connects cataloged vector-database providers. Assistant RAG then
   selects the saved database, embedding model, index, and source folders.
 
@@ -586,13 +586,13 @@ Friday stores configuration and working data below Electron's application-data d
 | Services    | Independent text, transcription, voice, image, video, and audio selections.                                                                 |
 | Media       | Standalone generated video and audio files.                                                                                                 |
 | Browser     | Persistent agent-browser profile.                                                                                                           |
-| Storage     | S3-compatible remote-storage credentials and sync configuration.                                                                            |
+| Storage     | Local folder selections and cloud-backup schedule.                                                                                           |
 | Diagnostics | Local rotating logs and crash dumps. Crash dumps are not uploaded by the current configuration.                                             |
 | Wiki        | Source inbox, immutable evidence snapshots, generated Markdown, source/page/operation registries, review queue, failures, and audit log.    |
 
 Secrets are masked in the renderer after saving, but provider keys, bot tokens, and MCP secrets are stored in ordinary local electron-store files rather than an encrypted credential vault. Anyone with access to the user's application-data files may be able to read them.
 
-Prompts, attachments, tool inputs, and generated content may be sent to configured model providers, MCP servers, websites, browser targets, Telegram, Discord, or the configured cloud storage endpoint as required by the requested operation.
+Prompts, attachments, tool inputs, and generated content may be sent to configured model providers, MCP servers, websites, browser targets, Telegram, Discord, or Supabase as required by the requested operation. Only folders selected in Cloud are included in folder backups.
 
 ### Electron hardening
 

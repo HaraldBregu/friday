@@ -16,15 +16,14 @@ Open Friday
   -> configuration complete: Home
   -> configuration incomplete: Model API keys
        -> Search Engine
-       -> Object Storage
        -> Vector Databases
        -> Assistant setup
        -> verify configuration
        -> Home
 ```
 
-The footer presents seven visible stages: **Welcome**, **Account**, **Model**, **Search**,
-**Storage**, **Database**, and **Models**. Configuration checks happen between stages and do not
+The footer presents six visible stages: **Welcome**, **Account**, **Model**, **Search**,
+**Database**, and **Models**. Configuration checks happen between stages and do not
 add another progress item.
 
 ## Entry and routing
@@ -43,7 +42,6 @@ add another progress item.
 | Account  | Sign in, create an account, or continue local-only | No account required  |
 | Model    | Save an API key for a catalog model provider       | Yes                  |
 | Search   | Connect a web-search provider                      | No                   |
-| Storage  | Configure catalog or custom S3-compatible storage  | No                   |
 | Database | Connect a vector database                          | No                   |
 | Models   | Select the primary assistant provider and model    | Assistant only       |
 
@@ -91,17 +89,12 @@ provider loading fails, the user should remain on this stage and see an inline e
 The Search stage should let the user save a supported search-provider API key. Search is optional,
 so **Continue** should remain available without a configured provider.
 
-### 5. Object Storage
-
-The Storage stage should support catalog and custom S3-compatible storage configuration. Storage
-is optional during onboarding.
-
-### 6. Vector Databases
+### 5. Vector Databases
 
 The Database stage should let the user connect a supported vector database. A database is optional
 during onboarding.
 
-### 7. Assistant setup
+### 6. Assistant setup
 
 The final stage should load existing selections and available models, then show these configuration
 rows in order:

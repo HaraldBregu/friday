@@ -55,8 +55,9 @@ The root install includes the Electron app, `@friday/sdk`, and `@friday/cli` thr
 workspaces and one lockfile.
 
 On first launch, follow the [Start Page Flow](docs/ui/START.md) to sign in or continue local-only,
-save a model-provider API key, and select the provider and model for the assistant. Search, storage,
+save a model-provider API key, and select the provider and model for the assistant. Search,
 database, speech, and media configuration are optional and can be completed later in Settings.
+Signed-in users can select folders for Supabase-backed cloud backup from **Settings → Cloud**.
 See [Home UI](docs/ui/HOME.md) for the chat workspace's states and interactions.
 See [Settings UI](docs/ui/SETTINGS.md) for configuration navigation and behavior.
 

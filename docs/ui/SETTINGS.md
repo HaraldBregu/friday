@@ -39,13 +39,13 @@ The visible sidebar is grouped as follows:
 | ------------ | ------------------------------------------------------------------------------------------------- |
 | General      | Account, General, System, Cloud                                                                   |
 | Assistant    | Assistant, Coder, Skills, Background tasks, MCP servers, Bots, RAG, LLM Wiki, Health, Permissions |
-| Providers    | Models, Search engines, Databases, Storage                                                        |
+| Providers    | Models, Search engines, Databases                                                                 |
 | Channels     | Channels                                                                                          |
 | Integrations | A2A agents, Extensions                                                                            |
 
 The `/settings` overview is intentionally shorter than the sidebar. It links to General, System,
 Cloud, Assistant, Coder, Skills, Background tasks, MCP servers, Models, Search engines, Databases,
-Storage, Channels, A2A agents, and Extensions. Account, Bots, RAG, LLM Wiki, Health, and
+Channels, A2A agents, and Extensions. Account, Bots, RAG, LLM Wiki, Health, and
 Permissions remain available from the sidebar or route search.
 
 ## Route search and deep pages
@@ -170,8 +170,6 @@ See [Provider Reference](../PROVIDERS.md) for exact runtime coverage and model I
 - **Models**, **Search engines**, **Databases**, and **Bots** should list their catalog providers as
   connection cards with external setup links, password inputs, and connected state.
 - Unsupported catalog entries should be disabled as **Soon**.
-- **Storage** should configure built-in or custom S3-compatible profiles, test a draft connection,
-  save it, and confirm before removing a saved profile.
 - The searchable **API Keys** deep page should provide the model-provider credential list. The
   visible Models page can connect the same model credentials inline.
 
@@ -196,18 +194,20 @@ options that belonged to the previous model rather than carrying incompatible va
 
 ## Cloud storage
 
-Cloud should use saved provider profiles from **Providers → Storage**. When none exists, it should
-show a recoverable empty state with a provider-configuration action.
+Cloud should use the signed-in Friday account's private Supabase storage directly. It should not
+show a storage provider, profile selector, endpoint, bucket, or storage credentials.
 
-With a saved profile, Cloud should allow the user to:
+Cloud should allow the user to:
 
-- choose the active profile;
 - include known Friday folders and additional folders selected from the system picker;
 - select an automatic sync interval or edit the cron expression;
 - save or cancel sync changes;
 - run a backup immediately;
 - confirm and run a restore;
 - inspect save, backup, restore, and failure status inline.
+
+Backup and restore require a signed-in account. Remote files are isolated below the account's
+private backup path; folder selections and schedules remain local application settings.
 
 ## Knowledge and data
 
@@ -306,8 +306,8 @@ required. Filesystem policy should:
 - A2A deletion has no confirmation or inline failure handling.
 - Ordinary Settings links do not close the mobile sidebar sheet after navigation; **Return to
   Chat** does.
-- Some setting-specific search entries still route search-engine, storage-provider, and scheduled-
-  task queries to Cloud instead of their newer provider or task pages.
+- Some setting-specific search entries still route search-engine and scheduled-task queries to
+  broader pages instead of their newer provider or task pages.
 - Some model selectors display the first catalog option as a fallback without persisting it until
   the user makes an explicit change.
 - Staged pages do not warn before navigation with unsaved drafts.

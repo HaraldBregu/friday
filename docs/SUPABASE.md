@@ -105,8 +105,11 @@ Then verify these hosted-project settings in the Supabase dashboard:
 
 Existing local chats and provider configuration stay on the device. The first signed-in
 Supabase account becomes the owner of that local Friday profile; signing into another account
-is rejected to prevent accidental cross-account data exposure. Cloud APIs are available for
-new synchronization work without replacing the existing S3 or vector-storage providers.
+is rejected to prevent accidental cross-account data exposure. Cloud folder backups use the
+private `user-files` bucket below `<user-id>/backups/`; no storage-provider selection or separate
+storage credentials are required. Legacy local storage-provider configuration is left untouched
+without migration but is no longer read by the Cloud workflow. Vector-database providers remain
+separate because they serve RAG rather than file backup.
 
 Supabase session and PKCE values are encrypted with Electron `safeStorage`. On systems where
 secure encryption is unavailable, Friday keeps the session in memory and requires sign-in
