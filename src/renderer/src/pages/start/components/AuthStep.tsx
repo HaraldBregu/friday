@@ -257,7 +257,7 @@ export function AuthStep(): React.JSX.Element {
 											minLength={8}
 											required
 											value={confirmation}
-										disabled={disabled}
+											disabled={disabled}
 											onChange={(event) => setConfirmation(event.target.value)}
 										/>
 									</div>

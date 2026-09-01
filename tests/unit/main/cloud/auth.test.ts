@@ -121,4 +121,12 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 			skipBrowserRedirect: true,
 		},
 	});
+
+	signInWithOAuth.mockResolvedValueOnce({
+		data: { url: 'https://malicious.example/auth/v1/authorize?provider=google' },
+		error: null,
+	});
+	await expect(service.signInWithGoogle()).rejects.toThrow(
+		'Supabase returned an invalid authentication URL.'
+	);
 });
