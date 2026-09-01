@@ -46,7 +46,14 @@ export {
 	type WorkspaceFileKind,
 	type WorkspaceFileType,
 } from '../../src/shared/workspace';
-export type { ContextMenuDescriptor, ContextMenuRole } from '../../src/shared/window_types';
+export {
+	EXTENSION_TITLEBAR_BUTTON_ICONS,
+	type ContextMenuDescriptor,
+	type ContextMenuRole,
+	type ExtensionTitlebarButton,
+	type ExtensionTitlebarButtonIcon,
+	type ExtensionTitlebarOptions,
+} from '../../src/shared/window_types';
 export {
 	CODER_PROVIDER_IDS,
 	CODER_THINKING_LEVELS,

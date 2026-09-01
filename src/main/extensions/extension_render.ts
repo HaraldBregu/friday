@@ -3,15 +3,17 @@ import { setupPdfContextMenu } from '../pdf';
 import type { WindowFactory } from '../window_factory';
 import { attachWindowHandlers } from '../window_events';
 import { getPlatformTranslucencyOptions } from '../translucency';
+import type { ExtensionTitlebarOptions } from '../../shared/window_types';
 
-interface ExtensionWindow {
+export interface ExtensionWindow {
 	window: BrowserWindow;
 	ready: boolean;
+	contents?: WebContents;
+	titlebarOptions: ExtensionTitlebarOptions | null;
 }
 
 const windows = new Map<string, ExtensionWindow>();
-export const openExtensionWindows: ReadonlyMap<string, { readonly window: BrowserWindow }> =
-	windows;
+export const openExtensionWindows: ReadonlyMap<string, ExtensionWindow> = windows;
 const titleBarHeight = 48;
 
 export function render(
@@ -50,7 +52,11 @@ export function render(
 		{ html: 'extension.html', hash: `extension/${encodeURIComponent(title)}` }
 	);
 
-	const extensionWindow: ExtensionWindow = { window: win, ready: false };
+	const extensionWindow: ExtensionWindow = {
+		window: win,
+		ready: false,
+		titlebarOptions: null,
+	};
 	windows.set(extensionId, extensionWindow);
 	win.setMenuBarVisibility(false);
 	let shellFailed = false;
@@ -91,6 +97,7 @@ export function render(
 		const { view, load } = windowFactory.createView(file, extensionId);
 		extensionView = view;
 		extensionContents = view.webContents;
+		extensionWindow.contents = extensionContents;
 		const viewContents = extensionContents;
 
 		view.setVisible(false);

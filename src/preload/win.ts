@@ -30,6 +30,18 @@ export const win: WindowApi = {
 	onFullScreenChange: (callback: (isFullScreen: boolean) => void): (() => void) => {
 		return typedOn(WindowChannels.fullScreenChange, callback);
 	},
+	setTitlebarOptions: (options): void => {
+		typedSend(WindowChannels.titlebarOptionsSet, options);
+	},
+	onTitlebarOptionsChanged: (callback): (() => void) => {
+		return typedOn(WindowChannels.titlebarOptionsChanged, callback);
+	},
+	clickTitlebarButton: (buttonId): void => {
+		typedSend(WindowChannels.titlebarButtonClick, buttonId);
+	},
+	onTitlebarButtonClick: (callback): (() => void) => {
+		return typedOn(WindowChannels.titlebarButtonClicked, callback);
+	},
 	setTitlebarSidebarWidth: (width: number | null): void => {
 		typedSend(WindowChannels.titlebarSidebarWidthSet, width);
 	},

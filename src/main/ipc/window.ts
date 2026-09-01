@@ -12,6 +12,9 @@ import type { LoggerService } from '../shared';
 import type { ContextMenuDescriptor, ContextMenuRole } from '../../shared/window_types';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
 import { openExtensionWindows } from '../extensions/extension_render';
+import { isExtensionTitlebarOptions } from '../../shared/titlebar_validate';
+import { setExtensionTitlebar } from '../extensions/extension_titlebar_set';
+import { dispatchExtensionTitlebarButton } from '../extensions/extension_titlebar_click';
 
 const contextMenuRoles = new Set<ContextMenuRole>([
 	'undo',
@@ -102,6 +105,22 @@ export class WindowIpc implements IpcModule<WindowIpcDeps> {
 			const extensionWindow = openExtensionWindows.get(extensionId)?.window;
 			if (!extensionWindow || extensionWindow.isDestroyed()) return;
 			extensionWindow.webContents.send(WindowChannels.titlebarSidebarWidthChanged, width);
+		});
+
+		ipcMain.on(WindowChannels.titlebarOptionsSet, (event, options) => {
+			if (!isExtensionTitlebarOptions(options)) return;
+			let extensionId: string;
+			try {
+				extensionId = extensionRegistry.resolve(event.sender);
+			} catch {
+				return;
+			}
+			setExtensionTitlebar(extensionId, options);
+		});
+
+		ipcMain.on(WindowChannels.titlebarButtonClick, (event, buttonId) => {
+			if (typeof buttonId !== 'string' || !buttonId.trim() || buttonId.length > 120) return;
+			dispatchExtensionTitlebarButton(event.sender, buttonId);
 		});
 
 		// --- Query handlers (invoke/handle) ---
