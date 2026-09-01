@@ -198,6 +198,13 @@ export class ProviderVault {
 		return { vaultId: state.vaultId, deviceId: state.deviceId, key: Buffer.from(key) };
 	}
 
+	ensureIdentity(): { vaultId: string; deviceId: string; key: Buffer } {
+		if (!this.available()) throw new Error('Secure operating-system storage is unavailable.');
+		const { state, key } = this.writableState();
+		this.persist(state);
+		return { vaultId: state.vaultId, deviceId: state.deviceId, key: Buffer.from(key) };
+	}
+
 	records(): ProviderVaultRecord[] {
 		return structuredClone(Object.values(this.state().records));
 	}

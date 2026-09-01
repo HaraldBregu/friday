@@ -44,3 +44,14 @@ export interface ProviderCredentialState {
 	dirty: boolean;
 	persistence: 'encrypted' | 'memory';
 }
+
+export interface ProviderKeyEnvelope {
+	wrappedDataKey: string;
+	wrappingNonce: string;
+	wrappingTag: string;
+	kdfSalt: string;
+	kdfN: number;
+	kdfR: number;
+	kdfP: number;
+	keyVersion: number;
+}
