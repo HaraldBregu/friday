@@ -1,4 +1,9 @@
-import { createClient, type AuthChangeEvent, type Session, type SupabaseClient } from '@supabase/supabase-js';
+import {
+	createClient,
+	type AuthChangeEvent,
+	type Session,
+	type SupabaseClient,
+} from '@supabase/supabase-js';
 import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_types';
 import type { CloudConfig } from './config';
 import { publicAuthError } from './error';
@@ -137,8 +142,7 @@ export class AuthService {
 		if (data.session) {
 			this.applySession('SIGNED_IN', data.session);
 			if (this.state.status !== 'signedIn') throw this.accountMismatchError();
-		}
-		else {
+		} else {
 			this.setState({
 				status: 'confirmationRequired',
 				email,

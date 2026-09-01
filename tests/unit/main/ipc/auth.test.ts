@@ -52,7 +52,9 @@ beforeEach(() => {
 
 it('returns only the public token-free auth projection to a trusted launcher', async () => {
 	expect(query(AuthChannels.getState)(event)).toEqual(state);
-	expect(JSON.stringify(query(AuthChannels.getState)(event))).not.toMatch(/access_token|refresh_token/);
+	expect(JSON.stringify(query(AuthChannels.getState)(event))).not.toMatch(
+		/access_token|refresh_token/
+	);
 	await expect(
 		command(AuthChannels.signIn)(event, {
 			email: 'user@example.test',

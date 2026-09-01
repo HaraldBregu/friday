@@ -218,7 +218,12 @@ export function AuthStep(): React.JSX.Element {
 												{recovery ? 'New password' : 'Password'}
 											</Label>
 											{mode === 'signIn' && !recovery ? (
-												<Button type="button" variant="link" size="xs" onClick={() => switchMode('forgot')}>
+												<Button
+													type="button"
+													variant="link"
+													size="xs"
+													onClick={() => switchMode('forgot')}
+												>
 													Forgot password?
 												</Button>
 											) : null}
@@ -227,7 +232,9 @@ export function AuthStep(): React.JSX.Element {
 											<Input
 												id="auth-password"
 												type={showPassword ? 'text' : 'password'}
-												autoComplete={mode === 'signIn' && !recovery ? 'current-password' : 'new-password'}
+												autoComplete={
+													mode === 'signIn' && !recovery ? 'current-password' : 'new-password'
+												}
 												minLength={8}
 												required
 												value={password}
@@ -263,7 +270,10 @@ export function AuthStep(): React.JSX.Element {
 									</div>
 								) : null}
 								{error ? (
-									<div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive" role="alert">
+									<div
+										className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive"
+										role="alert"
+									>
 										<AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
 										<span>{error}</span>
 									</div>
@@ -299,7 +309,8 @@ export function AuthStep(): React.JSX.Element {
 						)}
 						{state.persistence === 'memory' ? (
 							<p className="mt-3 text-center text-[10px] leading-4 text-muted-foreground">
-								Secure system storage is unavailable, so this session will not persist after restart.
+								Secure system storage is unavailable, so this session will not persist after
+								restart.
 							</p>
 						) : null}
 					</CardContent>
