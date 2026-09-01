@@ -314,7 +314,9 @@ export class ProviderVault {
 
 	private persist(state: ProviderVaultStoreState): void {
 		this.store.store = state;
-		restrictProviderPermissions(path.dirname(this.store.path), this.store.path);
+		if (typeof this.store.path === 'string') {
+			restrictProviderPermissions(path.dirname(this.store.path), this.store.path);
+		}
 	}
 
 	private recordKey(kind: ProviderCredentialKind, id: string): string {

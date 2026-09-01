@@ -91,7 +91,9 @@ function section(kind: ProviderCredentialKind): unknown[] {
 
 function writeSection(kind: ProviderCredentialKind, value: unknown[]): void {
 	store.set(kind, value);
-	restrictProviderPermissions(path.dirname(store.path), store.path);
+	if (typeof store.path === 'string') {
+		restrictProviderPermissions(path.dirname(store.path), store.path);
+	}
 }
 
 function isStoredProvider(value: unknown): value is StoredProvider {
