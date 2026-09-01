@@ -22,6 +22,7 @@ import { ShellDetector } from './terminal/shell';
 import { AuthService } from './cloud/auth';
 import { CloudService } from './cloud/cloud';
 import { loadCloudConfig } from './cloud/config';
+import { ProviderSyncService } from './providers/sync';
 
 export interface MainServices {
 	appState: AppState;
@@ -39,6 +40,7 @@ export interface MainServices {
 	terminalManager: PtyManager;
 	authService: AuthService;
 	cloudService: CloudService;
+	providerSyncService: ProviderSyncService;
 }
 
 export interface BootstrapResult extends MainServices {}
@@ -84,6 +86,7 @@ export function bootstrapServices(): BootstrapResult {
 		new EnvironmentManager(logger)
 	);
 	const cloudService = new CloudService(authService);
+	const providerSyncService = new ProviderSyncService(authService);
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
 		coderService.cancelWindow((event.payload as { windowId: number }).windowId);
@@ -112,6 +115,7 @@ export function bootstrapServices(): BootstrapResult {
 		terminalManager,
 		authService,
 		cloudService,
+		providerSyncService,
 	};
 }
 
@@ -123,6 +127,7 @@ export async function cleanup(services: MainServices): Promise<void> {
 		conversationService,
 		terminalManager,
 		cloudService,
+		providerSyncService,
 		authService,
 	} = services;
 	logger.info('Bootstrap', 'Starting cleanup');
@@ -130,6 +135,7 @@ export async function cleanup(services: MainServices): Promise<void> {
 	await conversationService.execute({ type: 'voice', action: 'stop-all' });
 	await windowContextManager.destroyAll();
 	await cloudService.destroy();
+	providerSyncService.destroy();
 	authService.destroy();
 	channelRegistry.destroy();
 	logger.destroy();
