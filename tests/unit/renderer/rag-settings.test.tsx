@@ -17,7 +17,7 @@ jest.mock('react-i18next', () => {
 			'Model used to embed RAG documents for vector search.',
 		'settings.rag.configurationTitle': 'Configuration',
 		'settings.rag.indexName': 'Index name',
-		'settings.rag.indexNameDescription': 'Pinecone index.',
+		'settings.rag.indexNameDescription': 'Remote vector index.',
 		'settings.rag.indexNamePlaceholder': 'friday',
 		'settings.rag.documentsDescription': 'Documents to index.',
 		'settings.rag.sourceFolder': 'Source folders',
@@ -36,10 +36,6 @@ jest.mock('react-i18next', () => {
 		'settings.rag.searchTitle': 'Search',
 		'settings.rag.searchPlaceholder': 'Search documents',
 		'settings.rag.search': 'Search',
-		'settings.vectorDb.defaultTitle': 'Vector database',
-		'settings.vectorDb.databaseDescription': 'Database used for embeddings.',
-		'settings.vectorDb.databasePlaceholder': 'Select a database',
-		'settings.vectorDb.empty': 'No database provider is available.',
 		'settings.modelServices.modelPlaceholder': 'Select model',
 		'settings.modelServices.noModels': 'No models are available.',
 		'settings.dataControls.title': 'Data management',
@@ -75,11 +71,6 @@ jest.mock('@/lib/providers', () => ({
 		},
 	],
 }));
-
-const databaseApi = {
-	getConfiguration: jest.fn(),
-	saveConfiguration: jest.fn(),
-};
 
 const agentApi = {
 	ragGetConfiguration: jest.fn(),
@@ -121,11 +112,6 @@ beforeEach(() => {
 		configurable: true,
 		value: MouseEvent,
 	});
-	Object.defineProperty(window, 'app', {
-		configurable: true,
-		value: { databases: jest.fn().mockResolvedValue([]) },
-	});
-	Object.defineProperty(window, 'database', { configurable: true, value: databaseApi });
 	Object.defineProperty(window, 'agent', { configurable: true, value: agentApi });
 	Object.defineProperty(window, 'models', {
 		configurable: true,
@@ -134,10 +120,6 @@ beforeEach(() => {
 	Object.defineProperty(window, 'dataControls', {
 		configurable: true,
 		value: dataControls,
-	});
-	databaseApi.getConfiguration.mockResolvedValue({
-		providerId: undefined,
-		databaseId: undefined,
 	});
 	agentApi.ragGetConfiguration.mockResolvedValue({
 		enabled: false,
@@ -237,27 +219,9 @@ it('records remote embedding consent for the selected provider and model', async
 	);
 });
 
-it('groups providers, model, index, and folder paths in one configuration card', async () => {
-	Object.defineProperty(window, 'app', {
-		configurable: true,
-		value: {
-			databases: jest.fn().mockResolvedValue([
-				{
-					id: 'pinecone',
-					name: 'Pinecone',
-					provider: { id: 'pinecone', name: 'Pinecone' },
-				},
-			]),
-		},
-	});
-	databaseApi.getConfiguration.mockResolvedValue({
-		providerId: 'pinecone',
-		databaseId: 'pinecone',
-	});
+it('groups the model, index, and folder paths in one configuration card', async () => {
 	agentApi.ragGetConfiguration.mockResolvedValue({
 		indexName: 'friday',
-		databaseProviderId: 'pinecone',
-		databaseId: 'pinecone',
 		embeddingProviderId: 'openai',
 		embeddingModelId: 'text-embedding-3-small',
 		folders: ['/Users/example/docs'],
@@ -267,7 +231,6 @@ it('groups providers, model, index, and folder paths in one configuration card',
 
 	render(<RagPage />);
 
-	await screen.findByRole('combobox', { name: 'Vector database' });
 	await screen.findByText('/Users/example/docs');
 	const configurationTitle = await screen.findByText('Configuration');
 	const configurationCard = configurationTitle
@@ -276,7 +239,7 @@ it('groups providers, model, index, and folder paths in one configuration card',
 	expect(configurationCard).toBeInTheDocument();
 
 	const configuration = within(configurationCard as HTMLElement);
-	expect(configuration.getByRole('combobox', { name: 'Vector database' })).toBeInTheDocument();
+	expect(configuration.queryByRole('combobox', { name: 'Vector database' })).not.toBeInTheDocument();
 	expect(configuration.getByRole('combobox', { name: 'Embedding model' })).toBeInTheDocument();
 	expect(configuration.getByLabelText('Index name')).toHaveValue('friday');
 	expect(configuration.getByText('/Users/example/docs')).toBeInTheDocument();
