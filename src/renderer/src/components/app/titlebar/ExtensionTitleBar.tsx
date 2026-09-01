@@ -20,7 +20,7 @@ interface ExtensionTitleBarProps {
 	leftButtons?: ExtensionTitlebarButtonDescriptor[];
 	rightButtons?: ExtensionTitlebarButtonDescriptor[];
 	sidebarOpen?: boolean;
-	sidebarTransitionStartedAt?: number;
+	sidebarTransitionDelay?: number;
 	sidebarWidth?: number | null;
 }
 
@@ -29,15 +29,13 @@ export function ExtensionTitleBar({
 	leftButtons = [],
 	rightButtons = [],
 	sidebarOpen,
-	sidebarTransitionStartedAt,
+	sidebarTransitionDelay,
 	sidebarWidth = null,
 }: ExtensionTitleBarProps): React.JSX.Element {
 	const isMaximized = useExtensionWindowState();
 	const sidebarOffset = sidebarOpen && sidebarWidth !== null ? sidebarWidth : 0;
 	const transitionDelay =
-		sidebarTransitionStartedAt === undefined
-			? undefined
-			: `${-Math.min(200, Math.max(0, Date.now() - sidebarTransitionStartedAt + 5))}ms`;
+		sidebarTransitionDelay === undefined ? undefined : `${sidebarTransitionDelay}ms`;
 
 	return (
 		<TitleBarContainer className="relative">

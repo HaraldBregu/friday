@@ -55,12 +55,11 @@ it('moves centered content with the visible sidebar boundary', () => {
 });
 
 it('catches up to a sidebar transition that started in the extension renderer', () => {
-	jest.spyOn(Date, 'now').mockReturnValue(1_040);
 	const { container } = render(
 		<ExtensionTitleBar
 			title="Workspace"
 			sidebarOpen={false}
-			sidebarTransitionStartedAt={1_000}
+			sidebarTransitionDelay={-45}
 			sidebarWidth={240}
 		/>
 	);
@@ -69,7 +68,6 @@ it('catches up to a sidebar transition that started in the extension renderer', 
 
 	expect(surface).toHaveStyle({ transitionDelay: '-45ms' });
 	expect(center).toHaveStyle({ transitionDelay: '-45ms' });
-	jest.restoreAllMocks();
 });
 
 it('renders centered titlebar content and relays left and right button ids', () => {

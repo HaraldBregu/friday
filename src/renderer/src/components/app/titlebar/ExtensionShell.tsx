@@ -11,9 +11,20 @@ export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Elemen
 	useAppTheme();
 	const [options, setOptions] = useState<ExtensionTitlebarOptions | null>(null);
 	const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
+	const [sidebarTransitionDelay, setSidebarTransitionDelay] = useState<number>();
 
 	useEffect(() => {
-		const stopOptions = window.win.onTitlebarOptionsChanged(setOptions);
+		const stopOptions = window.win.onTitlebarOptionsChanged((nextOptions) => {
+			setOptions(nextOptions);
+			setSidebarTransitionDelay(
+				nextOptions?.sidebarTransitionStartedAt === undefined
+					? undefined
+					: -Math.min(
+							200,
+							Math.max(0, Date.now() - nextOptions.sidebarTransitionStartedAt + 5)
+						)
+			);
+		});
 		const stopSidebarWidth = window.win.onTitlebarSidebarWidthChanged(setSidebarWidth);
 		return () => {
 			stopOptions();
@@ -28,7 +39,7 @@ export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Elemen
 				leftButtons={options?.leftButtons ?? []}
 				rightButtons={options?.rightButtons ?? []}
 				sidebarOpen={options?.sidebarOpen}
-				sidebarTransitionStartedAt={options?.sidebarTransitionStartedAt}
+				sidebarTransitionDelay={sidebarTransitionDelay}
 				sidebarWidth={options ? (options.sidebarWidth ?? null) : sidebarWidth}
 			/>
 		</div>

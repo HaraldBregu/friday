@@ -15,6 +15,7 @@ import { canLeaveInstructions } from '@/navigation';
 export default function App() {
 	useTheme();
 	const coder = useCoderWorkspace();
+	const setLeftOpen = coder.setLeftOpen;
 	const [page, setPage] = useState<'workspace' | 'configuration' | 'instructions'>('workspace');
 	const [instructionsDirty, setInstructionsDirty] = useState(false);
 	const activeSession = coder.sessions.find((item) => item.id === coder.activeSessionId);
@@ -46,9 +47,9 @@ export default function App() {
 	const setSidebarVisibility = useCallback(
 		(open: boolean): void => {
 			syncTitlebar(open);
-			coder.setLeftOpen(open);
+			setLeftOpen(open);
 		},
-		[coder.setLeftOpen, syncTitlebar]
+		[setLeftOpen, syncTitlebar]
 	);
 
 	useLayoutEffect(() => {

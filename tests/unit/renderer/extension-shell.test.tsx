@@ -11,14 +11,14 @@ jest.mock('../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar',
 		leftButtons,
 		rightButtons,
 		sidebarOpen,
-		sidebarTransitionStartedAt,
+		sidebarTransitionDelay,
 		sidebarWidth,
 	}: {
 		title: string;
 		leftButtons: Array<{ id: string }>;
 		rightButtons: Array<{ id: string }>;
 		sidebarOpen?: boolean;
-		sidebarTransitionStartedAt?: number;
+		sidebarTransitionDelay?: number;
 		sidebarWidth: number | null;
 	}) => (
 		<div
@@ -26,7 +26,7 @@ jest.mock('../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar',
 			data-left-buttons={leftButtons.map((button) => button.id).join(',')}
 			data-right-buttons={rightButtons.map((button) => button.id).join(',')}
 			data-sidebar-open={sidebarOpen}
-			data-sidebar-transition-started-at={sidebarTransitionStartedAt}
+			data-sidebar-transition-delay={sidebarTransitionDelay}
 			data-testid="extension-titlebar"
 		>
 			{title}
@@ -87,6 +87,7 @@ it('keeps the extension titlebar aligned with its sidebar width', () => {
 });
 
 it('renders the extension title, buttons, and animated sidebar width from one snapshot', () => {
+	jest.spyOn(Date, 'now').mockReturnValue(1_040);
 	render(<ExtensionShell title="Manifest title" />);
 
 	act(() =>
@@ -105,8 +106,9 @@ it('renders the extension title, buttons, and animated sidebar width from one sn
 	expect(titlebar).toHaveAttribute('data-left-buttons', 'toggle-sidebar');
 	expect(titlebar).toHaveAttribute('data-right-buttons', 'settings');
 	expect(titlebar).toHaveAttribute('data-sidebar-open', 'false');
-	expect(titlebar).toHaveAttribute('data-sidebar-transition-started-at', '1000');
+	expect(titlebar).toHaveAttribute('data-sidebar-transition-delay', '-45');
 	expect(titlebar).toHaveAttribute('data-sidebar-width', '240');
+	jest.restoreAllMocks();
 });
 
 it('restores manifest defaults and unsubscribes when the shell unmounts', () => {
