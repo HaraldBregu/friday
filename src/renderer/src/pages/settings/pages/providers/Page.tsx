@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import type { StoredProviderKind } from '@shared/provider_types';
 import type { SearchEngineId, SearchSettings } from '@shared/search_types';
 import type { McpData } from '@shared/mcp_types';
-import { botProviders, bots, databaseProviders, databases, mcps, providers } from '@/lib/providers';
+import { mcps } from '@/lib/providers';
 import {
 	actionableBotCatalog,
 	actionableDatabaseCatalog,

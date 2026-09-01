@@ -30,12 +30,12 @@ const ChannelDetailPage: React.FC = () => {
 	useEffect(() => {
 		let mounted = true;
 
-		void Promise.all([window.app.channels(), window.provider.get(providerId)])
+		void Promise.all([window.app.channels(), window.provider.getBot(providerId)])
 			.then(([services, stored]) => {
 				if (!mounted) return;
 				const entry = services.find((item) => item.provider.id === providerId) ?? null;
 				setService(entry);
-				setCredential(stored ?? blankCredential(providerId, entry));
+				setCredential(stored ? { ...stored, apiKey: '' } : blankCredential(providerId, entry));
 			})
 			.catch((err) => {
 				console.error('[ChannelDetailPage] Failed to load channel:', err);
@@ -51,7 +51,8 @@ const ChannelDetailPage: React.FC = () => {
 		setCredential(next);
 		setError(null);
 		try {
-			await window.provider.set(next, 'bots');
+			const saved = await window.provider.setBot(next);
+			setCredential({ ...saved, apiKey: '' });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : String(err));
 		}
