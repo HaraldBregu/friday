@@ -28,7 +28,8 @@ jest.mock('react-i18next', () => {
 		'settings.storage.operation.backup.running': 'Backup is running in the background…',
 		'settings.storage.operation.backup.succeeded': 'Backup completed',
 	};
-	return { useTranslation: () => ({ t: (key: string): string => translations[key] ?? key }) };
+	const t = (key: string): string => translations[key] ?? key;
+	return { useTranslation: () => ({ t }) };
 });
 
 const storageApi = {
