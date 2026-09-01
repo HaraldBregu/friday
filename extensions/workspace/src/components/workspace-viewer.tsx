@@ -1,5 +1,5 @@
 import { AlertCircle, Check, FileText, LoaderCircle, Save } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@friday/sdk';
 
 import { FileViewer } from '@/components/viewer';
@@ -8,12 +8,21 @@ import { FormatToggle } from '@/components/format-toggle';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
 import { showNativeContextMenu } from '@/lib/menu';
+import { cn } from '@/lib/utils';
+
+const editableWorkspaceKinds = new Set<WorkspaceFileKind>([
+	'markdown',
+	'mermaid',
+	'excalidraw',
+	'tldraw',
+]);
 
 interface WorkspaceViewerProps {
 	content: string;
 	dirty: boolean;
 	error: string;
 	file: WorkspaceTreeEntry | null;
+	isDark: boolean;
 	kind: WorkspaceFileKind | null;
 	loading: boolean;
 	mediaUrl: string;
@@ -33,6 +42,7 @@ export function WorkspaceViewer({
 	dirty,
 	error,
 	file,
+	isDark,
 	kind,
 	loading,
 	mediaUrl,
@@ -46,6 +56,21 @@ export function WorkspaceViewer({
 	sidebarTrigger,
 	saving,
 }: WorkspaceViewerProps) {
+	const editable = kind !== null && editableWorkspaceKinds.has(kind);
+	const canvas = kind === 'mermaid' || kind === 'excalidraw' || kind === 'tldraw';
+
+	useEffect(() => {
+		if (!editable) return;
+		const saveShortcut = (event: KeyboardEvent) => {
+			if (event.defaultPrevented || !(event.metaKey || event.ctrlKey)) return;
+			if (event.key.toLowerCase() !== 's') return;
+			event.preventDefault();
+			void onSave();
+		};
+		window.addEventListener('keydown', saveShortcut);
+		return () => window.removeEventListener('keydown', saveShortcut);
+	}, [editable, onSave]);
+
 	if (!path || !kind) {
 		return (
 			<section
@@ -84,7 +109,7 @@ export function WorkspaceViewer({
 				showNativeContextMenu(
 					event,
 					[
-						...(kind === 'markdown'
+						...(editable
 							? [
 									{
 										id: markdownMode === 'source' ? 'show-preview' : 'show-source',
@@ -131,7 +156,7 @@ export function WorkspaceViewer({
 					<p className="mt-0.5 truncate text-[11px] text-muted-foreground">{path}</p>
 				</div>
 
-				{kind === 'markdown' && !loading ? (
+				{editable && !loading ? (
 					<div className="flex shrink-0 items-center gap-2">
 						<span
 							className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex"
@@ -158,7 +183,12 @@ export function WorkspaceViewer({
 				) : null}
 			</header>
 
-			<div className="min-h-0 flex-1 overflow-y-auto scrollbar-subtle">
+			<div
+				className={cn(
+					'min-h-0 flex-1',
+					canvas ? 'overflow-hidden' : 'overflow-y-auto scrollbar-subtle'
+				)}
+			>
 				{loading ? (
 					<div className="flex min-h-full items-center justify-center gap-2 text-sm text-muted-foreground">
 						<LoaderCircle className="h-4 w-4 animate-spin" /> Loading file...
@@ -171,6 +201,7 @@ export function WorkspaceViewer({
 					<FileViewer
 						canSave={dirty && !saving}
 						content={content}
+						isDark={isDark}
 						kind={kind}
 						onChange={onChange}
 						onSave={onSave}

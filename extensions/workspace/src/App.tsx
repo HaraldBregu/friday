@@ -46,6 +46,19 @@ const fallbackTheme: AppThemeData = {
 const sidebarMinWidth = 200;
 const sidebarMaxWidth = 360;
 const sidebarDefaultWidth = 240;
+const editableWorkspaceKinds = new Set<WorkspaceFileKind>([
+	'markdown',
+	'mermaid',
+	'excalidraw',
+	'tldraw',
+]);
+const createFilePresets = [
+	{ kind: 'markdown', label: 'Markdown', name: 'Untitled.md' },
+	{ kind: 'mermaid', label: 'Mermaid', name: 'Untitled.mmd' },
+	{ kind: 'excalidraw', label: 'Excalidraw', name: 'Untitled.excalidraw' },
+	{ kind: 'tldraw', label: 'tldraw', name: 'Untitled.tldr' },
+] as const;
+type CreateFileKind = (typeof createFilePresets)[number]['kind'];
 
 export default function App() {
 	const [theme, setTheme] = useState<AppThemeData>(fallbackTheme);
@@ -68,6 +81,7 @@ export default function App() {
 		type: 'file' | 'directory';
 	} | null>(null);
 	const [createName, setCreateName] = useState('');
+	const [createFileKind, setCreateFileKind] = useState<CreateFileKind>('markdown');
 	const [createError, setCreateError] = useState('');
 	const [creating, setCreating] = useState(false);
 	const [renameTarget, setRenameTarget] = useState<WorkspaceTreeEntry | null>(null);
@@ -86,7 +100,8 @@ export default function App() {
 	const allowCloseRef = useRef(false);
 	const deletingScopeRef = useRef<string | null>(null);
 	const selectionRequestRef = useRef(0);
-	const selectedDirty = selectedKind === 'markdown' && selectedContent !== selectedSavedContent;
+	const selectedEditable = selectedKind !== null && editableWorkspaceKinds.has(selectedKind);
+	const selectedDirty = selectedEditable && selectedContent !== selectedSavedContent;
 	const selectedWorkspaceEntry = useMemo(
 		() => findWorkspaceEntry(workspaceFiles, selectedWorkspacePath),
 		[workspaceFiles, selectedWorkspacePath]
@@ -168,14 +183,14 @@ export default function App() {
 		};
 	}, []);
 
-	const saveWorkspaceMarkdown = useCallback(
-		async function saveWorkspaceMarkdown(
+	const saveWorkspaceFile = useCallback(
+		async function saveWorkspaceFile(
 			filePath = selectedPathRef.current,
 			content = selectedContent
 		): Promise<boolean> {
 			if (
 				!filePath ||
-				selectedKind !== 'markdown' ||
+				!editableWorkspaceKinds.has(selectedKind) ||
 				!isFriday() ||
 				(deletingScopeRef.current
 					? isWorkspacePathWithin(filePath, deletingScopeRef.current)
@@ -190,14 +205,14 @@ export default function App() {
 					return pendingSave;
 				}
 				await pendingSave;
-				return saveWorkspaceMarkdown(filePath, content);
+				return saveWorkspaceFile(filePath, content);
 			}
 
 			setSelectedSaving(true);
 			setSelectedSaveError('');
 			saveSnapshotRef.current = { filePath, content };
 			const operation = Promise.resolve()
-				.then(() => agent.writeWorkspaceMarkdown(filePath, content))
+				.then(() => agent.writeWorkspaceFile(filePath, content))
 				.then(() => {
 					if (selectedPathRef.current === filePath) setSelectedSavedContent(content);
 					return true;
@@ -205,7 +220,7 @@ export default function App() {
 				.catch((error) => {
 					if (selectedPathRef.current === filePath) {
 						setSelectedSaveError(
-							error instanceof Error ? error.message : 'Unable to save the Markdown file.'
+							error instanceof Error ? error.message : 'Unable to save the workspace file.'
 						);
 					}
 					return false;
@@ -221,14 +236,14 @@ export default function App() {
 		[selectedContent, selectedKind]
 	);
 
-	const saveLatestWorkspaceMarkdown = useCallback(
-		async function saveLatestWorkspaceMarkdown(
+	const saveLatestWorkspaceFile = useCallback(
+		async function saveLatestWorkspaceFile(
 			filePath = selectedPathRef.current
 		): Promise<boolean> {
 			if (!filePath) return false;
 			let content = selectedContentRef.current;
 			while (selectedPathRef.current === filePath) {
-				const saved = await saveWorkspaceMarkdown(filePath, content);
+				const saved = await saveWorkspaceFile(filePath, content);
 				if (!saved) return false;
 				const latestContent = selectedContentRef.current;
 				if (latestContent === content) return true;
@@ -236,16 +251,16 @@ export default function App() {
 			}
 			return false;
 		},
-		[saveWorkspaceMarkdown]
+		[saveWorkspaceFile]
 	);
 
 	useEffect(() => {
 		if (!selectedDirty || selectedSaving || selectedSaveError) return;
 		const timeout = window.setTimeout(() => {
-			void saveWorkspaceMarkdown(selectedPathRef.current, selectedContent);
+			void saveWorkspaceFile(selectedPathRef.current, selectedContent);
 		}, 700);
 		return () => window.clearTimeout(timeout);
-	}, [saveWorkspaceMarkdown, selectedContent, selectedDirty, selectedSaveError, selectedSaving]);
+	}, [saveWorkspaceFile, selectedContent, selectedDirty, selectedSaveError, selectedSaving]);
 
 	useEffect(() => {
 		if (!selectedDirty && !selectedSaving) return;
@@ -259,7 +274,7 @@ export default function App() {
 			event.returnValue = 'Changes are still being saved.';
 			if (closeAfterSaveRef.current) return;
 			closeAfterSaveRef.current = true;
-			void saveLatestWorkspaceMarkdown(selectedPathRef.current).then((saved) => {
+			void saveLatestWorkspaceFile(selectedPathRef.current).then((saved) => {
 				closeAfterSaveRef.current = false;
 				if (!saved) return;
 				allowCloseRef.current = true;
@@ -268,15 +283,16 @@ export default function App() {
 		};
 		window.addEventListener('beforeunload', preventUnsavedClose);
 		return () => window.removeEventListener('beforeunload', preventUnsavedClose);
-	}, [saveLatestWorkspaceMarkdown, selectedDirty, selectedSaveError, selectedSaving]);
+	}, [saveLatestWorkspaceFile, selectedDirty, selectedSaveError, selectedSaving]);
 
 	async function selectWorkspaceEntry(entry: WorkspaceTreeEntry) {
 		if (entry.type !== 'file') return;
 		if (
-			selectedKind === 'markdown' &&
+			selectedKind !== null &&
+			editableWorkspaceKinds.has(selectedKind) &&
 			(selectedContent !== selectedSavedContent || selectedSaving)
 		) {
-			const saved = await saveLatestWorkspaceMarkdown(selectedPathRef.current);
+			const saved = await saveLatestWorkspaceFile(selectedPathRef.current);
 			if (!saved) return;
 		}
 
@@ -323,6 +339,7 @@ export default function App() {
 
 	function startCreateWorkspaceEntry(parentPath: string, type: 'file' | 'directory') {
 		setCreateRequest({ parentPath, type });
+		setCreateFileKind('markdown');
 		setCreateName(type === 'file' ? 'Untitled.md' : 'New Folder');
 		setCreateError('');
 	}
@@ -377,12 +394,13 @@ export default function App() {
 		setRenameError('');
 		if (
 			renamesSelection &&
-			selectedKind === 'markdown' &&
+			selectedKind !== null &&
+			editableWorkspaceKinds.has(selectedKind) &&
 			(selectedContentRef.current !== selectedSavedContent || selectedSaving)
 		) {
-			const saved = await saveLatestWorkspaceMarkdown(selectedPath);
+			const saved = await saveLatestWorkspaceFile(selectedPath);
 			if (!saved) {
-				setRenameError('Save the selected Markdown file before renaming it.');
+				setRenameError('Save the selected file before renaming it.');
 				setRenaming(false);
 				return;
 			}
@@ -479,7 +497,7 @@ export default function App() {
 			isWorkspacePathWithin(selectedPathRef.current, targetPath) &&
 			selectedContentRef.current !== selectedSavedContent
 		) {
-			void saveWorkspaceMarkdown(selectedPathRef.current, selectedContentRef.current);
+			void saveWorkspaceFile(selectedPathRef.current, selectedContentRef.current);
 		}
 	}
 
@@ -494,11 +512,12 @@ export default function App() {
 		);
 		if (
 			movesSelection &&
-			selectedKind === 'markdown' &&
+			selectedKind !== null &&
+			editableWorkspaceKinds.has(selectedKind) &&
 			(selectedContentRef.current !== selectedSavedContent || selectedSaving)
 		) {
-			const saved = await saveLatestWorkspaceMarkdown(currentSelectedPath);
-			if (!saved) throw new Error('Save the selected Markdown file before moving it.');
+			const saved = await saveLatestWorkspaceFile(currentSelectedPath);
+			if (!saved) throw new Error('Save the selected file before moving it.');
 		}
 
 		const movedPath = await agent.moveWorkspaceEntry(entry.path, destinationPath);
@@ -629,6 +648,7 @@ export default function App() {
 						error={selectedError}
 						file={selectedWorkspaceEntry?.type === 'file' ? selectedWorkspaceEntry : null}
 						kind={selectedKind}
+						isDark={theme.isDark}
 						loading={selectedLoading}
 						markdownMode={markdownMode}
 						mediaUrl={selectedMediaUrl}
@@ -646,7 +666,7 @@ export default function App() {
 								type: 'file',
 							});
 						}}
-						onSave={() => saveWorkspaceMarkdown(selectedPathRef.current, selectedContent)}
+						onSave={() => saveWorkspaceFile(selectedPathRef.current, selectedContent)}
 						path={selectedWorkspacePath}
 						saveError={selectedSaveError}
 						sidebarTrigger={<SidebarTrigger />}
@@ -699,8 +719,29 @@ export default function App() {
 									? `Create it inside ${createRequest.parentPath}.`
 									: 'Create it at the workspace root.'}
 							</DialogDescription>
-						</DialogHeader>
-						<div className="space-y-2">
+							</DialogHeader>
+							{createRequest?.type === 'file' ? (
+								<div className="space-y-2">
+									<span className="text-sm font-medium">Type</span>
+									<div className="grid grid-cols-2 gap-2" role="group" aria-label="File type">
+										{createFilePresets.map((preset) => (
+											<Button
+												key={preset.kind}
+												type="button"
+												variant={createFileKind === preset.kind ? 'default' : 'outline'}
+												onClick={() => {
+													setCreateFileKind(preset.kind);
+													setCreateName(preset.name);
+													setCreateError('');
+												}}
+											>
+												{preset.label}
+											</Button>
+										))}
+									</div>
+								</div>
+							) : null}
+							<div className="space-y-2">
 							<label htmlFor="workspace-entry-name" className="text-sm font-medium">
 								Name
 							</label>
