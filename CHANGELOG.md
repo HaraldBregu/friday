@@ -17,7 +17,7 @@ Changes since [v1.0.2] (2026-07-26).
 - Realtime voice conversations and dictation with OpenAI and xAI support, PCM capture/playback, and configurable realtime voice settings.
 - Background microphone, camera, and screen recording tools with status and stop controls.
 - Extension packages, isolated extension windows, manifests, stores, import/delete flows, file watching, and extension management settings.
-- Built-in Mermaid, tldraw, document, spreadsheet, presentation, PDF, and coding extension/skill resources.
+- Built-in workspace editors for Mermaid, tldraw, and Excalidraw files, plus document, spreadsheet, presentation, PDF, and coding extension/skill resources.
 - Provider manifests and catalogs for models, bots, channels, storage, search, vector databases, and transactional email.
 - Bot/channel integrations for Telegram and Discord, including credential-backed configuration, default channel selection, voice handling, and channel security.
 - Task scheduling APIs and agent tools for creating, updating, pausing, resuming, deleting, listing, and immediately running tasks.
