@@ -43,12 +43,14 @@ export class ProviderStoreIpc implements IpcModule<ProviderStoreIpcDeps> {
 		});
 		registerQueryWithEvent(ProviderStoreChannels.list, (event, kind) => {
 			trusted.assert(event);
-			if (kind) listProviders(this.kind(kind));
-			else {
-				listProviders('models');
-				listProviders('databases');
+			if (kind) {
+				const normalizedKind = this.kind(kind);
+				listProviders(normalizedKind);
+				return sync.listSummaries(normalizedKind);
 			}
-			return sync.listSummaries(kind ? this.kind(kind) : undefined);
+			listProviders('models');
+			listProviders('databases');
+			return [...sync.listSummaries('models'), ...sync.listSummaries('databases')];
 		});
 		registerCommandWithEvent(ProviderStoreChannels.set, (event, value) => {
 			trusted.assert(event);

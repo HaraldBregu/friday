@@ -15,18 +15,21 @@ export async function wrapProviderDataKey(
 	const saltBase64 = salt.toString('base64');
 	const wrappingKey = await deriveProviderWrappingKey(passphrase, salt, KDF);
 	const nonce = randomBytes(12);
-	const cipher = createCipheriv('aes-256-gcm', wrappingKey, nonce);
-	cipher.setAAD(providerWrappingAad(vaultId, 1, KDF, saltBase64));
-	const wrapped = Buffer.concat([cipher.update(dataKey), cipher.final()]);
-	wrappingKey.fill(0);
-	return {
-		wrappedDataKey: wrapped.toString('base64'),
-		wrappingNonce: nonce.toString('base64'),
-		wrappingTag: cipher.getAuthTag().toString('base64'),
-		kdfSalt: saltBase64,
-		kdfN: KDF.N,
-		kdfR: KDF.r,
-		kdfP: KDF.p,
-		keyVersion: 1,
-	};
+	try {
+		const cipher = createCipheriv('aes-256-gcm', wrappingKey, nonce);
+		cipher.setAAD(providerWrappingAad(vaultId, 1, KDF, saltBase64));
+		const wrapped = Buffer.concat([cipher.update(dataKey), cipher.final()]);
+		return {
+			wrappedDataKey: wrapped.toString('base64'),
+			wrappingNonce: nonce.toString('base64'),
+			wrappingTag: cipher.getAuthTag().toString('base64'),
+			kdfSalt: saltBase64,
+			kdfN: KDF.N,
+			kdfR: KDF.r,
+			kdfP: KDF.p,
+			keyVersion: 1,
+		};
+	} finally {
+		wrappingKey.fill(0);
+	}
 }

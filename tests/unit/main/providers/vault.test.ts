@@ -116,6 +116,24 @@ describe('local provider vault', () => {
 		expect(vault.get('models', 'openai')).toEqual(provider());
 	});
 
+	it('does not replace an unreadable protected key or overwrite encrypted records', () => {
+		const store = new Store<ProviderVaultStoreState>({ defaults });
+		new ProviderVault(store, secureStorage(), 'darwin').save('models', provider());
+		const persisted = structuredClone(store.store);
+		const unreadableStorage = {
+			...secureStorage(),
+			decryptString: () => {
+				throw new Error('unreadable');
+			},
+		};
+		const lockedVault = new ProviderVault(store, unreadableStorage, 'darwin');
+
+		expect(() => lockedVault.save('databases', { ...provider(), id: 'pinecone' })).toThrow(
+			'cannot be opened'
+		);
+		expect(store.store).toEqual(persisted);
+	});
+
 	it.each([
 		['unavailable encryption', secureStorage(false), 'darwin' as const],
 		['Linux basic_text', secureStorage(true, 'basic_text'), 'linux' as const],

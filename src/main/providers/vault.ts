@@ -291,6 +291,7 @@ export class ProviderVault {
 		state.deviceId ||= randomUUID();
 		let key = this.readKey();
 		if (!key) {
+			if (state.protectedKey) throw new Error('The local provider vault cannot be opened.');
 			key = randomBytes(32);
 			state.protectedKey = this.storage.encryptString(key.toString('base64')).toString('base64');
 			this.key = Buffer.from(key);
