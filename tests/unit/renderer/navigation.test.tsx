@@ -123,5 +123,18 @@ it('renders settings navigation beside the workspace and marks the current secti
 			name: 'settings.overview.groups.mlModels',
 		})
 	).toBeInTheDocument();
+	expect(
+		within(providersGroup as HTMLElement).getByRole('link', {
+			name: 'settings.tabs.searchEngines',
+		})
+	).toBeInTheDocument();
+	expect(
+		within(providersGroup as HTMLElement).queryByRole('link', {
+			name: 'settings.tabs.databases',
+		})
+	).not.toBeInTheDocument();
+	expect(
+		within(assistantGroup as HTMLElement).getByRole('link', { name: 'settings.tabs.mcp' })
+	).toBeInTheDocument();
 	expect(currentSection).toHaveAttribute('data-active');
 });

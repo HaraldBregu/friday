@@ -58,6 +58,7 @@ it('keeps object storage out of the providers group', () => {
 	const providersGroup = screen.getByText('settings.tabs.providers').closest('section');
 	expect(providersGroup).not.toBeNull();
 	expect(within(providersGroup as HTMLElement).queryByText('settings.tabs.storage')).toBeNull();
+	expect(within(providersGroup as HTMLElement).queryByText('settings.tabs.databases')).toBeNull();
 	expect(screen.getByRole('button', { name: /settings\.tabs\.cloud/ })).toBeInTheDocument();
 });
 

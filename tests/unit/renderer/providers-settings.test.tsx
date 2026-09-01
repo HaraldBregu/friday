@@ -7,7 +7,6 @@ jest.mock('react-i18next', () => {
 		'settings.tabs.providers': 'Providers',
 		'settings.providers.description': 'Connect providers and configure models.',
 		'settings.overview.groups.mlModels': 'Models',
-		'settings.overview.groups.vectorDatabases': 'Databases',
 		'settings.tabs.bots': 'Bots',
 	};
 	const t = (key: string): string => translations[key] ?? key;
@@ -52,7 +51,7 @@ describe('Providers settings', () => {
 		);
 
 		expect(screen.getByRole('heading', { name: 'Models' })).toBeInTheDocument();
-		expect(screen.getByRole('heading', { name: 'Databases' })).toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: 'Databases' })).not.toBeInTheDocument();
 		expect(screen.getByRole('heading', { name: 'Search' })).toBeInTheDocument();
 		expect(screen.getByRole('heading', { name: 'Bots' })).toBeInTheDocument();
 		expect(screen.queryByRole('heading', { name: /storage/i })).not.toBeInTheDocument();

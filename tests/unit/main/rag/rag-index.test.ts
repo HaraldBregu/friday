@@ -47,7 +47,6 @@ beforeEach(() => {
 		embeddingProviderId: 'openai',
 		embeddingModelId: 'text-embedding-3-small',
 		embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small' },
-		databaseProviderId: 'pinecone',
 	});
 	embed.mockResolvedValue({
 		providerId: 'openai',
@@ -168,7 +167,7 @@ it('indexes nested and extensionless text files while skipping binary files', as
 	]);
 });
 
-it('does not publish locally when the optional Pinecone mirror fails', async () => {
+it('does not publish locally when the Pinecone mirror fails', async () => {
 	upsert.mockRejectedValueOnce(new Error('remote failure'));
 
 	await expect(

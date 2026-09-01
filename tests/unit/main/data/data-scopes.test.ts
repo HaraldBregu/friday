@@ -6,7 +6,6 @@ const getIndex = jest.fn(() => ({
 const ragVectorStore = jest.fn(() => ({ getIndex, close }));
 const getRagConfiguration = jest.fn(() => ({
 	indexName: 'knowledge-base',
-	databaseProviderId: 'pinecone',
 }));
 const getWikiSettings = jest.fn(() => ({ targetPath: '/wiki' }));
 

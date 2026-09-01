@@ -67,17 +67,7 @@ describe('provider manifests', () => {
 		expect(providersById.get('tavily')?.iconLightUrl).toContain(
 			'/resources/providers/tavily/images/official/tavily-black.svg'
 		);
-		expect(providersById.get('pinecone')).toEqual(
-			expect.objectContaining({
-				name: 'Pinecone',
-				iconDarkUrl: expect.stringContaining(
-					'/resources/providers/pinecone/images/official/pinecone.png'
-				),
-				iconLightUrl: expect.stringContaining(
-					'/resources/providers/pinecone/images/official/pinecone.png'
-				),
-			})
-		);
+		expect(providersById.has('pinecone')).toBe(false);
 		expect(deepseek?.metadata).toEqual(
 			expect.objectContaining({ contextWindow: 1_048_576, defaultOutputTokens: 32_768 })
 		);
@@ -134,14 +124,7 @@ describe('provider manifests', () => {
 				}),
 			])
 		);
-		expect(loadDatabases()).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					id: 'vector-database',
-					provider: expect.objectContaining({ id: 'pinecone' }),
-				}),
-			])
-		);
+		expect(loadDatabases()).toEqual([]);
 		expect(namesAreAlphabetical(loadModels())).toBe(true);
 		expect(namesAreAlphabetical(loadDatabases())).toBe(true);
 		expect(namesAreAlphabetical(loadWebSearches())).toBe(true);

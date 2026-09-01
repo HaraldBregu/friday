@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { ProviderAvatar } from '../../../src/renderer/src/components/provider-avatar';
 
-it.each(['brave', 'tavily', 'pinecone', 'reka'])('enlarges the %s provider icon', (providerId) => {
+it.each(['brave', 'tavily', 'reka'])('enlarges the %s provider icon', (providerId) => {
 	const { container } = render(
 		<ProviderAvatar
 			providerId={providerId}
