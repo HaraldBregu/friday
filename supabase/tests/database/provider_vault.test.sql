@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(17);
 
 set local role postgres;
 
@@ -304,17 +304,18 @@ select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111
 
 select results_eq(
 	$$
-		with deleted as (
-			delete from public.provider_vaults
-			where vault_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-			returning owner_id
-		)
-		select
-			(select count(*) from deleted)::bigint,
-			(select count(*) from public.provider_credentials)::bigint
+		delete from public.provider_vaults
+		where vault_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+		returning owner_id
 	$$,
-	$$ values (1::bigint, 0::bigint) $$,
-	'owner-confirmed vault deletion cascades through only their credentials'
+	$$ values ('11111111-1111-4111-8111-111111111111'::uuid) $$,
+	'owner can explicitly delete their cloud vault'
+);
+
+select results_eq(
+	$$ select count(*)::bigint from public.provider_credentials $$,
+	$$ values (0::bigint) $$,
+	'owner-confirmed vault deletion cascades through their credentials'
 );
 
 select * from finish();
