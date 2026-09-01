@@ -9,7 +9,6 @@ import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Choice } from '@/components/choice';
 import { Setting } from '@/components/setting';
@@ -31,7 +30,6 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col bg-background">
 			<header className="flex h-11 shrink-0 items-center gap-2 px-3">
-				<SidebarTrigger />
 				<h1 className="flex-1 text-xs font-medium">Configuration</h1>
 				{configuration.saving ? (
 					<span className="text-[11px] text-muted-foreground">Saving…</span>

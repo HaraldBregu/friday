@@ -111,6 +111,19 @@ const action = await win.showContextMenu([
 ]);
 win.maximize();
 const maximized = await win.isMaximized();
+
+win.setTitlebarOptions({
+	title: 'Workspace',
+	leftButtons: [
+		{ id: 'toggle-sidebar', label: 'Toggle sidebar', icon: 'panel-left' },
+	],
+	rightButtons: [],
+	sidebarWidth: 240,
+});
+const stopTitlebarActions = win.onTitlebarButtonClick((buttonId) => {
+	if (buttonId === 'toggle-sidebar') console.log('Toggle the extension sidebar');
+});
+stopTitlebarActions();
 ```
 
 ## What's available
@@ -138,6 +151,13 @@ list the Pi model catalog, and run Codex OAuth; other extensions are rejected. C
 `terminal` is also intentionally embedded-only and is authorized only for trusted Friday windows and
 the registered Coder extension. It exposes the narrow preload bridge; shell selection, PTY ownership,
 and process lifecycle remain in the Electron main process. It is not exposed by `connect()`.
+
+Extension titlebars are rendered by the Friday host. In-app extensions can provide a centered title,
+left and right button descriptors, and an optional sidebar surface width with
+`win.setTitlebarOptions()`. Button IDs are returned through `win.onTitlebarButtonClick()` so the
+extension remains the owner of its application state. Passing `null` restores the manifest title and
+removes extension-provided controls. Icons are selected from the exported
+`EXTENSION_TITLEBAR_BUTTON_ICONS` list; arbitrary markup is not accepted across the window boundary.
 
 Extension store methods are available only to extensions embedded in Friday. Friday derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.

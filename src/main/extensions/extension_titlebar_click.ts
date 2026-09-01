@@ -9,11 +9,9 @@ export function dispatchExtensionTitlebarButton(sender: WebContents, buttonId: s
 		const button = [...(options?.leftButtons ?? []), ...(options?.rightButtons ?? [])].find(
 			(item) => item.id === buttonId
 		);
-		if (!button || button.disabled || !extensionWindow.contents?.isDestroyed()) {
-			if (button && !button.disabled) {
-				extensionWindow.contents?.send(WindowChannels.titlebarButtonClicked, buttonId);
-			}
-			return;
-		}
+		if (!button || button.disabled) return;
+		if (!extensionWindow.contents || extensionWindow.contents.isDestroyed()) return;
+		extensionWindow.contents.send(WindowChannels.titlebarButtonClicked, buttonId);
+		return;
 	}
 }

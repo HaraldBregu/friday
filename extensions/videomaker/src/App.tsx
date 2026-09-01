@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { app, isFriday } from '@friday/sdk';
+import { app, isFriday, win } from '@friday/sdk';
 import type { CallbackListener, PlayerRef } from '@remotion/player';
 
 import { Export } from './components/Export';
@@ -40,6 +40,12 @@ export default function App() {
 	const duration = getProjectDuration(project);
 	const inputProps = useMemo(() => ({ project }), [project]);
 	const selectedClip = project.clips.find((clip) => clip.id === selectedId) ?? null;
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		win.setTitlebarOptions({ title: 'Video Maker', leftButtons: [], rightButtons: [] });
+		return () => win.setTitlebarOptions(null);
+	}, []);
 
 	useEffect(() => {
 		let active = true;

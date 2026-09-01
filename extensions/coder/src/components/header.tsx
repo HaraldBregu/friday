@@ -16,7 +16,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CoderController } from '@/controller';
 
@@ -30,8 +29,6 @@ export function Header({
 	const session = coder.sessions.find((item) => item.id === coder.activeSessionId);
 	return (
 		<header className="flex h-11 shrink-0 items-center gap-2 bg-background px-3">
-			<SidebarTrigger />
-
 			<div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs">
 				<span className="truncate font-medium">{coder.activeProject?.name ?? 'Coder'}</span>
 				<span className="text-muted-foreground">/</span>

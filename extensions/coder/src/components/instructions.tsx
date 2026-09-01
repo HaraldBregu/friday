@@ -4,7 +4,6 @@ import { AlertTriangle, FileText, LoaderCircle, Save } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { useProjectInstructions } from '@/hooks/instructions';
@@ -44,7 +43,6 @@ export function Instructions({
 	return (
 		<div className="flex min-h-0 flex-1 flex-col bg-background">
 			<header className="flex h-11 shrink-0 items-center gap-2 px-3">
-				<SidebarTrigger />
 				<div className="min-w-0 flex-1">
 					<h1 className="truncate text-xs font-medium">Agent instructions · {projectName}</h1>
 				</div>

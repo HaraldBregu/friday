@@ -29,7 +29,6 @@ import {
 	SidebarInset,
 	SidebarProvider,
 	SidebarResizeHandle,
-	SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { showNativeContextMenu } from '@/lib/menu';
@@ -139,9 +138,28 @@ export default function App() {
 
 	useEffect(() => {
 		if (!isFriday()) return;
-		win.setTitlebarSidebarWidth(sidebarOpen ? sidebarWidth : null);
-		return () => win.setTitlebarSidebarWidth(null);
+		win.setTitlebarOptions({
+			title: 'Workspace',
+			leftButtons: [
+				{
+					id: 'toggle-sidebar',
+					label: sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar',
+					icon: 'panel-left',
+					pressed: sidebarOpen,
+				},
+			],
+			rightButtons: [],
+			sidebarWidth: sidebarOpen ? sidebarWidth : 0,
+		});
+		return () => win.setTitlebarOptions(null);
 	}, [sidebarOpen, sidebarWidth]);
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		return win.onTitlebarButtonClick((buttonId) => {
+			if (buttonId === 'toggle-sidebar') setSidebarOpen((open) => !open);
+		});
+	}, []);
 
 	useEffect(() => {
 		if (!isFriday()) return;
@@ -677,7 +695,6 @@ export default function App() {
 						onSave={() => saveWorkspaceFile(selectedPathRef.current, selectedContent)}
 						path={selectedWorkspacePath}
 						saveError={selectedSaveError}
-						sidebarTrigger={<SidebarTrigger />}
 						saving={selectedSaving}
 					/>
 				</SidebarInset>

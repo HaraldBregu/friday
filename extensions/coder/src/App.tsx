@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isFriday, win } from '@friday/sdk';
 
 import { Configuration } from '@/components/configuration';
 import { Header } from '@/components/header';
@@ -16,6 +17,39 @@ export default function App() {
 	const coder = useCoderWorkspace();
 	const [page, setPage] = useState<'workspace' | 'configuration' | 'instructions'>('workspace');
 	const [instructionsDirty, setInstructionsDirty] = useState(false);
+	const activeSession = coder.sessions.find((item) => item.id === coder.activeSessionId);
+	const title =
+		page === 'configuration'
+			? 'Coder · Configuration'
+			: page === 'instructions'
+				? `Coder · ${coder.activeProject?.name ?? 'Agent instructions'}`
+				: [coder.activeProject?.name, activeSession?.title].filter(Boolean).join(' · ') || 'Coder';
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		win.setTitlebarOptions({
+			title,
+			leftButtons: [
+				{
+					id: 'toggle-sidebar',
+					label: coder.leftOpen ? 'Collapse project navigation' : 'Expand project navigation',
+					icon: 'panel-left',
+					pressed: coder.leftOpen,
+				},
+			],
+			rightButtons: [],
+			sidebarWidth: coder.leftOpen ? 288 : 48,
+		});
+		return () => win.setTitlebarOptions(null);
+	}, [coder.leftOpen, title]);
+
+	useEffect(() => {
+		if (!isFriday()) return;
+		return win.onTitlebarButtonClick((buttonId) => {
+			if (buttonId === 'toggle-sidebar') coder.setLeftOpen((open) => !open);
+		});
+	}, [coder.setLeftOpen]);
+
 	const openPage = (nextPage: 'workspace' | 'configuration' | 'instructions'): boolean => {
 		if (nextPage !== 'instructions' && !canLeaveInstructions(page, instructionsDirty)) {
 			return false;
