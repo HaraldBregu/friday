@@ -219,7 +219,6 @@
 			"extensions": "Extensions",
 			"plugins": "Plugins",
 			"rag": "RAG",
-			"wiki": "LLM Wiki",
 			"wiki": "LLM Wiki"
 		},
 		"breadcrumb": {
@@ -1558,7 +1557,7 @@
 			"saveError": "Unable to save wiki settings.",
 			"runError": "Unable to generate the wiki.",
 			"cancelError": "Unable to cancel wiki generation."
-		},
+		}
 	},
 	"dialogs": {
 		"title": "Native Dialogs",
