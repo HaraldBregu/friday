@@ -28,6 +28,26 @@ jest.mock('react-i18next', () => {
 	return { useTranslation: () => ({ t }) };
 });
 
+beforeEach(() => {
+	Object.defineProperty(window, 'provider', {
+		configurable: true,
+		value: { list: jest.fn().mockResolvedValue([]) },
+	});
+	Object.defineProperty(window, 'search', {
+		configurable: true,
+		value: {
+			getSettings: jest.fn().mockResolvedValue({
+				engineId: null,
+				configured: { brave: false, tavily: false },
+			}),
+		},
+	});
+	Object.defineProperty(window, 'mcp', {
+		configurable: true,
+		value: { list: jest.fn().mockResolvedValue({}) },
+	});
+});
+
 describe('Providers settings hub', () => {
 	it('opens the provider API key list from the first item', async () => {
 		const user = userEvent.setup();
@@ -64,6 +84,7 @@ describe('Providers settings hub', () => {
 		expect(screen.getByRole('button', { name: /Transcribe/ })).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /Voice/ })).toBeInTheDocument();
 		expect(screen.queryByRole('button', { name: /Agent/ })).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: /Storage/ })).not.toBeInTheDocument();
 
 		await user.click(screen.getByRole('button', { name: /Transcribe/ }));
 		expect(await screen.findByText('Nested transcribe settings')).toBeInTheDocument();
