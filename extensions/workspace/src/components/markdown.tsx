@@ -26,7 +26,9 @@ export function MarkdownPreview({ canSave, content, onSave, path }: MarkdownPrev
 						{ id: 'copy-path', label: 'Copy Path' },
 					],
 					{
-						save: () => onSave(),
+						save: async () => {
+							await onSave();
+						},
 						'copy-path': () => navigator.clipboard.writeText(path),
 					}
 				);

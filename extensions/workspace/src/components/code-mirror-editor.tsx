@@ -9,6 +9,23 @@ import { tags } from "@lezer/highlight"
 import { showNativeContextMenu } from "@/lib/menu"
 import { cn } from "@/lib/utils"
 
+interface CodeMirrorEditorHandle {
+  focus: () => void
+  prefixLines: (prefix: string) => void
+  redo: () => void
+  undo: () => void
+  wrapSelection: (prefix: string, suffix?: string) => void
+}
+
+interface CodeMirrorEditorProps {
+  canSave?: boolean
+  className?: string
+  onChange: (value: string) => void
+  onSave?: () => unknown
+  readOnly?: boolean
+  value: string
+}
+
 const markdownHighlight = HighlightStyle.define([
   { tag: tags.heading, fontWeight: "600" },
   { tag: tags.strong, fontWeight: "700" },
@@ -61,12 +78,12 @@ const noteEditorTheme = EditorView.theme({
   },
 })
 
-export const CodeMirrorEditor = forwardRef(function CodeMirrorEditor(
+export const CodeMirrorEditor = forwardRef<CodeMirrorEditorHandle, CodeMirrorEditorProps>(function CodeMirrorEditor(
   { canSave = true, className, onChange, onSave, readOnly = false, value },
   ref,
 ) {
-  const mountRef = useRef(null)
-  const viewRef = useRef(null)
+  const mountRef = useRef<HTMLDivElement>(null)
+  const viewRef = useRef<EditorView>(null)
   const onChangeRef = useRef(onChange)
   const onSaveRef = useRef(onSave)
   const initialValueRef = useRef(value)
@@ -224,7 +241,7 @@ export const CodeMirrorEditor = forwardRef(function CodeMirrorEditor(
                 { type: "separator" },
                 { id: "save", label: "Save", accelerator: "CommandOrControl+S", enabled: canSave },
               ],
-          { save: () => onSaveRef.current?.() },
+          { save: () => void onSaveRef.current?.() },
         )
       }}
     />

@@ -5,7 +5,6 @@ import {
 	THEME,
 	loadFromBlob,
 	serializeAsJSON,
-	type ExcalidrawInitialDataState,
 } from '@excalidraw/excalidraw';
 import { LoaderCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -24,7 +23,9 @@ export default function ExcalidrawEditor({
 	path,
 }: ExcalidrawEditorProps) {
 	const initialContent = useRef(content).current;
-	const [initialData, setInitialData] = useState<ExcalidrawInitialDataState | null | undefined>();
+	const [initialData, setInitialData] = useState<
+		Awaited<ReturnType<typeof loadFromBlob>> | null | undefined
+	>();
 	const [error, setError] = useState('');
 
 	useEffect(() => {
