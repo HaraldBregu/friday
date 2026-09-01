@@ -1,7 +1,4 @@
-export {
-	getStorageSettings,
-	saveStorageSettings,
-} from './storage_store';
+export { getStorageSettings, saveStorageSettings } from './storage_store';
 export { getObject } from './storage_get';
 export { listObjects } from './storage_list';
 export { syncFolders } from './storage_sync_folders';

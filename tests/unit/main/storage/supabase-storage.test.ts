@@ -38,9 +38,7 @@ it('downloads backups from the signed-in user prefix', async () => {
 		error: null,
 	});
 
-	await expect(getObject(auth, 'friday/v1/agent/note.md')).resolves.toEqual(
-		new Uint8Array([4, 5])
-	);
+	await expect(getObject(auth, 'friday/v1/agent/note.md')).resolves.toEqual(new Uint8Array([4, 5]));
 	expect(download).toHaveBeenCalledWith(
 		'11111111-1111-4111-8111-111111111111/backups/friday/v1/agent/note.md'
 	);

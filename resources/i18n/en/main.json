@@ -168,8 +168,8 @@
 			},
 			"descriptions": {
 				"cloud": "Cloud storage and sync",
-			"general": "App info and appearance",
-			"account": "Cloud identity and session",
+				"general": "App info and appearance",
+				"account": "Cloud identity and session",
 				"modelServices": "Model service setup",
 				"system": "System access and permissions",
 				"channels": "Messaging integrations",

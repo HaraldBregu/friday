@@ -18,14 +18,13 @@ let mcpCatalog: readonly CatalogService[] = [];
 let botCatalog: readonly CatalogService[] = [];
 
 export async function loadModels(): Promise<void> {
-	[catalog, databaseCatalog, webSearchCatalog, mcpCatalog, botCatalog] =
-		await Promise.all([
-			window.app.models(),
-			window.app.databases(),
-			window.app.webSearches(),
-			window.app.mcps(),
-			window.app.channels(),
-		]);
+	[catalog, databaseCatalog, webSearchCatalog, mcpCatalog, botCatalog] = await Promise.all([
+		window.app.models(),
+		window.app.databases(),
+		window.app.webSearches(),
+		window.app.mcps(),
+		window.app.channels(),
+	]);
 }
 
 export function models(): readonly CatalogModel[] {

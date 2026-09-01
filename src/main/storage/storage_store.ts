@@ -1,4 +1,1 @@
-export {
-	getStorageSettings,
-	saveStorageSettings,
-} from '../settings_store';
+export { getStorageSettings, saveStorageSettings } from '../settings_store';

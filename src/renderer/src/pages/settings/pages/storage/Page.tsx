@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Download, FolderPlus, FolderSync, Save, Trash2, Upload } from 'lucide-react';
+import {
+	AlertTriangle,
+	Download,
+	FolderPlus,
+	FolderSync,
+	Save,
+	Trash2,
+	Upload,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
@@ -311,7 +319,9 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 												</SelectItem>
 											))}
 											{intervalValue === 'custom' && (
-												<SelectItem value="custom">{t('settings.storage.autoSync.custom')}</SelectItem>
+												<SelectItem value="custom">
+													{t('settings.storage.autoSync.custom')}
+												</SelectItem>
 											)}
 										</SelectContent>
 									</Select>

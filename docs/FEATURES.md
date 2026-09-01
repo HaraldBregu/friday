@@ -586,7 +586,7 @@ Friday stores configuration and working data below Electron's application-data d
 | Services    | Independent text, transcription, voice, image, video, and audio selections.                                                                 |
 | Media       | Standalone generated video and audio files.                                                                                                 |
 | Browser     | Persistent agent-browser profile.                                                                                                           |
-| Storage     | Local folder selections and cloud-backup schedule.                                                                                           |
+| Storage     | Local folder selections and cloud-backup schedule.                                                                                          |
 | Diagnostics | Local rotating logs and crash dumps. Crash dumps are not uploaded by the current configuration.                                             |
 | Wiki        | Source inbox, immutable evidence snapshots, generated Markdown, source/page/operation registries, review queue, failures, and audit log.    |
 

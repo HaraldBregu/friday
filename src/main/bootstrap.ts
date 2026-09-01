@@ -10,12 +10,7 @@ import { Agent } from './agent/agent';
 import { Conversation } from './agent/conversation';
 import { ExecSandbox } from './agent/sandbox';
 import { createRealtimeVoiceManager } from './agent/realtime_voice';
-import {
-	StorageOperations,
-	pullFiles,
-	pushFiles,
-	withStorageLock,
-} from './storage';
+import { StorageOperations, pullFiles, pushFiles, withStorageLock } from './storage';
 import { preventStorageSuspension } from './storage/storage_suspension';
 import { StorageChannels } from '../shared/ipc_channels_definitions';
 import { Coder, CoderProjectStore, CoderStore } from './coder';

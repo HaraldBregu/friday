@@ -7,20 +7,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
-import {
-	type StoredProvider,
-	type StoredProviderKind,
-} from '@shared/provider_types';
+import { type StoredProvider, type StoredProviderKind } from '@shared/provider_types';
 import type { SearchEngineId, SearchSettings } from '@shared/search_types';
 import type { McpData } from '@shared/mcp_types';
-import {
-	botProviders,
-	bots,
-	databaseProviders,
-	databases,
-	mcps,
-	providers,
-} from '@/lib/providers';
+import { botProviders, bots, databaseProviders, databases, mcps, providers } from '@/lib/providers';
 import {
 	actionableBotCatalog,
 	actionableDatabaseCatalog,

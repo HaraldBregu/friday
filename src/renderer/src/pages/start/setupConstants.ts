@@ -169,12 +169,7 @@ export const MODEL_SERVICE_DEFINITIONS: readonly ModelServiceDefinition[] = [
 	},
 ];
 
-export const SETUP_STEPS: readonly SetupStep[] = [
-	'modelProvider',
-	'search',
-	'database',
-	'models',
-];
+export const SETUP_STEPS: readonly SetupStep[] = ['modelProvider', 'search', 'database', 'models'];
 
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = ['landing', 'auth', ...SETUP_STEPS];
 

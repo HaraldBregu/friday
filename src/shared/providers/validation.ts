@@ -12,13 +12,7 @@ const MODEL_SERVICE_TYPES = [
 	'embedding-model',
 ] as const;
 
-const SERVICE_TYPES = [
-	...MODEL_SERVICE_TYPES,
-	'web-search',
-	'database',
-	'mcp',
-	'bot',
-] as const;
+const SERVICE_TYPES = [...MODEL_SERVICE_TYPES, 'web-search', 'database', 'mcp', 'bot'] as const;
 
 const PROMPT_MODEL_SERVICE_TYPES = ['large-language-model', 'research-chat-model'] as const;
 const PROMPT_ATTACHMENT_KINDS = ['image', 'document', 'audio', 'video'] as const;

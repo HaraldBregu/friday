@@ -1,8 +1,4 @@
-import {
-	loadDatabases,
-	loadModels,
-	loadWebSearches,
-} from '../../../../src/main/models';
+import { loadDatabases, loadModels, loadWebSearches } from '../../../../src/main/models';
 
 function namesAreAlphabetical(entries: readonly { name: string }[]): boolean {
 	return entries.every(
