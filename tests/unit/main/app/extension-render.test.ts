@@ -3,6 +3,13 @@ import { closeExtension } from '../../../../src/main/extensions/extension_close'
 import { render } from '../../../../src/main/extensions/extension_render';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 
+jest.mock('../../../../src/main/translucency', () => ({
+	getPlatformTranslucencyOptions: jest.fn(() => ({
+		vibrancy: 'under-window',
+		visualEffectState: 'followWindow',
+	})),
+}));
+
 type Handler = (...args: unknown[]) => void;
 
 function createHarness() {
@@ -84,6 +91,8 @@ describe('extension renderer', () => {
 				resizable: true,
 				title: 'Project',
 				transparent: true,
+				vibrancy: 'under-window',
+				visualEffectState: 'followWindow',
 			}),
 			{ html: 'extension.html', hash: 'extension/Project' }
 		);

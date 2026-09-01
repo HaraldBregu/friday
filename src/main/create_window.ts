@@ -1,8 +1,9 @@
-import type { BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
+import type { BrowserWindow } from 'electron';
 import type { AppState } from './app_state';
 import type { RendererContentOptions, WindowFactory } from './window_factory';
 import type { WindowContextManager } from './window_context';
 import { attachWindowHandlers } from './window_events';
+import { getPlatformTranslucencyOptions } from './translucency';
 
 const DEFAULT_WINDOW_WIDTH = 812;
 const DEFAULT_WINDOW_HEIGHT = 625;
@@ -11,17 +12,6 @@ const MINIMUM_WINDOW_HEIGHT = 600;
 const STARTUP_WINDOW_WIDTH = 812;
 const STARTUP_WINDOW_HEIGHT = 625;
 const TRANSPARENT_WINDOW_BACKGROUND = '#00000000';
-
-function getPlatformTranslucencyOptions(): Partial<BrowserWindowConstructorOptions> {
-	if (process.platform === 'darwin') {
-		return {
-			vibrancy: 'under-window',
-			visualEffectState: 'followWindow',
-		};
-	}
-
-	return {};
-}
 
 export class Main {
 	private window: BrowserWindow | null = null;

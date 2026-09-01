@@ -2,6 +2,7 @@ import type { BrowserWindow, WebContents, WebContentsView } from 'electron';
 import { setupPdfContextMenu } from '../pdf';
 import type { WindowFactory } from '../window_factory';
 import { attachWindowHandlers } from '../window_events';
+import { getPlatformTranslucencyOptions } from '../translucency';
 
 interface ExtensionWindow {
 	window: BrowserWindow;
@@ -41,6 +42,7 @@ export function render(
 				titleBarStyle: 'hidden',
 				trafficLightPosition: { x: 16, y: 17 },
 			}),
+			...getPlatformTranslucencyOptions(),
 			title,
 			autoHideMenuBar: true,
 			backgroundColor: '#00000000',

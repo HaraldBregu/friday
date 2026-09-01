@@ -7,5 +7,9 @@ interface ExtensionShellProps {
 
 export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Element {
 	useAppTheme();
-	return <ExtensionTitleBar title={title} />;
+	return (
+		<div className="app-translucent-window flex h-full flex-col overflow-hidden bg-background text-foreground">
+			<ExtensionTitleBar title={title} />
+		</div>
+	);
 }
