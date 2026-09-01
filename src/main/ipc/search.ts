@@ -1,15 +1,33 @@
 import type { EventBus } from '../event_bus';
 import { getSearchSettings, saveSearchEngine, selectSearchEngine } from '../search';
 import { SearchChannels } from '../../shared/ipc_channels_definitions';
-import { registerCommand, registerQuery } from './core/gateway';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
+import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
+import { TrustedRenderer } from './core/trusted';
 
-export class SearchIpc implements IpcModule {
+export interface SearchIpcDeps {
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
+}
+
+export class SearchIpc implements IpcModule<SearchIpcDeps> {
 	readonly name = 'search';
 
-	register(_deps: void, _eventBus: EventBus): void {
-		registerQuery(SearchChannels.getSettings, getSearchSettings);
-		registerCommand(SearchChannels.saveEngine, saveSearchEngine);
-		registerCommand(SearchChannels.selectEngine, selectSearchEngine);
+	register({ windows, extensions }: SearchIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, extensions);
+		registerQueryWithEvent(SearchChannels.getSettings, (event) => {
+			trusted.assert(event);
+			return getSearchSettings();
+		});
+		registerCommandWithEvent(SearchChannels.saveEngine, (event, engineId, input) => {
+			trusted.assert(event);
+			return saveSearchEngine(engineId, input);
+		});
+		registerCommandWithEvent(SearchChannels.selectEngine, (event, engineId) => {
+			trusted.assert(event);
+			return selectSearchEngine(engineId);
+		});
 	}
 }

@@ -100,7 +100,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('search', () => new SearchIpc().register(undefined, eventBus));
+	safeRegister('search', () =>
+		new SearchIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('storage', () =>
 		new StorageIpc().register({ extensionRegistry, storageOperations }, eventBus)
 	);
