@@ -53,22 +53,18 @@ export class DataController {
 					indexName: index.indexName,
 					generation: index.generation,
 				});
-				if (rag.databaseProviderId === 'pinecone') {
-					scopes.push({
-						kind: 'rag',
-						mode: 'remote_namespace',
-						indexName: index.indexName,
-						generation: index.generation,
-					});
-				}
-			}
-			if (rag.databaseProviderId === 'pinecone') {
 				scopes.push({
 					kind: 'rag',
-					mode: 'remote_all_namespaces',
-					indexName: rag.indexName,
+					mode: 'remote_namespace',
+					indexName: index.indexName,
+					generation: index.generation,
 				});
 			}
+			scopes.push({
+				kind: 'rag',
+				mode: 'remote_all_namespaces',
+				indexName: rag.indexName,
+			});
 		} finally {
 			store.close();
 		}

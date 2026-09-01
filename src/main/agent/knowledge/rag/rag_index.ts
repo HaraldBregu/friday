@@ -117,15 +117,13 @@ export async function indexRag(
 		}
 		dependencies.signal?.throwIfAborted();
 
-		if (configuration.databaseProviderId === 'pinecone') {
-			await mirrorToPinecone(
-				selectedIndexName,
-				generation,
-				dimensions,
-				records,
-				dependencies.signal
-			);
-		}
+		await mirrorToPinecone(
+			selectedIndexName,
+			generation,
+			dimensions,
+			records,
+			dependencies.signal
+		);
 		dependencies.signal?.throwIfAborted();
 
 		const completedAt = new Date().toISOString();

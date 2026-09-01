@@ -2,8 +2,6 @@ import { getProviderApiConfigurationUrl } from '../../../../shared';
 import {
 	botProviders,
 	bots,
-	databaseProviders,
-	databases,
 	providerIdsFor,
 	providerModels,
 	providers,
@@ -169,7 +167,7 @@ export const MODEL_SERVICE_DEFINITIONS: readonly ModelServiceDefinition[] = [
 	},
 ];
 
-export const SETUP_STEPS: readonly SetupStep[] = ['modelProvider', 'search', 'database', 'models'];
+export const SETUP_STEPS: readonly SetupStep[] = ['modelProvider', 'search', 'models'];
 
 export const ONBOARDING_STEPS: readonly OnboardingStep[] = ['landing', 'auth', ...SETUP_STEPS];
 
@@ -178,7 +176,6 @@ export const ONBOARDING_STEP_TITLES: Record<OnboardingStep, string> = {
 	auth: 'Account',
 	modelProvider: 'Model',
 	search: 'Search',
-	database: 'Database',
 	models: 'Models',
 };
 
@@ -193,10 +190,6 @@ export const STEP_COPY: Record<SetupStep, { title: string; description: string }
 	search: {
 		title: 'Search Engine',
 		description: 'Add an API key for the search engine you want Friday to use.',
-	},
-	database: {
-		title: 'Vector Databases',
-		description: 'Connect a vector database to store embedding vectors.',
 	},
 	models: {
 		title: 'Assistant setup',
@@ -224,23 +217,6 @@ export function actionableProviderCatalog(): readonly ProviderCatalogItem[] {
 		id: provider.id,
 		name: provider.name,
 		capabilities: provider.capabilities ?? 'AI provider',
-		supported: true,
-		apiConfigurationUrl: getProviderApiConfigurationUrl(provider),
-		iconDarkUrl: provider.iconDarkUrl,
-		iconLightUrl: provider.iconLightUrl,
-	}));
-}
-
-/** Providers with at least one database, shaped like the models catalog cards. */
-export function actionableDatabaseCatalog(): readonly ProviderCatalogItem[] {
-	return databaseProviders().map((provider) => ({
-		id: provider.id,
-		name: provider.name,
-		capabilities:
-			databases()
-				.filter((entry) => entry.provider.id === provider.id)
-				.map((entry) => entry.name)
-				.join(' - ') || 'Database',
 		supported: true,
 		apiConfigurationUrl: getProviderApiConfigurationUrl(provider),
 		iconDarkUrl: provider.iconDarkUrl,

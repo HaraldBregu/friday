@@ -120,16 +120,6 @@ const StartPage: React.FC = () => {
 			);
 		}
 
-		if (step === 'database') {
-			return (
-				<SetupProviderStep
-					section="databases"
-					title={STEP_COPY.database.title}
-					description={STEP_COPY.database.description}
-				/>
-			);
-		}
-
 		return (
 			<SetupModelsStep
 				serviceStates={serviceStates}
