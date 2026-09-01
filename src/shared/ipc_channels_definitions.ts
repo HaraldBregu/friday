@@ -176,7 +176,6 @@ export const AppChannels = {
 	showAudioContextMenu: 'app:show-audio-context-menu',
 	models: 'app:models',
 	databases: 'app:databases',
-	storages: 'app:storages',
 	webSearches: 'app:web-searches',
 	mcps: 'app:mcps',
 	channels: 'app:channels:list',

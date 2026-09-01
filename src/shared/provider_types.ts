@@ -51,7 +51,6 @@ export type ProviderServiceType =
 	| 'embedding-model'
 	| 'web-search'
 	| 'database'
-	| 'storage'
 	| 'mcp'
 	| 'bot';
 
@@ -71,7 +70,7 @@ export interface CatalogEntryService {
 	readonly metadata?: ModelMetadata;
 }
 
-/** A database or storage offering, carrying the provider that serves it. */
+/** A non-model provider service, carrying the provider that serves it. */
 export interface CatalogService extends CatalogEntryService {
 	readonly provider: PublicProvider;
 }

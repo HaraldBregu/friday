@@ -34,9 +34,6 @@ export const app: AppApi = {
 	databases: () => {
 		return typedInvokeUnwrap(AppChannels.databases);
 	},
-	storages: () => {
-		return typedInvokeUnwrap(AppChannels.storages);
-	},
 	webSearches: () => {
 		return typedInvokeUnwrap(AppChannels.webSearches);
 	},

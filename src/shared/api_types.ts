@@ -276,7 +276,6 @@ export interface ProviderApi {
 	set: (provider: ProviderStoreRecord, kind?: StoredProviderKind) => Promise<ProviderStoreRecord>;
 	list: () => Promise<ProviderStoreRecord[]>;
 	getModelProviders: () => Promise<PublicProvider[]>;
-	getStorageProviders: () => Promise<PublicProvider[]>;
 	getDatabaseProviders: () => Promise<PublicProvider[]>;
 }
 
@@ -444,7 +443,6 @@ type ProviderStoreRecord = Provider | BotProvider;
 export interface AppApi extends ExtensionStorageApi {
 	models: () => Promise<CatalogModel[]>;
 	databases: () => Promise<CatalogService[]>;
-	storages: () => Promise<CatalogService[]>;
 	webSearches: () => Promise<CatalogWebSearch[]>;
 	mcps: () => Promise<CatalogService[]>;
 	channels: () => Promise<CatalogService[]>;

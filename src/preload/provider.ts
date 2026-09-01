@@ -36,9 +36,6 @@ export const provider: ProviderApi = {
 	getModelProviders: async (): Promise<PublicProvider[]> => {
 		return uniqueProvidersWithStored(await window.app.models());
 	},
-	getStorageProviders: async (): Promise<PublicProvider[]> => {
-		return uniqueProvidersWithStored(await window.app.storages());
-	},
 	getDatabaseProviders: async (): Promise<PublicProvider[]> => {
 		return uniqueProvidersWithStored(await window.app.databases());
 	},

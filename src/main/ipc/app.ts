@@ -47,7 +47,6 @@ import {
 	loadDatabases,
 	loadMcps,
 	loadModels,
-	loadStorages,
 	loadWebSearches,
 	providersDir,
 	refreshProviderCatalog,
@@ -443,13 +442,6 @@ export class AppIpc implements IpcModule {
 			wrapSimpleHandler(() => {
 				return [...loadDatabases()];
 			}, AppChannels.databases)
-		);
-
-		ipcMain.handle(
-			AppChannels.storages,
-			wrapSimpleHandler(() => {
-				return [...loadStorages()];
-			}, AppChannels.storages)
 		);
 
 		ipcMain.handle(

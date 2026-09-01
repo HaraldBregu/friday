@@ -469,10 +469,6 @@ export interface AppInvokeChannelMap {
 		args: [];
 		result: import('./provider_types').CatalogService[];
 	};
-	[AppChannels.storages]: {
-		args: [];
-		result: import('./provider_types').CatalogService[];
-	};
 	[AppChannels.webSearches]: {
 		args: [];
 		result: import('./provider_types').CatalogWebSearch[];

@@ -16,7 +16,6 @@ const SERVICE_TYPES = [
 	...MODEL_SERVICE_TYPES,
 	'web-search',
 	'database',
-	'storage',
 	'mcp',
 	'bot',
 ] as const;

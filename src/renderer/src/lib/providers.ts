@@ -13,17 +13,15 @@ import type {
 
 let catalog: readonly CatalogModel[] = [];
 let databaseCatalog: readonly CatalogService[] = [];
-let storageCatalog: readonly CatalogService[] = [];
 let webSearchCatalog: readonly CatalogWebSearch[] = [];
 let mcpCatalog: readonly CatalogService[] = [];
 let botCatalog: readonly CatalogService[] = [];
 
 export async function loadModels(): Promise<void> {
-	[catalog, databaseCatalog, storageCatalog, webSearchCatalog, mcpCatalog, botCatalog] =
+	[catalog, databaseCatalog, webSearchCatalog, mcpCatalog, botCatalog] =
 		await Promise.all([
 			window.app.models(),
 			window.app.databases(),
-			window.app.storages(),
 			window.app.webSearches(),
 			window.app.mcps(),
 			window.app.channels(),
@@ -58,15 +56,6 @@ export function databases(): readonly CatalogService[] {
 /** One record per provider, derived from the databases they serve. */
 export function databaseProviders(): readonly PublicProvider[] {
 	return uniqueProviders(databaseCatalog);
-}
-
-export function storages(): readonly CatalogService[] {
-	return storageCatalog;
-}
-
-/** One record per provider, derived from the storages they serve. */
-export function storageProviders(): readonly PublicProvider[] {
-	return uniqueProviders(storageCatalog);
 }
 
 export function webSearches(): readonly CatalogWebSearch[] {

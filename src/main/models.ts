@@ -23,7 +23,6 @@ import { parseProviderManifest } from '../shared/providers/validation';
 interface Catalog {
 	readonly models: readonly CatalogModel[];
 	readonly databases: readonly CatalogService[];
-	readonly storages: readonly CatalogService[];
 	readonly webSearches: readonly CatalogWebSearch[];
 	readonly mcps: readonly CatalogService[];
 }
@@ -46,11 +45,6 @@ export function loadModels(): readonly CatalogModel[] {
 /** Every database across ~/.friday/providers/<id>/manifest.json. */
 export function loadDatabases(): readonly CatalogService[] {
 	return loadCatalog().databases;
-}
-
-/** Every storage across ~/.friday/providers/<id>/manifest.json. */
-export function loadStorages(): readonly CatalogService[] {
-	return loadCatalog().storages;
 }
 
 /** Every web search provider across ~/.friday/providers/<id>/manifest.json. */
@@ -234,7 +228,6 @@ function bundledProvidersDir(): string {
 function readCatalog(): Catalog {
 	const models: CatalogModel[] = [];
 	const databases: CatalogService[] = [];
-	const storages: CatalogService[] = [];
 	const webSearches: CatalogWebSearch[] = [];
 	const mcps: CatalogService[] = [];
 	const manifests = new Map<string, { entry: ProviderManifest; providerDir: string }>();
@@ -268,11 +261,6 @@ function readCatalog(): Catalog {
 				.filter((service) => service.type === 'database')
 				.map((service) => ({ ...service, provider }))
 		);
-		storages.push(
-			...entry.services
-				.filter((service) => service.type === 'storage')
-				.map((service) => ({ ...service, provider }))
-		);
 		webSearches.push(
 			...entry.services
 				.filter((service): service is CatalogEntryWebSearch => service.type === 'web-search')
@@ -288,7 +276,6 @@ function readCatalog(): Catalog {
 	return {
 		models: models.sort(compareByName),
 		databases: databases.sort(compareByName),
-		storages: storages.sort(compareByName),
 		webSearches: webSearches.sort(compareByName),
 		mcps: mcps.sort(compareByName),
 	};
