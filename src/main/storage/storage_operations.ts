@@ -7,8 +7,6 @@ import type {
 	StoragePushResult,
 } from '../../shared/storage_types';
 import { describeStorageError } from './storage_error';
-import { withStorageLock } from './storage_lock';
-import { preventStorageSuspension } from './storage_suspension';
 
 type StorageTransferResult = StoragePushResult | StoragePullResult;
 

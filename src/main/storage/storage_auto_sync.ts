@@ -7,7 +7,6 @@ export function isAutoSyncable(storage: StorageSyncSettings): boolean {
 }
 
 export async function runStorageSync(
-	storage: StorageSyncSettings,
 	logger: StorageSyncLogger,
 	operations: StorageOperations
 ): Promise<void> {

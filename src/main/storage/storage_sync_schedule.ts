@@ -41,7 +41,7 @@ function scheduleAll(): void {
 	task = cron.schedule(
 		storage.syncCronExpression,
 		async () => {
-			await runStorageSync(storage, logger, operations);
+			await runStorageSync(logger, operations);
 		},
 		{ noOverlap: true }
 	);

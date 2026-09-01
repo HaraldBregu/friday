@@ -1,4 +1,3 @@
-import { ListObjectsV2Command } from '@aws-sdk/client-s3';
 import type { StorageObjectInfo } from '../../shared/storage_types';
 import type { AuthService } from '../cloud/auth';
 
