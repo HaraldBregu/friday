@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { isProtectedStoragePath } from './storage_protected';
 
 export function normalizeStoragePaths(value: unknown): string[] {
 	if (!Array.isArray(value) || value.length > 32) throw new Error('Invalid storage folders.');
@@ -9,6 +10,9 @@ export function normalizeStoragePaths(value: unknown): string[] {
 		const resolved = path.resolve(entry);
 		if (resolved === path.parse(resolved).root) {
 			throw new Error('A filesystem root cannot be synchronized.');
+		}
+		if (isProtectedStoragePath(resolved)) {
+			throw new Error('Provider credential data cannot be synchronized as a file.');
 		}
 		return resolved;
 	});
