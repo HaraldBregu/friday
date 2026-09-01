@@ -11,6 +11,7 @@ import { moveWorkspaceEntry } from '../../../../src/main/ipc/move';
 import { renameWorkspaceEntry } from '../../../../src/main/ipc/rename';
 import { readWorkspaceTree } from '../../../../src/main/ipc/tree';
 import { resolveWorkspaceFile } from '../../../../src/main/ipc/workspace';
+import { writeWorkspaceFile } from '../../../../src/main/ipc/write';
 import { workspaceFileType } from '../../../../src/shared/workspace';
 
 describe('workspace files', () => {
@@ -18,6 +19,26 @@ describe('workspace files', () => {
 		expect(workspaceFileType('notes/idea.md')).toEqual({
 			kind: 'markdown',
 			mimeType: 'text/markdown',
+		});
+		expect(workspaceFileType('diagrams/flow.mmd')).toEqual({
+			kind: 'mermaid',
+			mimeType: 'text/vnd.mermaid',
+		});
+		expect(workspaceFileType('diagrams/flow.mermaid')).toEqual({
+			kind: 'mermaid',
+			mimeType: 'text/vnd.mermaid',
+		});
+		expect(workspaceFileType('drawings/idea.excalidraw')).toEqual({
+			kind: 'excalidraw',
+			mimeType: 'application/vnd.excalidraw+json',
+		});
+		expect(workspaceFileType('drawings/idea.excalidraw.json')).toEqual({
+			kind: 'excalidraw',
+			mimeType: 'application/vnd.excalidraw+json',
+		});
+		expect(workspaceFileType('drawings/idea.tldr')).toEqual({
+			kind: 'tldraw',
+			mimeType: 'application/vnd.tldraw+json',
 		});
 		expect(workspaceFileType('images/photo.webp')).toEqual({
 			kind: 'image',
@@ -121,6 +142,23 @@ describe('workspace files', () => {
 		await deleteWorkspaceFile(root, 'notes.txt');
 		await expect(fs.stat(text)).rejects.toThrow();
 		await expect(deleteWorkspaceFile(root, 'folder')).rejects.toThrow('not a file');
+		await fs.rm(root, { recursive: true });
+	});
+
+	it('writes every editable workspace document kind', async () => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const files = ['notes.md', 'flow.mmd', 'sketch.excalidraw', 'canvas.tldr'];
+		for (const file of files) await fs.writeFile(path.join(root, file), 'Before');
+		await fs.writeFile(path.join(root, 'notes.txt'), 'Before');
+
+		for (const file of files) {
+			await writeWorkspaceFile(root, file, `After ${file}`);
+			await expect(fs.readFile(path.join(root, file), 'utf8')).resolves.toBe(`After ${file}`);
+		}
+		await expect(writeWorkspaceFile(root, 'notes.txt', 'After')).rejects.toThrow(
+			'cannot be edited'
+		);
+
 		await fs.rm(root, { recursive: true });
 	});
 

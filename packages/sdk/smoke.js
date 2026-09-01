@@ -59,6 +59,7 @@ globalThis.agent = {
 	listWorkspaceFiles: async () => [workspaceFile],
 	readWorkspaceFile: async (filePath) => `content:${filePath}`,
 	readWorkspaceAsset: async () => ({ mimeType: 'image/png', data: new Uint8Array([1, 2, 3]) }),
+	writeWorkspaceFile: async () => undefined,
 	writeWorkspaceMarkdown: async () => undefined,
 	createWorkspaceFile: async (parentPath, name) => [parentPath, name].filter(Boolean).join('/'),
 	createWorkspaceDirectory: async (parentPath, name) =>
@@ -207,6 +208,7 @@ assert.deepEqual(await agent.readWorkspaceAsset('photo.png'), {
 	data: new Uint8Array([1, 2, 3]),
 });
 await agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await agent.writeWorkspaceFile('diagram.mmd', 'flowchart LR');
 assert.equal(await agent.createWorkspaceFile('', 'draft.md'), 'draft.md');
 assert.equal(await agent.createWorkspaceDirectory('notes', 'ideas'), 'notes/ideas');
 assert.equal(await agent.moveWorkspaceEntry('draft.md', 'notes'), 'notes/draft.md');
@@ -342,6 +344,7 @@ assert.deepEqual(await friday.agent.readWorkspaceAsset('photo.png'), {
 	data: new Uint8Array([1, 2, 3]),
 });
 await friday.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await friday.agent.writeWorkspaceFile('diagram.mmd', 'flowchart LR');
 await friday.agent.createWorkspaceFile('', 'draft.md');
 await friday.agent.createWorkspaceDirectory('notes', 'ideas');
 await friday.agent.moveWorkspaceEntry('draft.md', 'notes');

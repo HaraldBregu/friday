@@ -34,6 +34,7 @@ const workspace = await friday.agent.getWorkspaceLocation();
 const files = await friday.agent.listWorkspaceFiles();
 const content = await friday.agent.readWorkspaceFile('USER.md');
 await friday.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await friday.agent.writeWorkspaceFile('diagrams/flow.mmd', 'flowchart LR');
 await friday.agent.createWorkspaceFile('', 'draft.md');
 await friday.agent.createWorkspaceDirectory('notes', 'ideas');
 await friday.agent.moveWorkspaceEntry('draft.md', 'notes');
@@ -75,6 +76,7 @@ const revised = await models.image.createImage({
 	source: { base64: generated.base64, mimeType: 'image/png' },
 });
 await agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await agent.writeWorkspaceFile('diagrams/flow.mmd', 'flowchart LR');
 await agent.createWorkspaceFile('', 'draft.md');
 await agent.createWorkspaceDirectory('notes', 'ideas');
 await agent.moveWorkspaceEntry('draft.md', 'notes');
