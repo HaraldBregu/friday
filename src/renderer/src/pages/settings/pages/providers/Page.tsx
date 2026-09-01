@@ -9,12 +9,9 @@ import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
 import {
 	getProviderApiConfigurationUrl,
-	type PublicProvider,
 	type StoredProvider,
 	type StoredProviderKind,
 } from '@shared/provider_types';
-import type { StorageConfig } from '@shared/storage_types';
-import { DEFAULT_STORAGE } from '../storage/defaults';
 import type { SearchEngineId, SearchSettings } from '@shared/search_types';
 import type { McpData } from '@shared/mcp_types';
 import {
@@ -24,8 +21,6 @@ import {
 	databases,
 	mcps,
 	providers,
-	storageProviders,
-	storages,
 } from '@/lib/providers';
 import {
 	actionableBotCatalog,
@@ -41,21 +36,14 @@ import {
 	SettingsPageHeader,
 	SettingsPageShell,
 	SettingsSection,
-	SettingsLoadingRows,
 } from '../../components';
-import { ProviderCard } from '../storage/ProviderCard';
 import { McpCard } from './McpCard';
 import { CustomMcpCard } from '../mcp/components/CustomMcpCard';
 import { McpServerForm } from '../mcp/components/McpServerForm';
 import { useMcpServers } from '../mcp/hooks/useMcpServers';
 
-interface StorageEntry {
-	key: string;
-	storage: StorageConfig;
-}
-
 type ProviderKind = StoredProviderKind | 'search';
-export type ProviderSetupSection = 'models' | 'search' | 'storage' | 'databases' | 'mcp' | 'bots';
+export type ProviderSetupSection = 'models' | 'search' | 'databases' | 'mcp' | 'bots';
 
 const SECTION_HEADERS: Record<ProviderSetupSection, { titleKey: string; descriptionKey: string }> =
 	{
@@ -70,10 +58,6 @@ const SECTION_HEADERS: Record<ProviderSetupSection, { titleKey: string; descript
 		databases: {
 			titleKey: 'settings.tabs.databases',
 			descriptionKey: 'settings.overview.descriptions.database',
-		},
-		storage: {
-			titleKey: 'settings.tabs.storage',
-			descriptionKey: 'settings.overview.descriptions.storage',
 		},
 		mcp: {
 			titleKey: 'settings.tabs.mcp',
@@ -97,35 +81,6 @@ function allCatalogItems(): ProviderCatalogItem[] {
 	];
 }
 
-function blankStorage(provider: PublicProvider): StorageConfig {
-	return provider.id === 'supabase'
-		? { ...DEFAULT_STORAGE, name: provider.name }
-		: {
-				...DEFAULT_STORAGE,
-				id: provider.id,
-				name: provider.name,
-				endpoint: '',
-				region: 'us-east-1',
-				accessKeyId: '',
-				secretAccessKey: '',
-				forcePathStyle: false,
-			};
-}
-
-/** Catalog storage providers (saved config when one exists) plus saved configs outside the catalog. */
-function mergedStorageEntries(saved: StorageEntry[]): StorageEntry[] {
-	const savedById = new Map(saved.map((entry) => [entry.storage.id, entry]));
-	const catalog = storageProviders();
-	const fromCatalog = catalog.map(
-		(provider) =>
-			savedById.get(provider.id) ?? { key: provider.id, storage: blankStorage(provider) }
-	);
-	const extras = saved.filter(
-		(entry) => !catalog.some((provider) => provider.id === entry.storage.id)
-	);
-	return [...fromCatalog, ...extras];
-}
-
 interface ProvidersPageProps {
 	readonly embedded?: boolean;
 	readonly section?: ProviderSetupSection;
@@ -143,9 +98,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	);
 	const [savingProviderId, setSavingProviderId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [storageEntries, setStorageEntries] = useState<StorageEntry[] | null>(null);
-	const [storageError, setStorageError] = useState<string | null>(null);
-	const [addingCustomStorage, setAddingCustomStorage] = useState(false);
 	const [searchSettings, setSearchSettings] = useState<SearchSettings | null>(null);
 	const [addingCustomMcp, setAddingCustomMcp] = useState(false);
 	const { servers: mcpServers, load: loadMcpServers } = useMcpServers();
@@ -186,17 +138,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 				if (cancelled) return;
 				setError(getErrorMessage(err, 'Could not check saved provider access.'));
 			});
-
-		// Load Storage configs
-		void window.storage.getStorages().then(
-			(storages) => {
-				if (!cancelled)
-					setStorageEntries(storages.map((storage) => ({ key: storage.id, storage })));
-			},
-			(err) => {
-				if (!cancelled) setStorageError(getErrorMessage(err, t('settings.storage.errors.load')));
-			}
-		);
 
 		void window.search.getSettings().then(
 			(settings) => {
@@ -451,7 +392,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 		string,
 		McpData,
 	][];
-	const storageCatalog = mergedStorageEntries(storageEntries ?? []);
 	const saveCustomMcpServer = async (id: string, entry: McpData): Promise<void> => {
 		await window.mcp.upsert(id, entry);
 		await loadMcpServers();
@@ -477,11 +417,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 			{error && (
 				<SettingsNotice variant="destructive" icon={AlertTriangle}>
 					{error}
-				</SettingsNotice>
-			)}
-			{storageError && (
-				<SettingsNotice variant="destructive" icon={AlertTriangle}>
-					{storageError}
 				</SettingsNotice>
 			)}
 			{(section === undefined || section === 'models') &&
@@ -579,97 +514,6 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 					</div>
 				</SettingsSection>
 			)}
-
-			{(section === undefined || section === 'storage') &&
-				(!embedded || storageEntries === null || storageCatalog.length > 0) && (
-					<SettingsSection
-						title={t('settings.tabs.storage')}
-						action={
-							<Button
-								variant="outline"
-								size="sm"
-								disabled={addingCustomStorage}
-								onClick={() => setAddingCustomStorage(true)}
-							>
-								<Plus className="size-3.5" />
-								{t('settings.storage.addCustomProvider')}
-							</Button>
-						}
-					>
-						{storageError && (
-							<SettingsNotice variant="destructive" icon={AlertTriangle}>
-								{storageError}
-							</SettingsNotice>
-						)}
-
-						{!storageEntries ? (
-							<SettingsLoadingRows rows={4} />
-						) : (
-							<div className="space-y-3 pb-4">
-								{addingCustomStorage && (
-									<ProviderCard
-										storage={blankStorage({
-											id: '',
-											name: t('settings.storage.customProviderName'),
-											baseUrl: '',
-										})}
-										onSaved={(saved) => {
-											setStorageEntries((current) => [
-												...(current ?? []),
-												{ key: saved.id, storage: saved },
-											]);
-											setAddingCustomStorage(false);
-										}}
-										onRemoved={() => setAddingCustomStorage(false)}
-									/>
-								)}
-								{storageCatalog.length === 0 && (
-									<SettingsNotice>{t('settings.storage.empty')}</SettingsNotice>
-								)}
-
-								{storageCatalog.map((entry) => {
-									const provider = storageProviders().find((item) => item.id === entry.storage.id);
-									const subtitle = storages()
-										.filter((service) => service.provider.id === entry.storage.id)
-										.map((service) => service.name)
-										.join(' - ');
-									return (
-										<ProviderCard
-											key={entry.key}
-											storage={entry.storage}
-											provider={provider}
-											subtitle={subtitle || undefined}
-											linkUrl={
-												provider ? getProviderApiConfigurationUrl(provider) || undefined : undefined
-											}
-											onSaved={(saved) =>
-												setStorageEntries((current) => {
-													const list = current ?? [];
-													return list.some((item) => item.storage.id === saved.id)
-														? list.map((item) =>
-																item.storage.id === saved.id ? { ...item, storage: saved } : item
-															)
-														: [...list, { key: saved.id, storage: saved }];
-												})
-											}
-											onRemoved={() =>
-												setStorageEntries(
-													(current) =>
-														current?.filter((item) => item.storage.id !== entry.storage.id) ??
-														current
-												)
-											}
-											hideDelete={
-												!storageEntries.some((item) => item.storage.id === entry.storage.id)
-											}
-											hideDropdown={true}
-										/>
-									);
-								})}
-							</div>
-						)}
-					</SettingsSection>
-				)}
 		</SettingsPageShell>
 	);
 };

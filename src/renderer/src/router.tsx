@@ -394,14 +394,6 @@ const routes: RouteObject[] = [
 								),
 							},
 							{
-								path: 'storage',
-								element: (
-									<SettingsRouteWrapper>
-										<ProvidersPage section="storage" />
-									</SettingsRouteWrapper>
-								),
-							},
-							{
 								path: 'mcp',
 								children: [
 									{

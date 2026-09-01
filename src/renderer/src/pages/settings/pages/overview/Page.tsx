@@ -40,7 +40,6 @@ const SETTINGS_OVERVIEW_GROUPS = [
 			'/settings/providers/models',
 			'/settings/providers/search',
 			'/settings/providers/databases',
-			'/settings/providers/storage',
 		],
 	},
 	{
