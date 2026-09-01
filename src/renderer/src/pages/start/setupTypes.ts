@@ -64,7 +64,6 @@ export type ModelServiceStateMap = Record<ModelServiceId, ModelServiceState>;
 export type SetupStep =
 	| 'modelProvider'
 	| 'search'
-	| 'storage'
 	| 'database'
 	| 'models';
 

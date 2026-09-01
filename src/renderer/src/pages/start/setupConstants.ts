@@ -172,7 +172,6 @@ export const MODEL_SERVICE_DEFINITIONS: readonly ModelServiceDefinition[] = [
 export const SETUP_STEPS: readonly SetupStep[] = [
 	'modelProvider',
 	'search',
-	'storage',
 	'database',
 	'models',
 ];
@@ -184,7 +183,6 @@ export const ONBOARDING_STEP_TITLES: Record<OnboardingStep, string> = {
 	auth: 'Account',
 	modelProvider: 'Model',
 	search: 'Search',
-	storage: 'Storage',
 	database: 'Database',
 	models: 'Models',
 };
@@ -200,11 +198,6 @@ export const STEP_COPY: Record<SetupStep, { title: string; description: string }
 	search: {
 		title: 'Search Engine',
 		description: 'Add an API key for the search engine you want Friday to use.',
-	},
-	storage: {
-		title: 'Object Storage',
-		description:
-			'Connect an S3-compatible object storage provider. Only S3-compatible services are supported.',
 	},
 	database: {
 		title: 'Vector Databases',

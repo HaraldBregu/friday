@@ -120,16 +120,6 @@ const StartPage: React.FC = () => {
 			);
 		}
 
-		if (step === 'storage') {
-			return (
-				<SetupProviderStep
-					section="storage"
-					title={STEP_COPY.storage.title}
-					description={STEP_COPY.storage.description}
-				/>
-			);
-		}
-
 		if (step === 'database') {
 			return (
 				<SetupProviderStep
