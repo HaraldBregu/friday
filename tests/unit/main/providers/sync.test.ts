@@ -47,6 +47,11 @@ class FakeAuth {
 		return () => this.listeners.delete(listener);
 	}
 
+	setState(state: AuthState): void {
+		this.state = state;
+		this.listeners.forEach((listener) => listener(structuredClone(state)));
+	}
+
 	getClient(): never {
 		throw new Error('unused');
 	}
@@ -161,4 +166,35 @@ it('recovers on a second device, retains dirty data offline, and converges tombs
 
 	firstAuth.state = { status: 'signedOut', persistence: 'encrypted' };
 	expect(firstVault.records()).toHaveLength(1);
+});
+
+it('keeps signed-out writes local and synchronizes them after sign-in', async () => {
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	await sync.setup('correct horse battery staple');
+	auth.setState({ status: 'signedOut', persistence: 'encrypted' });
+	sync.initialize();
+
+	vault.save('models', {
+		id: 'anthropic',
+		name: 'Anthropic',
+		apiKey: 'signed-out-key',
+		baseUrl: 'https://api.anthropic.com',
+	});
+	expect(vault.get('models', 'anthropic')?.apiKey).toBe('signed-out-key');
+	expect(cloud.records.has('models:anthropic')).toBe(false);
+
+	auth.setState({
+		status: 'signedIn',
+		persistence: 'encrypted',
+		user: { id: '11111111-1111-4111-8111-111111111111', email: 'owner@example.test' },
+	});
+	for (let attempt = 0; attempt < 20 && !cloud.records.has('models:anthropic'); attempt += 1) {
+		await new Promise<void>((resolve) => setImmediate(resolve));
+	}
+
+	expect(cloud.records.get('models:anthropic')).toBeDefined();
+	sync.destroy();
 });

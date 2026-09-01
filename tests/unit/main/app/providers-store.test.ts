@@ -1,7 +1,9 @@
+const mockStoreInstances: Array<{ store: Record<string, unknown> }> = [];
+
 jest.mock('electron-store', () =>
 	jest.fn().mockImplementation(({ defaults }: { defaults: Record<string, unknown> }) => {
 		let backing: Record<string, unknown> = { ...defaults };
-		return {
+		const instance = {
 			get(key: string) {
 				return backing[key];
 			},
@@ -15,6 +17,8 @@ jest.mock('electron-store', () =>
 				backing = value;
 			},
 		};
+		mockStoreInstances.push(instance);
+		return instance;
 	})
 );
 
@@ -48,6 +52,18 @@ describe('providers in app settings', () => {
 		setProvider(provider('openai', 'OpenAI'));
 		expect(getProvider('openai')).toEqual(provider('openai', 'OpenAI'));
 		expect(hasProvider('openai')).toBe(true);
+	});
+
+	it('persists only encrypted credential data and provider identifiers', () => {
+		setProvider({
+			...provider('openai', 'OpenAI'),
+			apiKey: 'plaintext-provider-secret',
+			baseUrl: 'https://plaintext-provider-url.example',
+		});
+
+		const persisted = JSON.stringify(mockStoreInstances.map((instance) => instance.store));
+		expect(persisted).not.toContain('plaintext-provider-secret');
+		expect(persisted).not.toContain('https://plaintext-provider-url.example');
 	});
 
 	it('returns undefined / false for unknown providers', () => {
