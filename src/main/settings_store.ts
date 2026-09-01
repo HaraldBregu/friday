@@ -172,12 +172,18 @@ export function listProviders(kind?: StoredProviderKind): StoredProvider[] {
 	return kind ? readProviders(kind) : [...readProviders('models'), ...readProviders('databases')];
 }
 
-export function getProvider(id: string): StoredProvider | undefined {
-	return listProviders().find((provider) => provider.id === id);
+export function getProvider(
+	id: string,
+	kind: Exclude<StoredProviderKind, 'bots'> = 'models'
+): StoredProvider | undefined {
+	return readProviders(kind).find((provider) => provider.id === id);
 }
 
-export function hasProvider(id: string): boolean {
-	return getProvider(id) !== undefined;
+export function hasProvider(
+	id: string,
+	kind: Exclude<StoredProviderKind, 'bots'> = 'models'
+): boolean {
+	return getProvider(id, kind) !== undefined;
 }
 
 export function setProvider(
@@ -199,18 +205,13 @@ export function setProvider(
 	return provider;
 }
 
-export function deleteProvider(id: string): void {
-	for (const kind of ['models', 'databases'] as const) {
-		const providers = readProviders(kind);
-		const remaining = providers.filter((provider) => provider.id !== id);
-		if (remaining.length !== providers.length) {
-			if (kind === 'databases') {
-				setDatabaseProvidersState(remaining);
-			} else {
-				setModelProvidersState(remaining);
-			}
-		}
-	}
+export function deleteProvider(
+	id: string,
+	kind: Exclude<StoredProviderKind, 'bots'> = 'models'
+): void {
+	const remaining = readProviders(kind).filter((provider) => provider.id !== id);
+	if (kind === 'databases') setDatabaseProvidersState(remaining);
+	else setModelProvidersState(remaining);
 }
 
 export function clearProviders(): void {
@@ -221,7 +222,7 @@ export function clearProviders(): void {
 /** The selected provider resolved to the shape model adapters consume. */
 export function getResolvedProvider(providerId: string | undefined): ResolvedProvider | undefined {
 	if (!providerId) return undefined;
-	const provider = getProvider(providerId);
+	const provider = getProvider(providerId, 'models');
 	if (!provider) return undefined;
 	return {
 		id: providerId,

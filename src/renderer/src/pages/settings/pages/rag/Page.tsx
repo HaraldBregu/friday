@@ -55,7 +55,6 @@ const RagPage: React.FC = () => {
 	const [databaseConfiguration, setDatabaseConfiguration] = useState<DatabaseConfiguration>({
 		providerId: undefined,
 		databaseId: undefined,
-		providers: [],
 	});
 	const [embeddingProviderId, setEmbeddingProviderId] = useState('');
 	const [embeddingModelId, setEmbeddingModelId] = useState('');

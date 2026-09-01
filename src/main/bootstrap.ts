@@ -60,7 +60,7 @@ export function bootstrapServices(): BootstrapResult {
 				(directory): directory is string => Boolean(directory)
 			)
 		),
-		getProvider,
+		getProvider: (providerId) => getProvider(providerId, 'models'),
 	});
 	const channelRegistry = createChannelRegistry({ logger, eventBus, agentService });
 	const windowContextManager = new WindowContextManager(logger, eventBus);
