@@ -67,8 +67,8 @@ it('catches up to a sidebar transition that started in the extension renderer', 
 	const surface = container.querySelector('[data-slot="extension-titlebar-sidebar"]');
 	const center = screen.getByText('Workspace').parentElement;
 
-	expect(surface).toHaveStyle({ transitionDelay: '-56ms' });
-	expect(center).toHaveStyle({ transitionDelay: '-56ms' });
+	expect(surface).toHaveStyle({ transitionDelay: '-48ms' });
+	expect(center).toHaveStyle({ transitionDelay: '-48ms' });
 	jest.restoreAllMocks();
 });
 
