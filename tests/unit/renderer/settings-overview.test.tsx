@@ -48,6 +48,19 @@ it('uses the assistant title UI for the providers title', () => {
 	expect(providersTitle.className).toBe(assistantTitle.className);
 });
 
+it('keeps object storage out of the providers group', () => {
+	render(
+		<MemoryRouter initialEntries={['/settings']}>
+			<OverviewPage />
+		</MemoryRouter>
+	);
+
+	const providersGroup = screen.getByText('settings.tabs.providers').closest('section');
+	expect(providersGroup).not.toBeNull();
+	expect(within(providersGroup as HTMLElement).queryByText('settings.tabs.storage')).toBeNull();
+	expect(screen.getByRole('button', { name: /settings\.tabs\.cloud/ })).toBeInTheDocument();
+});
+
 it('lists Channels once outside the providers group', () => {
 	render(
 		<MemoryRouter initialEntries={['/settings']}>
