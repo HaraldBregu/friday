@@ -8,7 +8,6 @@ const defaults: ProvidersStoreState = {
 	models: [],
 	databases: [],
 	search_engines: [],
-	storages: [],
 };
 
 const store = new Store<ProvidersStoreState>({
@@ -42,14 +41,6 @@ export function getSearchEngines(): StoredProvider[] {
 
 export function setSearchEngines(value: StoredProvider[]): void {
 	store.set('search_engines', value);
-}
-
-export function getStorageProvidersState(): ProvidersStoreState['storages'] {
-	return store.get('storages');
-}
-
-export function setStorageProvidersState(value: ProvidersStoreState['storages']): void {
-	store.set('storages', value);
 }
 
 function isStoredProvider(value: unknown): value is StoredProvider {
