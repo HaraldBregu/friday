@@ -10,6 +10,10 @@ import type {
 import { ProviderSyncService } from '../../../../src/main/providers/sync';
 import { ProviderVault } from '../../../../src/main/providers/vault';
 
+jest.mock('../../../../src/main/providers/providers_store', () => ({
+	reconcileProviderMetadata: jest.fn(),
+}));
+
 jest.setTimeout(30_000);
 
 const defaults: ProviderVaultStoreState = {
