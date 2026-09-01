@@ -149,7 +149,10 @@ globalThis.coder = {
 };
 globalThis.models = {
 	image: {
-		createImage: async (request) => ({ base64: request.source?.base64 ?? 'generated', mimeType: 'image/png' }),
+		createImage: async (request) => ({
+			base64: request.source?.base64 ?? 'generated',
+			mimeType: 'image/png',
+		}),
 	},
 };
 globalThis.terminalAPI = {
@@ -358,11 +361,11 @@ assert.deepEqual(
 		'app:get-theme-data',
 		'agent:workspace:location:get',
 		'agent:workspace:files:list',
-	'agent:workspace:file:read',
-	'agent:workspace:asset:read',
-	'agent:workspace:markdown:write',
-	'agent:workspace:file:write',
-	'agent:workspace:file:create',
+		'agent:workspace:file:read',
+		'agent:workspace:asset:read',
+		'agent:workspace:markdown:write',
+		'agent:workspace:file:write',
+		'agent:workspace:file:create',
 		'agent:workspace:directory:create',
 		'agent:workspace:entry:move',
 		'agent:workspace:entry:rename',

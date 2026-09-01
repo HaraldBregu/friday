@@ -238,9 +238,7 @@ export default function App() {
 	);
 
 	const saveLatestWorkspaceFile = useCallback(
-		async function saveLatestWorkspaceFile(
-			filePath = selectedPathRef.current
-		): Promise<boolean> {
+		async function saveLatestWorkspaceFile(filePath = selectedPathRef.current): Promise<boolean> {
 			if (!filePath) return false;
 			let content = selectedContentRef.current;
 			while (selectedPathRef.current === filePath) {
@@ -720,29 +718,29 @@ export default function App() {
 									? `Create it inside ${createRequest.parentPath}.`
 									: 'Create it at the workspace root.'}
 							</DialogDescription>
-							</DialogHeader>
-							{createRequest?.type === 'file' ? (
-								<div className="space-y-2">
-									<span className="text-sm font-medium">Type</span>
-									<div className="grid grid-cols-2 gap-2" role="group" aria-label="File type">
-										{createFilePresets.map((preset) => (
-											<Button
-												key={preset.kind}
-												type="button"
-												variant={createFileKind === preset.kind ? 'default' : 'outline'}
-												onClick={() => {
-													setCreateFileKind(preset.kind);
-													setCreateName(preset.name);
-													setCreateError('');
-												}}
-											>
-												{preset.label}
-											</Button>
-										))}
-									</div>
-								</div>
-							) : null}
+						</DialogHeader>
+						{createRequest?.type === 'file' ? (
 							<div className="space-y-2">
+								<span className="text-sm font-medium">Type</span>
+								<div className="grid grid-cols-2 gap-2" role="group" aria-label="File type">
+									{createFilePresets.map((preset) => (
+										<Button
+											key={preset.kind}
+											type="button"
+											variant={createFileKind === preset.kind ? 'default' : 'outline'}
+											onClick={() => {
+												setCreateFileKind(preset.kind);
+												setCreateName(preset.name);
+												setCreateError('');
+											}}
+										>
+											{preset.label}
+										</Button>
+									))}
+								</div>
+							</div>
+						) : null}
+						<div className="space-y-2">
 							<label htmlFor="workspace-entry-name" className="text-sm font-medium">
 								Name
 							</label>

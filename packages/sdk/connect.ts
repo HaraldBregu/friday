@@ -11,10 +11,10 @@ export type WorkspaceAgentApi = Pick<
 	| 'getWorkspaceLocation'
 	| 'listWorkspaceFiles'
 	| 'onWorkspaceChanged'
-		| 'readWorkspaceFile'
-		| 'readWorkspaceAsset'
-		| 'writeWorkspaceFile'
-		| 'writeWorkspaceMarkdown'
+	| 'readWorkspaceFile'
+	| 'readWorkspaceAsset'
+	| 'writeWorkspaceFile'
+	| 'writeWorkspaceMarkdown'
 	| 'createWorkspaceFile'
 	| 'createWorkspaceDirectory'
 	| 'moveWorkspaceEntry'
@@ -172,15 +172,15 @@ export function connect(options: ConnectOptions): FridayClient {
 				invoke(AgentChannels.readWorkspaceFile, [filePath]) as ReturnType<
 					AgentApi['readWorkspaceFile']
 				>,
-				readWorkspaceAsset: (filePath) =>
-					invoke(AgentChannels.readWorkspaceAsset, [filePath]) as ReturnType<
-						AgentApi['readWorkspaceAsset']
-					>,
-				writeWorkspaceFile: (filePath, content) =>
-					invoke(AgentChannels.writeWorkspaceFile, [filePath, content]) as ReturnType<
-						AgentApi['writeWorkspaceFile']
-					>,
-				writeWorkspaceMarkdown: (filePath, content) =>
+			readWorkspaceAsset: (filePath) =>
+				invoke(AgentChannels.readWorkspaceAsset, [filePath]) as ReturnType<
+					AgentApi['readWorkspaceAsset']
+				>,
+			writeWorkspaceFile: (filePath, content) =>
+				invoke(AgentChannels.writeWorkspaceFile, [filePath, content]) as ReturnType<
+					AgentApi['writeWorkspaceFile']
+				>,
+			writeWorkspaceMarkdown: (filePath, content) =>
 				invoke(AgentChannels.writeWorkspaceMarkdown, [filePath, content]) as ReturnType<
 					AgentApi['writeWorkspaceMarkdown']
 				>,

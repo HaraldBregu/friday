@@ -82,7 +82,7 @@ export interface WorkspaceAsset {
 
 export function workspaceFileType(filePath: string): WorkspaceFileType {
 	const name = filePath.split(/[\\/]/).pop()?.toLowerCase() ?? '';
-	const extension = name.includes('.') ? name.split('.').pop() ?? '' : '';
+	const extension = name.includes('.') ? (name.split('.').pop() ?? '') : '';
 	const mimeType = ASSET_MIME_TYPES[extension];
 	if (mimeType === 'application/pdf') return { kind: 'pdf', mimeType };
 	if (mimeType?.startsWith('image/')) return { kind: 'image', mimeType };
@@ -96,6 +96,7 @@ export function workspaceFileType(filePath: string): WorkspaceFileType {
 	if (extension === 'tldr' || extension === 'tldraw') {
 		return { kind: 'tldraw', mimeType: 'application/vnd.tldraw+json' };
 	}
-	if (TEXT_EXTENSIONS.has(extension) || TEXT_FILENAMES.has(name)) return { kind: 'text', mimeType: 'text/plain' };
+	if (TEXT_EXTENSIONS.has(extension) || TEXT_FILENAMES.has(name))
+		return { kind: 'text', mimeType: 'text/plain' };
 	return { kind: 'unsupported' };
 }

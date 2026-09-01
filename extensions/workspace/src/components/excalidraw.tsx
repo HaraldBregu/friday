@@ -24,9 +24,7 @@ export default function ExcalidrawEditor({
 	path,
 }: ExcalidrawEditorProps) {
 	const initialContent = useRef(content).current;
-	const [initialData, setInitialData] = useState<
-		ExcalidrawInitialDataState | null | undefined
-	>();
+	const [initialData, setInitialData] = useState<ExcalidrawInitialDataState | null | undefined>();
 	const [error, setError] = useState('');
 
 	useEffect(() => {
@@ -47,7 +45,9 @@ export default function ExcalidrawEditor({
 			})
 			.catch((reason) => {
 				if (active) {
-					setError(reason instanceof Error ? reason.message : 'Unable to open this Excalidraw file.');
+					setError(
+						reason instanceof Error ? reason.message : 'Unable to open this Excalidraw file.'
+					);
 				}
 			});
 		return () => {
@@ -57,9 +57,9 @@ export default function ExcalidrawEditor({
 
 	if (error) {
 		return (
-		<div className="flex h-full items-center justify-center px-6 text-center text-sm text-destructive">
-			{error}
-		</div>
+			<div className="flex h-full items-center justify-center px-6 text-center text-sm text-destructive">
+				{error}
+			</div>
 		);
 	}
 	if (initialData === undefined) {
