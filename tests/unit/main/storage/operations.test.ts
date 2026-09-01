@@ -20,16 +20,16 @@ describe('storage operations', () => {
 		const dependencies: StorageOperationDependencies = {
 			backup,
 			restore: jest.fn(),
-			lock: (_id, operation) => operation(),
+			lock: (operation) => operation(),
 			preventSuspension: () => releaseSuspension,
 		};
 		const Operations = await loadOperations();
 		const operations = new Operations(onStatusChanged, dependencies);
 
-		const running = operations.backup('profile-1', 'manual');
+		const running = operations.backup('manual');
 
 		expect(running.state).toBe('running');
-		expect(operations.getStatus('profile-1')).toEqual(running);
+		expect(operations.getStatus()).toEqual(running);
 		expect(onStatusChanged).toHaveBeenCalledWith(running);
 		const completion = operations.wait(running.operationId);
 		finishBackup?.({ uploaded: ['one', 'two'], failed: [] });
@@ -43,7 +43,7 @@ describe('storage operations', () => {
 			})
 		);
 		expect(finished?.revision).toBeGreaterThan(running.revision);
-		expect(operations.getStatus('profile-1')).toEqual(finished);
+		expect(operations.getStatus()).toEqual(finished);
 		expect(releaseSuspension).toHaveBeenCalledTimes(1);
 	});
 
@@ -55,17 +55,17 @@ describe('storage operations', () => {
 				.mockResolvedValueOnce({ uploaded: ['one'], failed: [{ path: 'two', error: 'no' }] })
 				.mockRejectedValueOnce(new Error('offline')),
 			restore: jest.fn(),
-			lock: (_id, operation) => operation(),
+			lock: (operation) => operation(),
 			preventSuspension: () => jest.fn(),
 		};
 		const Operations = await loadOperations();
 		const operations = new Operations(onStatusChanged, dependencies);
 
-		const partial = operations.backup('profile-1', 'scheduled');
+		const partial = operations.backup('scheduled');
 		expect(await operations.wait(partial.operationId)).toEqual(
 			expect.objectContaining({ state: 'partial', transferred: 1, failed: 1 })
 		);
-		const failed = operations.backup('profile-1', 'manual');
+		const failed = operations.backup('manual');
 		expect(await operations.wait(failed.operationId)).toEqual(
 			expect.objectContaining({ state: 'failed', error: 'offline' })
 		);
@@ -75,14 +75,14 @@ describe('storage operations', () => {
 		const dependencies: StorageOperationDependencies = {
 			backup: jest.fn(() => new Promise(() => undefined)),
 			restore: jest.fn(),
-			lock: (_id, operation) => operation(),
+			lock: (operation) => operation(),
 			preventSuspension: () => jest.fn(),
 		};
 		const Operations = await loadOperations();
 		const operations = new Operations(jest.fn(), dependencies);
-		const running = operations.backup('profile-1', 'manual');
+		const running = operations.backup('manual');
 
-		expect(operations.backup('profile-1', 'manual')).toEqual(running);
-		expect(() => operations.restore('profile-1')).toThrow('already running');
+		expect(operations.backup('manual')).toEqual(running);
+		expect(() => operations.restore()).toThrow('already running');
 	});
 });

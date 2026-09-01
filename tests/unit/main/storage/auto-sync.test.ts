@@ -1,9 +1,4 @@
-import { runProviderSync } from '../../../../src/main/storage/storage_auto_sync';
-
-const storage = {
-	id: 'backup',
-	name: 'Backup',
-} as never;
+import { runStorageSync } from '../../../../src/main/storage/storage_auto_sync';
 
 it('starts scheduled backups through the shared operation service', async () => {
 	const logger = { info: jest.fn(), error: jest.fn() };
@@ -19,11 +14,11 @@ it('starts scheduled backups through the shared operation service', async () => 
 		}),
 	};
 
-	await runProviderSync(storage, logger, operations as never);
+	await runStorageSync(logger, operations as never);
 
-	expect(operations.backup).toHaveBeenCalledWith('backup', 'scheduled');
+	expect(operations.backup).toHaveBeenCalledWith('scheduled');
 	expect(operations.wait).toHaveBeenCalledWith('scheduled-1');
-	expect(logger.info).toHaveBeenCalledWith('Storage', 'Auto sync "Backup" uploaded 3 file(s)');
+	expect(logger.info).toHaveBeenCalledWith('Storage', 'Auto sync uploaded 3 file(s)');
 });
 
 it('skips a schedule tick when a manual backup is already running', async () => {
@@ -33,13 +28,10 @@ it('skips a schedule tick when a manual backup is already running', async () => 
 		wait: jest.fn(),
 	};
 
-	await runProviderSync(storage, logger, operations as never);
+	await runStorageSync(logger, operations as never);
 
 	expect(operations.wait).not.toHaveBeenCalled();
-	expect(logger.info).toHaveBeenCalledWith(
-		'Storage',
-		'Auto sync "Backup" skipped; backup already running'
-	);
+	expect(logger.info).toHaveBeenCalledWith('Storage', 'Auto sync skipped; backup already running');
 });
 
 it('logs a failed background operation as an error', async () => {
@@ -57,12 +49,12 @@ it('logs a failed background operation as an error', async () => {
 		}),
 	};
 
-	await runProviderSync(storage, logger, operations as never);
+	await runStorageSync(logger, operations as never);
 
 	expect(logger.info).not.toHaveBeenCalled();
 	expect(logger.error).toHaveBeenCalledWith(
 		'Storage',
-		'Auto sync failed for "Backup"',
+		'Auto sync failed',
 		expect.objectContaining({ message: 'offline' })
 	);
 });

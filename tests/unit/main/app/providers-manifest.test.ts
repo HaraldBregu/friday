@@ -1,7 +1,6 @@
 import {
 	loadDatabases,
 	loadModels,
-	loadStorages,
 	loadWebSearches,
 } from '../../../../src/main/models';
 
@@ -23,7 +22,7 @@ describe('provider manifests', () => {
 			(model) => model.provider.id === 'openai' && model.type === 'realtime-voice'
 		);
 		const providersById = new Map(
-			[...loadModels(), ...loadDatabases(), ...loadStorages(), ...loadWebSearches()].map(
+			[...loadModels(), ...loadDatabases(), ...loadWebSearches()].map(
 				(model) => [model.provider.id, model.provider] as const
 			)
 		);
@@ -71,17 +70,6 @@ describe('provider manifests', () => {
 		);
 		expect(providersById.get('tavily')?.iconLightUrl).toContain(
 			'/resources/providers/tavily/images/official/tavily-black.svg'
-		);
-		expect(providersById.get('cloudflare')).toEqual(
-			expect.objectContaining({
-				name: 'Cloudflare',
-				iconDarkUrl: expect.stringContaining(
-					'/resources/providers/cloudflare/images/fallback_lobehub/cloudflare-color.png'
-				),
-				iconLightUrl: expect.stringContaining(
-					'/resources/providers/cloudflare/images/fallback_lobehub/cloudflare-color.png'
-				),
-			})
 		);
 		expect(providersById.get('pinecone')).toEqual(
 			expect.objectContaining({
@@ -158,17 +146,8 @@ describe('provider manifests', () => {
 				}),
 			])
 		);
-		expect(loadStorages()).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					id: 'object-storage',
-					provider: expect.objectContaining({ id: 'cloudflare' }),
-				}),
-			])
-		);
 		expect(namesAreAlphabetical(loadModels())).toBe(true);
 		expect(namesAreAlphabetical(loadDatabases())).toBe(true);
-		expect(namesAreAlphabetical(loadStorages())).toBe(true);
 		expect(namesAreAlphabetical(loadWebSearches())).toBe(true);
 	});
 });

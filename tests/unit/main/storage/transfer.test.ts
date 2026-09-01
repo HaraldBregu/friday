@@ -4,7 +4,7 @@ const mkdir = jest.fn();
 const lstat = jest.fn();
 const writeFile = jest.fn();
 const rm = jest.fn();
-const getStorage = jest.fn();
+const getStorageSettings = jest.fn();
 const walkFiles = jest.fn();
 const putObject = jest.fn();
 const listObjects = jest.fn();
@@ -13,7 +13,7 @@ const getObject = jest.fn();
 jest.mock('node:fs', () => ({
 	promises: { stat, readFile, mkdir, lstat, writeFile, rm },
 }));
-jest.mock('../../../../src/main/storage/storage_store', () => ({ getStorage }));
+jest.mock('../../../../src/main/storage/storage_store', () => ({ getStorageSettings }));
 jest.mock('../../../../src/main/storage/storage_walk', () => ({ walkFiles }));
 jest.mock('../../../../src/main/storage/storage_put', () => ({ putObject }));
 jest.mock('../../../../src/main/storage/storage_list', () => ({ listObjects }));
@@ -26,21 +26,13 @@ import { pullFiles } from '../../../../src/main/storage/storage_pull';
 import { pushFiles } from '../../../../src/main/storage/storage_push';
 
 const storage = {
-	id: 'backup',
-	name: 'Friday backup',
-	endpoint: 'https://storage.example.com',
-	region: 'us-east-1',
-	accessKeyId: 'access',
-	secretAccessKey: 'secret',
-	bucket: 'friday',
-	forcePathStyle: false,
 	paths: ['/data/agent'],
 	syncEnabled: true,
 	syncCronExpression: '0 3 * * *',
 };
 
 beforeEach(() => {
-	getStorage.mockReturnValue(storage);
+	getStorageSettings.mockReturnValue(storage);
 	stat.mockResolvedValue({ isDirectory: () => true });
 	readFile.mockResolvedValue(Buffer.from('hello'));
 	mkdir.mockResolvedValue(undefined);
@@ -52,13 +44,14 @@ beforeEach(() => {
 
 it('backs up selected files within the Friday-owned prefix', async () => {
 	walkFiles.mockResolvedValue(['/data/agent/notes/today.md']);
+	const auth = {} as never;
 
-	await expect(pushFiles('backup')).resolves.toEqual({
+	await expect(pushFiles(auth)).resolves.toEqual({
 		uploaded: ['/data/agent/notes/today.md'],
 		failed: [],
 	});
 	expect(putObject).toHaveBeenCalledWith(
-		'backup',
+		auth,
 		'friday/v1/agent/notes/today.md',
 		Buffer.from('hello')
 	);
@@ -69,11 +62,13 @@ it('restores cloud files without deleting unmatched local files', async () => {
 		{ key: 'friday/v1/agent/notes/today.md', size: 5, lastModified: undefined },
 	]);
 
-	await expect(pullFiles('backup')).resolves.toEqual({
+	const auth = {} as never;
+	await expect(pullFiles(auth)).resolves.toEqual({
 		downloaded: ['friday/v1/agent/notes/today.md'],
 		skipped: [],
 		failed: [],
 	});
 	expect(writeFile).toHaveBeenCalledWith('/data/agent/notes/today.md', Buffer.from('cloud'));
+	expect(getObject).toHaveBeenCalledWith(auth, 'friday/v1/agent/notes/today.md');
 	expect(rm).not.toHaveBeenCalled();
 });
