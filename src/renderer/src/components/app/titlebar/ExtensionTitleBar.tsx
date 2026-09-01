@@ -37,7 +37,7 @@ export function ExtensionTitleBar({
 	const transitionDelay =
 		sidebarTransitionStartedAt === undefined
 			? undefined
-			: `${-Math.min(200, Math.max(0, Date.now() - sidebarTransitionStartedAt))}ms`;
+			: `${-Math.min(200, Math.max(0, Date.now() - sidebarTransitionStartedAt + 16))}ms`;
 
 	return (
 		<TitleBarContainer className="relative">
