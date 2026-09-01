@@ -29,6 +29,7 @@ const defaults: ProviderVaultStoreState = {
 export class ProviderVault {
 	private key?: Buffer;
 	private readonly memory = new Map<string, StoredProvider>();
+	private readonly memoryDeleted = new Set<string>();
 	private readonly listeners = new Set<() => void>();
 
 	constructor(
@@ -115,6 +116,7 @@ export class ProviderVault {
 	}
 
 	save(kind: ProviderCredentialKind, provider: StoredProvider): void {
+		this.memoryDeleted.delete(this.recordKey(kind, provider.id));
 		if (!this.available()) {
 			this.memory.set(this.recordKey(kind, provider.id), structuredClone(provider));
 			this.emit();
@@ -141,6 +143,7 @@ export class ProviderVault {
 		const recordKey = this.recordKey(kind, id);
 		this.memory.delete(recordKey);
 		if (!this.available()) {
+			this.memoryDeleted.add(recordKey);
 			this.emit();
 			return;
 		}
@@ -165,6 +168,7 @@ export class ProviderVault {
 	}
 
 	migrate(kind: ProviderCredentialKind, provider: StoredProvider): boolean {
+		if (this.memoryDeleted.has(this.recordKey(kind, provider.id))) return false;
 		const existing = this.state().records[this.recordKey(kind, provider.id)];
 		if (existing) {
 			const key = this.readKey();

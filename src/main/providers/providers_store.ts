@@ -23,7 +23,7 @@ export const providersStorePath = store.path;
 
 export function getModelProvidersState(): StoredProvider[] {
 	migrateSection('models');
-	return providerVault.list('models');
+	return orderedProviders('models');
 }
 
 export function setModelProvidersState(value: StoredProvider[]): void {
@@ -32,7 +32,7 @@ export function setModelProvidersState(value: StoredProvider[]): void {
 
 export function getDatabaseProvidersState(): StoredProvider[] {
 	migrateSection('databases');
-	return providerVault.list('databases');
+	return orderedProviders('databases');
 }
 
 export function setDatabaseProvidersState(value: StoredProvider[]): void {
@@ -41,7 +41,7 @@ export function setDatabaseProvidersState(value: StoredProvider[]): void {
 
 export function getSearchEngines(): StoredProvider[] {
 	migrateSection('search_engines');
-	return providerVault.list('search_engines');
+	return orderedProviders('search_engines');
 }
 
 export function setSearchEngines(value: StoredProvider[]): void {
@@ -69,7 +69,25 @@ function setSection(kind: ProviderCredentialKind, value: StoredProvider[]): void
 	for (const provider of providerVault.list(kind)) {
 		if (!incomingIds.has(provider.id)) providerVault.remove(kind, provider.id);
 	}
-	reconcileProviderMetadata();
+	if (providerVault.persistence === 'encrypted') {
+		writeSection(
+			kind,
+			providers.map((provider) => ({ id: provider.id } satisfies ProviderMetadata))
+		);
+	}
+}
+
+function orderedProviders(kind: ProviderCredentialKind): StoredProvider[] {
+	const providers = providerVault.list(kind);
+	const byId = new Map(providers.map((provider) => [provider.id, provider]));
+	const ordered = section(kind).flatMap((value) => {
+		const id = isProviderMetadata(value) ? value.id : isStoredProvider(value) ? value.id : '';
+		const provider = byId.get(id);
+		if (!provider) return [];
+		byId.delete(id);
+		return [provider];
+	});
+	return [...ordered, ...byId.values()];
 }
 
 function migrateSection(kind: ProviderCredentialKind): void {
@@ -104,5 +122,13 @@ function isStoredProvider(value: unknown): value is StoredProvider {
 		typeof provider.name === 'string' &&
 		typeof provider.apiKey === 'string' &&
 		typeof provider.baseUrl === 'string'
+	);
+}
+
+function isProviderMetadata(value: unknown): value is ProviderMetadata {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		typeof (value as Partial<ProviderMetadata>).id === 'string'
 	);
 }
