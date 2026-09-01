@@ -20,6 +20,7 @@ interface ExtensionTitleBarProps {
 	leftButtons?: ExtensionTitlebarButtonDescriptor[];
 	rightButtons?: ExtensionTitlebarButtonDescriptor[];
 	sidebarOpen?: boolean;
+	sidebarTransitionStartedAt?: number;
 	sidebarWidth?: number | null;
 }
 
@@ -28,10 +29,15 @@ export function ExtensionTitleBar({
 	leftButtons = [],
 	rightButtons = [],
 	sidebarOpen,
+	sidebarTransitionStartedAt,
 	sidebarWidth = null,
 }: ExtensionTitleBarProps): React.JSX.Element {
 	const isMaximized = useExtensionWindowState();
 	const sidebarOffset = sidebarOpen && sidebarWidth !== null ? sidebarWidth : 0;
+	const transitionDelay =
+		sidebarTransitionStartedAt === undefined
+			? undefined
+			: `${-Math.min(200, Math.max(0, Date.now() - sidebarTransitionStartedAt))}ms`;
 
 	return (
 		<TitleBarContainer className="relative">
@@ -46,6 +52,7 @@ export function ExtensionTitleBar({
 					)}
 					style={{
 						width: sidebarWidth,
+						transitionDelay,
 						transform:
 							sidebarOpen === undefined
 								? undefined
@@ -75,7 +82,7 @@ export function ExtensionTitleBar({
 			</TitleBarLeftContainer>
 			<TitleBarCenterContainer
 				className="transition-[left] duration-200 ease-linear motion-reduce:transition-none"
-				style={{ left: sidebarOffset }}
+				style={{ left: sidebarOffset, transitionDelay }}
 			>
 				<TitleBarCenterContainerTitle
 					className={

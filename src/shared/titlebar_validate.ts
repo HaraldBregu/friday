@@ -33,6 +33,14 @@ export function isExtensionTitlebarOptions(
 		return false;
 	}
 	if (options.sidebarOpen !== undefined && typeof options.sidebarOpen !== 'boolean') return false;
+	if (
+		options.sidebarTransitionStartedAt !== undefined &&
+		(typeof options.sidebarTransitionStartedAt !== 'number' ||
+			!Number.isSafeInteger(options.sidebarTransitionStartedAt) ||
+			options.sidebarTransitionStartedAt < 0)
+	) {
+		return false;
+	}
 	const ids = new Set<string>();
 	for (const side of ['leftButtons', 'rightButtons'] as const) {
 		const buttons = options[side];

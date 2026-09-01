@@ -2,6 +2,8 @@ import { typedInvokeUnwrap, typedSend, typedOn } from '../shared/ipc_types';
 import { WindowChannels } from '../shared/ipc_channels_definitions';
 import type { WindowApi } from './index.d';
 
+let titlebarSidebarOpen: boolean | undefined;
+
 export const win: WindowApi = {
 	minimize: (): void => {
 		typedSend(WindowChannels.minimize);
@@ -31,7 +33,20 @@ export const win: WindowApi = {
 		return typedOn(WindowChannels.fullScreenChange, callback);
 	},
 	setTitlebarOptions: (options): void => {
-		typedSend(WindowChannels.titlebarOptionsSet, options);
+		if (options === null) {
+			titlebarSidebarOpen = undefined;
+			typedSend(WindowChannels.titlebarOptionsSet, options);
+			return;
+		}
+		const sidebarChanged =
+			titlebarSidebarOpen !== undefined &&
+			options.sidebarOpen !== undefined &&
+			titlebarSidebarOpen !== options.sidebarOpen;
+		titlebarSidebarOpen = options.sidebarOpen;
+		typedSend(
+			WindowChannels.titlebarOptionsSet,
+			sidebarChanged ? { ...options, sidebarTransitionStartedAt: Date.now() } : options
+		);
 	},
 	onTitlebarOptionsChanged: (callback): (() => void) => {
 		return typedOn(WindowChannels.titlebarOptionsChanged, callback);

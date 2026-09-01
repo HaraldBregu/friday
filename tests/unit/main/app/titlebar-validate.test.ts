@@ -14,6 +14,7 @@ it('accepts a complete extension titlebar snapshot and reset', () => {
 			],
 			rightButtons: [{ id: 'settings', label: 'Settings', icon: 'settings' }],
 			sidebarOpen: true,
+			sidebarTransitionStartedAt: 1_788_272_670_000,
 			sidebarWidth: 240,
 		})
 	).toBe(true);
@@ -25,6 +26,8 @@ it.each([
 	{ sidebarWidth: -1 },
 	{ sidebarWidth: Number.NaN },
 	{ sidebarOpen: 'yes' },
+	{ sidebarTransitionStartedAt: -1 },
+	{ sidebarTransitionStartedAt: Number.NaN },
 	{ leftButtons: [{ id: 'toggle', label: 'Toggle', icon: 'custom' }] },
 	{ leftButtons: [{ id: 'toggle', label: 'Toggle', icon: 'panel-left', expanded: 'yes' }] },
 	{

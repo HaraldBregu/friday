@@ -51,5 +51,6 @@ export interface ExtensionTitlebarOptions {
 	leftButtons?: ExtensionTitlebarButton[];
 	rightButtons?: ExtensionTitlebarButton[];
 	sidebarOpen?: boolean;
+	sidebarTransitionStartedAt?: number;
 	sidebarWidth?: number | null;
 }
