@@ -41,6 +41,12 @@ function provider(apiKey = 'provider-secret') {
 	};
 }
 
+function memoryStore(): Store<ProviderVaultStoreState> {
+	const store = new Store<ProviderVaultStoreState>({ defaults });
+	Object.defineProperty(store, 'path', { configurable: true, value: undefined });
+	return store;
+}
+
 describe('provider credential crypto', () => {
 	it('round-trips and authenticates the vault, kind, id, and schema', () => {
 		const key = randomBytes(32);
@@ -93,7 +99,7 @@ describe('provider credential crypto', () => {
 
 describe('local provider vault', () => {
 	it('persists encrypted records without plaintext key material', () => {
-		const store = new Store<ProviderVaultStoreState>({ defaults });
+		const store = memoryStore();
 		const vault = new ProviderVault(store, secureStorage(), 'darwin');
 
 		vault.save('models', provider());
@@ -105,7 +111,7 @@ describe('local provider vault', () => {
 	});
 
 	it('migrates idempotently only after a verifiable encrypted write', () => {
-		const store = new Store<ProviderVaultStoreState>({ defaults });
+		const store = memoryStore();
 		const vault = new ProviderVault(store, secureStorage(), 'darwin');
 
 		expect(vault.migrate('models', provider())).toBe(true);
@@ -117,7 +123,7 @@ describe('local provider vault', () => {
 	});
 
 	it('does not replace an unreadable protected key or overwrite encrypted records', () => {
-		const store = new Store<ProviderVaultStoreState>({ defaults });
+		const store = memoryStore();
 		new ProviderVault(store, secureStorage(), 'darwin').save('models', provider());
 		const persisted = structuredClone(store.store);
 		const unreadableStorage = {
@@ -138,7 +144,7 @@ describe('local provider vault', () => {
 		['unavailable encryption', secureStorage(false), 'darwin' as const],
 		['Linux basic_text', secureStorage(true, 'basic_text'), 'linux' as const],
 	])('keeps new credentials memory-only with %s', (_name, storage, platform) => {
-		const store = new Store<ProviderVaultStoreState>({ defaults });
+		const store = memoryStore();
 		const vault = new ProviderVault(store, storage, platform);
 		vault.save('models', provider());
 

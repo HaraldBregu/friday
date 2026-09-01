@@ -103,8 +103,10 @@ class FakeCloud implements ProviderCloudPort {
 }
 
 function newVault(): ProviderVault {
+	const store = new Store<ProviderVaultStoreState>({ defaults });
+	Object.defineProperty(store, 'path', { configurable: true, value: undefined });
 	return new ProviderVault(
-		new Store<ProviderVaultStoreState>({ defaults }),
+		store,
 		storage,
 		'darwin'
 	);
