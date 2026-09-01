@@ -110,7 +110,16 @@ export class AuthService {
 			},
 		});
 		if (error) throw publicAuthError(error);
-		return data.url;
+		const url = new URL(data.url);
+		if (
+			url.origin !== this.config.url ||
+			url.pathname !== '/auth/v1/authorize' ||
+			url.username ||
+			url.password
+		) {
+			throw new Error('Supabase returned an invalid authentication URL.');
+		}
+		return url.toString();
 	}
 
 	async signUp(input: SignUpInput): Promise<AuthState> {
