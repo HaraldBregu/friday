@@ -17,7 +17,16 @@ jest.mock('react-i18next', () => {
 beforeEach(() => {
 	Object.defineProperty(window, 'provider', {
 		configurable: true,
-		value: { list: jest.fn().mockResolvedValue([]) },
+		value: {
+			list: jest.fn().mockResolvedValue([]),
+			listBots: jest.fn().mockResolvedValue([]),
+			vaultStatus: jest.fn().mockResolvedValue({
+				persistence: 'encrypted',
+				cloudConfigured: false,
+				unlocked: false,
+				pending: 0,
+			}),
+		},
 	});
 	Object.defineProperty(window, 'search', {
 		configurable: true,

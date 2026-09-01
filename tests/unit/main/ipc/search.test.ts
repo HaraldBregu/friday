@@ -9,21 +9,36 @@ jest.mock('../../../../src/main/search', () => ({
 }));
 
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
-	registerQuery: jest.fn(),
-	registerCommand: jest.fn(),
+	registerQueryWithEvent: jest.fn(),
+	registerCommandWithEvent: jest.fn(),
 }));
 
 import type { EventBus } from '../../../../src/main/event_bus';
-import { registerCommand, registerQuery } from '../../../../src/main/ipc/core/gateway';
+import {
+	registerCommandWithEvent,
+	registerQueryWithEvent,
+} from '../../../../src/main/ipc/core/gateway';
 import { SearchIpc } from '../../../../src/main/ipc/search';
 import { SearchChannels } from '../../../../src/shared/ipc_channels_definitions';
 
 describe('SearchIpc', () => {
 	it('registers the typed search settings handlers', () => {
-		new SearchIpc().register(undefined, {} as EventBus);
+		new SearchIpc().register(
+			{ windows: {} as never, extensions: {} as never },
+			{} as EventBus
+		);
 
-		expect(registerQuery).toHaveBeenCalledWith(SearchChannels.getSettings, getSearchSettings);
-		expect(registerCommand).toHaveBeenCalledWith(SearchChannels.saveEngine, saveSearchEngine);
-		expect(registerCommand).toHaveBeenCalledWith(SearchChannels.selectEngine, selectSearchEngine);
+		expect(registerQueryWithEvent).toHaveBeenCalledWith(
+			SearchChannels.getSettings,
+			expect.any(Function)
+		);
+		expect(registerCommandWithEvent).toHaveBeenCalledWith(
+			SearchChannels.saveEngine,
+			expect.any(Function)
+		);
+		expect(registerCommandWithEvent).toHaveBeenCalledWith(
+			SearchChannels.selectEngine,
+			expect.any(Function)
+		);
 	});
 });

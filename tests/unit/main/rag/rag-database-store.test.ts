@@ -1,16 +1,10 @@
 const getRagConfiguration = jest.fn();
 const saveRagConfiguration = jest.fn();
-const getDatabaseProvidersState = jest.fn();
-const setDatabaseProvidersState = jest.fn();
 
 jest.mock('../../../../src/main/agent/knowledge/rag/rag_store', () => ({
 	getRagConfiguration,
 	ragConfigurationStorePath: '/settings/rag.json',
 	saveRagConfiguration,
-}));
-jest.mock('../../../../src/main/providers/providers_index', () => ({
-	getDatabaseProvidersState,
-	setDatabaseProvidersState,
 }));
 jest.mock('../../../../src/main/models', () => ({
 	loadDatabases: () => [
@@ -41,7 +35,6 @@ const ragConfiguration = {
 
 beforeEach(() => {
 	getRagConfiguration.mockReturnValue(ragConfiguration);
-	getDatabaseProvidersState.mockReturnValue([]);
 	saveRagConfiguration.mockImplementation((configuration) => configuration);
 });
 
@@ -50,13 +43,11 @@ it('reads and writes database selection through the RAG store', () => {
 	expect(getDatabaseConfiguration()).toEqual({
 		providerId: 'pinecone',
 		databaseId: 'pinecone',
-		providers: [],
 	});
 
 	saveDatabaseConfiguration({
 		providerId: 'pinecone',
 		databaseId: 'pinecone',
-		providers: [],
 	});
 
 	expect(saveRagConfiguration).toHaveBeenCalledWith({

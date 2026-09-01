@@ -63,10 +63,14 @@ describe('providers in app settings', () => {
 		expect(list.map((entry) => entry.id)).toEqual(['a', 'b']);
 	});
 
-	it('stores database providers in the database configuration', () => {
+	it('stores database credentials separately from renderer-facing configuration', () => {
 		setProvider(provider('pinecone', 'Pinecone'), 'databases');
 
-		expect(getDatabaseConfiguration().providers).toEqual([provider('pinecone', 'Pinecone')]);
+		expect(getProvider('pinecone', 'databases')).toEqual(provider('pinecone', 'Pinecone'));
+		expect(getDatabaseConfiguration()).toEqual({
+			providerId: undefined,
+			databaseId: undefined,
+		});
 	});
 
 	it('updates in place instead of appending a duplicate', () => {

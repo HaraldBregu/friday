@@ -138,7 +138,6 @@ beforeEach(() => {
 	databaseApi.getConfiguration.mockResolvedValue({
 		providerId: undefined,
 		databaseId: undefined,
-		providers: [],
 	});
 	agentApi.ragGetConfiguration.mockResolvedValue({
 		enabled: false,
@@ -254,7 +253,6 @@ it('groups providers, model, index, and folder paths in one configuration card',
 	databaseApi.getConfiguration.mockResolvedValue({
 		providerId: 'pinecone',
 		databaseId: 'pinecone',
-		providers: [],
 	});
 	agentApi.ragGetConfiguration.mockResolvedValue({
 		indexName: 'friday',
