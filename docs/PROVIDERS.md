@@ -1,10 +1,10 @@
 # Provider Reference
 
-Friday ships 24 provider manifests under `resources/providers`. This page is the canonical
+Friday ships 23 provider manifests under `resources/providers`. This page is the canonical
 human-readable inventory of those built-in providers, the services they expose in the catalog,
 and whether the current runtime can execute each service.
 
-The inventory covers model, search, database, and storage providers. Telegram and Discord are
+The inventory covers model, search, and database providers. Telegram and Discord are
 messaging channels and are documented in [Friday Feature Reference](FEATURES.md#messaging-channels).
 MCP servers and extensions are integrations rather than providers.
 
@@ -31,8 +31,7 @@ See [Settings UI](ui/SETTINGS.md) for the complete Settings navigation and persi
    Video, or Audio settings page.
 3. Configure Brave or Tavily under **Settings → Providers → Search**. Connect Pinecone under
    **Settings → Providers → Databases**, then select its database and index under
-   **Settings → Assistant → RAG**. Configure object storage under **Settings → Providers →
-   Storage**, then select folders and sync behavior under **Settings → Cloud**.
+   **Settings → Assistant → RAG**.
 4. Run the test offered by the settings page, when present, before relying on the provider in an
    agent run.
 
@@ -44,8 +43,6 @@ still apply.
 Most integrations use one API key. The exceptions are:
 
 - **Kling** expects the value saved in the API-key field to use `accessKey:secretKey` format.
-- **Cloudflare R2** uses an endpoint, region, access-key ID, secret access key, bucket, and optional
-  path-style setting instead of the normal model-provider key form.
 - **Pinecone** also requires the RAG index configuration.
 - **Brave** and **Tavily** can use `BRAVE_API_KEY` and `TAVILY_API_KEY` respectively when no key is
   stored in Settings.
@@ -63,7 +60,6 @@ manifest.
 | [Black Forest Labs](https://dashboard.bfl.ai)                                      | `black-forest-labs` | Image                                                            | Available                                                                |
 | [Brave](https://api-dashboard.search.brave.com/app/keys)                           | `brave`             | Web search                                                       | Available                                                                |
 | [Cartesia](https://play.cartesia.ai/keys)                                          | `cartesia`          | Text to speech                                                   | Available                                                                |
-| [Cloudflare](https://dash.cloudflare.com)                                          | `cloudflare`        | Object storage                                                   | Available                                                                |
 | [Cohere](https://dashboard.cohere.com/api-keys)                                    | `cohere`            | Embeddings                                                       | Available                                                                |
 | [Deepgram](https://console.deepgram.com)                                           | `deepgram`          | Speech to text, text to speech                                   | Available                                                                |
 | [DeepSeek](https://platform.deepseek.com/api_keys)                                 | `deepseek`          | Chat                                                             | Available                                                                |
@@ -186,14 +182,13 @@ The `bge` adapter targets a self-hosted OpenAI-compatible embeddings endpoint. I
 not ship a `bge` manifest, it does not appear in the normal model picker unless a compatible custom
 manifest supplies the provider and model entry.
 
-### Search, database, and storage
+### Search and database
 
-| Area            | Provider   | Service                                                                    |
-| --------------- | ---------- | -------------------------------------------------------------------------- |
-| Web search      | Brave      | Brave Web Search (`brave-web-search`)                                      |
-| Web search      | Tavily     | Tavily Web Search (`tavily-web-search`)                                    |
-| Vector database | Pinecone   | Vector Database (`vector-database`)                                        |
-| Object storage  | Cloudflare | Object Storage (`object-storage`) through the S3-compatible storage client |
+| Area            | Provider | Service                                 |
+| --------------- | -------- | --------------------------------------- |
+| Web search      | Brave    | Brave Web Search (`brave-web-search`)   |
+| Web search      | Tavily   | Tavily Web Search (`tavily-web-search`) |
+| Vector database | Pinecone | Vector Database (`vector-database`)     |
 
 ## Custom and plugin providers
 
@@ -222,6 +217,6 @@ corresponding runtime factory; adding only a manifest makes the service catalog 
 - Runtime adapters: [`src/main/models/adapters`](../src/main/models/adapters)
 - Search integrations: [`src/main/search`](../src/main/search)
 - Pinecone RAG integration: [`src/main/agent/knowledge/rag`](../src/main/agent/knowledge/rag)
-- S3-compatible storage integration: [`src/main/storage`](../src/main/storage)
+- Supabase cloud backup: [`SUPABASE.md`](SUPABASE.md)
 
 When a manifest changes, update this page in the same change and run `npm run quality:check`.
