@@ -1,32 +1,220 @@
-import type { IpcModule } from './core/module';
-import type { EventBus } from '../event_bus';
-import { registerCommand, registerQuery } from './core/gateway';
+import type { BotCredentialSaveInput, BotCredentialSummary, StoredBotProvider } from '../../shared/channels_types';
+import { CHANNEL_DM_POLICIES } from '../../shared/channels_types';
+import type {
+	ProviderCredentialKind,
+	ProviderCredentialSaveInput,
+	ProviderCredentialSummary,
+} from '../../shared/provider_types';
 import { ProviderStoreChannels } from '../../shared/ipc_channels_definitions';
-import type { StoredProvider as Provider, StoredProviderKind } from '../../shared/provider_types';
-import type { StoredBotProvider } from '../../shared/channels_types';
+import {
+	getChannelProvider,
+	listChannelProviders,
+	loadChannels,
+	setChannelProvider,
+} from '../channels';
+import type { EventBus } from '../event_bus';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import { loadDatabases, loadProviders } from '../models';
+import type { ProviderSyncService } from '../providers/sync';
 import { getProvider, listProviders, setProvider } from '../settings_store';
-import { getChannelProvider, listChannelProviders, setChannelProvider } from '../channels';
-type ProviderStoreRecord = Provider | StoredBotProvider;
+import type { WindowContextManager } from '../window_context';
+import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
+import type { IpcModule } from './core/module';
+import { TrustedRenderer } from './core/trusted';
 
-export class ProviderStoreIpc implements IpcModule {
+export interface ProviderStoreIpcDeps {
+	sync: ProviderSyncService;
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
+}
+
+type SavedCredentialKind = Exclude<ProviderCredentialKind, 'search_engines'>;
+
+export class ProviderStoreIpc implements IpcModule<ProviderStoreIpcDeps> {
 	readonly name = 'provider-store';
 
-	register(_deps: undefined, _eventBus: EventBus): void {
-		registerQuery(
-			ProviderStoreChannels.get,
-			(id: string) => getProvider(id) ?? getChannelProvider(id)
+	register({ sync, windows, extensions }: ProviderStoreIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, extensions);
+		registerQueryWithEvent(ProviderStoreChannels.get, (event, id, kind) => {
+			trusted.assert(event);
+			const normalizedId = this.id(id);
+			const normalizedKind = this.kind(kind);
+			getProvider(normalizedId, normalizedKind);
+			return sync.getSummary(normalizedKind, normalizedId);
+		});
+		registerQueryWithEvent(ProviderStoreChannels.list, (event, kind) => {
+			trusted.assert(event);
+			if (kind) listProviders(this.kind(kind));
+			else {
+				listProviders('models');
+				listProviders('databases');
+			}
+			return sync.listSummaries(kind ? this.kind(kind) : undefined);
+		});
+		registerCommandWithEvent(ProviderStoreChannels.set, (event, value) => {
+			trusted.assert(event);
+			const input = this.credential(value);
+			const provider = this.catalogProvider(input.kind, input.id, input.apiKey);
+			setProvider(provider, input.kind);
+			const summary = sync.getSummary(input.kind, input.id);
+			if (!summary) throw new Error('The provider credential could not be saved.');
+			return summary;
+		});
+		registerQueryWithEvent(ProviderStoreChannels.getBot, (event, id) => {
+			trusted.assert(event);
+			const provider = getChannelProvider(this.id(id));
+			return provider ? this.botSummary(provider) : undefined;
+		});
+		registerQueryWithEvent(ProviderStoreChannels.listBots, (event) => {
+			trusted.assert(event);
+			return listChannelProviders().map((provider) => this.botSummary(provider));
+		});
+		registerCommandWithEvent(ProviderStoreChannels.setBot, (event, value) => {
+			trusted.assert(event);
+			return this.saveBot(this.botInput(value));
+		});
+		registerQueryWithEvent(ProviderStoreChannels.vaultStatus, (event) => {
+			trusted.assert(event);
+			return sync.status();
+		});
+		registerCommandWithEvent(ProviderStoreChannels.setupVault, (event, passphrase) => {
+			trusted.assert(event);
+			return sync.setup(this.passphrase(passphrase));
+		});
+		registerCommandWithEvent(ProviderStoreChannels.unlockVault, (event, passphrase) => {
+			trusted.assert(event);
+			return sync.unlock(this.passphrase(passphrase));
+		});
+		registerCommandWithEvent(
+			ProviderStoreChannels.changeVaultPassphrase,
+			(event, passphrase) => {
+				trusted.assert(event);
+				return sync.changePassphrase(this.passphrase(passphrase));
+			}
 		);
-		registerQuery(ProviderStoreChannels.list, () => [
-			...listProviders('models'),
-			...listProviders('databases'),
-			...listChannelProviders(),
-		]);
-		registerCommand(
-			ProviderStoreChannels.set,
-			(provider: ProviderStoreRecord, kind?: StoredProviderKind) =>
-				kind === 'bots'
-					? setChannelProvider(provider as StoredBotProvider)
-					: setProvider(provider as Provider, kind)
-		);
+		registerCommandWithEvent(ProviderStoreChannels.syncVault, (event) => {
+			trusted.assert(event);
+			return sync.sync();
+		});
+	}
+
+	private credential(value: unknown): ProviderCredentialSaveInput {
+		const record = this.record(value);
+		const apiKey = typeof record.apiKey === 'string' ? record.apiKey.trim() : '';
+		if (!apiKey || apiKey.length > 16_384) throw new Error('The provider API key is invalid.');
+		return { kind: this.kind(record.kind), id: this.id(record.id), apiKey };
+	}
+
+	private catalogProvider(kind: SavedCredentialKind, id: string, apiKey: string) {
+		if (kind === 'models') {
+			const provider = loadProviders().find((entry) => entry.id === id);
+			if (!provider) throw new Error('Unknown provider.');
+			return { id, name: provider.name, apiKey, baseUrl: provider.baseUrl };
+		}
+		const service = loadDatabases().find((entry) => entry.provider.id === id);
+		if (!service) throw new Error('Unknown database provider.');
+		return {
+			id,
+			name: service.provider.name,
+			apiKey,
+			baseUrl: service.url ?? service.provider.baseUrl,
+		};
+	}
+
+	private botInput(value: unknown): BotCredentialSaveInput {
+		const record = this.record(value);
+		const dmPolicy = CHANNEL_DM_POLICIES.includes(record.dmPolicy as never)
+			? (record.dmPolicy as BotCredentialSaveInput['dmPolicy'])
+			: undefined;
+		return {
+			id: this.id(record.id),
+			apiKey:
+				typeof record.apiKey === 'string' && record.apiKey.length <= 16_384
+					? record.apiKey.trim()
+					: '',
+			...(this.list(record.allowFrom) ? { allowFrom: this.list(record.allowFrom) } : {}),
+			...(this.list(record.groupAllowFrom)
+				? { groupAllowFrom: this.list(record.groupAllowFrom) }
+				: {}),
+			...(dmPolicy ? { dmPolicy } : {}),
+			...this.optionalIdentifiers(record),
+		};
+	}
+
+	private saveBot(input: BotCredentialSaveInput): BotCredentialSummary {
+		const service = loadChannels().find((entry) => entry.provider.id === input.id);
+		if (!service) throw new Error('Unknown channel provider.');
+		const existing = getChannelProvider(input.id);
+		const apiKey = input.apiKey || existing?.apiKey || '';
+		if (!apiKey) throw new Error('The bot token is required.');
+		const saved = setChannelProvider({
+			...existing,
+			...input,
+			id: input.id,
+			name: service.provider.name,
+			baseUrl: service.url ?? service.provider.baseUrl,
+			apiKey,
+		});
+		return this.botSummary(saved);
+	}
+
+	private botSummary(provider: StoredBotProvider): BotCredentialSummary {
+		const { apiKey, ...summary } = provider;
+		return { ...summary, configured: Boolean(apiKey.trim()) };
+	}
+
+	private kind(value: unknown): SavedCredentialKind {
+		if (value === 'models' || value === 'databases') return value;
+		throw new Error('The provider kind is invalid.');
+	}
+
+	private id(value: unknown): string {
+		const id = typeof value === 'string' ? value.trim().toLowerCase() : '';
+		if (!/^[a-z0-9][a-z0-9._-]{0,127}$/.test(id)) {
+			throw new Error('The provider identifier is invalid.');
+		}
+		return id;
+	}
+
+	private passphrase(value: unknown): string {
+		if (typeof value !== 'string') throw new Error('The provider sync passphrase is invalid.');
+		return value;
+	}
+
+	private record(value: unknown): Record<string, unknown> {
+		if (!value || typeof value !== 'object' || Array.isArray(value)) {
+			throw new Error('The provider credential input is invalid.');
+		}
+		return value as Record<string, unknown>;
+	}
+
+	private list(value: unknown): string[] | undefined {
+		if (value === undefined) return undefined;
+		if (!Array.isArray(value) || value.length > 256) {
+			throw new Error('The channel access list is invalid.');
+		}
+		const result = value.map((entry) => (typeof entry === 'string' ? entry.trim() : ''));
+		if (result.some((entry) => !entry || entry.length > 256)) {
+			throw new Error('The channel access list is invalid.');
+		}
+		return [...new Set(result)];
+	}
+
+	private optionalIdentifiers(
+		record: Record<string, unknown>
+	): Pick<
+		BotCredentialSaveInput,
+		'sttProviderId' | 'sttModelId' | 'ttsProviderId' | 'ttsModelId'
+	> {
+		const result: Record<string, string> = {};
+		for (const key of ['sttProviderId', 'sttModelId', 'ttsProviderId', 'ttsModelId']) {
+			const value = record[key];
+			if (value === undefined) continue;
+			if (typeof value !== 'string' || value.trim().length > 200) {
+				throw new Error('The channel model identifier is invalid.');
+			}
+			result[key] = value.trim();
+		}
+		return result;
 	}
 }

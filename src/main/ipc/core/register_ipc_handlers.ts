@@ -37,6 +37,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		windowContextManager,
 		authService,
 		cloudService,
+		providerSyncService,
 	} = services;
 
 	const safeRegister = (name: string, register: () => void): void => {
@@ -89,7 +90,16 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		new RealtimeVoiceIpc().register({ conversation: conversationService }, eventBus)
 	);
 	safeRegister('skills', () => new SkillsIpc().register(undefined, eventBus));
-	safeRegister('provider-store', () => new ProviderStoreIpc().register(undefined, eventBus));
+	safeRegister('provider-store', () =>
+		new ProviderStoreIpc().register(
+			{
+				sync: providerSyncService,
+				windows: windowContextManager,
+				extensions: extensionRegistry,
+			},
+			eventBus
+		)
+	);
 	safeRegister('search', () => new SearchIpc().register(undefined, eventBus));
 	safeRegister('storage', () =>
 		new StorageIpc().register({ extensionRegistry, storageOperations }, eventBus)
