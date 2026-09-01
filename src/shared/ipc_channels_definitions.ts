@@ -17,6 +17,7 @@ export const AgentChannels = {
 	workspaceChanged: 'agent:workspace:changed',
 	readWorkspaceFile: 'agent:workspace:file:read',
 	readWorkspaceAsset: 'agent:workspace:asset:read',
+	writeWorkspaceFile: 'agent:workspace:file:write',
 	writeWorkspaceMarkdown: 'agent:workspace:markdown:write',
 	createWorkspaceFile: 'agent:workspace:file:create',
 	createWorkspaceDirectory: 'agent:workspace:directory:create',

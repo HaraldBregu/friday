@@ -164,6 +164,7 @@ export interface AgentApi {
 	onWorkspaceChanged: (callback: (event: WorkspaceChangeEvent) => void) => () => void;
 	readWorkspaceFile: (filePath: string) => Promise<string>;
 	readWorkspaceAsset: (filePath: string) => Promise<WorkspaceAsset>;
+	writeWorkspaceFile: (filePath: string, content: string) => Promise<void>;
 	writeWorkspaceMarkdown: (filePath: string, content: string) => Promise<void>;
 	createWorkspaceFile: (parentPath: string, name: string) => Promise<string>;
 	createWorkspaceDirectory: (parentPath: string, name: string) => Promise<string>;
