@@ -9,7 +9,8 @@ jest.mock('react-i18next', () => {
 		'settings.channels.configured': 'Configured',
 		'settings.channels.notConfigured': 'Not configured',
 	};
-	return { useTranslation: () => ({ t: (key: string) => translations[key] ?? key }) };
+	const t = (key: string): string => translations[key] ?? key;
+	return { useTranslation: () => ({ t }) };
 });
 
 const channels = jest.fn();
