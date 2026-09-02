@@ -23,8 +23,8 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		auth.onStateChanged((state) => trusted.broadcast(AuthChannels.stateChanged, state));
 		registerQueryWithEvent(AuthChannels.getState, (event) => {
 			trusted.assert(event);
-				return auth.getState();
-			});
+			return auth.getState();
+		});
 		registerQueryWithEvent(AuthChannels.getProfile, (event) => {
 			trusted.assert(event);
 			return auth.getProfile();
@@ -81,8 +81,8 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 	private profile(value: unknown): AccountProfile {
 		const record = this.record(value);
 		return {
-			firstName: this.name(record.firstName, 'First name'),
-			lastName: this.name(record.lastName, 'Last name'),
+			firstName: this.profileName(record.firstName, 'First name'),
+			lastName: this.profileName(record.lastName, 'Last name'),
 		};
 	}
 
@@ -111,7 +111,7 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		return value;
 	}
 
-	private name(value: unknown, label: string): string {
+	private profileName(value: unknown, label: string): string {
 		if (typeof value !== 'string' || !value.trim()) throw new Error(`${label} is required.`);
 		if (value.trim().length > 80) throw new Error(`${label} must be 80 characters or fewer.`);
 		return value.trim();
