@@ -108,7 +108,7 @@ it('shows the settings icon on Home', async () => {
 			<TitleBar />
 			<Routes>
 				<Route path="/home" element={null} />
-				<Route path="/settings" element={<p>/settings</p>} />
+				<Route path="/settings/general" element={<p>/settings/general</p>} />
 			</Routes>
 		</MemoryRouter>
 	);
@@ -117,7 +117,7 @@ it('shows the settings icon on Home', async () => {
 
 	await user.click(screen.getByRole('button', { name: 'settings.title' }));
 
-	expect(screen.getByText('/settings')).toBeInTheDocument();
+	expect(screen.getByText('/settings/general')).toBeInTheDocument();
 });
 
 it('renders search immediately before the Home or Settings button', async () => {

@@ -86,7 +86,7 @@ export const TitleBar = React.memo(function TitleBar({
 			variant="ghost"
 			size="icon"
 			className="size-8 rounded-full"
-			onClick={() => navigate('/settings')}
+			onClick={() => navigate('/settings/general')}
 			title={settingsLabel}
 			aria-label={settingsLabel}
 		>

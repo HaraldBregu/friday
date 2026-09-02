@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { CommandMenu } from '../../../src/renderer/src/experience/CommandMenu';
 
 jest.mock('react-i18next', () => ({
@@ -53,3 +53,19 @@ it.each(['/start', '/homepage', '/settings-old'])(
 		expect(screen.queryByPlaceholderText('Search routes and settings...')).not.toBeInTheDocument();
 	}
 );
+
+it('opens General settings with the settings shortcut', () => {
+	render(
+		<MemoryRouter initialEntries={['/home']}>
+			<CommandMenu />
+			<Routes>
+				<Route path="/home" element={null} />
+				<Route path="/settings/general" element={<p>General settings</p>} />
+			</Routes>
+		</MemoryRouter>
+	);
+
+	fireEvent.keyDown(window, { key: ',', metaKey: true });
+
+	expect(screen.getByText('General settings')).toBeInTheDocument();
+});

@@ -30,7 +30,6 @@ import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
 
 const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
-const SettingsOverviewPage = lazy(() => import('./pages/settings/pages/overview/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));
 const TasksPage = lazy(() => import('./pages/settings/pages/tasks/Page'));
 const TaskDetailsPage = lazy(() => import('./pages/settings/pages/tasks/detail/Page'));
@@ -71,7 +70,7 @@ function ModelServiceLegacyRedirect(): React.JSX.Element {
 	const decoded = decodeURIComponent(serviceId ?? '');
 	const normalized = decoded === 'friday' || decoded === 'main' ? 'assistant' : decoded;
 	const item = SETTINGS_MODEL_SERVICE_ITEMS.find((entry) => entry.id === normalized);
-	if (!item) return <Navigate to="/settings" replace />;
+	if (!item) return <Navigate to="/settings/general" replace />;
 	const isChatHistory = location.pathname.endsWith('/chathistory');
 	return <Navigate to={isChatHistory ? `${item.path}/chathistory` : item.path} replace />;
 }
@@ -226,18 +225,14 @@ const routes: RouteObject[] = [
 				),
 				children: [
 					{
+						index: true,
+						element: <Navigate to="/settings/general" replace />,
+					},
+					{
 						path: 'account',
 						element: (
 							<SettingsRouteWrapper>
 								<AccountPage />
-							</SettingsRouteWrapper>
-						),
-					},
-					{
-						index: true,
-						element: (
-							<SettingsRouteWrapper>
-								<SettingsOverviewPage />
 							</SettingsRouteWrapper>
 						),
 					},

@@ -208,7 +208,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 			<footer className="shrink-0 border-t border-sidebar-border/50 p-2">
 				<div className="flex min-w-0 items-center gap-1">
 					<Link
-						to="/settings"
+						to="/settings/general"
 						aria-label={accountLabel}
 						title={accountLabel}
 						className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg px-1 outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"

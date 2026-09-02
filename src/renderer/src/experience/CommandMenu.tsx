@@ -70,7 +70,7 @@ const TOP_LEVEL_ROUTES: readonly StaticRouteDefinition[] = [
 		label: 'Settings',
 		description: 'Configure Friday',
 		icon: Settings,
-		path: '/settings',
+		path: '/settings/general',
 		keywords: 'preferences configuration settings',
 	},
 ] as const;
@@ -281,7 +281,7 @@ export function CommandMenu({
 
 			if (isSettingsShortcut) {
 				e.preventDefault();
-				navigateTo('/settings');
+				navigateTo('/settings/general');
 				return;
 			}
 

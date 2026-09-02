@@ -22,6 +22,7 @@ const routes = [
 	'/start',
 	'/home',
 	'/settings',
+	'/settings/general',
 	'/settings/general/persona',
 	'/settings/cloud',
 	'/settings/system',
@@ -71,12 +72,19 @@ test('the start route mounts the unified onboarding flow', async () => {
 	await expect(page.getByText('errorBoundary.notFoundTitle')).toHaveCount(0);
 });
 
-test('Command+, opens the settings page', async () => {
+test('the settings home redirects to General settings', async () => {
+	await page.evaluate(() => {
+		window.location.hash = '#/settings';
+	});
+	await expect(page).toHaveURL(/#\/settings\/general$/);
+});
+
+test('Command+, opens General settings', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/home';
 	});
 	await page.keyboard.press('Meta+,');
-	await expect(page).toHaveURL(/#\/settings$/);
+	await expect(page).toHaveURL(/#\/settings\/general$/);
 });
 
 test('the platform shortcut creates a new chat session', async () => {

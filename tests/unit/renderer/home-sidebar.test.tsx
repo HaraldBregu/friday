@@ -101,7 +101,10 @@ it('loads chat history, marks the latest default session, and switches sessions'
 
 	await user.click(older);
 	expect(setSessionId).toHaveBeenCalledWith('session-older');
-	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute('href', '/settings');
+	expect(screen.getByRole('link', { name: 'settings.title' })).toHaveAttribute(
+		'href',
+		'/settings/general'
+	);
 	expect(screen.getByText('settings.title')).toBeInTheDocument();
 	expect(screen.getByRole('link', { name: 'settings.title' }).querySelector('.lucide-settings-2'))
 		.toBeInTheDocument();
@@ -147,7 +150,7 @@ it.each<[AuthState, string]>([
 	);
 
 	const accountLink = screen.getByRole('link', { name: username });
-	expect(accountLink).toHaveAttribute('href', '/settings');
+	expect(accountLink).toHaveAttribute('href', '/settings/general');
 	expect(within(accountLink).getByText(username)).toBeInTheDocument();
 	expect(accountLink.querySelector('.lucide-user')).toBeInTheDocument();
 	await screen.findByText('settings.chatHistory.empty');
