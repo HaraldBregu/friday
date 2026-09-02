@@ -22,45 +22,38 @@ const AccountPage: React.FC = () => {
 		firstName: '',
 		lastName: '',
 	});
-	const [profileLoaded, setProfileLoaded] = useState(false);
-	const [profileLoading, setProfileLoading] = useState(false);
+	const [profileUserId, setProfileUserId] = useState('');
 	const [profileSaving, setProfileSaving] = useState(false);
 	const [profileSaved, setProfileSaved] = useState(false);
 	const [sessionBusy, setSessionBusy] = useState(false);
 	const [error, setError] = useState('');
 	const signedIn = state.status === 'signedIn' && !localOnly;
+	const userId = signedIn ? (state.user?.id ?? '') : '';
+	const profileLoaded = Boolean(userId) && profileUserId === userId;
+	const profileLoading = Boolean(userId) && !profileLoaded;
 
 	useEffect(() => {
-		if (!signedIn) {
-			setProfileLoaded(false);
-			setProfile({ firstName: '', lastName: '' });
-			setStoredProfile({ firstName: '', lastName: '' });
-			return;
-		}
+		if (!userId) return;
 		let mounted = true;
-		setProfileLoading(true);
-		setProfileSaved(false);
-		setError('');
 		void window.auth
 			.getProfile()
 			.then((nextProfile) => {
 				if (!mounted) return;
 				setProfile(nextProfile);
 				setStoredProfile(nextProfile);
-				setProfileLoaded(true);
+				setProfileUserId(userId);
+				setProfileSaved(false);
+				setError('');
 			})
 			.catch((cause) => {
 				if (!mounted) return;
-				setProfileLoaded(false);
+				setProfileUserId('');
 				setError(cause instanceof Error ? cause.message : 'Could not load account details.');
-			})
-			.finally(() => {
-				if (mounted) setProfileLoading(false);
 			});
 		return () => {
 			mounted = false;
 		};
-	}, [signedIn, state.user?.id]);
+	}, [userId]);
 
 	const firstName = profile.firstName.trim();
 	const lastName = profile.lastName.trim();
@@ -90,7 +83,7 @@ const AccountPage: React.FC = () => {
 				title="Account"
 				description="Manage your personal details and sign-in status."
 				action={
-					profileSaving || profileSaved ? (
+					signedIn && (profileSaving || (profileLoaded && profileSaved)) ? (
 						<SettingsValue>
 							<span role="status">{profileSaving ? 'Saving…' : 'Saved'}</span>
 						</SettingsValue>
