@@ -26,7 +26,6 @@ import { reviewWikiChangesTool } from '../../../../../src/main/agent/tools/knowl
 import { saveWikiAnalysisTool } from '../../../../../src/main/agent/tools/knowledge/save_wiki_analysis';
 import { searchWikiTool } from '../../../../../src/main/agent/tools/knowledge/search_wiki';
 import { queryWikiTool } from '../../../../../src/main/agent/tools/knowledge/query_wiki';
-import { searchKnowledgeTool } from '../../../../../src/main/agent/tools/knowledge/search_knowledge';
 import { useWebBrowserTool } from '../../../../../src/main/agent/tools/web/use_web_browser';
 
 it.each([
@@ -52,7 +51,7 @@ it.each([
 	expect(tool.alwaysAsk).toBeUndefined();
 });
 
-it.each([searchKnowledgeTool, searchWikiTool, readWikiPageTool, queryWikiTool])(
+it.each([searchWikiTool, readWikiPageTool, queryWikiTool])(
 	'%s has an allow fallback before runtime registration',
 	(tool) => {
 		expect(tool.defaultPermission).toBe('allow');

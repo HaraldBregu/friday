@@ -195,7 +195,7 @@ Use `query_wiki` for grounded answer context. Retrieval order is:
 4. wiki full text;
 5. linked-page traversal;
 6. immutable raw evidence when requested or confidence is low;
-7. the independent `search_knowledge` RAG tool when the wiki is insufficient;
+7. the local RAG fallback within `query_knowledge` when the wiki is insufficient;
 8. external search only when the user permits it.
 
 Tool results distinguish `wiki_page` synthesis from `raw_source` evidence and include unresolved contradictions and limitations.
