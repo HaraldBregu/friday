@@ -69,9 +69,10 @@ it('reads and updates the signed-in account profile', async () => {
 	await service.initialize();
 
 	await expect(service.getProfile()).resolves.toEqual({ firstName: 'Ada', lastName: 'Byron' });
-	await expect(
-		service.updateProfile({ firstName: 'Grace', lastName: 'Hopper' })
-	).resolves.toEqual({ firstName: 'Grace', lastName: 'Hopper' });
+	await expect(service.updateProfile({ firstName: 'Grace', lastName: 'Hopper' })).resolves.toEqual({
+		firstName: 'Grace',
+		lastName: 'Hopper',
+	});
 	expect(update).toHaveBeenCalledWith({ first_name: 'Grace', last_name: 'Hopper' });
 	expect(getEq).toHaveBeenCalledWith('id', 'user-id');
 	expect(updateEq).toHaveBeenCalledWith('id', 'user-id');

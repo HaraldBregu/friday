@@ -203,16 +203,12 @@ const AccountPage: React.FC = () => {
 									void window.auth
 										.signOut()
 										.catch((cause) =>
-											setError(
-												cause instanceof Error ? cause.message : 'Could not sign out.'
-											)
+											setError(cause instanceof Error ? cause.message : 'Could not sign out.')
 										)
 										.finally(() => setSessionBusy(false));
 								}}
 							>
-								{sessionBusy ? (
-									<LoaderCircle className="animate-spin" aria-hidden="true" />
-								) : null}
+								{sessionBusy ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
 								Sign out
 							</Button>
 						)}
