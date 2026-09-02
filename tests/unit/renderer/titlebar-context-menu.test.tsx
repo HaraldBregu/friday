@@ -58,7 +58,7 @@ it.each([
 	fireEvent(titleBar as Element, contextMenuEvent);
 
 	expect(contextMenuEvent.defaultPrevented).toBe(true);
-		expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
+	expect(showContextMenu).toHaveBeenCalledWith(contextMenuItems);
 	await waitFor(() => expect(screen.getByText(path)).toBeInTheDocument());
 });
 

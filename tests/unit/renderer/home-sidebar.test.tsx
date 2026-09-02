@@ -106,8 +106,9 @@ it('loads chat history, marks the latest default session, and switches sessions'
 		'/settings/general'
 	);
 	expect(screen.getByText('settings.title')).toBeInTheDocument();
-	expect(screen.getByRole('link', { name: 'settings.title' }).querySelector('.lucide-settings-2'))
-		.toBeInTheDocument();
+	expect(
+		screen.getByRole('link', { name: 'settings.title' }).querySelector('.lucide-settings-2')
+	).toBeInTheDocument();
 	expect(
 		screen.queryByRole('button', { name: 'settings.modelServices.voiceName' })
 	).not.toBeInTheDocument();

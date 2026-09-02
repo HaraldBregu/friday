@@ -39,20 +39,17 @@ it.each(['/home', '/home/session/1', '/settings', '/settings/providers/models'])
 	}
 );
 
-it.each(['/start', '/homepage', '/settings-old'])(
-	'does not open command search on %s',
-	(path) => {
-		render(
-			<MemoryRouter initialEntries={[path]}>
-				<CommandMenu />
-			</MemoryRouter>
-		);
+it.each(['/start', '/homepage', '/settings-old'])('does not open command search on %s', (path) => {
+	render(
+		<MemoryRouter initialEntries={[path]}>
+			<CommandMenu />
+		</MemoryRouter>
+	);
 
-		fireEvent.keyDown(window, { key: 'f', ctrlKey: true });
+	fireEvent.keyDown(window, { key: 'f', ctrlKey: true });
 
-		expect(screen.queryByPlaceholderText('Search routes and settings...')).not.toBeInTheDocument();
-	}
-);
+	expect(screen.queryByPlaceholderText('Search routes and settings...')).not.toBeInTheDocument();
+});
 
 it('opens General settings with the settings shortcut', () => {
 	render(

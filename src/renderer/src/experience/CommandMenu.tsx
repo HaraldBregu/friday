@@ -2,11 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-	Home,
-	Settings,
-	type LucideIcon,
-} from 'lucide-react';
+import { Home, Settings, type LucideIcon } from 'lucide-react';
 import {
 	CommandDialog,
 	CommandEmpty,
@@ -116,15 +112,16 @@ function createCommandItem({
 }
 
 function getSettingsRouteIcon(path: string): LucideIcon {
-	return SETTINGS_NAVIGATION.find(
-		(item) => path === item.path || path.startsWith(`${item.path}/`)
-	)?.icon ?? Settings;
+	return (
+		SETTINGS_NAVIGATION.find((item) => path === item.path || path.startsWith(`${item.path}/`))
+			?.icon ?? Settings
+	);
 }
 
 function mapSettingsDetailItem(
 	item: SettingsDetailItem,
 	group: string,
-	t: TFunction,
+	t: TFunction
 ): AppRouteItem {
 	return createCommandItem({
 		id: `settings-detail-${item.path}-${item.labelKey}`,
@@ -162,12 +159,12 @@ function buildCommandGroups(t: TFunction): {
 			path: item.path,
 		})
 	);
-	const deepSettingsItems = SETTINGS_DETAIL_ITEMS
-		.filter((item) => item.path.startsWith('/settings/') && !settingsPagePaths.has(item.path))
-		.map((item) => mapSettingsDetailItem(item, settingsRoutesHeading, t));
-	const searchOnlyItems = SETTINGS_DETAIL_ITEMS
-		.filter((item) => item.path.startsWith('/settings/') && settingsPagePaths.has(item.path))
-		.map((item) => mapSettingsDetailItem(item, settingsRoutesHeading, t));
+	const deepSettingsItems = SETTINGS_DETAIL_ITEMS.filter(
+		(item) => item.path.startsWith('/settings/') && !settingsPagePaths.has(item.path)
+	).map((item) => mapSettingsDetailItem(item, settingsRoutesHeading, t));
+	const searchOnlyItems = SETTINGS_DETAIL_ITEMS.filter(
+		(item) => item.path.startsWith('/settings/') && settingsPagePaths.has(item.path)
+	).map((item) => mapSettingsDetailItem(item, settingsRoutesHeading, t));
 
 	return {
 		groups: [
@@ -198,9 +195,7 @@ function CommandMenuItem({
 				<Icon className="size-3" aria-hidden="true" strokeWidth={1.8} />
 			</span>
 			<span className="flex min-w-0 flex-1 flex-col">
-				<span className="truncate text-xs font-medium leading-4">
-					{item.label}
-				</span>
+				<span className="truncate text-xs font-medium leading-4">{item.label}</span>
 				{item.description && (
 					<span className="truncate text-[10px] leading-3.5 text-muted-foreground">
 						{item.description}
@@ -308,9 +303,7 @@ export function CommandMenu({
 				placeholder={t('command.placeholder', 'Search routes and settings...')}
 			/>
 			<CommandList ref={listRef}>
-				<CommandEmpty>
-					{t('command.empty', 'No matching route or setting.')}
-				</CommandEmpty>
+				<CommandEmpty>{t('command.empty', 'No matching route or setting.')}</CommandEmpty>
 				{isSearching
 					? allItems.map((item) => (
 							<CommandMenuItem key={item.id} item={item} onSelect={navigateTo} />
