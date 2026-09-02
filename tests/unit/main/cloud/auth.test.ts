@@ -82,7 +82,8 @@ it('reads and updates the signed-in account profile', async () => {
 it('explains when the required profile table is missing', () => {
 	expect(publicCloudError({ code: 'PGRST205' })).toMatchObject({
 		name: 'PGRST205',
-		message: 'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
+		message:
+			'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
 	});
 });
 
