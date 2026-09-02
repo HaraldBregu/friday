@@ -4,7 +4,7 @@ import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
 import AccountPage from '../../../src/renderer/src/pages/settings/pages/account/Page';
 
-it('shows a compact account session and switches to local use after sign-out', async () => {
+it('loads and saves account names before switching to local use after sign-out', async () => {
 	const user = userEvent.setup();
 	const signedIn: AuthState = {
 		status: 'signedIn',
@@ -15,6 +15,8 @@ it('shows a compact account session and switches to local use after sign-out', a
 	let listener: ((state: AuthState) => void) | undefined;
 	const auth: AuthApi = {
 		getState: jest.fn(async () => signedIn),
+		getProfile: jest.fn(async () => ({ firstName: 'Ada', lastName: 'Byron' })),
+		updateProfile: jest.fn(async (profile) => profile),
 		signIn: jest.fn(),
 		signInWithGoogle: jest.fn(),
 		signUp: jest.fn(),
@@ -39,7 +41,17 @@ it('shows a compact account session and switches to local use after sign-out', a
 	);
 
 	expect(await screen.findByText('user@example.test')).toBeInTheDocument();
+	expect(await screen.findByDisplayValue('Ada')).toBeInTheDocument();
+	expect(screen.getByDisplayValue('Byron')).toBeInTheDocument();
 	expect(container.querySelector('header svg')).toBeNull();
+	await user.clear(screen.getByLabelText('First name'));
+	await user.type(screen.getByLabelText('First name'), ' Grace ');
+	await user.clear(screen.getByLabelText('Last name'));
+	await user.type(screen.getByLabelText('Last name'), ' Hopper ');
+	await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+	expect(auth.updateProfile).toHaveBeenCalledWith({ firstName: 'Grace', lastName: 'Hopper' });
+	expect(await screen.findByText('Saved')).toBeInTheDocument();
 	await user.click(screen.getByRole('button', { name: 'Sign out' }));
 
 	expect(auth.signOut).toHaveBeenCalledTimes(1);

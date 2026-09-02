@@ -1,5 +1,5 @@
 import { shell } from 'electron';
-import type { AuthCredentials, SignUpInput } from '../../shared/auth_types';
+import type { AccountProfile, AuthCredentials, SignUpInput } from '../../shared/auth_types';
 import { AuthChannels } from '../../shared/ipc_channels_definitions';
 import type { AuthService } from '../cloud/auth';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
@@ -23,7 +23,15 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		auth.onStateChanged((state) => trusted.broadcast(AuthChannels.stateChanged, state));
 		registerQueryWithEvent(AuthChannels.getState, (event) => {
 			trusted.assert(event);
-			return auth.getState();
+				return auth.getState();
+			});
+		registerQueryWithEvent(AuthChannels.getProfile, (event) => {
+			trusted.assert(event);
+			return auth.getProfile();
+		});
+		registerCommandWithEvent(AuthChannels.updateProfile, (event, value) => {
+			trusted.assert(event);
+			return auth.updateProfile(this.profile(value));
 		});
 		registerCommandWithEvent(AuthChannels.signIn, (event, value) => {
 			trusted.assert(event);
@@ -70,6 +78,14 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		return { ...credentials, displayName: record.displayName.trim() || undefined };
 	}
 
+	private profile(value: unknown): AccountProfile {
+		const record = this.record(value);
+		return {
+			firstName: this.name(record.firstName, 'First name'),
+			lastName: this.name(record.lastName, 'Last name'),
+		};
+	}
+
 	private record(value: unknown): Record<string, unknown> {
 		if (!value || typeof value !== 'object' || Array.isArray(value)) {
 			throw new Error('Authentication input is invalid.');
@@ -93,5 +109,11 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 			throw new Error('Password must contain at least eight characters.');
 		}
 		return value;
+	}
+
+	private name(value: unknown, label: string): string {
+		if (typeof value !== 'string' || !value.trim()) throw new Error(`${label} is required.`);
+		if (value.trim().length > 80) throw new Error(`${label} must be 80 characters or fewer.`);
+		return value.trim();
 	}
 }

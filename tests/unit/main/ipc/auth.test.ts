@@ -17,6 +17,8 @@ const state = {
 };
 const auth = {
 	getState: jest.fn(() => state),
+	getProfile: jest.fn(async () => ({ firstName: 'Ada', lastName: 'Byron' })),
+	updateProfile: jest.fn(async (profile) => profile),
 	signIn: jest.fn(async () => state),
 	signInWithGoogle: jest.fn(),
 	signUp: jest.fn(async () => state),
@@ -70,6 +72,23 @@ it('opens the Supabase Google authorization URL in the system browser', async ()
 	await command(AuthChannels.signInWithGoogle)(event);
 
 	expect(shell.openExternal).toHaveBeenCalledWith(url);
+});
+
+it('reads and validates account profile updates', async () => {
+	await expect(query(AuthChannels.getProfile)(event)).resolves.toEqual({
+		firstName: 'Ada',
+		lastName: 'Byron',
+	});
+	await expect(
+		command(AuthChannels.updateProfile)(event, {
+			firstName: ' Grace ',
+			lastName: ' Hopper ',
+		})
+	).resolves.toEqual({ firstName: 'Grace', lastName: 'Hopper' });
+	expect(auth.updateProfile).toHaveBeenCalledWith({ firstName: 'Grace', lastName: 'Hopper' });
+	expect(() =>
+		command(AuthChannels.updateProfile)(event, { firstName: ' ', lastName: 'Hopper' })
+	).toThrow('First name is required.');
 });
 
 it('rejects child-frame callers before invoking auth', () => {

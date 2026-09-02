@@ -4,13 +4,24 @@ import {
 	type Session,
 	type SupabaseClient,
 } from '@supabase/supabase-js';
-import type { AuthCredentials, AuthState, SignUpInput } from '../../shared/auth_types';
+import type {
+	AccountProfile,
+	AuthCredentials,
+	AuthState,
+	SignUpInput,
+} from '../../shared/auth_types';
 import type { CloudConfig } from './config';
+import { publicCloudError } from './cloud_error';
 import { publicAuthError } from './error';
 import { DeviceAccountBinding } from './binding';
 import { AuthSessionStorage, type AuthStorage } from './session';
 
 type Subscription = { unsubscribe: () => void };
+
+interface ProfileRow {
+	first_name: string;
+	last_name: string;
+}
 
 export class AuthService {
 	private client?: SupabaseClient;
@@ -76,6 +87,31 @@ export class AuthService {
 
 	getState(): AuthState {
 		return structuredClone(this.state);
+	}
+
+	async getProfile(): Promise<AccountProfile> {
+		if (!this.session) throw new Error('Sign in to manage your account.');
+		const { data, error } = await this.getClient()
+			.from('profiles')
+			.select('first_name,last_name')
+			.eq('id', this.session.user.id)
+			.single();
+		if (error) throw publicCloudError(error);
+		const profile = data as ProfileRow;
+		return { firstName: profile.first_name, lastName: profile.last_name };
+	}
+
+	async updateProfile(profile: AccountProfile): Promise<AccountProfile> {
+		if (!this.session) throw new Error('Sign in to manage your account.');
+		const { data, error } = await this.getClient()
+			.from('profiles')
+			.update({ first_name: profile.firstName, last_name: profile.lastName })
+			.eq('id', this.session.user.id)
+			.select('first_name,last_name')
+			.single();
+		if (error) throw publicCloudError(error);
+		const saved = data as ProfileRow;
+		return { firstName: saved.first_name, lastName: saved.last_name };
 	}
 
 	getClient(): SupabaseClient {

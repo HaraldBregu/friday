@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(6);
+select plan(7);
 
 set local role postgres;
 
@@ -43,6 +43,17 @@ values
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111111', true);
+
+select results_eq(
+	$$
+		update public.profiles
+		set first_name = 'Ada', last_name = 'Lovelace'
+		where id = '11111111-1111-4111-8111-111111111111'
+		returning first_name, last_name
+	$$,
+	$$ values ('Ada'::text, 'Lovelace'::text) $$,
+	'owner can store first and last name on their profile'
+);
 
 select results_eq(
 	$$

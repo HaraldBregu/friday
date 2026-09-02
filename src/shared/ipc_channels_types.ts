@@ -1043,6 +1043,11 @@ export interface TerminalEventChannelMap {
 
 export interface AuthInvokeChannelMap {
 	[AuthChannels.getState]: { args: []; result: import('./auth_types').AuthState };
+	[AuthChannels.getProfile]: { args: []; result: import('./auth_types').AccountProfile };
+	[AuthChannels.updateProfile]: {
+		args: [profile: import('./auth_types').AccountProfile];
+		result: import('./auth_types').AccountProfile;
+	};
 	[AuthChannels.signIn]: {
 		args: [credentials: import('./auth_types').AuthCredentials];
 		result: import('./auth_types').AuthState;

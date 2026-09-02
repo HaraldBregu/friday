@@ -199,6 +199,8 @@ export const AppChannels = {
 
 export const AuthChannels = {
 	getState: 'auth:state:get',
+	getProfile: 'auth:profile:get',
+	updateProfile: 'auth:profile:update',
 	signIn: 'auth:sign-in',
 	signInWithGoogle: 'auth:sign-in:google',
 	signUp: 'auth:sign-up',

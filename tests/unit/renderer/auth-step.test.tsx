@@ -8,6 +8,8 @@ function authApi(state: AuthState): AuthApi {
 	let listener: ((next: AuthState) => void) | undefined;
 	return {
 		getState: jest.fn(async () => state),
+		getProfile: jest.fn(async () => ({ firstName: '', lastName: '' })),
+		updateProfile: jest.fn(async (profile) => profile),
 		signIn: jest.fn(async () => state),
 		signInWithGoogle: jest.fn(async () => undefined),
 		signUp: jest.fn(async (input) => {

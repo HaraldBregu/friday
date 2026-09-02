@@ -13,9 +13,11 @@ const onAuthStateChange = jest.fn(() => ({ data: { subscription: { unsubscribe }
 const exchangeCodeForSession = jest.fn();
 const signInWithOAuth = jest.fn();
 const stopAutoRefresh = jest.fn();
+const from = jest.fn();
 
 beforeEach(() => {
 	createClientMock.mockReturnValue({
+		from,
 		auth: {
 			exchangeCodeForSession,
 			getSession,
@@ -24,6 +26,55 @@ beforeEach(() => {
 			stopAutoRefresh,
 		},
 	});
+});
+
+it('reads and updates the signed-in account profile', async () => {
+	getSession.mockResolvedValueOnce({
+		data: {
+			session: {
+				access_token: 'access-secret',
+				refresh_token: 'refresh-secret',
+				user: { id: 'user-id', email: 'user@example.test', user_metadata: {} },
+			},
+		},
+		error: null,
+	});
+	const getSingle = jest.fn(async () => ({
+		data: { first_name: 'Ada', last_name: 'Byron' },
+		error: null,
+	}));
+	const updateSingle = jest.fn(async () => ({
+		data: { first_name: 'Grace', last_name: 'Hopper' },
+		error: null,
+	}));
+	const getEq = jest.fn(() => ({ single: getSingle }));
+	const updateSelect = jest.fn(() => ({ single: updateSingle }));
+	const updateEq = jest.fn(() => ({ select: updateSelect }));
+	const update = jest.fn(() => ({ eq: updateEq }));
+	const select = jest.fn(() => ({ eq: getEq }));
+	from.mockReturnValue({ select, update });
+	const service = new AuthService(
+		{
+			url: 'https://project.supabase.co',
+			publishableKey: 'sb_publishable_test',
+			redirectUrl: 'friday://auth/callback',
+		},
+		{
+			persistence: 'encrypted',
+			getItem: jest.fn(() => null),
+			setItem: jest.fn(),
+			removeItem: jest.fn(),
+		}
+	);
+	await service.initialize();
+
+	await expect(service.getProfile()).resolves.toEqual({ firstName: 'Ada', lastName: 'Byron' });
+	await expect(
+		service.updateProfile({ firstName: 'Grace', lastName: 'Hopper' })
+	).resolves.toEqual({ firstName: 'Grace', lastName: 'Hopper' });
+	expect(update).toHaveBeenCalledWith({ first_name: 'Grace', last_name: 'Hopper' });
+	expect(getEq).toHaveBeenCalledWith('id', 'user-id');
+	expect(updateEq).toHaveBeenCalledWith('id', 'user-id');
 });
 
 it('configures Supabase to restore sessions from encrypted main-process storage', async () => {

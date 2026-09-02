@@ -39,6 +39,8 @@ function authApi(initialState: AuthState, signedInState?: AuthState): AuthApi {
 	let listener: ((next: AuthState) => void) | undefined;
 	return {
 		getState: jest.fn(async () => initialState),
+		getProfile: jest.fn(async () => ({ firstName: '', lastName: '' })),
+		updateProfile: jest.fn(async (profile) => profile),
 		signIn: jest.fn(async () => {
 			const next = signedInState ?? initialState;
 			listener?.(next);

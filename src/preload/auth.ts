@@ -4,6 +4,8 @@ import { typedInvokeUnwrap, typedOn } from '../shared/ipc_types';
 
 export const auth: AuthApi = {
 	getState: () => typedInvokeUnwrap(AuthChannels.getState),
+	getProfile: () => typedInvokeUnwrap(AuthChannels.getProfile),
+	updateProfile: (profile) => typedInvokeUnwrap(AuthChannels.updateProfile, profile),
 	signIn: (credentials) => typedInvokeUnwrap(AuthChannels.signIn, credentials),
 	signInWithGoogle: () => typedInvokeUnwrap(AuthChannels.signInWithGoogle),
 	signUp: (input) => typedInvokeUnwrap(AuthChannels.signUp, input),
