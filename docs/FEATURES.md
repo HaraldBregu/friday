@@ -508,11 +508,9 @@ The Channels screen configures both adapters with enable state, token, DM policy
 
 See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and page behavior.
 
-- The Settings overview groups pages as: **General** (General, System, Cloud), **Assistant**
-  (Assistant, Coder, Skills, Background tasks, MCP), **Providers** (Models, Search),
-  **Channels**, and **Integrations** (A2A, Extensions).
-- Account, Bots, RAG, LLM Wiki, Health, and Permissions are available in the sidebar but omitted
-  from the shorter overview. Dedicated model-service and API-key pages are available through
+- `/settings` and the application Settings entry points open General settings directly.
+- The sidebar groups pages as **General**, **Assistant**, **Providers**, **Channels**, and
+  **Integrations**. Dedicated model-service and API-key pages are also available through
   Assistant, route search, or direct links.
 - The **Cloud** page configures folders, schedules, backup, and restore for the signed-in account's
   private Supabase storage. It has no storage-provider selection or storage credentials.

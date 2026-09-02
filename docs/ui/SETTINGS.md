@@ -11,7 +11,8 @@ for the current provider and model catalog.
 
 ```text
 Open /settings
-  -> use the overview, sidebar, or route search to choose a page
+  -> redirect to /settings/general
+  -> use the sidebar or route search to choose another page
   -> load that page's stored configuration and runtime status
   -> update a selection or form
        -> immediate settings: save on selection, toggle, or blur
@@ -43,10 +44,8 @@ The visible sidebar is grouped as follows:
 | Channels     | Channels                                                                                          |
 | Integrations | A2A agents, Extensions                                                                            |
 
-The `/settings` overview is intentionally shorter than the sidebar. It links to General, System,
-Cloud, Assistant, Coder, Skills, Background tasks, MCP servers, Models, Search engines, Channels,
-A2A agents, and Extensions. Account, Bots, RAG, LLM Wiki, Health, and
-Permissions remain available from the sidebar or route search.
+The `/settings` route redirects to `/settings/general`. The username link, title-bar user button,
+Settings route-search item, and `Cmd+,` shortcut also open General directly.
 
 ## Route search and deep pages
 
@@ -54,7 +53,7 @@ The title-bar search button and `Cmd/Ctrl+F` should open **Search routes and set
 or Settings is active. The initial list shows the main routes; after at least two characters, the
 search also matches individual settings by label, description, and keywords.
 
-- `Cmd+,` should navigate directly to Settings on macOS.
+- `Cmd+,` should navigate directly to General settings on macOS.
 - Search results should include deep pages such as Persona, provider API keys, individual model
   services, assistant data, and media permissions.
 - Breadcrumbs should link detail pages back to their Settings parent.
@@ -297,7 +296,6 @@ required. Filesystem policy should:
   empty states, and inline notices for their own asynchronous work.
 - Detail routes should show a useful missing-item state or return to their parent when an ID is not
   valid.
-- The overview is a curated entry page and does not enumerate every visible sidebar destination.
 - There is no unified image/video/audio Library route in Settings. Only the Audio service page has
   a saved-output library.
 - Data-control **Purge** does not show a renderer confirmation dialog; it immediately performs the
@@ -323,8 +321,8 @@ required. Filesystem policy should:
 - [Navigation catalog](../../src/renderer/src/pages/settings/navigation.ts)
 - [Settings layout](../../src/renderer/src/pages/settings/Layout.tsx)
 - [Settings sidebar](../../src/renderer/src/pages/settings/Sidebar.tsx)
-- [Settings overview](../../src/renderer/src/pages/settings/pages/overview/Page.tsx)
 - [Shared Settings components](../../src/renderer/src/pages/settings/components/index.tsx)
+- [General settings](../../src/renderer/src/pages/settings/pages/general/Page.tsx)
 - [Assistant settings](../../src/renderer/src/pages/settings/pages/assistant/Page.tsx)
 - [Provider settings](../../src/renderer/src/pages/settings/pages/providers/Page.tsx)
 - [Cloud storage settings](../../src/renderer/src/pages/settings/pages/cloud/Page.tsx)
@@ -336,7 +334,7 @@ required. Filesystem policy should:
 - [Channel settings](../../src/renderer/src/pages/settings/pages/channels/Page.tsx)
 - [MCP settings](../../src/renderer/src/pages/settings/pages/mcp/Page.tsx)
 - [A2A settings](../../src/renderer/src/pages/settings/pages/a2a/Page.tsx)
-- [Settings overview tests](../../tests/unit/renderer/settings-overview.test.tsx)
+- [General settings tests](../../tests/unit/renderer/general-settings.test.tsx)
 - [Assistant settings tests](../../tests/unit/renderer/assistant-settings.test.tsx)
 - [Provider settings tests](../../tests/unit/renderer/providers-settings.test.tsx)
 - [Permissions settings tests](../../tests/unit/renderer/permissions-settings.test.tsx)
