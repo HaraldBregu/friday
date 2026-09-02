@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { AuthService } from '../../../../src/main/cloud/auth';
+import { publicCloudError } from '../../../../src/main/cloud/cloud_error';
 import type { AuthStorage } from '../../../../src/main/cloud/session';
 
 jest.mock('@supabase/supabase-js', () => ({
@@ -76,6 +77,13 @@ it('reads and updates the signed-in account profile', async () => {
 	expect(update).toHaveBeenCalledWith({ first_name: 'Grace', last_name: 'Hopper' });
 	expect(getEq).toHaveBeenCalledWith('id', 'user-id');
 	expect(updateEq).toHaveBeenCalledWith('id', 'user-id');
+});
+
+it('explains when the required profile table is missing', () => {
+	expect(publicCloudError({ code: 'PGRST205' })).toMatchObject({
+		name: 'PGRST205',
+		message: 'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
+	});
 });
 
 it('configures Supabase to restore sessions from encrypted main-process storage', async () => {
