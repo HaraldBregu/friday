@@ -85,8 +85,7 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 			throw new Error('Terminal IPC is restricted to the main frame.');
 		}
 		if (extensions.has(event.sender)) {
-			if (extensions.resolve(event.sender) === 'coder') return;
-			throw new Error('Terminal IPC is only available to the Coder extension.');
+			throw new Error('Terminal IPC is unavailable to extension views.');
 		}
 		const window = BrowserWindow.fromWebContents(event.sender);
 		if (!window || window.webContents !== event.sender || !windows.has(window.id)) {

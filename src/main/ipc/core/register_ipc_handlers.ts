@@ -80,7 +80,10 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		)
 	);
 	safeRegister('coder', () =>
-		new CoderIpc().register({ coder: coderService, extensionRegistry }, eventBus)
+		new CoderIpc().register(
+			{ coder: coderService, extensionRegistry, windows: windowContextManager },
+			eventBus
+		)
 	);
 	safeRegister('recorder', () =>
 		new RecorderIpc().register(
@@ -117,7 +120,10 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		)
 	);
 	safeRegister('storage', () =>
-		new StorageIpc().register({ extensionRegistry, storageOperations }, eventBus)
+		new StorageIpc().register(
+			{ extensionRegistry, storageOperations, windows: windowContextManager },
+			eventBus
+		)
 	);
 	safeRegister('database', () => new DatabaseIpc().register(undefined, eventBus));
 	safeRegister('extensions', () =>

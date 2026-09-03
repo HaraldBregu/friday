@@ -8,23 +8,28 @@ import {
 import type { Coder } from '../coder';
 import type { EventBus } from '../event_bus';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
+import { TrustedRenderer } from './core/trusted';
 
 interface CoderIpcDependencies {
 	readonly coder: Coder;
 	readonly extensionRegistry: ExtensionRegistry;
+	readonly windows: WindowContextManager;
 }
 
 export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 	readonly name = 'coder';
 
-	register({ coder, extensionRegistry }: CoderIpcDependencies, _eventBus: EventBus): void {
+	register({ coder, extensionRegistry, windows }: CoderIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, extensionRegistry);
 		const assertCoderCaller = (event: Electron.IpcMainInvokeEvent): void => {
-			if (!extensionRegistry.has(event.sender)) return;
-			if (extensionRegistry.resolve(event.sender) !== 'coder') {
+			if (extensionRegistry.has(event.sender)) {
+				if (extensionRegistry.resolve(event.sender) === 'coder') return;
 				throw new Error('Coder is only available to the Coder extension.');
 			}
+			trusted.assert(event);
 		};
 		const assertCoderExtensionCaller = (event: Electron.IpcMainInvokeEvent): void => {
 			if (

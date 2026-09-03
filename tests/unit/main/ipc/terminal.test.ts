@@ -64,7 +64,7 @@ it('validates create requests and accepts only registered main windows', async (
 	});
 });
 
-it('accepts only the registered Coder extension', async () => {
+it('rejects terminal creation from extension views', async () => {
 	const manager = {
 		create: jest.fn(async (_sender, request) => ({
 			...request,
@@ -75,10 +75,8 @@ it('accepts only the registered Coder extension', async () => {
 	} as unknown as PtyManager;
 	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
 	const windows = { has: jest.fn(() => false) } as unknown as WindowContextManager;
-	let extensionId = 'coder';
 	const extensions = {
 		has: () => true,
-		resolve: () => extensionId,
 	} as unknown as ExtensionRegistry;
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
@@ -89,14 +87,8 @@ it('accepts only the registered Coder extension', async () => {
 	(BrowserWindow.fromWebContents as jest.Mock).mockClear();
 
 	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject({
-		success: true,
-		data: { id: 'terminal-coder' },
-	});
-	expect(BrowserWindow.fromWebContents).not.toHaveBeenCalled();
-
-	extensionId = 'notes';
-	await expect(handler(event, { id: 'terminal-notes', cols: 80, rows: 24 })).resolves.toMatchObject({
 		success: false,
-		error: { message: 'Terminal IPC is only available to the Coder extension.' },
+		error: { message: 'Terminal IPC is unavailable to extension views.' },
 	});
+	expect(manager.create).not.toHaveBeenCalled();
 });
