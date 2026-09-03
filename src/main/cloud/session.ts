@@ -2,7 +2,6 @@ import { chmodSync } from 'node:fs';
 import path from 'node:path';
 import { safeStorage } from 'electron';
 import Store from 'electron-store';
-import type { SupportedStorage } from '@supabase/supabase-js';
 import { userDataLocation } from '../shared/user_data_location';
 import { isSafeStorageAvailable } from '../shared/safe_storage';
 
@@ -10,8 +9,11 @@ interface AuthSessionState {
 	values: Record<string, string>;
 }
 
-export interface AuthStorage extends SupportedStorage {
+export interface AuthStorage {
 	readonly persistence: 'encrypted' | 'memory';
+	getItem(key: string): string | null;
+	setItem(key: string, value: string): void;
+	removeItem(key: string): void;
 }
 
 export class AuthSessionStorage implements AuthStorage {
