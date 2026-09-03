@@ -116,6 +116,7 @@ function RootRouteComponent(): React.JSX.Element {
 
 	const { phase } = useOnboarding();
 	const { state: authState, skipSignIn } = useAuth();
+	const showOnboardingTitle = phase === 'auth' || phase === 'setup';
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
 	const hasSidebar = isHome || isSettings;
@@ -152,14 +153,14 @@ function RootRouteComponent(): React.JSX.Element {
 				>
 					<TitleBar
 						centerContent={
-							phase === 'auth' ? (
+							showOnboardingTitle ? (
 								<span className="text-sm font-medium">Kucedr</span>
 							) : isSettings && showSettingsBreadcrumb ? (
 								<SettingsBreadcrumb />
 							) : undefined
 						}
 						centerContentClassName={
-							phase === 'auth'
+							showOnboardingTitle
 								? 'left-1/2 right-auto -translate-x-1/2'
 								: isSettings && (isMobile || !state.sidebarOpen)
 									? 'left-28'
