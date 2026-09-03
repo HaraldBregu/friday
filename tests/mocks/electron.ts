@@ -57,12 +57,28 @@ export const protocol = {
 	handle: jest.fn(),
 };
 
+const extensionSession = {
+	protocol: { handle: jest.fn() },
+	setPermissionCheckHandler: jest.fn(),
+	setPermissionRequestHandler: jest.fn(),
+	setDisplayMediaRequestHandler: jest.fn(),
+};
+
 export const session = {
-	defaultSession: {},
+	defaultSession: {
+		setPermissionCheckHandler: jest.fn(),
+		setPermissionRequestHandler: jest.fn(),
+		setDisplayMediaRequestHandler: jest.fn(),
+	},
+	fromPartition: jest.fn(() => extensionSession),
 };
 
 export const net = {
 	fetch: jest.fn(),
+};
+
+export const desktopCapturer = {
+	getSources: jest.fn(),
 };
 
 export const crashReporter = {

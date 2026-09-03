@@ -1,11 +1,14 @@
-import { BrowserWindow, desktopCapturer, net, protocol, session } from 'electron';
+import { app, BrowserWindow, desktopCapturer, net, protocol, session } from 'electron';
 import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { resolveWorkspaceFile } from './ipc/workspace';
 import { agentLocation } from './shared/agent_location';
 import type { LoggerService } from './shared';
 import type { ExtensionRegistry } from './extensions/extension_registry';
 
 const LOCAL_RESOURCE_SCHEME = 'local-resource';
+export const EXTENSION_SESSION_PARTITION = 'persist:friday-extensions';
 
 export function registerLocalResourceProtocolScheme(): void {
 	protocol.registerSchemesAsPrivileged([
@@ -25,9 +28,15 @@ export function registerLocalResourceProtocolScheme(): void {
 export function registerLocalResourceProtocolHandler(
 	logger: Pick<LoggerService, 'error'>
 ): void {
-	protocol.handle(LOCAL_RESOURCE_SCHEME, async (request) => {
+	const handler = (allowAbsolutePaths: boolean) => async (request: Request): Promise<Response> => {
 		try {
 			const url = new URL(request.url);
+			if (
+				url.host !== 'agent' &&
+				(url.host !== 'file' || !allowAbsolutePaths)
+			) {
+				return new Response(null, { status: 403 });
+			}
 			let pathname = decodeURIComponent(url.pathname);
 			if (url.host === 'agent') {
 				pathname = await resolveWorkspaceFile(agentLocation(), pathname.replace(/^\/+/, ''));
@@ -42,18 +51,26 @@ export function registerLocalResourceProtocolHandler(
 			logger.error('App', `${LOCAL_RESOURCE_SCHEME} fetch failed for ${request.url}`, err);
 			return new Response(null, { status: 500 });
 		}
-	});
+	};
+
+	protocol.handle(LOCAL_RESOURCE_SCHEME, handler(true));
+	session
+		.fromPartition(EXTENSION_SESSION_PARTITION)
+		.protocol.handle(LOCAL_RESOURCE_SCHEME, handler(false));
 }
 
 export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistry): void {
-	session.defaultSession.setPermissionCheckHandler(
+	const configure = (targetSession: Electron.Session, allowDisplayCapture: boolean): void => {
+		targetSession.setPermissionCheckHandler(
 		(webContents, permission, requestingOrigin, details) => {
 			const isAppContents = isAppWindowWebContents(webContents, extensionRegistry);
 			if (permission === 'fullscreen') return Boolean(webContents && extensionRegistry.has(webContents));
 			if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
 				return Boolean(
 					details.isMainFrame &&
-					isAppContents &&
+					(permission === 'clipboard-sanitized-write'
+						? isAppContents
+						: webContents && BrowserWindow.fromWebContents(webContents)) &&
 					isTrustedMediaRequestSource(
 						requestingOrigin,
 						details.requestingUrl,
@@ -64,16 +81,16 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 			if (permission !== 'media') return false;
 			if (details.mediaType !== 'audio' && details.mediaType !== 'video') return false;
 			if (!details.isMainFrame) return false;
-			if (!isAppContents) return false;
+			if (!webContents || !BrowserWindow.fromWebContents(webContents)) return false;
 			return isTrustedMediaRequestSource(
 				requestingOrigin,
 				details.requestingUrl,
 				details.securityOrigin
 			);
 		}
-	);
+		);
 
-	session.defaultSession.setPermissionRequestHandler(
+		targetSession.setPermissionRequestHandler(
 		(webContents, permission, callback, details) => {
 			if (permission === 'fullscreen') {
 				callback(Boolean(webContents && extensionRegistry.has(webContents)));
@@ -83,7 +100,9 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				callback(
 					Boolean(
 						details.isMainFrame &&
-						isAppWindowWebContents(webContents, extensionRegistry) &&
+						(permission === 'clipboard-sanitized-write'
+							? isAppWindowWebContents(webContents, extensionRegistry)
+							: webContents && BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(
 							undefined,
 							details.requestingUrl,
@@ -104,7 +123,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 			const allowed =
 				(requestsAudio || requestsVideo) &&
 				mediaDetails.isMainFrame &&
-				isAppWindowWebContents(webContents, extensionRegistry) &&
+				Boolean(webContents && BrowserWindow.fromWebContents(webContents)) &&
 				isTrustedMediaRequestSource(
 					undefined,
 					mediaDetails.requestingUrl,
@@ -113,14 +132,10 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 
 			callback(allowed);
 		}
-	);
-
-	session.defaultSession.setDisplayMediaRequestHandler((request, callback) => {
-		const trusted = isTrustedMediaRequestSource(
-			undefined,
-			request.frame?.url,
-			request.securityOrigin
 		);
+
+		targetSession.setDisplayMediaRequestHandler((request, callback) => {
+		const trusted = allowDisplayCapture && isTrustedDisplayCaptureUrl(request.frame?.url);
 		if (!trusted) {
 			callback({});
 			return;
@@ -132,7 +147,11 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				callback(source ? { video: source } : {});
 			})
 			.catch(() => callback({}));
-	});
+		});
+	};
+
+	configure(session.defaultSession, true);
+	configure(session.fromPartition(EXTENSION_SESSION_PARTITION), false);
 }
 
 function rendererDevOrigin(): string | null {
@@ -159,6 +178,22 @@ function isTrustedRendererUrl(url?: string): boolean {
 
 	try {
 		return isTrustedRendererOrigin(new URL(url).origin);
+	} catch {
+		return false;
+	}
+}
+
+function isTrustedDisplayCaptureUrl(url?: string): boolean {
+	if (!url) return false;
+	const devOrigin = rendererDevOrigin();
+	try {
+		const parsed = new URL(url);
+		if (devOrigin && parsed.origin === devOrigin) return true;
+		if (parsed.protocol !== 'file:') return false;
+		return (
+			path.resolve(fileURLToPath(parsed)) ===
+			path.resolve(app.getAppPath(), 'out/renderer/index.html')
+		);
 	} catch {
 		return false;
 	}

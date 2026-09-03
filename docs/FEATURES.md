@@ -597,16 +597,14 @@ Prompts, attachments, tool inputs, and generated content may be sent to configur
 - Renderer windows use Electron sandboxing, context isolation, disabled Node integration, web security, and insecure-content blocking.
 - Production navigation is restricted to local `file://` content.
 - Renderer capabilities are exposed through typed preload APIs rather than direct Node access.
+- Extension views use an isolated Electron session; their local-resource protocol is limited to the agent workspace, clipboard reads are denied, and media/display capture is reserved for app windows.
 - Renderer agent requests are always mapped to the `default` run type; renderers cannot request privileged background execution.
 - Media permission requests are limited to trusted app windows and renderer origins.
 - Native media context menus validate that files are inside the agent or media data roots.
 
 Known boundaries:
 
-- The `window.open` denial handler is currently commented out.
-- The external-URL IPC path does not validate schemes before passing a URL to Electron.
 - Provider secrets can be read by trusted renderer code through the provider preload API.
-- The local-resource protocol confines `local-resource://agent/...`, while other host/path forms are less restricted.
 - Some MCP behaviors (see [MCP servers](#mcp-servers)) run outside the centralized tool-policy system.
 - Trusted background callers bypass only Friday's stored tool policy. Capability allowlists, sandboxing, OS controls, and tool-internal authorization remain in force.
 - Friday does not claim formal certification for regulated data.

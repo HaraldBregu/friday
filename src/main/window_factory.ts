@@ -13,6 +13,7 @@ import type { LoggerService } from './shared';
 import { setupPdfContextMenu } from './pdf';
 import type { ExtensionRegistry } from './extensions/extension_registry';
 import { externalUrl } from './external';
+import { EXTENSION_SESSION_PARTITION } from './protocol';
 
 export interface WindowPreset {
 	name: string;
@@ -142,7 +143,12 @@ export class WindowFactory {
 	}
 
 	createView(file: string, extensionId: string): LoadableView {
-		const view = new WebContentsView({ webPreferences: this.getBaseWebPreferences() });
+		const view = new WebContentsView({
+			webPreferences: {
+				...this.getBaseWebPreferences(),
+				partition: EXTENSION_SESSION_PARTITION,
+			},
+		});
 		const viewContents = view.webContents;
 		this.extensionRegistry.register(viewContents, extensionId);
 		this.secureNavigation(viewContents, path.dirname(file));

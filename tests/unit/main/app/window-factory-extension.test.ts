@@ -1,5 +1,6 @@
 import { WebContentsView } from 'electron';
 import { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
+import { EXTENSION_SESSION_PARTITION } from '../../../../src/main/protocol';
 import { WindowFactory } from '../../../../src/main/window_factory';
 
 it('registers an extension view before loading and removes it when destroyed', async () => {
@@ -16,6 +17,9 @@ it('registers an extension view before loading and removes it when destroyed', a
 	const factory = new WindowFactory(undefined, registry);
 
 	const extension = factory.createView('/extension/index.html', 'draw');
+	expect(WebContentsView).toHaveBeenCalledWith({
+		webPreferences: expect.objectContaining({ partition: EXTENSION_SESSION_PARTITION }),
+	});
 	expect(registry.resolve(contents)).toBe('draw');
 	expect(contents.loadFile).not.toHaveBeenCalled();
 
