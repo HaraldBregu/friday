@@ -16,7 +16,7 @@ test.afterAll(async () => {
 
 test('opens a window and renders the React app', async () => {
 	await expect(page).toHaveTitle('Friday');
-	await expect(page).toHaveURL(/#\/start$/);
+	await expect(page).toHaveURL(/#\/?start$/);
 	await page.waitForSelector('#root');
 	await expect(page.locator('#root')).not.toBeEmpty();
 });

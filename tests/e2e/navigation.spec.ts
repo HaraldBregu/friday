@@ -54,7 +54,7 @@ const routes = [
 	'/settings/providers/music',
 	'/settings/providers/search',
 	'/settings/assistant/rag',
-	'/settings/wiki',
+	'/settings/assistant/llm-wiki',
 	'/settings/tasks',
 	'/settings/assistant',
 	'/settings/coder',
@@ -72,6 +72,7 @@ for (const route of routes) {
 		await page.waitForTimeout(500);
 		await expect(page.locator('#root')).not.toBeEmpty();
 		await expect(page.getByText('This page crashed')).toHaveCount(0);
+		await expect(page.getByText('Page not found', { exact: true })).toHaveCount(0);
 	});
 }
 
@@ -141,7 +142,7 @@ test('wiki settings renders the complete configuration workflow', async ({
 	browserName: _browserName,
 }, testInfo) => {
 	await page.evaluate(() => {
-		window.location.hash = '#/settings/wiki';
+		window.location.hash = '#/settings/assistant/llm-wiki';
 	});
 	await expect(page.getByRole('heading', { name: 'Wiki', exact: true })).toBeVisible();
 	await expect(page.getByRole('textbox', { name: 'Raw source folder', exact: true })).toBeVisible();
