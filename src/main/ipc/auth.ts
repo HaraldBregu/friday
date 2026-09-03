@@ -55,7 +55,7 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		});
 		registerCommandWithEvent(AuthChannels.updatePassword, (event, value) => {
 			trusted.assert(event);
-			return auth.updatePassword(this.password(value));
+			return auth.updatePassword(this.newPassword(value));
 		});
 		registerCommandWithEvent(AuthChannels.signOut, (event) => {
 			trusted.assert(event);
@@ -65,12 +65,15 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 
 	private credentials(value: unknown): AuthCredentials {
 		const record = this.record(value);
-		return { email: this.email(record.email), password: this.password(record.password) };
+		return { email: this.email(record.email), password: this.currentPassword(record.password) };
 	}
 
 	private signUp(value: unknown): SignUpInput {
 		const record = this.record(value);
-		const credentials = this.credentials(record);
+		const credentials = {
+			email: this.email(record.email),
+			password: this.newPassword(record.password),
+		};
 		if (record.displayName === undefined) return credentials;
 		if (typeof record.displayName !== 'string' || record.displayName.trim().length > 80) {
 			throw new Error('Display name is invalid.');
@@ -104,7 +107,14 @@ export class AuthIpc implements IpcModule<AuthIpcDeps> {
 		return value.trim().toLowerCase();
 	}
 
-	private password(value: unknown): string {
+	private currentPassword(value: unknown): string {
+		if (typeof value !== 'string' || value.length === 0) {
+			throw new Error('Password is required.');
+		}
+		return value;
+	}
+
+	private newPassword(value: unknown): string {
 		if (typeof value !== 'string' || value.length < 8 || value.length > 1024) {
 			throw new Error('Password must contain at least eight characters.');
 		}

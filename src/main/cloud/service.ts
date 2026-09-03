@@ -18,6 +18,7 @@ interface AccountBinding {
 export class AuthService {
 	private unsubscribeProvider?: () => void;
 	private session: AccountSession | null = null;
+	private providerSessionVersion = 0;
 	private initialized = false;
 	private readonly stateListeners = new Set<(state: AuthState) => void>();
 	private readonly sessionListeners = new Set<(session: AccountSession | null) => void>();
@@ -37,13 +38,20 @@ export class AuthService {
 			this.setState({ status: 'unconfigured', persistence: 'memory' });
 			return;
 		}
+		const restoreVersion = this.providerSessionVersion;
 		this.unsubscribeProvider = this.provider.subscribe((event, session) => {
+			this.providerSessionVersion += 1;
 			this.applySession(event, session);
 		});
 		try {
-			this.applySession('session', await this.provider.restore());
+			const session = await this.provider.restore();
+			if (this.providerSessionVersion === restoreVersion) {
+				this.applySession('session', session);
+			}
 		} catch {
-			this.applySession('session', null);
+			if (this.providerSessionVersion === restoreVersion) {
+				this.applySession('session', null);
+			}
 		}
 	}
 

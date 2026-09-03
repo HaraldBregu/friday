@@ -65,6 +65,47 @@ it('returns only the public token-free auth projection to a trusted launcher', a
 	).resolves.toEqual(state);
 });
 
+it('accepts any nonempty existing password at sign-in', async () => {
+	await command(AuthChannels.signIn)(event, {
+		email: 'user@example.test',
+		password: 'x',
+	});
+
+	expect(auth.signIn).toHaveBeenCalledWith({
+		email: 'user@example.test',
+		password: 'x',
+	});
+	expect(() =>
+		command(AuthChannels.signIn)(event, {
+			email: 'user@example.test',
+			password: '',
+		})
+	).toThrow('Password is required.');
+});
+
+it('keeps the eight-character minimum for new passwords', async () => {
+	expect(() =>
+		command(AuthChannels.signUp)(event, {
+			email: 'user@example.test',
+			password: 'short',
+		})
+	).toThrow('Password must contain at least eight characters.');
+	expect(() => command(AuthChannels.updatePassword)(event, 'short')).toThrow(
+		'Password must contain at least eight characters.'
+	);
+
+	await command(AuthChannels.signUp)(event, {
+		email: 'user@example.test',
+		password: 'eight-ok',
+	});
+	await command(AuthChannels.updatePassword)(event, 'eight-ok');
+	expect(auth.signUp).toHaveBeenCalledWith({
+		email: 'user@example.test',
+		password: 'eight-ok',
+	});
+	expect(auth.updatePassword).toHaveBeenCalledWith('eight-ok');
+});
+
 it('opens the Supabase Google authorization URL in the system browser', async () => {
 	const url = 'https://project.supabase.co/auth/v1/authorize?provider=google';
 	auth.signInWithGoogle.mockResolvedValueOnce(url);
