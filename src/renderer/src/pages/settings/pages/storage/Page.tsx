@@ -318,7 +318,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 											variant="ghost"
 											size="icon-sm"
 											aria-label={t('settings.storage.sync.removeFolder')}
-										disabled={controlsDisabled}
+											disabled={controlsDisabled}
 											onClick={() =>
 												updateDraft({
 													...storage,
@@ -399,7 +399,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="outline"
 								size="sm"
 								onClick={() => setRestoreOpen(true)}
-									disabled={controlsDisabled || storage.paths.length === 0}
+								disabled={controlsDisabled || storage.paths.length === 0}
 							>
 								<Download className="size-3" />
 								{runningOperation?.operation === 'restore'
@@ -410,7 +410,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="outline"
 								size="sm"
 								onClick={() => void runBackup()}
-									disabled={controlsDisabled || storage.paths.length === 0}
+								disabled={controlsDisabled || storage.paths.length === 0}
 							>
 								<Upload className="size-3" />
 								{runningOperation?.operation === 'backup'
@@ -421,7 +421,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="ghost"
 								size="sm"
 								onClick={() => setDraft(null)}
-									disabled={!draft || controlsDisabled}
+								disabled={!draft || controlsDisabled}
 							>
 								{t('settings.storage.cancel')}
 							</Button>
@@ -439,7 +439,13 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 					{syncStatus && <SettingsNotice icon={FolderSync}>{syncStatus}</SettingsNotice>}
 					{operationStatusText && (
 						<div
-							role={operationStatus?.state === 'partial' ? 'alert' : undefined}
+							role={
+								operationStatus?.state === 'partial'
+									? 'alert'
+									: operationStatus?.state === 'failed'
+										? undefined
+										: 'status'
+							}
 							aria-live={operationNeedsAttention ? 'assertive' : 'polite'}
 							aria-atomic="true"
 						>
