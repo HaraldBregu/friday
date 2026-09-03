@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
-const MAIN_ENTRY = path.resolve(dirname, '../../out/main/index.js');
+const APP_ROOT = path.resolve(dirname, '../..');
 
 /**
  * Launch the built Electron app and return the app handle plus its first window.
@@ -20,7 +20,7 @@ export async function launchApp(): Promise<{
 	let app: ElectronApplication | undefined;
 	try {
 		app = await electron.launch({
-			args: [`--user-data-dir=${userDataDir}`, MAIN_ENTRY],
+			args: [`--user-data-dir=${userDataDir}`, APP_ROOT],
 			// ponytail: force production renderer (loadFile) even if a dev URL leaked into env
 			env: {
 				...process.env,
