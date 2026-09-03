@@ -19,12 +19,16 @@ import { agentLocation } from './shared/agent_location';
 import { EnvironmentManager } from './terminal/environment';
 import { PtyManager } from './terminal/manager';
 import { ShellDetector } from './terminal/shell';
-import { AuthService } from './cloud/auth';
-import { CloudService } from './cloud/cloud';
+import { AuthService } from './cloud/service';
+import { CloudService } from './cloud/data';
 import { loadCloudConfig } from './cloud/config';
+import { SupabaseAccountProvider } from './cloud/supabase/auth';
 import { SupabaseObjectStore } from './cloud/supabase/objects';
+import { SupabaseCloudRepository } from './cloud/supabase/records';
+import { SupabaseProviderCloud } from './cloud/supabase/providers';
 import { UnavailableObjectStore } from './storage/unavailable';
 import { ProviderSyncService } from './providers/sync';
+import { providerVault } from './providers/vault';
 
 export interface MainServices {
 	appState: AppState;
@@ -71,14 +75,12 @@ export function bootstrapServices(): BootstrapResult {
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
 	const conversationService = new Conversation(agentService, realtimeVoiceManager);
 	const cloudConfig = loadCloudConfig();
-	const authService = new AuthService(cloudConfig);
-	const objectStore = cloudConfig
+	const accountProvider = cloudConfig ? new SupabaseAccountProvider(cloudConfig) : undefined;
+	const authService = new AuthService(accountProvider ?? null);
+	const objectStore = accountProvider
 		? new SupabaseObjectStore(
-				() => authService.getClient(),
-				() => {
-					const state = authService.getState();
-					return state.status === 'signedIn' ? state.user?.id : undefined;
-				}
+				() => accountProvider.client,
+				() => authService.getSignedInUserId()
 			)
 		: new UnavailableObjectStore();
 	const storageOperations = new StorageOperations(
@@ -97,8 +99,15 @@ export function bootstrapServices(): BootstrapResult {
 		new ShellDetector(),
 		new EnvironmentManager(logger)
 	);
-	const cloudService = new CloudService(authService);
-	const providerSyncService = new ProviderSyncService(authService);
+	const cloudService = new CloudService(
+		authService,
+		accountProvider ? new SupabaseCloudRepository(accountProvider.client) : undefined
+	);
+	const providerSyncService = new ProviderSyncService(
+		authService,
+		providerVault,
+		accountProvider ? new SupabaseProviderCloud(accountProvider.client) : undefined
+	);
 	eventBus.on('window:closed', (event) => {
 		agentService.cancelWindow((event.payload as { windowId: number }).windowId);
 		coderService.cancelWindow((event.payload as { windowId: number }).windowId);

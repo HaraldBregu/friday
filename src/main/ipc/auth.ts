@@ -1,7 +1,7 @@
 import { shell } from 'electron';
 import type { AccountProfile, AuthCredentials, SignUpInput } from '../../shared/auth_types';
 import { AuthChannels } from '../../shared/ipc_channels_definitions';
-import type { AuthService } from '../cloud/auth';
+import type { AuthService } from '../cloud/service';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
 import type { EventBus } from '../event_bus';
 import type { WindowContextManager } from '../window_context';

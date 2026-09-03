@@ -4,7 +4,7 @@ import type {
 	CloudFileUpload,
 } from '../../shared/cloud_types';
 import { CloudChannels } from '../../shared/ipc_channels_definitions';
-import type { CloudService } from '../cloud/cloud';
+import type { CloudService } from '../cloud/data';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
 import type { EventBus } from '../event_bus';
 import type { WindowContextManager } from '../window_context';
