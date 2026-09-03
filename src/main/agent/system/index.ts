@@ -17,6 +17,7 @@ export { readSoul } from './system_read_soul';
 export { readTextFile } from './system_read_text_file';
 export { readUser } from './system_read_user';
 export { resolveTemplatePath } from './system_resolve_template_path';
+export { resolveContextMode } from './system_resolve_context_mode';
 export { resolveWorkspacePath } from './system_resolve_workspace_path';
 export { workspacePath } from './system_workspace_path';
 export {

@@ -331,6 +331,97 @@ describe('run stream system prompt', () => {
 		}
 	});
 
+	it('loads a pending bootstrap for a minimal main-agent turn', async () => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-run-bootstrap-'));
+		try {
+			const session = createSessionState();
+			session.messages = [{ role: 'user', content: 'Hello' }];
+
+			for await (const event of stream(
+				{ location: root },
+				session,
+				{
+					runId: 'bootstrap',
+					task: 'chat',
+					message: 'Hello',
+					model: 'test-model',
+					type: 'default',
+					agentId: 'main',
+					contextMode: 'minimal',
+					interactionMode: 'default',
+				},
+				new AbortController().signal,
+				{ tools: [] }
+			))
+				void event;
+
+			const systemPrompt = runModelTurnMock.mock.calls[0][3] as string;
+			const contextMessages = runModelTurnMock.mock.calls[0][10] as Message[];
+			expect(systemPrompt).toContain('## Workspace');
+			expect(contextMessages[0]).toMatchObject({
+				role: 'user',
+				content: expect.stringContaining('### BOOTSTRAP.md'),
+			});
+
+			await fs.rm(path.join(root, 'BOOTSTRAP.md'));
+			runModelTurnMock.mockClear();
+			for await (const event of stream(
+				{ location: root },
+				createSessionState(),
+				{
+					runId: 'after-bootstrap',
+					task: 'chat',
+					message: 'Hello again',
+					model: 'test-model',
+					type: 'default',
+					agentId: 'main',
+					contextMode: 'minimal',
+					interactionMode: 'default',
+				},
+				new AbortController().signal,
+				{ tools: [] }
+			))
+				void event;
+
+			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('## Workspace');
+			expect(runModelTurnMock.mock.calls[0][10]).toEqual([]);
+		} finally {
+			await fs.rm(root, { recursive: true, force: true });
+		}
+	});
+
+	it('keeps pending bootstrap context out of non-main minimal turns', async () => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-run-bot-bootstrap-'));
+		try {
+			const session = createSessionState();
+			session.category = 'bot';
+			session.messages = [{ role: 'user', content: 'Hello' }];
+
+			for await (const event of stream(
+				{ location: root },
+				session,
+				{
+					runId: 'bot-bootstrap',
+					task: 'chat',
+					message: 'Hello',
+					model: 'test-model',
+					type: 'background',
+					agentId: 'channels',
+					contextMode: 'minimal',
+					interactionMode: 'default',
+				},
+				new AbortController().signal,
+				{ tools: [] }
+			))
+				void event;
+
+			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('## Workspace');
+			expect(runModelTurnMock.mock.calls[0][10]).toEqual([]);
+		} finally {
+			await fs.rm(root, { recursive: true, force: true });
+		}
+	});
+
 	it('caps public web calls only for bot-origin runs', async () => {
 		const calls = Array.from({ length: 9 }, (_, index) => ({
 			id: `web-${index}`,

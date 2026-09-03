@@ -20,6 +20,7 @@ import {
 	buildSkillContext,
 	buildSystemPrompt,
 	buildWorkspaceContext,
+	resolveContextMode,
 } from '../system';
 import { loadMcpTools } from '../tools/mcp/loader';
 import { listSkillsTool } from '../tools/skills/list_skills';
@@ -119,7 +120,6 @@ async function* loop(
 	const provider = getResolvedProvider(input.providerId ?? getProviderId());
 	const modelId = input.model ?? getModelId();
 	const modelOptions = getModelOptions();
-	const contextMode = input.contextMode;
 	const runId = input.runId ?? session.id;
 	const skillLoadingEnabled =
 		(input.toolsAllow === undefined || input.toolsAllow.includes('load_skill')) &&
@@ -137,6 +137,13 @@ async function* loop(
 		input.promptCapabilities ?? resolvePromptInputCapabilities(provider.id, modelId);
 
 	if (!options.tools && !options.sandbox) throw new Error('Agent command sandbox is unavailable.');
+	const contextMode = await resolveContextMode(
+		config,
+		input.contextMode,
+		session.category,
+		input.interactionMode,
+		options.instructions !== undefined
+	);
 
 	let tools: Tool[] = options.tools
 		? [...options.tools]
