@@ -17,15 +17,20 @@ const AGENT_FILES: Record<string, string> = {
 	update_health: 'HEALTH.md',
 	complete_bootstrap: 'BOOTSTRAP.md',
 };
-const MEDIA_TOOLS = new Set(['create_image', 'create_video', 'create_sound']);
+const MEDIA_TOOLS = new Set([
+	'create_image',
+	'create_video',
+	'create_sound',
+	'microphone_recorder',
+	'camera_recorder',
+	'screen_recorder',
+]);
 const TASK_TOOLS = new Set([
 	'create_task',
 	'update_task',
 	'pause_task',
 	'resume_task',
 	'delete_task',
-	'get_task',
-	'list_tasks',
 	'run_task_now',
 ]);
 const WIKI_TOOLS = new Set([
@@ -35,6 +40,24 @@ const WIKI_TOOLS = new Set([
 	'review_wiki_changes',
 	'rebuild_wiki_index',
 ]);
+
+export function isWritePermissionTool(
+	toolName: string,
+	args: Record<string, unknown>
+): boolean {
+	return (
+		toolName === 'write' ||
+		toolName === 'edit' ||
+		toolName === 'patch' ||
+		toolName === 'undo' ||
+		toolName === 'redo' ||
+		toolName in AGENT_FILES ||
+		toolName === 'update_health_settings' ||
+		MEDIA_TOOLS.has(toolName) ||
+		TASK_TOOLS.has(toolName) ||
+		(WIKI_TOOLS.has(toolName) && (toolName !== 'lint_wiki' || args.autoFix === true))
+	);
+}
 
 export function directoryPermissionTargets(
 	toolName: string,

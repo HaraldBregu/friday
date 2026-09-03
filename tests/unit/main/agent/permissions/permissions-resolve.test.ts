@@ -91,4 +91,73 @@ describe('resolveToolPermission', () => {
 			})
 		).toBe('allow');
 	});
+
+	it.each([
+		['save_memory', {}],
+		['forget_memory', {}],
+		['update_health', {}],
+		['update_health_settings', {}],
+		['complete_bootstrap', {}],
+		['create_task', {}],
+		['update_task', {}],
+		['pause_task', {}],
+		['resume_task', {}],
+		['delete_task', {}],
+		['run_task_now', {}],
+		['ingest_wiki_source', {}],
+		['save_wiki_analysis', {}],
+		['review_wiki_changes', {}],
+		['rebuild_wiki_index', {}],
+		['lint_wiki', { autoFix: true }],
+		['microphone_recorder', {}],
+		['camera_recorder', {}],
+		['screen_recorder', {}],
+	] as const)('applies the write policy to %s', (toolName, args) => {
+		const denyWrites: PermissionsSchema = {
+			...defaults,
+			write: { allow: [], deny: ['*'] },
+		};
+
+		expect(
+			resolveToolPermission(toolName, args, undefined, true, 'ask', denyWrites)
+		).toBe('deny');
+	});
+
+	it('distinguishes read-only operations from conditional writes', () => {
+		const denyWrites: PermissionsSchema = {
+			...defaults,
+			write: { allow: [], deny: ['*'] },
+		};
+
+		expect(resolveToolPermission('get_task', {}, undefined, true, 'ask', denyWrites)).toBe(
+			'allow'
+		);
+		expect(resolveToolPermission('list_tasks', {}, undefined, true, 'ask', denyWrites)).toBe(
+			'allow'
+		);
+		expect(
+			resolveToolPermission('lint_wiki', { autoFix: false }, undefined, true, 'ask', denyWrites)
+		).toBe('allow');
+	});
+
+	it('allows recorder output in trusted roots and asks outside them', () => {
+		const trustedWrites: PermissionsSchema = {
+			...defaults,
+			write: { allow: ['/appdata/agent/**'], deny: [] },
+		};
+
+		expect(
+			resolveToolPermission('screen_recorder', {}, undefined, true, 'ask', trustedWrites)
+		).toBe('allow');
+		expect(
+			resolveToolPermission(
+				'screen_recorder',
+				{ directory: '/outside' },
+				undefined,
+				true,
+				'ask',
+				trustedWrites
+			)
+		).toBe('ask');
+	});
 });
