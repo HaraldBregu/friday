@@ -43,6 +43,16 @@ beforeEach(() => {
 });
 
 describe('Providers settings', () => {
+	it('removes the settings shell padding when embedded', () => {
+		const { container } = render(
+			<MemoryRouter>
+				<ProvidersPage embedded section="models" />
+			</MemoryRouter>
+		);
+
+		expect(container.firstElementChild).toHaveClass('p-0', 'sm:p-0');
+	});
+
 	it('shows provider connections without object storage', async () => {
 		render(
 			<MemoryRouter>

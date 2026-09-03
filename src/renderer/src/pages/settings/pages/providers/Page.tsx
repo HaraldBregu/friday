@@ -371,7 +371,7 @@ const ProvidersPage: React.FC<ProvidersPageProps> = ({ embedded = false, section
 	};
 
 	return (
-		<SettingsPageShell className={embedded ? 'max-w-none px-0 pb-0' : undefined}>
+		<SettingsPageShell className={embedded ? 'max-w-none p-0 sm:p-0' : undefined}>
 			{!embedded && (
 				<SettingsPageHeader
 					title={t(section ? SECTION_HEADERS[section].titleKey : 'settings.tabs.providers')}
