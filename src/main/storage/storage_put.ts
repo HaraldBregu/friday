@@ -1,21 +1,10 @@
-import type { AuthService } from '../cloud/auth';
+import type { StorageObjectStore } from './remote';
 
 export async function putObject(
-	auth: AuthService,
+	store: StorageObjectStore,
 	key: string,
 	data: Uint8Array,
 	contentType?: string
 ): Promise<void> {
-	const state = auth.getState();
-	if ((state.status !== 'signedIn' && state.status !== 'recovery') || !state.user) {
-		throw new Error('Sign in to use sync.');
-	}
-	const { error } = await auth
-		.getClient()
-		.storage.from('user-files')
-		.upload(`${state.user.id}/backups/${key}`, data, {
-			upsert: true,
-			...(contentType ? { contentType } : {}),
-		});
-	if (error) throw error;
+	await store.put(key, data, contentType);
 }

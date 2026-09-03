@@ -11,3 +11,5 @@ export { startStorageSync, stopStorageSync, rescheduleStorageSync } from './stor
 export { DEFAULT_SYNC_CRON_EXPRESSION, type StorageSyncLogger } from './storage_sync_types';
 export { withStorageLock } from './storage_lock';
 export { StorageOperations, type StorageOperationDependencies } from './storage_operations';
+export type { StorageObjectStore } from './remote';
+export { UnavailableObjectStore } from './unavailable';

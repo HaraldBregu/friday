@@ -22,6 +22,8 @@ import { ShellDetector } from './terminal/shell';
 import { AuthService } from './cloud/auth';
 import { CloudService } from './cloud/cloud';
 import { loadCloudConfig } from './cloud/config';
+import { SupabaseObjectStore } from './cloud/supabase/objects';
+import { UnavailableObjectStore } from './storage/unavailable';
 import { ProviderSyncService } from './providers/sync';
 
 export interface MainServices {
@@ -68,14 +70,24 @@ export function bootstrapServices(): BootstrapResult {
 	const windowContextManager = new WindowContextManager(logger, eventBus);
 	const realtimeVoiceManager = createRealtimeVoiceManager(agentService, windowFactory, eventBus);
 	const conversationService = new Conversation(agentService, realtimeVoiceManager);
-	const authService = new AuthService(loadCloudConfig());
+	const cloudConfig = loadCloudConfig();
+	const authService = new AuthService(cloudConfig);
+	const objectStore = cloudConfig
+		? new SupabaseObjectStore(
+				() => authService.getClient(),
+				() => {
+					const state = authService.getState();
+					return state.status === 'signedIn' ? state.user?.id : undefined;
+				}
+			)
+		: new UnavailableObjectStore();
 	const storageOperations = new StorageOperations(
 		(status) => {
 			eventBus.broadcastToWindows(StorageChannels.operationStatusChanged, status);
 		},
 		{
-			backup: () => pushFiles(authService),
-			restore: () => pullFiles(authService),
+			backup: () => pushFiles(objectStore),
+			restore: () => pullFiles(objectStore),
 			lock: withStorageLock,
 			preventSuspension: preventStorageSuspension,
 		}
