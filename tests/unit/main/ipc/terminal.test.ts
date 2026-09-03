@@ -35,30 +35,39 @@ it('validates create requests and accepts only registered main windows', async (
 		resolve: jest.fn(),
 	} as unknown as ExtensionRegistry;
 	const event = createEvent();
-	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 42, webContents: event.sender });
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({
+		id: 42,
+		webContents: event.sender,
+	});
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
-	const handler = (ipcMain.handle as jest.Mock).mock.calls.filter(
-		([channel]) => channel === TerminalChannels.create
-	).at(-1)?.[1];
+	const handler = (ipcMain.handle as jest.Mock).mock.calls
+		.filter(([channel]) => channel === TerminalChannels.create)
+		.at(-1)?.[1];
 
-	await expect(handler(event, { id: 'terminal-valid', cols: 80, rows: 24 })).resolves.toMatchObject({
-		success: true,
-		data: { id: 'terminal-valid', shell: '/bin/zsh' },
-	});
+	await expect(handler(event, { id: 'terminal-valid', cols: 80, rows: 24 })).resolves.toMatchObject(
+		{
+			success: true,
+			data: { id: 'terminal-valid', shell: '/bin/zsh' },
+		}
+	);
 	await expect(handler(event, { id: 'bad', cols: Number.NaN, rows: 0 })).resolves.toMatchObject({
 		success: false,
 		error: { message: 'Terminal session ID is invalid.' },
 	});
 
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 42, webContents: { id: 7 } });
-	await expect(handler(event, { id: 'terminal-child', cols: 80, rows: 24 })).resolves.toMatchObject({
-		success: false,
-		error: { message: 'Terminal IPC is unavailable to this renderer.' },
-	});
+	await expect(handler(event, { id: 'terminal-child', cols: 80, rows: 24 })).resolves.toMatchObject(
+		{
+			success: false,
+			error: { message: 'Terminal IPC is unavailable to this renderer.' },
+		}
+	);
 
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(null);
-	await expect(handler(event, { id: 'terminal-denied', cols: 80, rows: 24 })).resolves.toMatchObject({
+	await expect(
+		handler(event, { id: 'terminal-denied', cols: 80, rows: 24 })
+	).resolves.toMatchObject({
 		success: false,
 		error: { message: 'Terminal IPC is unavailable to this renderer.' },
 	});
@@ -80,15 +89,17 @@ it('rejects terminal creation from extension views', async () => {
 	} as unknown as ExtensionRegistry;
 
 	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
-	const handler = (ipcMain.handle as jest.Mock).mock.calls.filter(
-		([channel]) => channel === TerminalChannels.create
-	).at(-1)?.[1];
+	const handler = (ipcMain.handle as jest.Mock).mock.calls
+		.filter(([channel]) => channel === TerminalChannels.create)
+		.at(-1)?.[1];
 	const event = createEvent();
 	(BrowserWindow.fromWebContents as jest.Mock).mockClear();
 
-	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject({
-		success: false,
-		error: { message: 'Terminal IPC is unavailable to extension views.' },
-	});
+	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject(
+		{
+			success: false,
+			error: { message: 'Terminal IPC is unavailable to extension views.' },
+		}
+	);
 	expect(manager.create).not.toHaveBeenCalled();
 });

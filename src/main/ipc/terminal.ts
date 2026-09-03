@@ -1,9 +1,4 @@
-import {
-	BrowserWindow,
-	ipcMain,
-	type IpcMainEvent,
-	type IpcMainInvokeEvent,
-} from 'electron';
+import { BrowserWindow, ipcMain, type IpcMainEvent, type IpcMainInvokeEvent } from 'electron';
 import { TerminalChannels } from '../../shared/ipc_channels_definitions';
 import type {
 	TerminalCreateRequest,
