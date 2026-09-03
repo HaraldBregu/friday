@@ -14,7 +14,7 @@ export default tseslint.config(
 			'**/*.cjs',
 			'project/**',
 			'resources/mcp/**',
-			'skills/**',
+			'resources/skills/**',
 		],
 	},
 	tseslint.configs.recommended,

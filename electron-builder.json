@@ -5,6 +5,9 @@
 	"files": [
 		"out/**",
 		"resources/**",
+		"!resources/extensions/**",
+		"!resources/mcp/gmail-smtp/**",
+		"!resources/mcp/resend/**",
 		"!resources/skills/**",
 		"!resources/sounds/**",
 		"!resources/svgs/**",
@@ -89,7 +92,16 @@
 			{
 				"from": "./resources",
 				"to": "resources",
-				"filter": ["**/*", "!skills/**", "!sounds/**", "!svgs/**", "!providers/**/*.svg"]
+				"filter": [
+					"**/*",
+					"!extensions/**",
+					"!mcp/gmail-smtp/**",
+					"!mcp/resend/**",
+					"!skills/**",
+					"!sounds/**",
+					"!svgs/**",
+					"!providers/**/*.svg"
+				]
 			}
 		]
 	},
@@ -134,7 +146,16 @@
 			{
 				"from": "./resources",
 				"to": "resources",
-				"filter": ["**/*", "!skills/**", "!sounds/**", "!svgs/**", "!providers/**/*.svg"]
+				"filter": [
+					"**/*",
+					"!extensions/**",
+					"!mcp/gmail-smtp/**",
+					"!mcp/resend/**",
+					"!skills/**",
+					"!sounds/**",
+					"!svgs/**",
+					"!providers/**/*.svg"
+				]
 			}
 		]
 	},
@@ -183,7 +204,16 @@
 			{
 				"from": "./resources",
 				"to": "resources",
-				"filter": ["**/*", "!skills/**", "!sounds/**", "!svgs/**", "!providers/**/*.svg"]
+				"filter": [
+					"**/*",
+					"!extensions/**",
+					"!mcp/gmail-smtp/**",
+					"!mcp/resend/**",
+					"!skills/**",
+					"!sounds/**",
+					"!svgs/**",
+					"!providers/**/*.svg"
+				]
 			}
 		]
 	},

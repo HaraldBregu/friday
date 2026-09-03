@@ -25,7 +25,7 @@ describe('local MCP registry', () => {
 	it('derives local and workspace discovery roots', () => {
 		expect(mcpLocalDiscoveryRoots('/app-data')).toEqual([
 			path.resolve('/app-data', 'mcp', 'servers'),
-			path.resolve(process.cwd(), 'mcp'),
+			path.resolve(process.cwd(), 'resources', 'mcp'),
 		]);
 	});
 
@@ -176,7 +176,7 @@ describe('local MCP registry', () => {
 		const originalCwd = process.cwd();
 		process.chdir(temp);
 		try {
-			const workspaceServerRoot = path.join(temp, 'mcp');
+			const workspaceServerRoot = path.join(temp, 'resources', 'mcp');
 			const packageServer = path.join(workspaceServerRoot, 'gmail-smtp');
 			const localRoot = path.join(temp, 'app-data', 'mcp', 'servers');
 

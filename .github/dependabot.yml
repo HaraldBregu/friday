@@ -14,37 +14,37 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /extensions/architect
+    directory: /resources/extensions/architect
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /extensions/coder
+    directory: /resources/extensions/coder
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /extensions/videomaker
+    directory: /resources/extensions/videomaker
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /extensions/workspace
+    directory: /resources/extensions/workspace
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /mcp/gmail-smtp
+    directory: /resources/mcp/gmail-smtp
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /mcp/resend
+    directory: /resources/mcp/resend
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

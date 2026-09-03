@@ -7,6 +7,6 @@ export function mcpLocalRoot(location = userDataLocation()): string {
 
 export function mcpLocalDiscoveryRoots(location = userDataLocation()): readonly string[] {
 	const localRoot = mcpLocalRoot(location);
-	const workspaceRoot = path.resolve(process.cwd(), 'mcp');
+	const workspaceRoot = path.resolve(process.cwd(), 'resources', 'mcp');
 	return localRoot === workspaceRoot ? [localRoot] : [localRoot, workspaceRoot];
 }
