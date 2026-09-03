@@ -715,201 +715,203 @@ function PageContent(): ReactElement {
 				}
 			>
 				<div
-						data-slot="home-workspace"
-						className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
-					>
+					data-slot="home-workspace"
+					className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
+				>
 					<span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
 						{agent.isLoading ? 'Friday is responding' : 'Friday is ready'}
 					</span>
 					<ChatContainerRoot className="min-h-0 p-0 [scrollbar-gutter:auto]">
 						<ChatContainerContent
-						className={cn(
-							'mx-auto w-full max-w-4xl gap-5 px-4',
-							showEmptyConversation
-								? 'h-full min-h-0 justify-center overflow-hidden pb-36 pt-12'
-								: voiceMode === 'conversation'
-									? 'min-h-full pb-80 pt-6'
-									: 'min-h-full pb-28 pt-6'
-						)}
-					>
-						{showEmptyConversation ? (
-							<>
-								<EmptyConversation />
-								{showPromptSuggestions ? (
-									<PromptSuggestions onUseSuggestion={agent.useSuggestion} />
-								) : null}
-							</>
-						) : (
-							<>
-								{visibleMessages.map((message, index) => {
-									const previous = index > 0 ? visibleMessages[index - 1] : null;
-									const isPreviousMessage = index < visibleMessages.length - 1;
-									const showAssistantHeader = !previous || previous.role !== 'agent';
-									const groupedAssistantClassName = showAssistantHeader ? undefined : '-mt-5';
+							className={cn(
+								'mx-auto w-full max-w-4xl gap-5 px-4',
+								showEmptyConversation
+									? 'h-full min-h-0 justify-center overflow-hidden pb-36 pt-12'
+									: voiceMode === 'conversation'
+										? 'min-h-full pb-80 pt-6'
+										: 'min-h-full pb-28 pt-6'
+							)}
+						>
+							{showEmptyConversation ? (
+								<>
+									<EmptyConversation />
+									{showPromptSuggestions ? (
+										<PromptSuggestions onUseSuggestion={agent.useSuggestion} />
+									) : null}
+								</>
+							) : (
+								<>
+									{visibleMessages.map((message, index) => {
+										const previous = index > 0 ? visibleMessages[index - 1] : null;
+										const isPreviousMessage = index < visibleMessages.length - 1;
+										const showAssistantHeader = !previous || previous.role !== 'agent';
+										const groupedAssistantClassName = showAssistantHeader ? undefined : '-mt-5';
 
-									if (message.role === 'user') {
-										const userOffsetFromEnd = visibleMessages
-											.slice(index + 1)
-											.filter((nextMessage) => nextMessage.role === 'user').length;
+										if (message.role === 'user') {
+											const userOffsetFromEnd = visibleMessages
+												.slice(index + 1)
+												.filter((nextMessage) => nextMessage.role === 'user').length;
+											return (
+												<UserMessage
+													key={message.id}
+													content={message.content}
+													collapseLongContent={isPreviousMessage}
+													canEdit={!agent.isLoading && voiceMode === null}
+													onEdit={(content) =>
+														agent.editUserMessage(message.id, userOffsetFromEnd, content)
+													}
+												/>
+											);
+										}
+
 										return (
-											<UserMessage
+											<AssistantMessage
 												key={message.id}
-												content={message.content}
-												collapseLongContent={isPreviousMessage}
-												canEdit={!agent.isLoading && voiceMode === null}
-												onEdit={(content) =>
-													agent.editUserMessage(message.id, userOffsetFromEnd, content)
+												message={message}
+												isStreaming={
+													agent.isLoading && message.id === agent.chatState.activeAgentId
 												}
+												showHeader={showAssistantHeader}
+												collapseLongContent={isPreviousMessage}
+												className={groupedAssistantClassName}
+												onReply={agent.switchToTyping}
+												canImplement={
+													index === visibleMessages.length - 1 &&
+													message.state === 'completed' &&
+													!agent.isLoading
+												}
+												onImplement={agent.implementPlan}
 											/>
 										);
-									}
-
-									return (
-										<AssistantMessage
-											key={message.id}
-											message={message}
-											isStreaming={agent.isLoading && message.id === agent.chatState.activeAgentId}
-											showHeader={showAssistantHeader}
-											collapseLongContent={isPreviousMessage}
-											className={groupedAssistantClassName}
-											onReply={agent.switchToTyping}
-											canImplement={
-												index === visibleMessages.length - 1 &&
-												message.state === 'completed' &&
-												!agent.isLoading
-											}
-											onImplement={agent.implementPlan}
-										/>
-									);
-								})}
-							</>
-						)}
-						<ChatContainerScrollAnchor className={showEmptyConversation ? 'h-0' : undefined} />
-					</ChatContainerContent>
-					<div
-						className={cn(
-							'pointer-events-none absolute inset-x-0 z-30 flex justify-center',
-							voiceMode === 'conversation' ? 'bottom-80' : 'bottom-24'
-						)}
-					>
-						<ScrollButton
-							type="button"
-							aria-label="Scroll to latest"
-							className="pointer-events-auto"
-						/>
-					</div>
-				</ChatContainerRoot>
-				<div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 py-3">
-					<div className="mx-auto w-full max-w-4xl">
-						<RecorderErrorMessage
-							message={voiceErrorMessage}
-							actionLabel={voiceErrorAction?.label}
-							onAction={voiceErrorAction?.action}
-						/>
-						<PromptEditor
-							placeholder="Ask anything"
-							ariaLabel="Message Friday"
-							value={agent.input}
-							onValueChange={agent.setInput}
-							onPlanCommandChange={(active) => {
-								setPlanCommandActive(active);
-								agent.setInteractionMode(active ? 'plan' : 'default');
-							}}
-							onGoalCommandChange={setGoalCommandActive}
-							isLoading={agent.isLoading}
-							maxHeight={360}
-							onSubmit={() => void submitPrompt()}
-							textareaRef={agent.inputRef}
-							header={
-								attachments.length > 0 ? (
-									<AttachmentTray attachments={attachments} onRemove={removeAttachment} />
-								) : undefined
-							}
-							leadingAction={
-								voiceMode === 'dictation' ? undefined : (
-									<AttachmentButton
-										disabled={attachmentDisabled}
-										disabledReason={
-											attachmentUnavailable ? 'Attachment support is unavailable' : undefined
-										}
-									/>
-								)
-							}
-							voiceMode={voiceMode}
-							voiceElapsedMs={
-								voiceMode === 'conversation' ? realtimeVoice.elapsedMs : activeVoiceElapsedMs
-							}
-							voiceMuted={voiceMode === 'conversation' ? realtimeVoice.isMuted : activeVoiceMuted}
-							voiceMediaStream={
-								voiceMode === 'conversation' ? realtimeVoice.stream : activeVoiceStream
-							}
-							voiceAnalyser={voiceMode === 'conversation' ? realtimeVoice.analyser : null}
-							voiceStatus={
-								voiceMode === 'conversation'
-									? realtimeVoiceStatusLabels[realtimeVoice.status]
-									: undefined
-							}
-							voicePersonaState={
-								(realtimeVoice.status === 'listening' && !realtimeVoice.isMuted) ||
-								realtimeVoice.status === 'thinking' ||
-								realtimeVoice.status === 'speaking'
-									? realtimeVoice.status
-									: 'idle'
-							}
-							voiceWaveformActive={
-								voiceMode === 'conversation'
-									? realtimeVoice.status === 'speaking' ||
-										(realtimeVoice.status === 'listening' && !realtimeVoice.isMuted)
-									: undefined
-							}
-							onVoiceMutedChange={
-								voiceMode === 'conversation' ? realtimeVoice.setMuted : activeVoiceSetMuted
-							}
-							onVoiceEnd={() => void endVoiceConversation()}
-							onVoiceCancel={() => void cancelDictation()}
-							onVoiceConfirm={() => void confirmDictation()}
-							filesAccept={promptCapabilities?.accept}
-							onFilesChange={(files) => {
-								if (!promptCapabilities) return;
-								setAttachments((current) =>
-									validatePromptAttachments(
-										[...current, ...filesToAttachments(files)],
-										promptCapabilities
-									)
-								);
-							}}
-							wrapperClassName="max-w-none"
-							className={cn(
-								'w-full',
-								planCommandActive && 'plan-prompt-frame',
-								goalCommandActive && 'goal-prompt-frame'
+									})}
+								</>
 							)}
-							footerClassName="-mx-1.5 -mb-1.5"
-							actions={
-								<PromptInputActions className="justify-end gap-1.5">
-									<VoiceButton
-										onVoiceModeRequest={() => void startDictation()}
-										disabled={voiceBusy || agent.isLoading}
-										mode={voiceButtonMode}
-									/>
-									<SubmitButton
-										isLoading={agent.isLoading}
-										canSubmit={canSubmit}
-										forceSubmit={planCommandActive || goalCommandActive}
-										disabled={
-											voiceBusy ||
-											hasAttachmentErrors ||
-											(planCommandActive && !hasPromptText) ||
-											(goalCommandActive && !hasGoalObjective)
-										}
-										onAction={handlePrimaryAction}
-									/>
-								</PromptInputActions>
-							}
-						/>
+							<ChatContainerScrollAnchor className={showEmptyConversation ? 'h-0' : undefined} />
+						</ChatContainerContent>
+						<div
+							className={cn(
+								'pointer-events-none absolute inset-x-0 z-30 flex justify-center',
+								voiceMode === 'conversation' ? 'bottom-80' : 'bottom-24'
+							)}
+						>
+							<ScrollButton
+								type="button"
+								aria-label="Scroll to latest"
+								className="pointer-events-auto"
+							/>
+						</div>
+					</ChatContainerRoot>
+					<div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 py-3">
+						<div className="mx-auto w-full max-w-4xl">
+							<RecorderErrorMessage
+								message={voiceErrorMessage}
+								actionLabel={voiceErrorAction?.label}
+								onAction={voiceErrorAction?.action}
+							/>
+							<PromptEditor
+								placeholder="Ask anything"
+								ariaLabel="Message Friday"
+								value={agent.input}
+								onValueChange={agent.setInput}
+								onPlanCommandChange={(active) => {
+									setPlanCommandActive(active);
+									agent.setInteractionMode(active ? 'plan' : 'default');
+								}}
+								onGoalCommandChange={setGoalCommandActive}
+								isLoading={agent.isLoading}
+								maxHeight={360}
+								onSubmit={() => void submitPrompt()}
+								textareaRef={agent.inputRef}
+								header={
+									attachments.length > 0 ? (
+										<AttachmentTray attachments={attachments} onRemove={removeAttachment} />
+									) : undefined
+								}
+								leadingAction={
+									voiceMode === 'dictation' ? undefined : (
+										<AttachmentButton
+											disabled={attachmentDisabled}
+											disabledReason={
+												attachmentUnavailable ? 'Attachment support is unavailable' : undefined
+											}
+										/>
+									)
+								}
+								voiceMode={voiceMode}
+								voiceElapsedMs={
+									voiceMode === 'conversation' ? realtimeVoice.elapsedMs : activeVoiceElapsedMs
+								}
+								voiceMuted={voiceMode === 'conversation' ? realtimeVoice.isMuted : activeVoiceMuted}
+								voiceMediaStream={
+									voiceMode === 'conversation' ? realtimeVoice.stream : activeVoiceStream
+								}
+								voiceAnalyser={voiceMode === 'conversation' ? realtimeVoice.analyser : null}
+								voiceStatus={
+									voiceMode === 'conversation'
+										? realtimeVoiceStatusLabels[realtimeVoice.status]
+										: undefined
+								}
+								voicePersonaState={
+									(realtimeVoice.status === 'listening' && !realtimeVoice.isMuted) ||
+									realtimeVoice.status === 'thinking' ||
+									realtimeVoice.status === 'speaking'
+										? realtimeVoice.status
+										: 'idle'
+								}
+								voiceWaveformActive={
+									voiceMode === 'conversation'
+										? realtimeVoice.status === 'speaking' ||
+											(realtimeVoice.status === 'listening' && !realtimeVoice.isMuted)
+										: undefined
+								}
+								onVoiceMutedChange={
+									voiceMode === 'conversation' ? realtimeVoice.setMuted : activeVoiceSetMuted
+								}
+								onVoiceEnd={() => void endVoiceConversation()}
+								onVoiceCancel={() => void cancelDictation()}
+								onVoiceConfirm={() => void confirmDictation()}
+								filesAccept={promptCapabilities?.accept}
+								onFilesChange={(files) => {
+									if (!promptCapabilities) return;
+									setAttachments((current) =>
+										validatePromptAttachments(
+											[...current, ...filesToAttachments(files)],
+											promptCapabilities
+										)
+									);
+								}}
+								wrapperClassName="max-w-none"
+								className={cn(
+									'w-full',
+									planCommandActive && 'plan-prompt-frame',
+									goalCommandActive && 'goal-prompt-frame'
+								)}
+								footerClassName="-mx-1.5 -mb-1.5"
+								actions={
+									<PromptInputActions className="justify-end gap-1.5">
+										<VoiceButton
+											onVoiceModeRequest={() => void startDictation()}
+											disabled={voiceBusy || agent.isLoading}
+											mode={voiceButtonMode}
+										/>
+										<SubmitButton
+											isLoading={agent.isLoading}
+											canSubmit={canSubmit}
+											forceSubmit={planCommandActive || goalCommandActive}
+											disabled={
+												voiceBusy ||
+												hasAttachmentErrors ||
+												(planCommandActive && !hasPromptText) ||
+												(goalCommandActive && !hasGoalObjective)
+											}
+											onAction={handlePrimaryAction}
+										/>
+									</PromptInputActions>
+								}
+							/>
+						</div>
 					</div>
 				</div>
-					</div>
 			</Split>
 		</PageContainer>
 	);

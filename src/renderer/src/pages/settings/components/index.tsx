@@ -128,13 +128,7 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ children, className }: SettingsPanelProps): React.JSX.Element {
 	return (
-		<Card
-			size="sm"
-			className={cn(
-				'p-0!',
-				className
-			)}
-		>
+		<Card size="sm" className={cn('p-0!', className)}>
 			<CardContent className="p-0!">{children}</CardContent>
 		</Card>
 	);
