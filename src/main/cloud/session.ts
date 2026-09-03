@@ -4,6 +4,7 @@ import { safeStorage } from 'electron';
 import Store from 'electron-store';
 import type { SupportedStorage } from '@supabase/supabase-js';
 import { userDataLocation } from '../shared/user_data_location';
+import { isSafeStorageAvailable } from '../shared/safe_storage';
 
 interface AuthSessionState {
 	values: Record<string, string>;
@@ -76,10 +77,7 @@ export class AuthSessionStorage implements AuthStorage {
 	}
 
 	private secureStorageAvailable(): boolean {
-		return (
-			safeStorage.isEncryptionAvailable() &&
-			(process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text')
-		);
+		return isSafeStorageAvailable();
 	}
 
 	private restrictPermissions(): void {

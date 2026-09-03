@@ -1,6 +1,7 @@
 import { safeStorage } from 'electron';
 import { MCP_SECRET_KEYS, type McpSecrets } from './mcp_secret_keys';
 import type { McpRecord, McpStoredRecord } from './mcp_types';
+import { isSafeStorageAvailable } from '../shared/safe_storage';
 
 export function openMcpRecord(
 	record: McpStoredRecord,
@@ -16,7 +17,7 @@ export function openMcpRecord(
 		}
 		delete data[key];
 	}
-	if (typeof data.encryptedSecrets === 'string' && safeStorage.isEncryptionAvailable()) {
+	if (typeof data.encryptedSecrets === 'string' && isSafeStorageAvailable()) {
 		try {
 			const decrypted = JSON.parse(
 				safeStorage.decryptString(Buffer.from(data.encryptedSecrets, 'base64'))

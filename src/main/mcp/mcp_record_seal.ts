@@ -1,6 +1,7 @@
 import { safeStorage } from 'electron';
 import { MCP_SECRET_KEYS, type McpSecrets } from './mcp_secret_keys';
 import type { McpRecord, McpStoredRecord } from './mcp_types';
+import { isSafeStorageAvailable } from '../shared/safe_storage';
 
 export function sealMcpRecord(record: McpRecord): {
 	record: McpStoredRecord;
@@ -13,7 +14,7 @@ export function sealMcpRecord(record: McpRecord): {
 		delete stored[key];
 	}
 	if (Object.keys(secrets).length === 0) return { record: stored as McpStoredRecord };
-	if (!safeStorage.isEncryptionAvailable()) {
+	if (!isSafeStorageAvailable()) {
 		return { record: stored as McpStoredRecord, volatileSecrets: secrets };
 	}
 	stored.encryptedSecrets = safeStorage

@@ -4,6 +4,7 @@ export const MCP_SECRET_KEYS = [
 	'refresh_token',
 	'tokens',
 	'codeVerifier',
+	'env',
 ] as const;
 
 export type McpSecretKey = (typeof MCP_SECRET_KEYS)[number];
