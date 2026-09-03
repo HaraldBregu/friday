@@ -5,8 +5,7 @@ export function publicCloudError(error: unknown): Error {
 		'23503': 'The selected cloud conversation no longer exists.',
 		'23505': 'This cloud item already exists.',
 		'42501': 'Your account is not allowed to access this cloud item.',
-		PGRST205:
-			'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
+		PGRST205: 'The cloud service is temporarily unavailable. Please try again later.',
 		PGRST116: 'The requested cloud item was not found.',
 	};
 	const result = new Error(messages[code] ?? 'The cloud request failed. Please try again.');

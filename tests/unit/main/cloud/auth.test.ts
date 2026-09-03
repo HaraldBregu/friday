@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import { AuthService } from '../../../../src/main/cloud/auth';
+import { AuthService } from '../../../../src/main/cloud/service';
 import { publicCloudError } from '../../../../src/main/cloud/cloud_error';
 import type { AuthStorage } from '../../../../src/main/cloud/session';
+import { SupabaseAccountProvider } from '../../../../src/main/cloud/supabase/auth';
 
 jest.mock('@supabase/supabase-js', () => ({
 	createClient: jest.fn(),
@@ -15,6 +16,12 @@ const exchangeCodeForSession = jest.fn();
 const signInWithOAuth = jest.fn();
 const stopAutoRefresh = jest.fn();
 const from = jest.fn();
+const config = {
+	url: 'https://project.supabase.co',
+	publishableKey: 'sb_publishable_test',
+	redirectUrl: 'kucedr://auth/callback',
+};
+const binding = { accept: jest.fn(() => true) };
 
 beforeEach(() => {
 	createClientMock.mockReturnValue({
@@ -55,17 +62,13 @@ it('reads and updates the signed-in account profile', async () => {
 	const select = jest.fn(() => ({ eq: getEq }));
 	from.mockReturnValue({ select, update });
 	const service = new AuthService(
-		{
-			url: 'https://project.supabase.co',
-			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'kucedr://auth/callback',
-		},
-		{
+		new SupabaseAccountProvider(config, {
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
 			removeItem: jest.fn(),
-		}
+		}),
+		binding
 	);
 	await service.initialize();
 
@@ -82,8 +85,7 @@ it('reads and updates the signed-in account profile', async () => {
 it('explains when the required profile table is missing', () => {
 	expect(publicCloudError({ code: 'PGRST205' })).toMatchObject({
 		name: 'PGRST205',
-		message:
-			'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
+			message: 'The cloud service is temporarily unavailable. Please try again later.',
 	});
 });
 
@@ -94,14 +96,7 @@ it('configures Supabase to restore sessions from encrypted main-process storage'
 		setItem: jest.fn(),
 		removeItem: jest.fn(),
 	};
-	const service = new AuthService(
-		{
-			url: 'https://project.supabase.co',
-			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'kucedr://auth/callback',
-		},
-		storage
-	);
+	const service = new AuthService(new SupabaseAccountProvider(config, storage), binding);
 
 	await service.initialize();
 
@@ -134,17 +129,13 @@ it('restores a persisted session without exposing its tokens in public auth stat
 		error: null,
 	});
 	const service = new AuthService(
-		{
-			url: 'https://project.supabase.co',
-			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'kucedr://auth/callback',
-		},
-		{
+		new SupabaseAccountProvider(config, {
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
 			removeItem: jest.fn(),
-		}
+		}),
+		binding
 	);
 
 	await service.initialize();
@@ -161,17 +152,13 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 	const url = 'https://project.supabase.co/auth/v1/authorize?provider=google';
 	signInWithOAuth.mockResolvedValueOnce({ data: { url }, error: null });
 	const service = new AuthService(
-		{
-			url: 'https://project.supabase.co',
-			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'kucedr://auth/callback',
-		},
-		{
+		new SupabaseAccountProvider(config, {
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
 			removeItem: jest.fn(),
-		}
+		}),
+		binding
 	);
 
 	await service.initialize();
@@ -190,7 +177,7 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 		error: null,
 	});
 	await expect(service.signInWithGoogle()).rejects.toThrow(
-		'Supabase returned an invalid authentication URL.'
+		'The account service returned an invalid sign-in URL.'
 	);
 });
 
@@ -206,17 +193,13 @@ it('exchanges a Google callback code for a token-free signed-in state', async ()
 	};
 	exchangeCodeForSession.mockResolvedValueOnce({ data: { session }, error: null });
 	const service = new AuthService(
-		{
-			url: 'https://project.supabase.co',
-			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'kucedr://auth/callback',
-		},
-		{
+		new SupabaseAccountProvider(config, {
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
 			removeItem: jest.fn(),
-		}
+		}),
+		binding
 	);
 
 	await service.initialize();
