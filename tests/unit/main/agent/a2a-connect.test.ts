@@ -40,6 +40,7 @@ it('fetches and revalidates an authenticated extended Agent Card', async () => {
 		2,
 		extendedCard,
 		expect.objectContaining({ credential: 'secret' }),
-		'https://agent.example'
+		'https://agent.example',
+		undefined
 	);
 });
