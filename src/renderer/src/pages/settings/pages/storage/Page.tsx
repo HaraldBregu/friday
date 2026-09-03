@@ -238,17 +238,37 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 				/>
 			)}
 
-			{error && (
-				<SettingsNotice variant="destructive" icon={AlertTriangle}>
-					{error}
-				</SettingsNotice>
+			{!cloudEnabled && (
+				<div className="flex flex-wrap items-center gap-2">
+					<SettingsNotice className="min-w-0 flex-1" icon={AlertTriangle}>
+						{cloudAccessMessage}
+					</SettingsNotice>
+					{canRequestSignIn && (
+						<Button type="button" size="sm" onClick={requireSignIn}>
+							{t('common.signIn')}
+						</Button>
+					)}
+				</div>
 			)}
 
-			{!storage ? (
+			{error && (
+				<div className="flex flex-wrap items-center gap-2">
+					<SettingsNotice className="min-w-0 flex-1" variant="destructive" icon={AlertTriangle}>
+						{error}
+					</SettingsNotice>
+					{loadFailed && (
+						<Button type="button" variant="outline" size="sm" onClick={retryLoad}>
+							{t('common.tryAgain')}
+						</Button>
+					)}
+				</div>
+			)}
+
+			{settingsLoading && !storage ? (
 				<div aria-busy="true">
 					<SettingsLoadingRows rows={4} />
 				</div>
-			) : (
+			) : storage ? (
 				<>
 					<Card size="sm" className="gap-0! py-0!" aria-busy={Boolean(runningOperation)}>
 						<CardHeader className="border-b border-border/60 py-3">
@@ -444,7 +464,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 						</DialogContent>
 					</Dialog>
 				</>
-			)}
+			) : null}
 		</SettingsPageShell>
 	);
 };
