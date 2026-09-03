@@ -71,9 +71,9 @@ export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
 			async (event): Promise<ExtensionImportResult | undefined> => {
 				const window = trusted.assert(event);
 				const result = await dialog.showOpenDialog(window, {
-							title: 'Select extension folder(s)',
-							properties: ['openDirectory', 'multiSelections'],
-						});
+					title: 'Select extension folder(s)',
+					properties: ['openDirectory', 'multiSelections'],
+				});
 
 				if (result.canceled || result.filePaths.length === 0) return undefined;
 				return importExtensions(result.filePaths);
