@@ -4,7 +4,7 @@ import React from 'react';
 import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { StartupGate } from '../../../src/renderer/src/auth/Gate';
-import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
+import { AuthProvider, useAuth } from '../../../src/renderer/src/contexts/AuthContext';
 import { OnboardingProvider } from '../../../src/renderer/src/contexts/OnboardingProvider';
 import { useOnboarding } from '../../../src/renderer/src/contexts/useOnboarding';
 import StartPage from '../../../src/renderer/src/pages/start/StartPage';
@@ -31,6 +31,15 @@ function RefreshConfiguration(): React.JSX.Element {
 	return (
 		<button type="button" onClick={() => void refreshConfiguration()}>
 			Refresh configuration
+		</button>
+	);
+}
+
+function SkipAuthentication(): React.JSX.Element {
+	const { skipSignIn } = useAuth();
+	return (
+		<button type="button" onClick={skipSignIn}>
+			Skip
 		</button>
 	);
 }
@@ -77,6 +86,7 @@ function renderFlow(path: string): ReturnType<typeof render> {
 										<Location />
 										<StartPage />
 										<RefreshConfiguration />
+										<SkipAuthentication />
 									</>
 								}
 							/>
@@ -187,7 +197,7 @@ it('preserves home when a skipped local-only session is refreshed', async () => 
 	const firstRender = renderFlow('/start');
 
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await user.click(await screen.findByRole('button', { name: 'Skip and continue' }));
+	await user.click(await screen.findByRole('button', { name: 'Skip' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 	firstRender.unmount();
 
@@ -268,7 +278,7 @@ it('takes skipped sign-in to home when configuration is complete', async () => {
 	renderFlow('/start');
 
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await user.click(await screen.findByRole('button', { name: 'Skip and continue' }));
+	await user.click(await screen.findByRole('button', { name: 'Skip' }));
 	await waitFor(() => expect(screen.getByLabelText('Current route')).toHaveTextContent('/home'));
 });
 
@@ -278,7 +288,7 @@ it('takes skipped sign-in to setup in place when configuration is incomplete', a
 	renderFlow('/start');
 
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
-	await user.click(await screen.findByRole('button', { name: 'Skip and continue' }));
+	await user.click(await screen.findByRole('button', { name: 'Skip' }));
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	expect(localStorage.getItem('kucedr-auth-local-only')).toBeNull();
