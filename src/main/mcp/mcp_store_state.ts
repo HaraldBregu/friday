@@ -80,9 +80,7 @@ export function setMcpServersState(value: McpRecord[]): void {
 	restrictSettingsFile(mcpStorePath);
 }
 
-export function getLocalMcpEnvironment(
-	id: string
-): Readonly<Record<string, string>> | undefined {
+export function getLocalMcpEnvironment(id: string): Readonly<Record<string, string>> | undefined {
 	const volatile = volatileLocalEnvironments.get(id);
 	if (volatile) return volatile;
 	const encrypted = store.get('localEnvironments')[id];

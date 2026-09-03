@@ -35,7 +35,10 @@ describe('local MCP registry', () => {
 
 		const localServer = path.join(localRoot, 'from-user');
 		fs.mkdirSync(localServer, { recursive: true });
-		fs.writeFileSync(path.join(localServer, 'mcp.json'), JSON.stringify({ id: 'first', command: 'user' }));
+		fs.writeFileSync(
+			path.join(localServer, 'mcp.json'),
+			JSON.stringify({ id: 'first', command: 'user' })
+		);
 
 		const workspaceServer = path.join(workspaceRoot, 'from-workspace');
 		fs.mkdirSync(workspaceServer, { recursive: true });
@@ -59,7 +62,10 @@ describe('local MCP registry', () => {
 
 		const workspaceServer = path.join(workspaceRoot, 'duplicate');
 		fs.mkdirSync(workspaceServer, { recursive: true });
-		fs.writeFileSync(path.join(workspaceServer, 'mcp.json'), JSON.stringify({ command: 'workspace' }));
+		fs.writeFileSync(
+			path.join(workspaceServer, 'mcp.json'),
+			JSON.stringify({ command: 'workspace' })
+		);
 
 		const result = listLocalMcpServers([localRoot, workspaceRoot]);
 		expect(result.servers).toHaveLength(1);
@@ -160,9 +166,9 @@ describe('local MCP registry', () => {
 			cwd: 'runtime',
 			package_value: 'preserved',
 		});
-		expect(JSON.parse(fs.readFileSync(path.join(directory, 'mcp.json'), 'utf8'))).not.toHaveProperty(
-			'env'
-		);
+		expect(
+			JSON.parse(fs.readFileSync(path.join(directory, 'mcp.json'), 'utf8'))
+		).not.toHaveProperty('env');
 		expect(fs.readdirSync(directory).filter((entry) => entry.startsWith('.mcp-'))).toEqual([]);
 	});
 
@@ -187,12 +193,16 @@ describe('local MCP registry', () => {
 				})
 			);
 
-			const result = configureLocalMcpServer('gmail-smtp', {
-				type: 'stdio',
-				command: 'node',
-				args: ['--experimental-strip-types', 'src/index.ts'],
-				env: { GMAIL_SMTP_HOST: 'smtp.gmail.com' },
-			}, localRoot);
+			const result = configureLocalMcpServer(
+				'gmail-smtp',
+				{
+					type: 'stdio',
+					command: 'node',
+					args: ['--experimental-strip-types', 'src/index.ts'],
+					env: { GMAIL_SMTP_HOST: 'smtp.gmail.com' },
+				},
+				localRoot
+			);
 
 			const installed = path.join(localRoot, 'gmail-smtp');
 			expect(result.path).toBe(installed);
@@ -255,7 +265,9 @@ describe('local MCP registry', () => {
 			require_approval: 'always',
 			enabled: false,
 		});
-		expect(JSON.parse(fs.readFileSync(path.join(root, 'uploaded', 'mcp.json'), 'utf8'))).toMatchObject({
+		expect(
+			JSON.parse(fs.readFileSync(path.join(root, 'uploaded', 'mcp.json'), 'utf8'))
+		).toMatchObject({
 			require_approval: 'always',
 			enabled: false,
 		});

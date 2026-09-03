@@ -54,17 +54,22 @@ export function configureLocalMcpServer(
 
 	const localRoot = path.resolve(root);
 	const searchRoots = [localRoot, ...mcpLocalDiscoveryRoots()];
-	const discovered = listLocalMcpServers(searchRoots).servers.find((entry) => entry.id === serverId);
+	const discovered = listLocalMcpServers(searchRoots).servers.find(
+		(entry) => entry.id === serverId
+	);
 	if (!discovered?.path) throw new Error(`No local MCP server "${id}".`);
 	let server = discovered;
 	let serverPath = discovered.path;
 
 	const relativePath = path.relative(localRoot, path.resolve(serverPath));
-	const isInstalled = relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
+	const isInstalled =
+		relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
 	if (!isInstalled) {
 		const importResult = importLocalMcpServers([serverPath], root);
 		if (importResult.imported.length === 0) {
-			throw new Error(importResult.skipped[0]?.reason ?? `Unable to configure local MCP server "${id}".`);
+			throw new Error(
+				importResult.skipped[0]?.reason ?? `Unable to configure local MCP server "${id}".`
+			);
 		}
 		serverPath = path.resolve(root, server.id);
 		server = readLocalMcpServer(serverPath);
