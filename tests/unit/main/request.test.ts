@@ -14,7 +14,7 @@ it('connects to the validated address while preserving the public TLS identity',
 		family: 4,
 	});
 	httpsRequest.mockImplementation((options, callback) => {
-		const response = Readable.from(['ok']) as Readable & {
+		const response = Readable.from([Buffer.from('ok')]) as Readable & {
 			headers: Record<string, string>;
 			statusCode: number;
 			statusMessage: string;
