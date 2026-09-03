@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	AlertTriangle,
 	Download,
@@ -35,12 +35,12 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/contexts/AuthContext';
 import type {
 	StorageOperationStatus,
 	StorageSyncFolder,
 	StorageSyncSettings,
 } from '@shared/storage_types';
-import { getErrorMessage } from '../../../start/setupConstants';
 import {
 	SettingsLoadingRows,
 	SettingsNotice,
@@ -48,21 +48,17 @@ import {
 	SettingsPageShell,
 	SettingsRow,
 } from '../../components';
-import { DEFAULT_SYNC_CRON_EXPRESSION, SYNC_INTERVALS } from './constants';
+import { SYNC_INTERVALS } from './constants';
 
 interface StoragePageProps {
 	readonly inline?: boolean;
 }
 
-const DEFAULT_SETTINGS: StorageSyncSettings = {
-	paths: [],
-	syncEnabled: false,
-	syncCronExpression: DEFAULT_SYNC_CRON_EXPRESSION,
-};
-
 const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 	const { t } = useTranslation();
+	const { state: authState, localOnly, requireSignIn } = useAuth();
 	const [settings, setSettings] = useState<StorageSyncSettings | null>(null);
+	const [settingsLoading, setSettingsLoading] = useState(true);
 	const [availableFolders, setAvailableFolders] = useState<StorageSyncFolder[]>([]);
 	const [draft, setDraft] = useState<StorageSyncSettings | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -71,42 +67,48 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 	const [operationStatus, setOperationStatus] = useState<StorageOperationStatus>();
 	const [operationStatusLoading, setOperationStatusLoading] = useState(true);
 	const [restoreOpen, setRestoreOpen] = useState(false);
+	const [loadFailed, setLoadFailed] = useState(false);
+	const [loadVersion, setLoadVersion] = useState(0);
+	const applyOperationStatus = useCallback((status: StorageOperationStatus): void => {
+		setOperationStatus((current) =>
+			current && current.revision >= status.revision ? current : status
+		);
+	}, []);
 
 	useEffect(() => {
 		let cancelled = false;
-		const applyOperationStatus = (status: StorageOperationStatus): void => {
-			if (cancelled) return;
-			setOperationStatus((current) =>
-				current && current.revision >= status.revision ? current : status
-			);
-		};
-		const unsubscribe = window.storage.onOperationStatusChanged(applyOperationStatus);
-		void Promise.all([
+		const unsubscribe = window.storage.onOperationStatusChanged((status) => {
+			if (!cancelled) applyOperationStatus(status);
+		});
+		void Promise.allSettled([
 			window.storage.getSettings(),
 			window.storage.syncFolders(),
 			window.storage.getOperationStatus(),
-		]).then(
-			([storedSettings, folders, status]) => {
-				if (cancelled) return;
-				setSettings(storedSettings);
-				setAvailableFolders(folders);
-				if (status) applyOperationStatus(status);
-				setOperationStatusLoading(false);
-			},
-			(err) => {
-				if (cancelled) return;
-				setSettings(DEFAULT_SETTINGS);
-				setOperationStatusLoading(false);
-				setError(getErrorMessage(err, t('settings.storage.errors.load')));
+		]).then(([settingsResult, foldersResult, statusResult]) => {
+			if (cancelled) return;
+
+			if (settingsResult.status === 'fulfilled') setSettings(settingsResult.value);
+			if (foldersResult.status === 'fulfilled') setAvailableFolders(foldersResult.value);
+			if (statusResult.status === 'fulfilled' && statusResult.value) {
+				applyOperationStatus(statusResult.value);
 			}
-		);
+
+			const failed = [settingsResult, foldersResult, statusResult].some(
+				(result) => result.status === 'rejected'
+			);
+			setLoadFailed(failed);
+			if (failed) setError(t('settings.storage.errors.load'));
+			setSettingsLoading(false);
+			setOperationStatusLoading(false);
+		});
 		return () => {
 			cancelled = true;
 			unsubscribe();
 		};
-	}, [t]);
+	}, [applyOperationStatus, loadVersion, t]);
 
 	const storage = draft ?? settings;
+	const cloudEnabled = authState.status === 'signedIn' && !localOnly;
 	const runningOperation = operationStatus?.state === 'running' ? operationStatus : undefined;
 	const builtInPaths = new Set(availableFolders.map((folder) => folder.path));
 	const customPaths = storage?.paths.filter((entry) => !builtInPaths.has(entry)) ?? [];
@@ -115,6 +117,18 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 		: (SYNC_INTERVALS.find((interval) => interval.cron === storage.syncCronExpression)?.key ??
 			'custom');
 	const busy = operationStatusLoading || savingSync || Boolean(runningOperation);
+	const controlsDisabled = busy || !cloudEnabled;
+	const cloudAccessMessage =
+		authState.status === 'loading'
+			? 'Checking account access…'
+			: authState.status === 'unconfigured'
+				? 'Cloud sync is unavailable right now.'
+				: authState.status === 'recovery'
+					? 'Finish updating your password before using cloud sync.'
+					: authState.status === 'confirmationRequired'
+						? 'Confirm your email address before using cloud sync.'
+						: 'Sign in to back up and restore your folders.';
+	const canRequestSignIn = authState.status === 'signedOut';
 	const operationStatusKey = operationStatus
 		? operationStatus.state === 'running' && operationStatus.trigger === 'scheduled'
 			? `settings.storage.operation.${operationStatus.operation}.scheduledRunning`
@@ -124,9 +138,14 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 		? t(operationStatusKey, {
 				count: operationStatus?.transferred,
 				failed: operationStatus?.failed,
-				error: operationStatus?.error,
-			})
-		: undefined;
+					error:
+						operationStatus?.operation === 'backup'
+							? t('settings.storage.errors.push')
+							: t('settings.storage.errors.pull'),
+				})
+			: undefined;
+	const operationNeedsAttention =
+		operationStatus?.state === 'failed' || operationStatus?.state === 'partial';
 
 	const updateDraft = (next: StorageSyncSettings): void => {
 		setDraft(next);
@@ -141,8 +160,8 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 			if (paths.length > 0) {
 				updateDraft({ ...storage, paths: [...new Set([...storage.paths, ...paths])] });
 			}
-		} catch (err) {
-			setError(getErrorMessage(err, t('settings.storage.errors.pickFolders')));
+		} catch {
+			setError(t('settings.storage.errors.pickFolders'));
 		}
 	};
 
@@ -157,8 +176,8 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 			setDraft(null);
 			setSyncStatus(t('settings.storage.syncSaved'));
 			return saved;
-		} catch (err) {
-			setError(getErrorMessage(err, t('settings.storage.errors.saveSync')));
+		} catch {
+			setError(t('settings.storage.errors.saveSync'));
 			return undefined;
 		} finally {
 			setSavingSync(false);
@@ -170,9 +189,9 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 		setSyncStatus(null);
 		try {
 			if (!(await saveSync())) return;
-			setOperationStatus(await window.storage.backup());
-		} catch (err) {
-			setError(getErrorMessage(err, t('settings.storage.errors.push')));
+			applyOperationStatus(await window.storage.backup());
+		} catch {
+			setError(t('settings.storage.errors.push'));
 		}
 	};
 
@@ -182,10 +201,18 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 		setSyncStatus(null);
 		try {
 			if (!(await saveSync())) return;
-			setOperationStatus(await window.storage.restore());
-		} catch (err) {
-			setError(getErrorMessage(err, t('settings.storage.errors.pull')));
+			applyOperationStatus(await window.storage.restore());
+		} catch {
+			setError(t('settings.storage.errors.pull'));
 		}
+	};
+
+	const retryLoad = (): void => {
+		setError(null);
+		setLoadFailed(false);
+		setSettingsLoading(true);
+		setOperationStatusLoading(true);
+		setLoadVersion((current) => current + 1);
 	};
 
 	const selectInterval = (value: string | null): void => {
