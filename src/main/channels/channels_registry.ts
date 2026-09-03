@@ -42,7 +42,7 @@ export interface ChannelRegistry {
 	restart(channel: ChannelType): Promise<void>;
 	send(message: ChannelOutboundMessage): Promise<ChannelMessageReceipt>;
 	getStatus(channel?: ChannelType): ChannelStatusEvent | undefined;
-	destroy(): void;
+  destroy(): Promise<void>;
 }
 
 export function createChannelRegistry(dependencies: ChannelRegistryDependencies): ChannelRegistry {
@@ -232,11 +232,9 @@ export function createChannelRegistry(dependencies: ChannelRegistryDependencies)
 		getStatus(channel = 'telegram') {
 			return statusCache.get(channel);
 		},
-		destroy() {
-			for (const channel of adapters.keys()) {
-				void stop(channel);
-			}
-		},
+    async destroy() {
+      await Promise.all([...adapters.keys()].map(stop));
+    },
 	};
 }
 
