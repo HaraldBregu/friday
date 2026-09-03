@@ -12,16 +12,23 @@ function command(channel: string): (...args: unknown[]) => unknown {
 
 it('routes realtime voice lifecycle commands through the invoking window owner', async () => {
 	const execute = jest.fn(async () => undefined);
-	const sender = {};
+	const mainFrame = {};
+	const sender = { mainFrame };
+	const dependencies = {
+		conversation: { execute } as never,
+		windows: { has: () => true } as never,
+		extensions: { has: () => false } as never,
+	};
 	jest
 		.mocked(BrowserWindow.fromWebContents)
-		.mockReturnValue({ id: 42, isDestroyed: () => false } as never);
-	new RealtimeVoiceIpc().register({ conversation: { execute } as never }, {} as never);
+		.mockReturnValue({ id: 42, webContents: sender, isDestroyed: () => false } as never);
+	new RealtimeVoiceIpc().register(dependencies, {} as never);
+	const event = { sender, senderFrame: mainFrame };
 
-	await command(RealtimeVoiceChannels.startSession)({ sender }, { chatSessionId: 'chat' });
-	await command(RealtimeVoiceChannels.appendAudio)({ sender }, 'voice', 'AAAA');
-	await command(RealtimeVoiceChannels.interruptSession)({ sender }, 'voice');
-	await command(RealtimeVoiceChannels.stopSession)({ sender }, 'voice');
+	await command(RealtimeVoiceChannels.startSession)(event, { chatSessionId: 'chat' });
+	await command(RealtimeVoiceChannels.appendAudio)(event, 'voice', 'AAAA');
+	await command(RealtimeVoiceChannels.interruptSession)(event, 'voice');
+	await command(RealtimeVoiceChannels.stopSession)(event, 'voice');
 
 	expect(execute).toHaveBeenNthCalledWith(1, {
 		type: 'voice',

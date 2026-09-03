@@ -1,6 +1,5 @@
-const registerCommand = jest.fn();
 const registerCommandWithEvent = jest.fn();
-const registerQuery = jest.fn();
+const registerQueryWithEvent = jest.fn();
 const getModelId = jest.fn();
 const getOptions = jest.fn();
 const getProviderId = jest.fn();
@@ -11,9 +10,8 @@ const getRealtimeVoiceSetup = jest.fn();
 const setRealtimeVoiceSetup = jest.fn();
 
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
-	registerCommand,
 	registerCommandWithEvent,
-	registerQuery,
+	registerQueryWithEvent,
 }));
 jest.mock('../../../../src/main/models/index', () => ({
 	embedding: { createEmbedding: jest.fn() },
@@ -49,18 +47,32 @@ jest.mock('../../../../src/main/agent/realtime_voice/setup', () => ({
 
 import { ModelsIpc } from '../../../../src/main/ipc/models';
 import { RealtimeVoiceChannels } from '../../../../src/shared/ipc_channels_definitions';
+import { BrowserWindow } from 'electron';
+
+let event: Record<string, unknown>;
+const extensionHas = jest.fn(() => false);
 
 function command(channel: string): (...args: unknown[]) => unknown {
-	return registerCommand.mock.calls.find(([registered]) => registered === channel)?.[1];
+	const handler = registerCommandWithEvent.mock.calls.find(([registered]) => registered === channel)?.[1];
+	return (...args: unknown[]) => handler(event, ...args);
 }
 
 function query(channel: string): (...args: unknown[]) => unknown {
-	return registerQuery.mock.calls.find(([registered]) => registered === channel)?.[1];
+	const handler = registerQueryWithEvent.mock.calls.find(([registered]) => registered === channel)?.[1];
+	return (...args: unknown[]) => handler(event, ...args);
 }
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	new ModelsIpc().register(undefined, {} as never);
+	extensionHas.mockReturnValue(false);
+	const mainFrame = {};
+	const sender = { mainFrame };
+	event = { sender, senderFrame: mainFrame };
+	jest.mocked(BrowserWindow.fromWebContents).mockReturnValue({ id: 1, webContents: sender } as never);
+	new ModelsIpc().register(
+		{ windows: { has: () => true } as never, extensions: { has: extensionHas } as never },
+		{} as never
+	);
 });
 
 it('wires realtime voice selection and options to their distinct model kind', () => {
@@ -95,5 +107,12 @@ it('rejects unsafe realtime voice selection inputs in main', () => {
 	);
 	expect(() => command(RealtimeVoiceChannels.setOptions)('marin')).toThrow(
 		'Invalid realtime voice options.'
+	);
+});
+
+it('rejects model operations from extension renderers', () => {
+	extensionHas.mockReturnValue(true);
+	expect(() => query(RealtimeVoiceChannels.getSetup)()).toThrow(
+		'Privileged IPC is unavailable to extension views.'
 	);
 });
