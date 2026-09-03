@@ -109,9 +109,21 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('models', () => new ModelsIpc().register(undefined, eventBus));
+	safeRegister('models', () =>
+		new ModelsIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('realtime-voice', () =>
-		new RealtimeVoiceIpc().register({ conversation: conversationService }, eventBus)
+		new RealtimeVoiceIpc().register(
+			{
+				conversation: conversationService,
+				windows: windowContextManager,
+				extensions: extensionRegistry,
+			},
+			eventBus
+		)
 	);
 	safeRegister('skills', () =>
 		new SkillsIpc().register(

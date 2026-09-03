@@ -1,19 +1,27 @@
 import { BrowserWindow } from 'electron';
 import { RealtimeVoiceChannels } from '../../shared/ipc_channels_definitions';
 import type { EventBus } from '../event_bus';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
 import type { Conversation } from '../agent/conversation';
-import { registerCommandWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
+import { TrustedRenderer } from './core/trusted';
 
 export interface RealtimeVoiceIpcDependencies {
 	conversation: Conversation;
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
 }
 
 export class RealtimeVoiceIpc implements IpcModule<RealtimeVoiceIpcDependencies> {
 	readonly name = 'realtime-voice';
 
-	register({ conversation }: RealtimeVoiceIpcDependencies, _eventBus: EventBus): void {
-		registerCommandWithEvent(RealtimeVoiceChannels.startSession, (event, request) =>
+	register(
+		{ conversation, windows, extensions }: RealtimeVoiceIpcDependencies,
+		_eventBus: EventBus
+	): void {
+		const trusted = new TrustedRenderer(windows, extensions);
+		trusted.commandWithEvent(RealtimeVoiceChannels.startSession, (event, request) =>
 			conversation.execute({
 				type: 'voice',
 				action: 'start',
@@ -21,7 +29,7 @@ export class RealtimeVoiceIpc implements IpcModule<RealtimeVoiceIpcDependencies>
 				request,
 			})
 		);
-		registerCommandWithEvent(RealtimeVoiceChannels.appendAudio, (event, sessionId, audio) =>
+		trusted.commandWithEvent(RealtimeVoiceChannels.appendAudio, (event, sessionId, audio) =>
 			conversation.execute({
 				type: 'voice',
 				action: 'append-audio',
@@ -30,7 +38,7 @@ export class RealtimeVoiceIpc implements IpcModule<RealtimeVoiceIpcDependencies>
 				audio,
 			})
 		);
-		registerCommandWithEvent(RealtimeVoiceChannels.interruptSession, (event, sessionId) =>
+		trusted.commandWithEvent(RealtimeVoiceChannels.interruptSession, (event, sessionId) =>
 			conversation.execute({
 				type: 'voice',
 				action: 'interrupt',
@@ -38,7 +46,7 @@ export class RealtimeVoiceIpc implements IpcModule<RealtimeVoiceIpcDependencies>
 				sessionId,
 			})
 		);
-		registerCommandWithEvent(RealtimeVoiceChannels.stopSession, (event, sessionId) =>
+		trusted.commandWithEvent(RealtimeVoiceChannels.stopSession, (event, sessionId) =>
 			conversation.execute({
 				type: 'voice',
 				action: 'stop',
