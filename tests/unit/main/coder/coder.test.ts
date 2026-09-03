@@ -1,6 +1,6 @@
 jest.mock('../../../../src/main/coder/location', () => ({
-	coderLocation: () => '/tmp/friday-coder-test',
-	coderSessionsLocation: () => '/tmp/friday-coder-test/sessions',
+	coderLocation: () => '/tmp/kucedr-coder-test',
+	coderSessionsLocation: () => '/tmp/kucedr-coder-test/sessions',
 }));
 
 import {
@@ -25,7 +25,7 @@ const settings = {
 
 const project = {
 	id: 'project-1',
-	name: 'Friday',
+	name: 'Kucedr',
 	directory: process.cwd(),
 	kind: 'external' as const,
 	createdAt: '2026-08-20T10:00:00.000Z',
@@ -56,7 +56,7 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 	};
 	const runtime = {
 		getModel: jest.fn(() => model),
-		checkAuth: jest.fn(async () => ({ type: 'api_key', source: 'Friday' })),
+		checkAuth: jest.fn(async () => ({ type: 'api_key', source: 'Kucedr' })),
 		setRuntimeApiKey: jest.fn(async () => undefined),
 		removeRuntimeApiKey: jest.fn(async () => undefined),
 	};
@@ -112,7 +112,7 @@ it('runs Pi with the saved model, isolated resources, and redacted stream events
 	).resolves.toEqual({ projectId: project.id, sessionId: 'session-1', output: 'done' });
 	expect(sessionManagerCreate).toHaveBeenCalledWith(
 		project.directory,
-		'/tmp/friday-coder-test/sessions'
+		'/tmp/kucedr-coder-test/sessions'
 	);
 	expect(createAgentSession).toHaveBeenCalledWith(
 		expect.objectContaining({
@@ -165,7 +165,7 @@ it('reloads cwd-bound instructions before the next message in a resumed session'
 	(createAgentSession as jest.Mock).mockResolvedValue({ session });
 	const sessionInfo = {
 		id: 'session-1',
-		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		path: '/tmp/kucedr-coder-test/sessions/session-1.jsonl',
 		cwd: project.directory,
 		name: undefined,
 		created: new Date('2026-08-20T10:00:00.000Z'),
@@ -230,7 +230,7 @@ it('rejects instruction access for an unavailable stored project', async () => {
 it('reopens a project session and records streamed Shell output', async () => {
 	const sessionInfo = {
 		id: 'session-1',
-		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		path: '/tmp/kucedr-coder-test/sessions/session-1.jsonl',
 		cwd: project.directory,
 		name: undefined,
 		created: new Date('2026-08-20T10:00:00.000Z'),
@@ -276,7 +276,7 @@ it('reopens a project session and records streamed Shell output', async () => {
 	).resolves.toEqual({ projectId: project.id, sessionId: sessionInfo.id, output: 'file-a\n' });
 	expect(sessionManagerOpen).toHaveBeenCalledWith(
 		sessionInfo.path,
-		'/tmp/friday-coder-test/sessions',
+		'/tmp/kucedr-coder-test/sessions',
 		project.directory
 	);
 	expect(session.executeBash).toHaveBeenCalledWith('ls', expect.any(Function));
@@ -337,7 +337,7 @@ it('renames only a session resolved inside its project', async () => {
 	const appendSessionInfo = jest.fn();
 	const original = {
 		id: 'session-1',
-		path: '/tmp/friday-coder-test/sessions/session-1.jsonl',
+		path: '/tmp/kucedr-coder-test/sessions/session-1.jsonl',
 		cwd: project.directory,
 		name: undefined,
 		created: new Date('2026-08-20T10:00:00.000Z'),
@@ -360,7 +360,7 @@ it('renames only a session resolved inside its project', async () => {
 	);
 	expect(sessionManagerOpen).toHaveBeenCalledWith(
 		original.path,
-		'/tmp/friday-coder-test/sessions',
+		'/tmp/kucedr-coder-test/sessions',
 		project.directory
 	);
 	expect(appendSessionInfo).toHaveBeenCalledWith('Focused tests');

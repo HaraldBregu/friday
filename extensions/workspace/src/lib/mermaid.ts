@@ -15,7 +15,7 @@ export function renderMermaid(source: string, isDark: boolean) {
 			theme: isDark ? 'dark' : 'default',
 		});
 		await mermaid.parse(source);
-		return mermaid.render(`friday-workspace-mermaid-${++renderId}`, source);
+		return mermaid.render(`kucedr-workspace-mermaid-${++renderId}`, source);
 	});
 	queue = job.then(
 		() => undefined,

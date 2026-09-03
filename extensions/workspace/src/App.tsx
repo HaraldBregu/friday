@@ -11,13 +11,13 @@ import {
 import {
 	agent,
 	app,
-	isFriday,
+	isKucedr,
 	win,
 	workspaceFileType,
 	type AppThemeData,
 	type WorkspaceFileKind,
 	type WorkspaceTreeEntry,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 import { AppSidebar } from '@/components/app-sidebar';
 import { WorkspaceViewer } from '@/components/workspace-viewer';
 import { Button } from '@/components/ui/button';
@@ -115,7 +115,7 @@ export default function App() {
 		[workspaceFiles, selectedWorkspacePath]
 	);
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 
 		let active = true;
 
@@ -145,7 +145,7 @@ export default function App() {
 	}, [theme]);
 
 	const syncTitlebar = useCallback((open: boolean, width: number): void => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		win.setTitlebarOptions({
 			title: 'Workspace',
 			leftButtons: [
@@ -175,19 +175,19 @@ export default function App() {
 	}, [sidebarOpen, sidebarWidth, syncTitlebar]);
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		return () => win.setTitlebarOptions(null);
 	}, []);
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		return win.onTitlebarButtonClick((buttonId) => {
 			if (buttonId === 'toggle-sidebar') setSidebarVisibility(!sidebarOpen);
 		});
 	}, [setSidebarVisibility, sidebarOpen]);
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 
 		let active = true;
 		let refreshTimer: ReturnType<typeof setTimeout> | undefined;
@@ -242,7 +242,7 @@ export default function App() {
 				!filePath ||
 				selectedKind === null ||
 				!editableWorkspaceKinds.has(selectedKind) ||
-				!isFriday() ||
+				!isKucedr() ||
 				(deletingScopeRef.current
 					? isWorkspacePathWithin(filePath, deletingScopeRef.current)
 					: false)
@@ -394,7 +394,7 @@ export default function App() {
 	}
 
 	async function confirmCreateWorkspaceEntry() {
-		if (!createRequest || creating || !isFriday()) return;
+		if (!createRequest || creating || !isKucedr()) return;
 		const name = createName.trim();
 		if (!name) {
 			setCreateError('Enter a name.');
@@ -427,7 +427,7 @@ export default function App() {
 	}
 
 	async function confirmRenameWorkspaceEntry() {
-		if (!renameTarget || renaming || !isFriday()) return;
+		if (!renameTarget || renaming || !isKucedr()) return;
 		const name = renameName.trim();
 		if (!name) {
 			setRenameError('Enter a name.');
@@ -488,7 +488,7 @@ export default function App() {
 	}
 
 	async function confirmDeleteWorkspaceEntry() {
-		if (!deleteTarget || deleting || !isFriday()) return;
+		if (!deleteTarget || deleting || !isKucedr()) return;
 		const target = deleteTarget;
 		const targetPath = target.path;
 		deletingScopeRef.current = targetPath;
@@ -554,7 +554,7 @@ export default function App() {
 		entry: WorkspaceTreeEntry,
 		destinationPath: string
 	): Promise<string> {
-		if (!isFriday()) throw new Error('Workspace moves are only available inside Friday.');
+		if (!isKucedr()) throw new Error('Workspace moves are only available inside Kucedr.');
 		const currentSelectedPath = selectedPathRef.current;
 		const movesSelection = Boolean(
 			currentSelectedPath && isWorkspacePathWithin(currentSelectedPath, entry.path)

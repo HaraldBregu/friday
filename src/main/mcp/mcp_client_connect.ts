@@ -9,7 +9,7 @@ export async function connect(
 	timeout = 300_000,
 	signal?: AbortSignal
 ): Promise<McpClient> {
-	const client = new Client({ name: 'friday', version: '1.0.0' });
+	const client = new Client({ name: 'kucedr', version: '1.0.0' });
 	try {
 		await client.connect(buildTransport(id, data), { timeout, signal });
 		return client;

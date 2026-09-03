@@ -56,15 +56,15 @@ const TOP_LEVEL_ROUTES: readonly StaticRouteDefinition[] = [
 	{
 		id: 'route-home',
 		label: 'Home',
-		description: 'Chat with Friday',
+		description: 'Chat with Kucedr',
 		icon: Home,
 		path: '/home',
-		keywords: 'chat agent ai assistant friday',
+		keywords: 'chat agent ai assistant kucedr',
 	},
 	{
 		id: 'route-settings',
 		label: 'Settings',
-		description: 'Configure Friday',
+		description: 'Configure Kucedr',
 		icon: Settings,
 		path: '/settings/general',
 		keywords: 'preferences configuration settings',

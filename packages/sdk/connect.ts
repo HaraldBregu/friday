@@ -40,15 +40,15 @@ const RemoteAppChannels = Object.fromEntries(
 ) as Omit<typeof AppChannels, ExtensionStoreAppMethod>;
 
 export interface ConnectOptions {
-	/** Base URL of the Friday API. Defaults to `http://127.0.0.1:8765`. */
+	/** Base URL of the Kucedr API. Defaults to `http://127.0.0.1:8765`. */
 	url?: string;
-	/** Contents of `<userData>/sdk-token` in the Friday app data folder. */
+	/** Contents of `<userData>/sdk-token` in the Kucedr app data folder. */
 	token: string;
 	/** Override the fetch implementation (defaults to the global one). */
 	fetch?: typeof globalThis.fetch;
 }
 
-export interface FridayClient {
+export interface KucedrClient {
 	app: RemoteAppApi;
 	agent: WorkspaceAgentApi;
 	/** Verify the app is reachable and the token is accepted. */
@@ -59,7 +59,7 @@ export interface FridayClient {
 
 type Listener = (channel: string, data: unknown) => void;
 
-export function connect(options: ConnectOptions): FridayClient {
+export function connect(options: ConnectOptions): KucedrClient {
 	const base = (options.url ?? 'http://127.0.0.1:8765').replace(/\/$/, '');
 	const call = options.fetch ?? globalThis.fetch;
 	const headers = { authorization: `Bearer ${options.token}`, 'content-type': 'application/json' };
@@ -124,7 +124,7 @@ export function connect(options: ConnectOptions): FridayClient {
 				if (typeof key !== 'string') return undefined;
 				if (key in target) return (target as Record<string, unknown>)[key];
 				const channel = channels[key];
-				if (!channel) throw new Error(`@friday/sdk: "${key}" is not available over the API.`);
+				if (!channel) throw new Error(`@kucedr/sdk: "${key}" is not available over the API.`);
 				return (...args: unknown[]): Promise<unknown> => invoke(channel, args);
 			},
 		}) as T;
@@ -212,7 +212,7 @@ export function connect(options: ConnectOptions): FridayClient {
 		},
 		ping: async () => {
 			const response = await call(`${base}/health`, { headers });
-			if (!response.ok) throw new Error(`Friday API unreachable: ${response.status}`);
+			if (!response.ok) throw new Error(`Kucedr API unreachable: ${response.status}`);
 			return (await response.json()) as { name: string; version: string };
 		},
 		close: () => {

@@ -20,7 +20,7 @@ jest.mock('../../../../src/main/storage/storage_put', () => ({ putObject }));
 jest.mock('../../../../src/main/storage/storage_list', () => ({ listObjects }));
 jest.mock('../../../../src/main/storage/storage_get', () => ({ getObject }));
 jest.mock('../../../../src/main/storage/storage_prefix', () => ({
-	storagePrefix: () => 'friday/v1/agent/',
+	storagePrefix: () => 'kucedr/v1/agent/',
 }));
 
 import { pullFiles } from '../../../../src/main/storage/storage_pull';
@@ -56,7 +56,7 @@ it('rejects a symbolic link selected as a backup root', async () => {
 	expect(putObject).not.toHaveBeenCalled();
 });
 
-it('backs up selected files within the Friday-owned prefix', async () => {
+it('backs up selected files within the Kucedr-owned prefix', async () => {
 	walkFiles.mockResolvedValue(['/data/agent/notes/today.md']);
 	const auth = {} as never;
 
@@ -66,38 +66,38 @@ it('backs up selected files within the Friday-owned prefix', async () => {
 	});
 	expect(putObject).toHaveBeenCalledWith(
 		auth,
-		'friday/v1/agent/notes/today.md',
+		'kucedr/v1/agent/notes/today.md',
 		Buffer.from('hello')
 	);
 });
 
 it('restores cloud files without deleting unmatched local files', async () => {
 	listObjects.mockResolvedValue([
-		{ key: 'friday/v1/agent/notes/today.md', size: 5, lastModified: undefined },
+		{ key: 'kucedr/v1/agent/notes/today.md', size: 5, lastModified: undefined },
 	]);
 
 	const auth = {} as never;
 	await expect(pullFiles(auth)).resolves.toEqual({
-		downloaded: ['friday/v1/agent/notes/today.md'],
+		downloaded: ['kucedr/v1/agent/notes/today.md'],
 		skipped: [],
 		failed: [],
 	});
 	expect(writeFile).toHaveBeenCalledWith(
-		'/data/agent/notes/today.md.friday-restore.tmp',
+		'/data/agent/notes/today.md.kucedr-restore.tmp',
 		Buffer.from('cloud'),
 		{ flag: 'wx' }
 	);
 	expect(rename).toHaveBeenCalledWith(
-		'/data/agent/notes/today.md.friday-restore.tmp',
+		'/data/agent/notes/today.md.kucedr-restore.tmp',
 		'/data/agent/notes/today.md'
 	);
-	expect(getObject).toHaveBeenCalledWith(auth, 'friday/v1/agent/notes/today.md');
+	expect(getObject).toHaveBeenCalledWith(auth, 'kucedr/v1/agent/notes/today.md');
 	expect(rm).not.toHaveBeenCalled();
 });
 
 it('rejects a restore target that is a symbolic link', async () => {
 	listObjects.mockResolvedValue([
-		{ key: 'friday/v1/agent/notes/today.md', size: 5, lastModified: undefined },
+		{ key: 'kucedr/v1/agent/notes/today.md', size: 5, lastModified: undefined },
 	]);
 	lstat.mockImplementation(async (value: string) => ({
 		isDirectory: () => true,
@@ -106,7 +106,7 @@ it('rejects a restore target that is a symbolic link', async () => {
 
 	await expect(pullFiles({} as never)).resolves.toMatchObject({
 		downloaded: [],
-		failed: [{ path: 'friday/v1/agent/notes/today.md' }],
+		failed: [{ path: 'kucedr/v1/agent/notes/today.md' }],
 	});
 	expect(getObject).not.toHaveBeenCalled();
 	expect(writeFile).not.toHaveBeenCalled();

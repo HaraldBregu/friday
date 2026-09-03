@@ -40,7 +40,7 @@ export function normalizeDataScope(value: unknown): DataScope {
 		if (
 			(input.mode === 'local_namespace' || input.mode === 'remote_namespace') &&
 			typeof input.generation === 'string' &&
-			/^friday-[0-9a-f-]{36}$/i.test(input.generation)
+			/^kucedr-[0-9a-f-]{36}$/i.test(input.generation)
 		) {
 			return {
 				kind: 'rag',

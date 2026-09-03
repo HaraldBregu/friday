@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { app, isFriday, win } from '@friday/sdk';
+import { app, isKucedr, win } from '@kucedr/sdk';
 import type { CallbackListener, PlayerRef } from '@remotion/player';
 
 import { Export } from './components/Export';
@@ -18,11 +18,11 @@ import { loadProject } from './load';
 import { readMediaDuration } from './metadata';
 import { saveProject } from './save';
 import { storeMedia } from './store';
-import { useFridayTheme } from './theme';
+import { useKucedrTheme } from './theme';
 import type { Clip, Project } from './types';
 
 export default function App() {
-	useFridayTheme();
+	useKucedrTheme();
 	const playerRef = useRef<PlayerRef>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const abortRef = useRef<AbortController | null>(null);
@@ -42,7 +42,7 @@ export default function App() {
 	const selectedClip = project.clips.find((clip) => clip.id === selectedId) ?? null;
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		win.setTitlebarOptions({ title: 'Video Maker', leftButtons: [], rightButtons: [] });
 		return () => win.setTitlebarOptions(null);
 	}, []);
@@ -230,7 +230,7 @@ export default function App() {
 
 	const openDocs = useCallback(() => {
 		const url = 'https://www.remotion.dev/docs/';
-		if (isFriday()) void app.openExternalUrl(url);
+		if (isKucedr()) void app.openExternalUrl(url);
 		else window.open(url, '_blank', 'noopener,noreferrer');
 	}, []);
 

@@ -1,15 +1,15 @@
 # Development, Testing, and Deployment
 
-This is the canonical workflow for developing, testing, pushing, and deploying Friday from
+This is the canonical workflow for developing, testing, pushing, and deploying Kucedr from
 the monorepo.
 
-Friday contains three independently versioned products:
+Kucedr contains three independently versioned products:
 
 | Product      | Manifest                    | Workspace name | Deployment destination |
 | ------------ | --------------------------- | -------------- | ---------------------- |
 | Electron app | `package.json`              | root package   | GitHub Releases        |
-| SDK          | `packages/sdk/package.json` | `@friday/sdk`  | npm                    |
-| CLI          | `packages/cli/package.json` | `@friday/cli`  | npm                    |
+| SDK          | `packages/sdk/package.json` | `@kucedr/sdk`  | npm                    |
+| CLI          | `packages/cli/package.json` | `@kucedr/cli`  | npm                    |
 
 The private root package manages the Electron application and both npm workspaces through
 one root `package-lock.json`. `packages/examples/projects` is a standalone example and
@@ -43,12 +43,12 @@ npm install --global npm@11.13.0
 Clone the repository and install all root and workspace dependencies:
 
 ```sh
-git clone https://github.com/HaraldBregu/friday.git
-cd friday
+git clone https://github.com/HaraldBregu/kucedr.git
+cd kucedr
 npm ci
 ```
 
-`npm ci` uses the committed lockfile, links `@friday/sdk` and `@friday/cli` as local
+`npm ci` uses the committed lockfile, links `@kucedr/sdk` and `@kucedr/cli` as local
 workspaces, and rebuilds Electron native dependencies through the root `postinstall`
 script.
 
@@ -82,7 +82,7 @@ The `dev:*` commands always run a live development server; they do not create in
 The `dev-linux*` commands disable Electron's sandbox and are only for local hosts where the
 normal command cannot start. Do not use that override for production distribution.
 
-Friday reads an optional root `.env` file when the Electron main process starts. Keep
+Kucedr reads an optional root `.env` file when the Electron main process starts. Keep
 local credentials in `.env`; the file is ignored by Git. Provider credentials can also be
 configured from the application settings.
 
@@ -105,7 +105,7 @@ listener.
 Inspect the exact files that would be published:
 
 ```sh
-npm pack --dry-run --workspace @friday/sdk
+npm pack --dry-run --workspace @kucedr/sdk
 ```
 
 ### Develop the CLI
@@ -122,20 +122,20 @@ Optionally link the development CLI globally:
 
 ```sh
 npm link ./packages/cli
-friday --version
-friday --help
+kucedr --version
+kucedr --help
 ```
 
 Remove the global link when finished:
 
 ```sh
-npm unlink --global @friday/cli
+npm unlink --global @kucedr/cli
 ```
 
 Inspect the publishable CLI tarball:
 
 ```sh
-npm pack --dry-run --workspace @friday/cli
+npm pack --dry-run --workspace @kucedr/cli
 ```
 
 ### Run the example project
@@ -292,8 +292,8 @@ npm run typecheck
 npm run build
 npm run test:packages
 npm run build:packages
-npm pack --dry-run --workspace @friday/sdk
-npm pack --dry-run --workspace @friday/cli
+npm pack --dry-run --workspace @kucedr/sdk
+npm pack --dry-run --workspace @kucedr/cli
 ```
 
 Newer pushes cancel an older in-progress CI run for the same branch. A cancelled run
@@ -336,8 +336,8 @@ Deployment is tag-driven:
 | Tag          | Workflow               | Result                                |
 | ------------ | ---------------------- | ------------------------------------- |
 | `v1.2.3`     | `Release Electron app` | Signed installers in a GitHub Release |
-| `sdk-v1.2.3` | `Publish npm package`  | `@friday/sdk@1.2.3` on npm            |
-| `cli-v1.2.3` | `Publish npm package`  | `@friday/cli@1.2.3` on npm            |
+| `sdk-v1.2.3` | `Publish npm package`  | `@kucedr/sdk@1.2.3` on npm            |
+| `cli-v1.2.3` | `Publish npm package`  | `@kucedr/cli@1.2.3` on npm            |
 
 Versions are independent. Releasing the SDK does not release the CLI or Electron app.
 A normal push to `main` runs CI only.
@@ -361,7 +361,7 @@ an unsigned production installer.
 #### Initial npm publication
 
 The npm packages must exist before trusted publishing can be configured. At the time of
-the initial bootstrap, confirm that the `@friday` scope belongs to the intended npm account
+the initial bootstrap, confirm that the `@kucedr` scope belongs to the intended npm account
 or organization, then publish each package once from a protected maintainer machine:
 
 ```sh
@@ -369,8 +369,8 @@ npm ci
 npm run test:packages
 npm login
 npm whoami
-npm publish --workspace @friday/sdk --access public
-npm publish --workspace @friday/cli --access public
+npm publish --workspace @kucedr/sdk --access public
+npm publish --workspace @kucedr/cli --access public
 ```
 
 After both packages exist:
@@ -378,7 +378,7 @@ After both packages exist:
 1. Create a protected GitHub environment named `npm` and require a reviewer.
 2. Open the trusted publisher settings for each npm package.
 3. Select GitHub Actions.
-4. Set owner `HaraldBregu`, repository `friday`, workflow `npm-publish.yml`, and
+4. Set owner `HaraldBregu`, repository `kucedr`, workflow `npm-publish.yml`, and
    environment `npm`. The values are case-sensitive.
 5. Test the next package version with a tag-based release.
 6. Revoke any bootstrap token and remove it from GitHub.
@@ -445,7 +445,7 @@ The root manifest version and tag must match exactly.
 6. Create an annotated tag on the verified commit and push only that tag:
 
    ```sh
-   git tag -a v1.0.3 -m "Friday v1.0.3"
+   git tag -a v1.0.3 -m "Kucedr v1.0.3"
    git push origin v1.0.3
    ```
 
@@ -470,16 +470,16 @@ Verify:
 2. Update only the SDK version:
 
    ```sh
-   npm version 0.1.1 --workspace @friday/sdk --no-git-tag-version
+   npm version 0.1.1 --workspace @kucedr/sdk --no-git-tag-version
    ```
 
 3. Verify the manifest, tests, build, and tarball:
 
    ```sh
    node -p "require('./packages/sdk/package.json').version"
-   npm run typecheck --workspace @friday/sdk
-   npm test --workspace @friday/sdk
-   npm pack --dry-run --workspace @friday/sdk
+   npm run typecheck --workspace @kucedr/sdk
+   npm test --workspace @kucedr/sdk
+   npm pack --dry-run --workspace @kucedr/sdk
    ```
 
 4. Commit and push:
@@ -493,15 +493,15 @@ Verify:
 5. Wait for CI, then tag the same commit:
 
    ```sh
-   git tag -a sdk-v0.1.1 -m "@friday/sdk v0.1.1"
+   git tag -a sdk-v0.1.1 -m "@kucedr/sdk v0.1.1"
    git push origin sdk-v0.1.1
    ```
 
 6. Verify the published version and provenance:
 
    ```sh
-   npm view @friday/sdk@0.1.1 version
-   npm view @friday/sdk@0.1.1 dist
+   npm view @kucedr/sdk@0.1.1 version
+   npm view @kucedr/sdk@0.1.1 dist
    ```
 
 ### Release the CLI
@@ -511,7 +511,7 @@ Verify:
 2. Update the CLI package version:
 
    ```sh
-   npm version 0.1.1 --workspace @friday/cli --no-git-tag-version
+   npm version 0.1.1 --workspace @kucedr/cli --no-git-tag-version
    ```
 
    The CLI currently also declares its displayed version in
@@ -521,11 +521,11 @@ Verify:
 
    ```sh
    node -p "require('./packages/cli/package.json').version"
-   npm run typecheck --workspace @friday/cli
-   npm test --workspace @friday/cli
-   npm run build --workspace @friday/cli
+   npm run typecheck --workspace @kucedr/cli
+   npm test --workspace @kucedr/cli
+   npm run build --workspace @kucedr/cli
    node packages/cli/dist/bin.js --version
-   npm pack --dry-run --workspace @friday/cli
+   npm pack --dry-run --workspace @kucedr/cli
    ```
 
    The two version commands must both print `0.1.1`.
@@ -541,17 +541,17 @@ Verify:
 5. Wait for CI, then tag the same commit:
 
    ```sh
-   git tag -a cli-v0.1.1 -m "@friday/cli v0.1.1"
+   git tag -a cli-v0.1.1 -m "@kucedr/cli v0.1.1"
    git push origin cli-v0.1.1
    ```
 
 6. Verify the published package:
 
    ```sh
-   npm view @friday/cli@0.1.1 version
-   npm install --global @friday/cli@0.1.1
-   friday --version
-   friday --help
+   npm view @kucedr/cli@0.1.1 version
+   npm install --global @kucedr/cli@0.1.1
+   kucedr --version
+   kucedr --help
    ```
 
 ### Manually dispatch an npm release
@@ -586,7 +586,7 @@ npm versions are immutable. Deprecate the bad version if necessary, fix the pack
 increment its version, and publish a new tag:
 
 ```sh
-npm deprecate @friday/sdk@0.1.1 "Use a newer version"
+npm deprecate @kucedr/sdk@0.1.1 "Use a newer version"
 ```
 
 Use the equivalent package name for the CLI.

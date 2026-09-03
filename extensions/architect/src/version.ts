@@ -1,4 +1,4 @@
-import type { ImageResult } from '@friday/sdk';
+import type { ImageResult } from '@kucedr/sdk';
 import type { ArchitectVersion } from './types';
 
 export function createVersion(

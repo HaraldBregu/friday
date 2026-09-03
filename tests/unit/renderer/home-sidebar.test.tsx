@@ -286,7 +286,7 @@ it('resizes the sidebar with keyboard and pointer input and persists the width',
 
 	expect(resizer).toHaveAttribute('aria-valuenow', '320');
 	expect(document.documentElement.style.getPropertyValue('--app-sidebar-width')).toBe('320px');
-	expect(window.localStorage.getItem('friday_sidebar_width')).toBe('320');
+	expect(window.localStorage.getItem('kucedr_sidebar_width')).toBe('320');
 
 	fireEvent.click(toggle);
 	expect(toggle).toHaveAttribute('aria-expanded', 'false');

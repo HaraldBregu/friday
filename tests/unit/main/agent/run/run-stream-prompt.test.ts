@@ -82,7 +82,7 @@ describe('run stream system prompt', () => {
 	it.each(['minimal', 'workspace'] as const)(
 		'injects an explicitly selected skill before the first %s model turn',
 		async (contextMode) => {
-			const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-explicit-skill-'));
+			const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-explicit-skill-'));
 			createSkillRegistrySnapshotMock.mockReturnValue({ skills: [registrySkill], diagnostics: [] });
 			activateSkillMock.mockResolvedValue(activatedSkill);
 			const session = createSessionState();
@@ -290,7 +290,7 @@ describe('run stream system prompt', () => {
 	});
 
 	it('sends workspace files as user context instead of system instructions', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-run-prompt-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-run-prompt-'));
 		try {
 			await fs.writeFile(path.join(root, 'USER.md'), '- **Name:** Alice');
 			await fs.writeFile(path.join(root, 'MEMORY.md'), '- Private preference');

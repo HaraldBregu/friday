@@ -12,7 +12,7 @@ it('defaults, normalizes, and validates the configured RAG index name', () => {
 	expect(getRagConfiguration()).toEqual(
 		expect.objectContaining({
 			enabled: false,
-			indexName: 'friday',
+			indexName: 'kucedr',
 			databaseProviderId: '',
 			databaseId: '',
 			embeddingProviderId: '',

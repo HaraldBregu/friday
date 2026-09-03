@@ -32,7 +32,7 @@ export class EnvironmentManager {
 			...login,
 			TERM: 'xterm-256color',
 			COLORTERM: 'truecolor',
-			TERM_PROGRAM: 'Friday',
+			TERM_PROGRAM: 'Kucedr',
 		};
 	}
 

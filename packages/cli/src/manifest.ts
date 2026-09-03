@@ -157,7 +157,7 @@ export async function readPluginManifest(directory: string): Promise<PluginManif
 	const parsed = pluginManifestSchema.safeParse(value);
 	if (!parsed.success) {
 		throw new Error(
-			`Invalid Friday plugin manifest: ${parsed.error.issues.map((issue) => issue.message).join(' ')}`
+			`Invalid Kucedr plugin manifest: ${parsed.error.issues.map((issue) => issue.message).join(' ')}`
 		);
 	}
 

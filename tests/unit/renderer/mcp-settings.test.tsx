@@ -39,7 +39,7 @@ beforeEach(() => {
 	jest.clearAllMocks();
 	Object.defineProperty(window, 'PointerEvent', { configurable: true, value: MouseEvent });
 	Object.defineProperty(window, 'mcp', { configurable: true, value: mcpApi });
-	mcpApi.getRoot.mockResolvedValue('/home/user/.friday/mcp/servers');
+	mcpApi.getRoot.mockResolvedValue('/home/user/.kucedr/mcp/servers');
 	mcpApi.registry.mockResolvedValue({
 		servers: [
 			{
@@ -50,7 +50,7 @@ beforeEach(() => {
 			{
 				id: 'local',
 				source: 'local',
-				path: '/home/user/.friday/mcp/servers/local',
+				path: '/home/user/.kucedr/mcp/servers/local',
 				data: {
 					type: 'stdio',
 					name: 'Local files',
@@ -79,7 +79,7 @@ describe('MCP settings', () => {
 		expect(mcpApi.getRoot).not.toHaveBeenCalled();
 		expect(screen.queryByRole('heading', { name: 'Remote servers' })).not.toBeInTheDocument();
 		expect(screen.queryByRole('heading', { name: 'Local servers' })).not.toBeInTheDocument();
-		expect(screen.queryByText('/home/user/.friday/mcp/servers/local')).not.toBeInTheDocument();
+		expect(screen.queryByText('/home/user/.kucedr/mcp/servers/local')).not.toBeInTheDocument();
 		expect(screen.getByRole('button', { name: 'Open folder' })).toBeInTheDocument();
 		expect(screen.queryByText('Open folder')).not.toBeInTheDocument();
 	});

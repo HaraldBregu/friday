@@ -66,7 +66,7 @@ it('publishes SQLite locally and mirrors record fields to Pinecone', async () =>
 	expect(result).toEqual({ files: 1, vectors: 1 });
 	expect(publication).toEqual({
 		indexName: 'knowledge-base',
-		generation: expect.stringMatching(/^friday-[a-f0-9-]+$/),
+		generation: expect.stringMatching(/^kucedr-[a-f0-9-]+$/),
 		providerId: 'openai',
 		modelId: 'text-embedding-3-small',
 		dimensions: 2,

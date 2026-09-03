@@ -21,7 +21,7 @@ export async function createPluginFixture(root: string, version = '1.0.0'): Prom
 	await fs.writeFile(
 		path.join(plugin, 'package.json'),
 		JSON.stringify({
-			name: '@friday-test/package-one',
+			name: '@kucedr-test/package-one',
 			version,
 			files: ['manifest.json', 'skills'],
 		})

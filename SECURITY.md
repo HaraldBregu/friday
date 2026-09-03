@@ -23,7 +23,7 @@ You should receive an acknowledgment within a few days. Please allow a reasonabl
 
 ## Scope
 
-Friday handles the following sensitive data locally on the user's machine:
+Kucedr handles the following sensitive data locally on the user's machine:
 
 - AI provider API keys
 - Connector credentials (Google, Microsoft, Dropbox)
@@ -45,4 +45,4 @@ The application is built against the following hardening baseline:
 
 ## Disclaimer
 
-Friday does not currently claim any formal regulated-data certification. Data sent to third-party AI providers or connected services is governed by those providers' own terms.
+Kucedr does not currently claim any formal regulated-data certification. Data sent to third-party AI providers or connected services is governed by those providers' own terms.

@@ -1,4 +1,4 @@
-import type { WorkspaceTreeEntry } from '@friday/sdk';
+import type { WorkspaceTreeEntry } from '@kucedr/sdk';
 import type { DragEvent } from 'react';
 
 import {

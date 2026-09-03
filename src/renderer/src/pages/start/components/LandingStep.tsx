@@ -15,13 +15,13 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 				<LogoView className="size-20 rounded-xl" />
 			</div>
 			<p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-				Welcome to Friday
+				Welcome to Kucedr
 			</p>
 			<h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-foreground">
 				The Personal Desktop AI Assistant
 			</h1>
 			<p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-				Friday helps with everyday tasks, works across your tools, and keeps important context
+				Kucedr helps with everyday tasks, works across your tools, and keeps important context
 				close at hand.
 			</p>
 			<Button className="mt-8" size="sm" disabled={loading} onClick={onStart}>

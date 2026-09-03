@@ -1,4 +1,4 @@
-import { IMAGE_SOURCE_MAX_BYTES, type ImageSource } from '@friday/sdk';
+import { IMAGE_SOURCE_MAX_BYTES, type ImageSource } from '@kucedr/sdk';
 
 export function readImage(file: File): Promise<ImageSource> {
 	if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {

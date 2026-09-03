@@ -18,11 +18,11 @@ interface Message {
 const COMMANDS = ['/install', '/app', '/help', '/clear', '/quit'] as const;
 const HELP = '/install <package>  /app  /clear  /quit';
 
-export function FridayTui({ install, launch }: TuiProps): React.JSX.Element {
+export function KucedrTui({ install, launch }: TuiProps): React.JSX.Element {
 	const { exit } = useApp();
 	const nextId = useRef(1);
 	const [messages, setMessages] = useState<Message[]>([
-		{ id: 0, text: 'Friday terminal is ready. Type /help for commands.', type: 'info' },
+		{ id: 0, text: 'Kucedr terminal is ready. Type /help for commands.', type: 'info' },
 	]);
 	const [input, setInput] = useState('');
 	const [status, setStatus] = useState('');
@@ -58,16 +58,16 @@ export function FridayTui({ install, launch }: TuiProps): React.JSX.Element {
 
 		try {
 			if (command.kind === 'app') {
-				setStatus('Launching Friday…');
+				setStatus('Launching Kucedr…');
 				await launch();
-				addMessage('Friday desktop app launched.', 'success');
+				addMessage('Kucedr desktop app launched.', 'success');
 				return;
 			}
 
 			setStatus(`Installing ${command.spec}…`);
 			const result = await install(command.spec, { force: command.force });
 			addMessage(
-				`Installed ${result.name} ${result.version}. Restart Friday to activate it.`,
+				`Installed ${result.name} ${result.version}. Restart Kucedr to activate it.`,
 				'success'
 			);
 		} catch (error) {
@@ -85,7 +85,7 @@ export function FridayTui({ install, launch }: TuiProps): React.JSX.Element {
 	return (
 		<Box flexDirection="column" paddingX={1}>
 			<Text bold color="magenta">
-				Friday
+				Kucedr
 			</Text>
 			<Static items={messages}>
 				{(message) => (

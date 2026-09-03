@@ -189,7 +189,7 @@ export const STEP_COPY: Record<SetupStep, { title: string; description: string }
 	},
 	search: {
 		title: 'Search Engine',
-		description: 'Add an API key for the search engine you want Friday to use.',
+		description: 'Add an API key for the search engine you want Kucedr to use.',
 	},
 	models: {
 		title: 'Assistant setup',

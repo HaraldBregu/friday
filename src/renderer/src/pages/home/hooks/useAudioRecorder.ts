@@ -56,7 +56,7 @@ function createRecordingId(): string {
 
 function createRecordingFileName(mimeType: string): string {
 	const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-	return `friday-audio-${timestamp}.${extensionForMimeType(mimeType)}`;
+	return `kucedr-audio-${timestamp}.${extensionForMimeType(mimeType)}`;
 }
 
 function normalizePermissionState(state: PermissionState): AudioRecorderPermissionState {

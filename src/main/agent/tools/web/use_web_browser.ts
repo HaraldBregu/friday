@@ -75,7 +75,7 @@ async function ensureStarted(signal?: AbortSignal): Promise<BrowserContext> {
 		signal?.throwIfAborted();
 		const detail = cause instanceof Error ? cause.message : String(cause);
 		throw new Error(
-			`Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Friday profile.\n${detail}`,
+			`Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Kucedr profile.\n${detail}`,
 			{ cause }
 		);
 	}

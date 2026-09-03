@@ -3,14 +3,14 @@ import { cva } from 'class-variance-authority';
 
 import {
 	app,
-	isFriday,
+	isKucedr,
 	isExtensionStoreValue,
 	win,
 	type AppLanguage,
 	type AppTheme,
 	type AppThemeColors,
 	type AppThemeData,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 import { cn } from './lib/utils';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -57,9 +57,9 @@ const fallbackColors: AppThemeColors = {
 const fallbackTheme: AppThemeData = { themeMode: 'light', isDark: false, colors: fallbackColors };
 const fallbackLanguage: AppLanguage = 'en';
 const initialStorageKey = 'demo';
-const initialStorageJson = '{\n  "label": "Friday demo",\n  "count": 1\n}';
+const initialStorageJson = '{\n  "label": "Kucedr demo",\n  "count": 1\n}';
 const initialStoragePath = 'demo/message.txt';
-const initialStorageFileContent = 'Saved by the Friday demo extension.';
+const initialStorageFileContent = 'Saved by the Kucedr demo extension.';
 const themeBadgeClass = cva(
 	'inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold',
 	{
@@ -87,20 +87,20 @@ export default function App() {
 	const [extensionFileValue, setExtensionFileValue] = useState('');
 	const [storageTestResults, setStorageTestResults] = useState<string[]>([]);
 	const [storageBusy, setStorageBusy] = useState(false);
-	const inFridayApp = isFriday();
+	const inKucedrApp = isKucedr();
 	const text = translations[language] ?? translations.en;
 	const themeStyle = Object.fromEntries(
 		Object.entries(theme.colors).map(([name, value]) => [`--${name}`, value])
 	) as CSSProperties;
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		win.setTitlebarOptions({ title: 'Demo', leftButtons: [], rightButtons: [] });
 		return () => win.setTitlebarOptions(null);
 	}, []);
 
-	const ensureFridayApp = () => {
-		if (!isFriday()) {
+	const ensureKucedrApp = () => {
+		if (!isKucedr()) {
 			setStatus(text.runtimeMissing);
 			return false;
 		}
@@ -112,7 +112,7 @@ export default function App() {
 	};
 
 	const refreshTheme = async () => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		try {
 			const themeData = await app.getThemeData();
 			setTheme(themeData);
@@ -123,7 +123,7 @@ export default function App() {
 	};
 
 	const refreshLanguage = async () => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		try {
 			const appLanguage = await app.getLanguage();
 			setLanguage(appLanguage);
@@ -136,7 +136,7 @@ export default function App() {
 	};
 
 	const setAppTheme = async (nextTheme: AppTheme) => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		try {
 			await app.setTheme(nextTheme);
 			await refreshTheme();
@@ -147,7 +147,7 @@ export default function App() {
 	};
 
 	const setAppLanguage = async (nextLanguage: AppLanguage) => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		try {
 			await app.setLanguage(nextLanguage);
 			await refreshLanguage();
@@ -158,11 +158,11 @@ export default function App() {
 	};
 
 	const printThemeData = async () => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		try {
 			const themeData = await app.getThemeData();
 			setTheme(themeData);
-			console.log('Friday app theme data', themeData);
+			console.log('Kucedr app theme data', themeData);
 			setStatus(text.printThemeDataSuccess);
 		} catch {
 			setStatus(text.printThemeDataFailed);
@@ -170,7 +170,7 @@ export default function App() {
 	};
 
 	const runStorageAction = async (action: () => Promise<string>) => {
-		if (!ensureFridayApp()) return;
+		if (!ensureKucedrApp()) return;
 		setStorageBusy(true);
 		try {
 			setStatus(await action());
@@ -256,7 +256,7 @@ export default function App() {
 	};
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 
 		let mounted = true;
 		const loadCurrentState = async () => {
@@ -289,7 +289,7 @@ export default function App() {
 				<div className="min-h-full w-full space-y-5 border border-border bg-card p-6 text-card-foreground shadow-sm">
 					<p className="text-lg font-semibold">{text.title}</p>
 					<p className="text-sm text-muted-foreground">
-						{inFridayApp ? text.connected : text.disconnected}
+						{inKucedrApp ? text.connected : text.disconnected}
 					</p>
 					<div className="space-y-2">
 						<p className="text-sm font-semibold">{text.theme}</p>

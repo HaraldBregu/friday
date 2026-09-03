@@ -1,15 +1,15 @@
-# Friday Demo MCP Server
+# Kucedr Demo MCP Server
 
-A dependency-free local MCP server for testing Friday's dynamic server workflow.
+A dependency-free local MCP server for testing Kucedr's dynamic server workflow.
 
 ## Install and test
 
 1. Open **Settings → MCP**.
 2. Choose **Upload local**.
 3. Select this `demo-server` folder.
-4. Click **Test Friday Demo Tools**. Friday should report three tools.
+4. Click **Test Kucedr Demo Tools**. Kucedr should report three tools.
 
-The folder can also be copied manually to `~/.friday/mcp/servers/friday-demo` and loaded with
+The folder can also be copied manually to `~/.kucedr/mcp/servers/kucedr-demo` and loaded with
 the **Refresh** action. The server uses only Node.js built-ins, so no package installation is needed.
 
 ## Tools

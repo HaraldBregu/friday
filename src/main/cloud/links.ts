@@ -32,7 +32,7 @@ export class AuthLinkBroker {
 		if (value.length > 4096) return false;
 		try {
 			const url = new URL(value);
-			return url.protocol === 'friday:' && url.hostname === 'auth' && url.pathname === '/callback';
+			return url.protocol === 'kucedr:' && url.hostname === 'auth' && url.pathname === '/callback';
 		} catch {
 			return false;
 		}

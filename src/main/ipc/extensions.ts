@@ -57,7 +57,7 @@ export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
 				defaultId: 0,
 				noLink: true,
 				message: `Delete “${extension.title}”?`,
-				detail: 'This permanently deletes the extension from Friday. This action cannot be undone.',
+				detail: 'This permanently deletes the extension from Kucedr. This action cannot be undone.',
 			};
 			const result = await dialog.showMessageBox(window, options);
 			if (result.response !== 1) return false;

@@ -20,7 +20,7 @@ it('classifies process termination as a hard approval', () => {
 });
 
 it('classifies file deletion and overwrite as hard approvals', () => {
-	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-destructive-tool-'));
+	const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-destructive-tool-'));
 	const existing = path.join(directory, 'existing.txt');
 	fs.writeFileSync(existing, 'content');
 

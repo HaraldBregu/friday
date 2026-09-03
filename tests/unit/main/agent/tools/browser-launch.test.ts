@@ -10,6 +10,6 @@ it('explains how to resolve a blocked or missing Chrome installation', async () 
 	launchPersistentContext.mockRejectedValue(new Error('Executable does not exist'));
 
 	await expect(useWebBrowserTool.run({ action: 'start' })).rejects.toThrow(
-		'Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Friday profile.\nExecutable does not exist'
+		'Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Kucedr profile.\nExecutable does not exist'
 	);
 });

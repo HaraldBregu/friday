@@ -1,7 +1,7 @@
 import { normalizeStorageSettings } from '../../../../src/main/storage/storage_config';
 
 const validConfig = {
-	paths: ['/data/friday'],
+	paths: ['/data/kucedr'],
 	syncEnabled: true,
 	syncCronExpression: '0 3 * * *',
 };
@@ -11,14 +11,14 @@ describe('normalizeStorageSettings', () => {
 		expect(
 			normalizeStorageSettings({
 				...validConfig,
-				paths: ['/data/friday/../friday', '/data/friday'],
+				paths: ['/data/kucedr/../kucedr', '/data/kucedr'],
 				syncCronExpression: '0  3  * * *',
 			})
 		).toEqual(validConfig);
 	});
 
 	it.each([
-		['relative folders', { paths: ['data/friday'] }],
+		['relative folders', { paths: ['data/kucedr'] }],
 		['filesystem roots', { paths: ['/'] }],
 		['invalid schedules', { syncCronExpression: 'sometimes' }],
 		['invalid enabled flags', { syncEnabled: 'yes' }],

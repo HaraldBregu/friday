@@ -1,6 +1,6 @@
 import { lazy, Suspense, useRef } from 'react';
 import { FileQuestion, LoaderCircle, Music2 } from 'lucide-react';
-import type { WorkspaceFileKind } from '@friday/sdk';
+import type { WorkspaceFileKind } from '@kucedr/sdk';
 
 import { TabsContent } from '@/components/ui/tabs';
 import {

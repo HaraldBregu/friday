@@ -1,6 +1,6 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 
-const root = '/tmp/friday-storage-protected-test';
+const root = '/tmp/kucedr-storage-protected-test';
 
 jest.mock('../../../../src/main/shared/user_data_location', () => ({
 	userDataLocation: () => root,
@@ -30,6 +30,6 @@ it.each([
 	expect(() => normalizeStoragePaths([value])).toThrow('cannot be synchronized as a file');
 });
 
-it('excludes provider data when a parent Friday folder is selected', async () => {
+it('excludes provider data when a parent Kucedr folder is selected', async () => {
 	await expect(walkFiles(root)).resolves.toEqual([`${root}/notes.md`]);
 });

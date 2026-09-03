@@ -30,7 +30,7 @@ const sourceB: WikiSource = {
 
 describe('incremental wiki knowledge integration', () => {
 	it('enriches one concept page with claim-level evidence from multiple sources', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-claims-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-claims-'));
 		await applyWikiUpdate(target, sourceA, {
 			pages: [
 				{
@@ -86,7 +86,7 @@ describe('incremental wiki knowledge integration', () => {
 	});
 
 	it('preserves unresolved contradictions when an automatic update tries to resolve them', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-contradiction-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-contradiction-'));
 		const claims = [
 			{
 				id: 'claim-market-a',
@@ -155,7 +155,7 @@ describe('incremental wiki knowledge integration', () => {
 	});
 
 	it('adds reciprocal relationships between pages in one change set', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-links-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-links-'));
 		await applyWikiUpdate(target, sourceA, {
 			pages: [
 				{
@@ -181,7 +181,7 @@ describe('incremental wiki knowledge integration', () => {
 	});
 
 	it('queues a major synthesis rewrite instead of applying it', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-review-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-review-'));
 		const original = 'Original evidence-backed synthesis. '.repeat(30);
 		await applyWikiUpdate(target, sourceA, {
 			pages: [
@@ -221,7 +221,7 @@ describe('incremental wiki knowledge integration', () => {
 	});
 
 	it('merges saved analyses into an existing page and keeps index and log synchronized', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-save-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-save-'));
 		const target = path.join(root, 'data');
 		const archive = path.join(root, 'a.md');
 		await import('node:fs/promises').then(({ writeFile }) =>
@@ -275,7 +275,7 @@ describe('incremental wiki knowledge integration', () => {
 	});
 
 	it('applies a queued major rewrite only after explicit review approval', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-approve-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-approve-'));
 		const target = path.join(root, 'data');
 		const archive = path.join(root, 'b.md');
 		await import('node:fs/promises').then(({ writeFile }) =>

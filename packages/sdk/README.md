@@ -1,60 +1,60 @@
-# @friday/sdk
+# @kucedr/sdk
 
-Typed client for app-data access in Friday.
+Typed client for app-data access in Kucedr.
 
-This package exposes typed Friday APIs for in-app code and the accompanying remote client
-used to call supported APIs over Friday's local HTTP bridge.
+This package exposes typed Kucedr APIs for in-app code and the accompanying remote client
+used to call supported APIs over Kucedr's local HTTP bridge.
 
 ## Install
 
 ```sh
-npm install @friday/sdk
+npm install @kucedr/sdk
 ```
 
 ## Usage from another app
 
-Friday writes a bearer token to `<userData>/sdk-token` (for example:
-`~/Library/Application Support/Friday/sdk-token` on macOS).
-Read that token and call `connect()` to reach Friday over HTTP.
+Kucedr writes a bearer token to `<userData>/sdk-token` (for example:
+`~/Library/Application Support/Kucedr/sdk-token` on macOS).
+Read that token and call `connect()` to reach Kucedr over HTTP.
 
 ```ts
 import { readFileSync } from 'node:fs';
-import { connect } from '@friday/sdk';
+import { connect } from '@kucedr/sdk';
 
-const friday = connect({
-	token: readFileSync('/Users/me/Library/Application Support/Friday/sdk-token', 'utf8').trim(),
+const kucedr = connect({
+	token: readFileSync('/Users/me/Library/Application Support/Kucedr/sdk-token', 'utf8').trim(),
 });
 
-await friday.ping(); // { name: 'friday', version: '1.0.0' }
+await kucedr.ping(); // { name: 'kucedr', version: '1.0.0' }
 
-const theme = await friday.app.getThemeData();
-await friday.app.setTheme('dark');
+const theme = await kucedr.app.getThemeData();
+await kucedr.app.setTheme('dark');
 
-const workspace = await friday.agent.getWorkspaceLocation();
-const files = await friday.agent.listWorkspaceFiles();
-const content = await friday.agent.readWorkspaceFile('USER.md');
-await friday.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
-await friday.agent.writeWorkspaceFile('diagrams/flow.mmd', 'flowchart LR');
-await friday.agent.createWorkspaceFile('', 'draft.md');
-await friday.agent.createWorkspaceDirectory('notes', 'ideas');
-await friday.agent.moveWorkspaceEntry('draft.md', 'notes');
-await friday.agent.renameWorkspaceEntry('notes/draft.md', 'idea.md');
-await friday.agent.deleteWorkspaceFile('old.md');
-await friday.agent.deleteWorkspaceDirectory('archive');
+const workspace = await kucedr.agent.getWorkspaceLocation();
+const files = await kucedr.agent.listWorkspaceFiles();
+const content = await kucedr.agent.readWorkspaceFile('USER.md');
+await kucedr.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await kucedr.agent.writeWorkspaceFile('diagrams/flow.mmd', 'flowchart LR');
+await kucedr.agent.createWorkspaceFile('', 'draft.md');
+await kucedr.agent.createWorkspaceDirectory('notes', 'ideas');
+await kucedr.agent.moveWorkspaceEntry('draft.md', 'notes');
+await kucedr.agent.renameWorkspaceEntry('notes/draft.md', 'idea.md');
+await kucedr.agent.deleteWorkspaceFile('old.md');
+await kucedr.agent.deleteWorkspaceDirectory('archive');
 ```
 
 File entries returned by `listWorkspaceFiles()` include their byte size and ISO creation and
 update timestamps. Directory entries contain their recursive `children` instead.
 
 Streaming callbacks (for `app` events) use the SSE stream opened on first use; call
-`friday.close()` when finished.
+`kucedr.close()` when finished.
 
-## Usage inside Friday
+## Usage inside Kucedr
 
 ```ts
-import { agent, app, coder, isFriday, models, win, type AppThemeData } from '@friday/sdk';
+import { agent, app, coder, isKucedr, models, win, type AppThemeData } from '@kucedr/sdk';
 
-if (!isFriday()) throw new Error('Not running inside Friday');
+if (!isKucedr()) throw new Error('Not running inside Kucedr');
 
 const themeData: AppThemeData = await app.getThemeData();
 await app.setTheme(themeData.themeMode === 'dark' ? 'light' : 'dark');
@@ -141,10 +141,10 @@ stopTitlebarActions();
 - `terminal`: embedded-only, owner-scoped PTY lifecycle, input, resize, output, and exit events.
 - `win`: embedded-only window APIs, including native context menus and window controls.
 - `connect()`: remote client for the app API and workspace agent APIs.
-- `isFriday()`: host check for in-app mode.
+- `isKucedr()`: host check for in-app mode.
 - `ping()`: validate API reachability in remote mode.
 
-`coder` is intentionally embedded-only. `addProject()` opens Friday's native folder picker, and all
+`coder` is intentionally embedded-only. `addProject()` opens Kucedr's native folder picker, and all
 runs use an opaque main-owned project ID rather than accepting a filesystem path from an extension.
 Agent conversations persist per project; Shell mode records non-interactive commands in the same
 session but is not a PTY. A project's directory is the default cwd, not a security sandbox: coding
@@ -154,11 +154,11 @@ inside the main process. The registered Coder extension may read and save non-se
 list the Pi model catalog, and run Codex OAuth; other extensions are rejected. Coder is not exposed by
 `connect()`.
 
-`terminal` is also intentionally embedded-only and is authorized only for trusted Friday windows and
+`terminal` is also intentionally embedded-only and is authorized only for trusted Kucedr windows and
 the registered Coder extension. It exposes the narrow preload bridge; shell selection, PTY ownership,
 and process lifecycle remain in the Electron main process. It is not exposed by `connect()`.
 
-Extension titlebars are rendered by the Friday host. In-app extensions can provide a centered title,
+Extension titlebars are rendered by the Kucedr host. In-app extensions can provide a centered title,
 left and right button descriptors, and optional sidebar state with
 `win.setTitlebarOptions()`. Button IDs are returned through `win.onTitlebarButtonClick()` so the
 extension remains the owner of its application state. Passing `null` restores the manifest title and
@@ -167,7 +167,7 @@ removes extension-provided controls. Icons are selected from the exported
 Keep `sidebarWidth` at the expanded width and update `sidebarOpen` when showing or hiding it so the
 host titlebar uses the same off-canvas transition as the extension sidebar.
 
-Extension store methods are available only to extensions embedded in Friday. Friday derives the
+Extension store methods are available only to extensions embedded in Kucedr. Kucedr derives the
 extension namespace from the calling view, so extensions never pass or select an extension ID.
 Values are JSON state stored in plaintext and should not contain passwords or API keys. File paths
 are relative to the extension's isolated files directory, and file data uses `Uint8Array`.

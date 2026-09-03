@@ -68,7 +68,7 @@ function ModelServiceLegacyRedirect(): React.JSX.Element {
 	const location = useLocation();
 	const { serviceId } = useParams();
 	const decoded = decodeURIComponent(serviceId ?? '');
-	const normalized = decoded === 'friday' || decoded === 'main' ? 'assistant' : decoded;
+	const normalized = decoded === 'kucedr' || decoded === 'main' ? 'assistant' : decoded;
 	const item = SETTINGS_MODEL_SERVICE_ITEMS.find((entry) => entry.id === normalized);
 	if (!item) return <Navigate to="/settings/general" replace />;
 	const isChatHistory = location.pathname.endsWith('/chathistory');

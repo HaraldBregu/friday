@@ -1,9 +1,9 @@
 import type { installPlugin } from './install.js';
-import type { launchFriday } from './launch.js';
+import type { launchKucedr } from './launch.js';
 
 export interface CliDependencies {
 	readonly install: typeof installPlugin;
-	readonly launch: typeof launchFriday;
+	readonly launch: typeof launchKucedr;
 	readonly tui: () => Promise<void>;
 }
 

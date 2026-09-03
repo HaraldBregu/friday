@@ -198,7 +198,7 @@ const AssistantPage: React.FC = () => {
 		<SettingsPageShell>
 			<SettingsPageHeader
 				title={t('settings.modelServices.assistantName')}
-				description={t('settings.modelServices.fridayDescription')}
+				description={t('settings.modelServices.kucedrDescription')}
 			/>
 
 			{state.error && (

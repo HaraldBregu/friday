@@ -1,6 +1,6 @@
 # Home UI
 
-Home is Friday's primary conversation workspace after setup. It combines session navigation,
+Home is Kucedr's primary conversation workspace after setup. It combines session navigation,
 text and file prompts, dictation, realtime voice, streamed responses, tool activity, permission
 requests, and generated media on `/home`.
 
@@ -42,7 +42,7 @@ title bar.
 
 After history finishes loading, a session with no visible messages and no active run should show:
 
-- the Friday icon;
+- the Kucedr icon;
 - **What can I do for you?**;
 - a short capability description;
 - **Schedule a task**, **Create a sound**, **Create an image**, and **Create a video** suggestions.
@@ -188,7 +188,7 @@ The microphone action should be based on the selected speech-to-text model:
 
 The dictation panel should show a recording indicator, waveform, elapsed time, **Cancel**, and
 **Confirm**. Cancel should discard the active dictation session. Confirm should keep or append the
-transcript and return to chat. Capture must respect both Friday's microphone setting and system
+transcript and return to chat. Capture must respect both Kucedr's microphone setting and system
 permission.
 
 The underlying dictation hooks support muting, but the current panel does not expose a mute

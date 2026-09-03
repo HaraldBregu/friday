@@ -5,8 +5,8 @@ import { resolveSkillResource } from '../../../../../src/main/agent/skills/skill
 
 describe('resolveSkillResource', () => {
 	it('resolves contained files and rejects traversal, absolute paths, and escaping symlinks', () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-skill-resource-'));
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-skill-outside-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-skill-resource-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-skill-outside-'));
 		try {
 			fs.mkdirSync(path.join(root, 'references'));
 			fs.writeFileSync(path.join(root, 'references', 'guide.md'), 'guide');

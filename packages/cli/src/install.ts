@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { fridayDataDirectory } from './data.js';
+import { kucedrDataDirectory } from './data.js';
 import { validatePluginEntries } from './entries.js';
 import { preparePluginSource } from './fetch.js';
 import { readPluginManifest } from './manifest.js';
@@ -21,7 +21,7 @@ export async function installPlugin(
 		const manifest = await readPluginManifest(source.directory);
 		await validatePluginEntries(source.directory, manifest);
 
-		const dataDirectory = path.resolve(options.dataDir ?? fridayDataDirectory());
+		const dataDirectory = path.resolve(options.dataDir ?? kucedrDataDirectory());
 		const pluginsDirectory = path.join(dataDirectory, 'plugins');
 		const destination = path.join(pluginsDirectory, manifest.id);
 		await fs.mkdir(pluginsDirectory, { recursive: true });

@@ -43,7 +43,7 @@ export async function indexRag(
 
 	const vectorStore = dependencies.vectors ?? ragVectorStore();
 	const embeddingProvider = dependencies.embeddings ?? new SelectedEmbeddingProvider();
-	const generation = `friday-${randomUUID()}`;
+	const generation = `kucedr-${randomUUID()}`;
 	const records: VectorRecord[] = [];
 	let dimensions: number | undefined;
 	let indexedFiles = 0;

@@ -1,6 +1,6 @@
 # Supabase
 
-Friday uses Supabase for email/password and Google authentication, cloud chat metadata, private file
+Kucedr uses Supabase for email/password and Google authentication, cloud chat metadata, private file
 storage, and per-chat Realtime events. The Supabase client runs only in Electron's main
 process. The renderer receives token-free data through validated IPC handlers.
 
@@ -14,7 +14,7 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
 ```
 
 Do not put `SUPABASE_SECRET_KEY`, service-role keys, JWT signing keys, or database passwords
-in the application environment. Friday rejects secret-key prefixes at startup. The JWKS
+in the application environment. Kucedr rejects secret-key prefixes at startup. The JWKS
 endpoint is derived by Supabase and does not need a separate application variable.
 
 Packaged builds can inject the same public values at build time:
@@ -24,7 +24,7 @@ MAIN_VITE_SUPABASE_URL=https://your-project.supabase.co
 MAIN_VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
 ```
 
-Friday uses `@supabase/supabase-js`. Do not add `@supabase/server`; that package targets
+Kucedr uses `@supabase/supabase-js`. Do not add `@supabase/server`; that package targets
 stateless HTTP servers and Edge Functions, not Electron's persistent main process.
 
 ## Configure Google sign-in
@@ -39,7 +39,7 @@ https://your-project-ref.supabase.co/auth/v1/callback
 ```
 
 Enable Google in **Supabase Dashboard → Authentication → Providers**, and save the OAuth client ID
-and secret there. Keep `friday://auth/callback` in Supabase's redirect allow list; Friday opens the
+and secret there. Keep `kucedr://auth/callback` in Supabase's redirect allow list; Kucedr opens the
 Supabase authorization URL in the system browser and exchanges the returned PKCE code in the main
 process.
 
@@ -79,7 +79,7 @@ npm run supabase:stop
 ```
 
 The local email inbox is available at `http://127.0.0.1:54324`. Authentication redirects
-back to the desktop app through `friday://auth/callback`.
+back to the desktop app through `kucedr://auth/callback`.
 
 ## Deploy the schema
 
@@ -95,7 +95,7 @@ npx supabase db push
 
 Then verify these hosted-project settings in the Supabase dashboard:
 
-1. Add `friday://auth/callback` to the Auth redirect allow list.
+1. Add `kucedr://auth/callback` to the Auth redirect allow list.
 2. Enable the Google provider with its Web OAuth client ID and secret.
 3. Keep email/password sign-up enabled and require email confirmation for production.
 4. Disable Realtime public-channel access so the migration's private-channel policies apply.
@@ -104,7 +104,7 @@ Then verify these hosted-project settings in the Supabase dashboard:
 ## Local data boundary
 
 Existing local chats and provider configuration stay on the device. The first signed-in
-Supabase account becomes the owner of that local Friday profile; signing into another account
+Supabase account becomes the owner of that local Kucedr profile; signing into another account
 is rejected to prevent accidental cross-account data exposure. Cloud folder backups use the
 private `user-files` bucket below `<user-id>/backups/`; no storage-provider selection or separate
 storage credentials are required. Legacy local storage-provider configuration is left untouched
@@ -112,5 +112,5 @@ without migration but is no longer read by the Cloud workflow. Vector-database p
 separate because they serve RAG rather than file backup.
 
 Supabase session and PKCE values are encrypted with Electron `safeStorage`. On systems where
-secure encryption is unavailable, Friday keeps the session in memory and requires sign-in
+secure encryption is unavailable, Kucedr keeps the session in memory and requires sign-in
 again after restart.

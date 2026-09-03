@@ -6,7 +6,7 @@ import { DataController } from '../../../../src/main/data/data_controller';
 const sessionId = '11111111-1111-4111-8111-111111111111';
 
 it('exports and purges memory only after a matching one-use preview', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-data-memory-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-data-memory-'));
 	const workspace = path.join(root, 'workspace');
 	await fs.mkdir(workspace, { recursive: true });
 	await fs.writeFile(
@@ -41,7 +41,7 @@ it('exports and purges memory only after a matching one-use preview', async () =
 });
 
 it('exports and deletes only explicitly listed sessions through the agent lock boundary', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-data-sessions-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-data-sessions-'));
 	const workspace = path.join(root, 'workspace');
 	const sessionDirectory = path.join(root, 'sessions', sessionId);
 	await fs.mkdir(sessionDirectory, { recursive: true });

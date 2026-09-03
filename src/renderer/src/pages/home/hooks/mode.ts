@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { AgentInteractionMode } from '@/lib/compat';
 
-const STORAGE_KEY = 'friday-interaction-modes';
+const STORAGE_KEY = 'kucedr-interaction-modes';
 
 function readModes(): Record<string, AgentInteractionMode> {
 	try {

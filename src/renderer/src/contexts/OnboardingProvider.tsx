@@ -8,7 +8,7 @@ type ConfigurationState = {
 	status: 'idle' | 'checking' | 'incomplete' | 'complete';
 };
 
-const ONBOARDING_STARTED_SESSION_KEY = 'friday-onboarding-started';
+const ONBOARDING_STARTED_SESSION_KEY = 'kucedr-onboarding-started';
 
 export function OnboardingProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {
 	const { state, localOnly } = useAuth();

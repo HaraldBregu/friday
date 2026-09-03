@@ -68,7 +68,7 @@ jobs:
             exit 1
           fi
 
-          workspace="@friday/$package"
+          workspace="@kucedr/$package"
           manifest_version="$(node -p "require('./packages/$package/package.json').version")"
           if [[ "$version" != "$manifest_version" ]]; then
             echo "::error::Requested $workspace@$version but its package.json contains $manifest_version."

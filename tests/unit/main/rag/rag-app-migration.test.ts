@@ -51,7 +51,7 @@ jest.mock('electron-store', () =>
 );
 jest.mock('../../../../src/main/agent/knowledge/rag/rag_store', () => ({
 	getRagConfiguration: () => ({
-		indexName: 'friday',
+		indexName: 'kucedr',
 		databaseProviderId: '',
 		databaseId: '',
 		embeddingProviderId: '',

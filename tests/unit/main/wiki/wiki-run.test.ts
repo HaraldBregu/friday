@@ -5,7 +5,7 @@ import path from 'node:path';
 const generateWikiUpdate = jest.fn();
 
 jest.mock('../../../../src/main/agent/knowledge/wiki/wiki_location', () => ({
-	wikiLocation: () => '/tmp/friday-wiki-test-data',
+	wikiLocation: () => '/tmp/kucedr-wiki-test-data',
 }));
 
 jest.mock('../../../../src/main/agent/knowledge/wiki/wiki_generate', () => ({
@@ -29,7 +29,7 @@ describe('runWiki', () => {
 	});
 
 	it('processes changed sources, skips unchanged sources and updates stable pages', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-run-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-run-'));
 		const sourcePath = path.join(root, 'raw');
 		const targetPath = path.join(root, 'data');
 		await import('node:fs/promises').then(({ mkdir }) => mkdir(sourcePath, { recursive: true }));
@@ -79,7 +79,7 @@ describe('runWiki', () => {
 	});
 
 	it('rolls back an invalid generated change and records the failed operation', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-failure-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-failure-'));
 		const sourcePath = path.join(root, 'raw');
 		const targetPath = path.join(root, 'data');
 		const repository = getWikiRepository(targetPath);
@@ -139,7 +139,7 @@ describe('runWiki', () => {
 	});
 
 	it('reports source progress and cancels an in-flight model request', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-cancel-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-cancel-'));
 		const sourcePath = path.join(root, 'raw');
 		const targetPath = path.join(root, 'data');
 		const repository = getWikiRepository(targetPath);
@@ -187,7 +187,7 @@ describe('runWiki', () => {
 	});
 
 	it('propagates an external agent cancellation into the active model request', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-agent-cancel-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-agent-cancel-'));
 		const sourcePath = path.join(root, 'raw');
 		const targetPath = path.join(root, 'data');
 		await import('node:fs/promises').then(({ mkdir }) => mkdir(sourcePath, { recursive: true }));

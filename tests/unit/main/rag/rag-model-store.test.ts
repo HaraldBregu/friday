@@ -35,7 +35,7 @@ import {
 } from '../../../../src/main/models/selection';
 
 const ragConfiguration = {
-	indexName: 'friday',
+	indexName: 'kucedr',
 	databaseProviderId: 'pinecone',
 	databaseId: 'pinecone',
 	embeddingProviderId: 'openai',

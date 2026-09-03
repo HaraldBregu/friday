@@ -1,4 +1,4 @@
-# Releasing Friday
+# Releasing Kucedr
 
 The canonical release instructions are now part of
 [Development, Testing, and Deployment](DEVELOPMENT.md#deployment).

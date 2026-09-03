@@ -1,11 +1,11 @@
-# @friday/cli
+# @kucedr/cli
 
-Command-line and terminal interface for Friday.
+Command-line and terminal interface for Kucedr.
 
 ## Install
 
 ```sh
-npm install --global @friday/cli
+npm install --global @kucedr/cli
 ```
 
 Node.js 22.12 or newer is required.
@@ -13,15 +13,15 @@ Node.js 22.12 or newer is required.
 ## Commands
 
 ```sh
-friday                         # Launch the Friday desktop app
-friday app                     # Launch the Friday desktop app explicitly
-friday install package-one     # Install a Friday plugin from npm
-friday install ./my-plugin     # Install a local plugin directory
-friday install package-one -f  # Replace an installed plugin with the same id
-friday tui                     # Open the interactive terminal interface
+kucedr                         # Launch the Kucedr desktop app
+kucedr app                     # Launch the Kucedr desktop app explicitly
+kucedr install package-one     # Install a Kucedr plugin from npm
+kucedr install ./my-plugin     # Install a local plugin directory
+kucedr install package-one -f  # Replace an installed plugin with the same id
+kucedr tui                     # Open the interactive terminal interface
 ```
 
-Inside `friday tui`, use:
+Inside `kucedr tui`, use:
 
 ```text
 /install package-one
@@ -31,23 +31,23 @@ Inside `friday tui`, use:
 /quit
 ```
 
-`/install` is a TUI command. In a normal shell, use `friday install <package>`.
+`/install` is a TUI command. In a normal shell, use `kucedr install <package>`.
 
 ## Plugin installation
 
 The package spec is resolved with `npm pack --ignore-scripts`. No package lifecycle scripts are run.
-The archive must contain a Friday plugin `manifest.json`. Its manifest ID determines the install
+The archive must contain a Kucedr plugin `manifest.json`. Its manifest ID determines the install
 folder:
 
 ```text
-<Friday userData>/plugins/<plugin-id>/
+<Kucedr userData>/plugins/<plugin-id>/
 ```
 
 The manifest and every contributed file are validated before the staged directory is renamed into
-place. Existing plugins are left untouched unless `--force` is passed. Restart Friday after an
+place. Existing plugins are left untouched unless `--force` is passed. Restart Kucedr after an
 install so all contribution registries reload.
 
-Use `--data-dir <path>` to target a non-default Friday data directory. Use `FRIDAY_APP_PATH` when the
+Use `--data-dir <path>` to target a non-default Kucedr data directory. Use `KUCEDR_APP_PATH` when the
 desktop executable is in a custom location, including a downloaded Linux AppImage.
 
 ## Development
@@ -56,7 +56,7 @@ Run these commands from the repository root:
 
 ```sh
 npm ci
-npm run typecheck --workspace @friday/cli
+npm run typecheck --workspace @kucedr/cli
 npm run cli:test
 npm run cli:build
 npm link ./packages/cli

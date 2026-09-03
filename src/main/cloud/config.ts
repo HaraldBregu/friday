@@ -17,7 +17,7 @@ export function loadCloudConfig(): CloudConfig | null {
 		return {
 			url: parsed.origin,
 			publishableKey,
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		};
 	} catch {
 		return null;

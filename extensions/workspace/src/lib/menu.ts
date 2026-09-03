@@ -1,4 +1,4 @@
-import { isFriday, win, type ContextMenuDescriptor } from "@friday/sdk"
+import { isKucedr, win, type ContextMenuDescriptor } from "@kucedr/sdk"
 
 interface ContextMenuEvent {
   preventDefault: () => void
@@ -12,7 +12,7 @@ export function showNativeContextMenu(
   items: ContextMenuDescriptor[],
   actions: ContextMenuActions = {},
 ) {
-  if (!isFriday()) return
+  if (!isKucedr()) return
   event.preventDefault()
   event.stopPropagation()
   void win

@@ -13,26 +13,26 @@ it('normalizes exact local RAG and session scopes', () => {
 			kind: 'rag',
 			mode: 'local_namespace',
 			indexName: 'knowledge-base',
-			generation: 'friday-11111111-1111-4111-8111-111111111111',
+			generation: 'kucedr-11111111-1111-4111-8111-111111111111',
 		})
 	).toEqual({
 		kind: 'rag',
 		mode: 'local_namespace',
 		indexName: 'knowledge-base',
-		generation: 'friday-11111111-1111-4111-8111-111111111111',
+		generation: 'kucedr-11111111-1111-4111-8111-111111111111',
 	});
 	expect(
 		normalizeDataScope({
 			kind: 'rag',
 			mode: 'remote_namespace',
 			indexName: 'knowledge-base',
-			generation: 'friday-11111111-1111-4111-8111-111111111111',
+			generation: 'kucedr-11111111-1111-4111-8111-111111111111',
 		})
 	).toEqual({
 		kind: 'rag',
 		mode: 'remote_namespace',
 		indexName: 'knowledge-base',
-		generation: 'friday-11111111-1111-4111-8111-111111111111',
+		generation: 'kucedr-11111111-1111-4111-8111-111111111111',
 	});
 	expect(
 		normalizeDataScope({
@@ -66,7 +66,7 @@ it('rejects broad, malformed, and unconfigured scopes', () => {
 		normalizeDataScope({
 			kind: 'rag',
 			mode: 'local_namespace',
-			indexName: 'friday',
+			indexName: 'kucedr',
 			generation: '..',
 		})
 	).toThrow('Invalid data scope.');

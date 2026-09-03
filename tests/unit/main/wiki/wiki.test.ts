@@ -50,7 +50,7 @@ describe('wiki settings', () => {
 
 describe('wiki source ingestion', () => {
 	it('collects supported text files and keeps source page names stable across content changes', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-source-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-source-'));
 		await writeFile(path.join(root, 'notes.md'), '# Notes', 'utf8');
 		await writeFile(path.join(root, 'ignored.bin'), 'binary', 'utf8');
 		const sources = await collectWikiSources(root);
@@ -63,7 +63,7 @@ describe('wiki source ingestion', () => {
 	});
 
 	it('rejects source symlinks that escape the configured folder', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-symlink-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-symlink-'));
 		const inbox = path.join(root, 'inbox');
 		const outside = path.join(root, 'outside.md');
 		await mkdir(inbox);
@@ -76,7 +76,7 @@ describe('wiki source ingestion', () => {
 	});
 
 	it('rejects oversized sources instead of truncating them', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-oversized-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-oversized-'));
 		await writeFile(path.join(root, 'large.md'), Buffer.alloc(MAX_WIKI_SOURCE_BYTES + 1, 97));
 
 		await expect(collectWikiSources(root)).rejects.toThrow('Refusing to ingest oversized source');
@@ -118,11 +118,11 @@ describe('wiki source ingestion', () => {
 	});
 
 	it('writes generated pages, schema, index and append-only log artifacts', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-target-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-target-'));
 		const source: WikiSource = {
 			absolutePath: '/tmp/raw/notes.md',
 			relativePath: 'notes.md',
-			content: 'Friday is a desktop assistant.',
+			content: 'Kucedr is a desktop assistant.',
 			hash: 'abc123',
 		};
 		const sourcePage = wikiSourcePage(source);
@@ -131,16 +131,16 @@ describe('wiki source ingestion', () => {
 			pages: [
 				{
 					path: sourcePage,
-					title: 'Friday notes',
-					summary: 'Notes about Friday.',
-					content: 'Friday connects to [[Desktop assistants]].',
+					title: 'Kucedr notes',
+					summary: 'Notes about Kucedr.',
+					content: 'Kucedr connects to [[Desktop assistants]].',
 					sources: ['notes.md'],
 				},
 				{
 					path: 'concepts/desktop-assistants.md',
 					title: 'Desktop assistants',
 					summary: 'Assistants integrated with desktop workflows.',
-					content: 'Connected from [[Friday notes]].',
+					content: 'Connected from [[Kucedr notes]].',
 					sources: ['notes.md'],
 				},
 			],

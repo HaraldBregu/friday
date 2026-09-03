@@ -18,7 +18,7 @@ interface AuthContextValue {
 }
 
 const initialState: AuthState = { status: 'loading', persistence: 'memory' };
-const LOCAL_ONLY_SESSION_KEY = 'friday-auth-local-only';
+const LOCAL_ONLY_SESSION_KEY = 'kucedr-auth-local-only';
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { readonly children: ReactNode }): React.JSX.Element {

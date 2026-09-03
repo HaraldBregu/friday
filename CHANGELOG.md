@@ -65,5 +65,5 @@ Changes since [v1.0.2] (2026-07-26).
 - Obsolete policy settings and policy modules superseded by permissions and sandbox controls.
 - Temporary Electron and Playwright driver scripts used during development.
 
-[Unreleased]: https://github.com/HaraldBregu/friday/compare/v1.0.2...HEAD
-[v1.0.2]: https://github.com/HaraldBregu/friday/releases/tag/v1.0.2
+[Unreleased]: https://github.com/HaraldBregu/kucedr/compare/v1.0.2...HEAD
+[v1.0.2]: https://github.com/HaraldBregu/kucedr/releases/tag/v1.0.2

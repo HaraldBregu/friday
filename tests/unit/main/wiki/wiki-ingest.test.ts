@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 jest.mock('../../../../src/main/agent/knowledge/wiki/wiki_location', () => ({
-	wikiLocation: () => '/tmp/friday-wiki-test-data',
+	wikiLocation: () => '/tmp/kucedr-wiki-test-data',
 }));
 
 import { collectWikiSources } from '../../../../src/main/agent/knowledge/wiki/wiki_collect_sources';
@@ -13,12 +13,12 @@ import { getWikiRepository } from '../../../../src/main/agent/knowledge/wiki/wik
 
 describe('immutable wiki source registration', () => {
 	it('archives exact bytes without changing the source and deduplicates repeated ingest', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-ingest-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-ingest-'));
 		const inbox = path.join(root, 'inbox');
 		const repository = getWikiRepository(path.join(root, 'wiki'));
 		await import('node:fs/promises').then(({ mkdir }) => mkdir(inbox, { recursive: true }));
 		const sourcePath = path.join(inbox, 'notes.md');
-		const original = Buffer.from('# Notes\n\nFriday keeps durable knowledge.\n', 'utf8');
+		const original = Buffer.from('# Notes\n\nKucedr keeps durable knowledge.\n', 'utf8');
 		await writeFile(sourcePath, original);
 		const [source] = await collectWikiSources(inbox);
 
@@ -35,7 +35,7 @@ describe('immutable wiki source registration', () => {
 	});
 
 	it('rejects credential-like sources before creating a registry record', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-secret-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-secret-'));
 		const repository = getWikiRepository(path.join(root, 'wiki'));
 		await writeFile(
 			path.join(root, '.env'),
@@ -56,7 +56,7 @@ describe('immutable wiki source registration', () => {
 	});
 
 	it('scans the complete bytes that are eligible for immutable archival', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-full-scan-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-full-scan-'));
 		const repository = getWikiRepository(path.join(root, 'wiki'));
 		const sourcePath = path.join(root, 'notes.md');
 		const bytes = Buffer.from(`Safe prefix\n${'x'.repeat(4_000)}\npassword=abcdefghijklmnopqrstuvwxyz123456`);

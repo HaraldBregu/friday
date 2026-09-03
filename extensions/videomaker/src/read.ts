@@ -1,9 +1,9 @@
-import { app, isFriday } from '@friday/sdk';
+import { app, isKucedr } from '@kucedr/sdk';
 
 import { openDatabase } from './database';
 
 export async function readMedia(assetPath: string, mime: string): Promise<string> {
-	if (isFriday()) {
+	if (isKucedr()) {
 		const bytes = await app.readExtensionStoreFile(assetPath);
 		return URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: mime }));
 	}

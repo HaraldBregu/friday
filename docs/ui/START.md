@@ -1,14 +1,14 @@
 # Start Page Flow
 
-The start page is Friday's single entry point for first-run onboarding and incomplete assistant
-configuration. Visible onboarding should remain on `/start` until Friday has a stored assistant
+The start page is Kucedr's single entry point for first-run onboarding and incomplete assistant
+configuration. Visible onboarding should remain on `/start` until Kucedr has a stored assistant
 provider and model, then open `/home`. A restored signed-in user should be checked automatically
 and should not have to repeat Welcome or Account.
 
 ## Flow at a glance
 
 ```text
-Open Friday
+Open Kucedr
   -> Restore authentication
        -> signed in: check assistant configuration
        -> signed out: Welcome -> Account or local-only mode -> check assistant configuration
@@ -45,7 +45,7 @@ add another progress item.
 
 ### 1. Welcome
 
-For a signed-out user, the first stage should introduce Friday and provide one primary **Get
+For a signed-out user, the first stage should introduce Kucedr and provide one primary **Get
 started** action. While the authentication state is unresolved, that action should be disabled and
 labeled **Checking your session…**.
 
@@ -61,14 +61,14 @@ email confirmation, confirmation-email resend, password-reset requests, and pass
 An account is optional. Outside password recovery, the footer should provide:
 
 - **Back**, which returns to Welcome;
-- **Skip and continue**, which uses Friday in local-only mode for the current session.
+- **Skip and continue**, which uses Kucedr in local-only mode for the current session.
 
 If Supabase is not configured, the page should explain which environment variables must be
 configured while leaving Back and local-only continuation available. Password recovery should
 take priority over the normal flow and hide the footer Back and Skip actions until recovery is
 complete.
 
-After a successful sign-in or local-only continuation, Friday should check the stored assistant
+After a successful sign-in or local-only continuation, Kucedr should check the stored assistant
 configuration. A stored assistant provider and model ID count as complete and lead directly to
 Home. An incomplete configuration begins the Model stage.
 

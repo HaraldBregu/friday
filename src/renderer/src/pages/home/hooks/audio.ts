@@ -142,7 +142,7 @@ export function createRecordingId(): string {
 
 export function createRecordingFileName(mimeType: string): string {
 	const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-	return `friday-audio-${timestamp}.${extensionForMimeType(mimeType)}`;
+	return `kucedr-audio-${timestamp}.${extensionForMimeType(mimeType)}`;
 }
 
 export function normalizePermissionState(state: PermissionState): 'granted' | 'denied' | 'prompt' | 'unknown' {

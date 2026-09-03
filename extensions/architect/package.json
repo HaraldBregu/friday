@@ -1,8 +1,8 @@
 {
-	"name": "friday-architect",
+	"name": "kucedr-architect",
 	"private": true,
 	"version": "1.0.0",
-	"description": "An AI interior architecture image studio for Friday.",
+	"description": "An AI interior architecture image studio for Kucedr.",
 	"keywords": ["creative"],
 	"main": "dist/index.html",
 	"files": ["dist", "manifest.json"],
@@ -15,7 +15,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@friday/sdk": "file:../../packages/sdk",
+		"@kucedr/sdk": "file:../../packages/sdk",
 		"lucide-react": "^1.31.0",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"

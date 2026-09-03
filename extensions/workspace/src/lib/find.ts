@@ -1,4 +1,4 @@
-import type { WorkspaceTreeEntry } from '@friday/sdk';
+import type { WorkspaceTreeEntry } from '@kucedr/sdk';
 
 export function findWorkspaceEntry(
 	entries: WorkspaceTreeEntry[],

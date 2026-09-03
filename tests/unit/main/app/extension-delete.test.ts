@@ -4,7 +4,7 @@ import path from 'node:path';
 import { deleteExtension } from '../../../../src/main/extensions/extension_delete';
 
 it('deletes only a validated extension directory', () => {
-	const appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-delete-'));
+	const appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-delete-'));
 	const extension = path.join(appLocation, 'extensions', 'demo-extension');
 	const extensionData = path.join(appLocation, 'extensions-data', 'demo-extension');
 	const outside = path.join(appLocation, 'outside');

@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import {
 	app,
 	coder,
-	isFriday,
+	isKucedr,
 	type CoderAuthEvent,
 	type CoderCatalog,
 	type CoderProviderId,
 	type CoderSettings,
 	type CoderThinkingLevel,
 	type CoderToolMode,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 
 const previewSettings: CoderSettings = {
 	runtime: 'pi',
@@ -38,7 +38,7 @@ const previewCatalog: CoderCatalog = {
 };
 
 export function useConfiguration() {
-	const preview = !isFriday();
+	const preview = !isKucedr();
 	const [settings, setSettings] = useState<CoderSettings | null>(preview ? previewSettings : null);
 	const [catalog, setCatalog] = useState<CoderCatalog>(
 		preview ? previewCatalog : { providers: [] }

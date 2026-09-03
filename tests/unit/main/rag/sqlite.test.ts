@@ -3,7 +3,7 @@ import type { VectorPublication } from '../../../../src/main/agent/knowledge/rag
 
 const publication: VectorPublication = {
 	indexName: 'knowledge-base',
-	generation: 'friday-first',
+	generation: 'kucedr-first',
 	providerId: 'openai',
 	modelId: 'text-embedding-3-small',
 	dimensions: 2,
@@ -45,7 +45,7 @@ it('stores Float32 vectors, reuses source fingerprints, and performs exact cosin
 
 		expect(store.getIndex('knowledge-base')).toEqual({
 			indexName: 'knowledge-base',
-			generation: 'friday-first',
+			generation: 'kucedr-first',
 			providerId: 'openai',
 			modelId: 'text-embedding-3-small',
 			dimensions: 2,
@@ -84,12 +84,12 @@ it('keeps the previous generation active when publication fails', () => {
 		expect(() =>
 			store.publish({
 				...publication,
-				generation: 'friday-failed',
+				generation: 'kucedr-failed',
 				records: [publication.records[0], publication.records[0]],
 			})
 		).toThrow();
 
-		expect(store.getIndex('knowledge-base')?.generation).toBe('friday-first');
+		expect(store.getIndex('knowledge-base')?.generation).toBe('kucedr-first');
 		expect(store.search('knowledge-base', [1, 0], 5)).toHaveLength(2);
 	} finally {
 		store.close();
@@ -101,13 +101,13 @@ it('exports and purges only the exact active namespace or local index', () => {
 	try {
 		store.publish(publication);
 		expect(store.exportIndex('knowledge-base', 'another-generation')).toBeUndefined();
-		expect(store.exportIndex('knowledge-base', 'friday-first')).toEqual(publication);
+		expect(store.exportIndex('knowledge-base', 'kucedr-first')).toEqual(publication);
 		expect(store.purge('knowledge-base', 'another-generation')).toEqual({
 			records: 0,
 			indexRemoved: false,
 		});
 		expect(store.getIndex('knowledge-base')).toBeDefined();
-		expect(store.purge('knowledge-base', 'friday-first')).toEqual({
+		expect(store.purge('knowledge-base', 'kucedr-first')).toEqual({
 			records: 2,
 			indexRemoved: true,
 		});

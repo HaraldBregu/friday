@@ -7,7 +7,7 @@ describe('extension import', () => {
 	let appLocation: string;
 
 	beforeEach(() => {
-		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-import-'));
+		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-import-'));
 	});
 
 	afterEach(() => {
@@ -35,7 +35,7 @@ describe('extension import', () => {
 	});
 
 	it.each(['coder', 'workspace'])('rejects the privileged %s extension identifier', (id) => {
-		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-source-'));
+		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-source-'));
 		const source = path.join(sourceRoot, id);
 		fs.mkdirSync(source, { recursive: true });
 
@@ -51,7 +51,7 @@ describe('extension import', () => {
 
 	it('replaces an installed extension through a staged copy', () => {
 		const installed = path.join(appLocation, 'extensions', 'project');
-		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-source-'));
+		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-source-'));
 		const source = path.join(sourceRoot, 'project');
 		fs.mkdirSync(installed, { recursive: true });
 		fs.mkdirSync(source, { recursive: true });

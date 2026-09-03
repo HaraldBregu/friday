@@ -1,6 +1,6 @@
 import { Bot } from 'lucide-react';
 import { useMemo, useState, type DragEvent } from 'react';
-import type { WorkspaceTreeEntry } from '@friday/sdk';
+import type { WorkspaceTreeEntry } from '@kucedr/sdk';
 
 import { Badge } from '@/components/ui/badge';
 import {
@@ -30,7 +30,7 @@ const agentFilePaths = [
 	'USER.md',
 ] as const;
 const agentFilePathSet = new Set<string>(agentFilePaths);
-const agentNodeId = '__friday_workspace_agent__';
+const agentNodeId = '__kucedr_workspace_agent__';
 
 interface AppSidebarProps {
 	onCreateRequest: (parentPath: string, type: 'file' | 'directory') => void;
@@ -90,7 +90,7 @@ export function AppSidebar({
 
 	function startDrag(event: DragEvent<HTMLElement>, entry: WorkspaceTreeEntry) {
 		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.setData('application/x-friday-workspace-entry', entry.path);
+		event.dataTransfer.setData('application/x-kucedr-workspace-entry', entry.path);
 		event.dataTransfer.setData('text/plain', entry.path);
 		setDraggedEntry(entry);
 		setDropTargetPath(null);

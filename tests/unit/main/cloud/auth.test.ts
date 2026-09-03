@@ -58,7 +58,7 @@ it('reads and updates the signed-in account profile', async () => {
 		{
 			url: 'https://project.supabase.co',
 			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		},
 		{
 			persistence: 'encrypted',
@@ -98,7 +98,7 @@ it('configures Supabase to restore sessions from encrypted main-process storage'
 		{
 			url: 'https://project.supabase.co',
 			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		},
 		storage
 	);
@@ -137,7 +137,7 @@ it('restores a persisted session without exposing its tokens in public auth stat
 		{
 			url: 'https://project.supabase.co',
 			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		},
 		{
 			persistence: 'encrypted',
@@ -164,7 +164,7 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 		{
 			url: 'https://project.supabase.co',
 			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		},
 		{
 			persistence: 'encrypted',
@@ -180,7 +180,7 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 	expect(signInWithOAuth).toHaveBeenCalledWith({
 		provider: 'google',
 		options: {
-			redirectTo: 'friday://auth/callback',
+			redirectTo: 'kucedr://auth/callback',
 			skipBrowserRedirect: true,
 		},
 	});
@@ -209,7 +209,7 @@ it('exchanges a Google callback code for a token-free signed-in state', async ()
 		{
 			url: 'https://project.supabase.co',
 			publishableKey: 'sb_publishable_test',
-			redirectUrl: 'friday://auth/callback',
+			redirectUrl: 'kucedr://auth/callback',
 		},
 		{
 			persistence: 'encrypted',
@@ -222,7 +222,7 @@ it('exchanges a Google callback code for a token-free signed-in state', async ()
 	await service.initialize();
 
 	await expect(
-		service.handleDeepLink('friday://auth/callback?code=google-authorization-code')
+		service.handleDeepLink('kucedr://auth/callback?code=google-authorization-code')
 	).resolves.toEqual({
 		status: 'signedIn',
 		persistence: 'encrypted',

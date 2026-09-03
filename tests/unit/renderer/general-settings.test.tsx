@@ -22,7 +22,7 @@ jest.mock('@/contexts', () => ({
 }));
 
 beforeAll(() => {
-	Object.defineProperty(globalThis, '__APP_NAME__', { configurable: true, value: 'Friday' });
+	Object.defineProperty(globalThis, '__APP_NAME__', { configurable: true, value: 'Kucedr' });
 	Object.defineProperty(globalThis, '__APP_VERSION__', { configurable: true, value: '1.0.0' });
 });
 

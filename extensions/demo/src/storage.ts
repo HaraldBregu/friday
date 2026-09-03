@@ -1,4 +1,4 @@
-import { app } from '@friday/sdk';
+import { app } from '@kucedr/sdk';
 
 export async function runStorageTest(): Promise<string[]> {
 	const key = 'demo-storage-test';

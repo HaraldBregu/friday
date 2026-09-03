@@ -12,7 +12,7 @@ test('launches by default and accepts the slash install alias', async () => {
 			id: 'package-one',
 			name: 'Package One',
 			version: '1.0.0',
-			destination: '/tmp/friday/plugins/package-one',
+			destination: '/tmp/kucedr/plugins/package-one',
 			restartRequired: true,
 		};
 	};
@@ -24,16 +24,16 @@ test('launches by default and accepts the slash install alias', async () => {
 		tui: async () => undefined,
 	};
 
-	await createProgram(dependencies).parseAsync(['node', 'friday']);
+	await createProgram(dependencies).parseAsync(['node', 'kucedr']);
 	assert.equal(launches, 1);
 
 	await createProgram(dependencies).parseAsync([
 		'node',
-		'friday',
+		'kucedr',
 		'/install',
 		'package-one',
 		'--data-dir',
-		'/tmp/friday',
+		'/tmp/kucedr',
 	]);
-	assert.deepEqual(installs, [{ spec: 'package-one', options: { dataDir: '/tmp/friday' } }]);
+	assert.deepEqual(installs, [{ spec: 'package-one', options: { dataDir: '/tmp/kucedr' } }]);
 });

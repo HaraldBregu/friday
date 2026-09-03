@@ -15,8 +15,8 @@ test.beforeAll(async () => {
 			baseUrl: 'https://api.openai.com/v1',
 		});
 		await window.agent.setModelId('gpt-5.6-luna');
-		window.sessionStorage.setItem('friday-auth-local-only', 'true');
-		window.sessionStorage.setItem('friday-onboarding-started', 'true');
+		window.sessionStorage.setItem('kucedr-auth-local-only', 'true');
+		window.sessionStorage.setItem('kucedr-onboarding-started', 'true');
 	});
 	await page.reload();
 	await expect(page).toHaveURL(/#\/home$/);
@@ -112,14 +112,14 @@ test('the platform shortcut creates a new chat session', async () => {
 	await expect
 		.poll(() => page.evaluate(() => localStorage.getItem('chat-session-id')))
 		.not.toBe(previousSessionId);
-	await expect(page.getByRole('textbox', { name: 'Message Friday' })).toBeFocused();
+	await expect(page.getByRole('textbox', { name: 'Message Kucedr' })).toBeFocused();
 });
 
 test('the leading /plan command activates Plan mode and requires prompt text', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/home';
 	});
-	const editor = page.getByRole('textbox', { name: 'Message Friday' });
+	const editor = page.getByRole('textbox', { name: 'Message Kucedr' });
 	await editor.pressSequentially('/plan');
 	await expect(editor.locator('[data-plan-command]')).toHaveText('Plan');
 	await expect(page.getByRole('button', { name: 'Send message' })).toBeDisabled();
@@ -129,7 +129,7 @@ test('the leading /plan command activates Plan mode and requires prompt text', a
 	await expect
 		.poll(() =>
 			page.evaluate((sessionId) => {
-				const modes = JSON.parse(localStorage.getItem('friday-interaction-modes') ?? '{}');
+				const modes = JSON.parse(localStorage.getItem('kucedr-interaction-modes') ?? '{}');
 				return modes[sessionId ?? ''];
 			}, selectedSession)
 		)

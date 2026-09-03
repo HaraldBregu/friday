@@ -2,7 +2,7 @@ const mockRejectPendingToolPermissions = jest.fn();
 const mockStream = jest.fn();
 
 jest.mock('../../../../src/main/shared/agent_location', () => ({
-	agentLocation: () => '/tmp/friday-agent-cancellation',
+	agentLocation: () => '/tmp/kucedr-agent-cancellation',
 }));
 jest.mock('../../../../src/main/tasks', () => ({
 	initTask: jest.fn(),

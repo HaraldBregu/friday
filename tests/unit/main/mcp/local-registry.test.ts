@@ -10,7 +10,7 @@ import { mcpLocalDiscoveryRoots, mcpLocalRoot } from '../../../../src/main/mcp/m
 let temp: string;
 
 beforeEach(() => {
-	temp = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-mcp-'));
+	temp = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-mcp-'));
 });
 
 afterEach(() => {
@@ -143,7 +143,7 @@ describe('local MCP registry', () => {
 				name: 'Configured demo',
 				command: 'bun',
 				args: ['run', 'server.mjs'],
-				env: { DEMO_COMPANY: 'Friday Studio', DEMO_TAX_RATE: '22' },
+				env: { DEMO_COMPANY: 'Kucedr Studio', DEMO_TAX_RATE: '22' },
 				require_approval: 'always',
 				enabled: false,
 				cwd: 'runtime',
@@ -155,7 +155,7 @@ describe('local MCP registry', () => {
 			name: 'Configured demo',
 			command: 'bun',
 			args: ['run', 'server.mjs'],
-			env: { DEMO_COMPANY: 'Friday Studio', DEMO_TAX_RATE: '22' },
+			env: { DEMO_COMPANY: 'Kucedr Studio', DEMO_TAX_RATE: '22' },
 			require_approval: 'always',
 			enabled: false,
 			cwd: path.join(directory, 'runtime'),

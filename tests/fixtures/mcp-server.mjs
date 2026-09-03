@@ -3,7 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 const server = new Server(
-	{ name: 'friday-test-server', version: '1.0.0' },
+	{ name: 'kucedr-test-server', version: '1.0.0' },
 	{ capabilities: { tools: {} } }
 );
 

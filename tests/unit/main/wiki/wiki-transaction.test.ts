@@ -5,7 +5,7 @@ import { transactWiki } from '../../../../src/main/agent/knowledge/wiki/wiki_tra
 
 describe('wiki transactions', () => {
 	it('leaves the current wiki untouched when validation fails', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-transaction-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-transaction-'));
 		const target = path.join(root, 'data');
 		await import('node:fs/promises').then(({ mkdir }) => mkdir(target, { recursive: true }));
 		await writeFile(path.join(target, 'index.md'), '# Original index\n', 'utf8');
@@ -29,7 +29,7 @@ describe('wiki transactions', () => {
 	});
 
 	it('replaces the complete wiki after successful validation', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-transaction-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-transaction-'));
 		const target = path.join(root, 'data');
 		await import('node:fs/promises').then(({ mkdir }) => mkdir(target, { recursive: true }));
 		await writeFile(path.join(target, 'index.md'), '# Original index\n', 'utf8');

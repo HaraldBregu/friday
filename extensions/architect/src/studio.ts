@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { app, isFriday, models, type CatalogModel, type ImageResult } from '@friday/sdk';
+import { app, isKucedr, models, type CatalogModel, type ImageResult } from '@kucedr/sdk';
 import { buildBriefPrompt } from './brief';
 import { cropImage } from './crop';
 import { selectGenerationModel } from './generation';
@@ -22,7 +22,7 @@ const initialBrief: GenerationBrief = {
 const initialCrop: CropSettings = { ratio: 'original', zoom: 1, x: 0, y: 0 };
 
 export function useStudio(): StudioController {
-	const connected = isFriday();
+	const connected = isKucedr();
 	const [brief, setBrief] = useState(initialBrief);
 	const [crop, setCrop] = useState(initialCrop);
 	const [cropMode, setCropMode] = useState(false);
@@ -33,7 +33,7 @@ export function useStudio(): StudioController {
 	const [modelId, setModelId] = useState<string>();
 	const [busy, setBusy] = useState<string>();
 	const [message, setMessage] = useState(
-		connected ? 'Ready for a design brief.' : 'Open this extension in Friday to generate images.'
+		connected ? 'Ready for a design brief.' : 'Open this extension in Kucedr to generate images.'
 	);
 
 	useEffect(() => {
@@ -68,11 +68,11 @@ export function useStudio(): StudioController {
 	};
 
 	const generate = async (): Promise<void> => {
-		if (!connected) return setMessage('Open Architect in Friday to use the configured image model.');
+		if (!connected) return setMessage('Open Architect in Kucedr to use the configured image model.');
 		if (!brief.description.trim()) return setMessage('Describe the space you want to create.');
 		const prompt = buildBriefPrompt(brief);
 		setBusy('Generating architectural visualization…');
-		setMessage('Friday is translating the brief into a finished interior.');
+		setMessage('Kucedr is translating the brief into a finished interior.');
 		try {
 			const result = await models.image.createImage({
 				prompt,
@@ -104,13 +104,13 @@ export function useStudio(): StudioController {
 	};
 
 	const revise = async (instruction: string): Promise<void> => {
-		if (!connected) return setMessage('Open Architect in Friday to revise images with AI.');
+		if (!connected) return setMessage('Open Architect in Kucedr to revise images with AI.');
 		if (!current) return setMessage('Generate or import an image first.');
 		if (!instruction.trim()) return setMessage('Describe the design revision.');
 		const editModel = selectEditModel(catalog, providerId, modelId);
 		if (!editModel) {
 			return setMessage(
-				'Your configured image provider has no compatible edit model. Choose Google, BFL Kontext, or Qwen Image Edit in Friday Settings.'
+				'Your configured image provider has no compatible edit model. Choose Google, BFL Kontext, or Qwen Image Edit in Kucedr Settings.'
 			);
 		}
 		const prompt = buildRevisionPrompt(instruction);

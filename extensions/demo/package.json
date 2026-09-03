@@ -2,7 +2,7 @@
 	"name": "Demo",
 	"private": true,
 	"version": "1.0.0",
-	"description": "Minimal Friday app-data demo extension.",
+	"description": "Minimal Kucedr app-data demo extension.",
 	"keywords": [
 		"utility"
 	],
@@ -15,7 +15,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@friday/sdk": "file:../../packages/sdk",
+		"@kucedr/sdk": "file:../../packages/sdk",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"react": "^19.1.1",

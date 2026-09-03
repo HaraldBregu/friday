@@ -1,5 +1,5 @@
 {
-	"appTitle": "Friday",
+	"appTitle": "Kucedr",
 	"welcome": {
 		"tagline": "Un editor di testo intelligente per sviluppatori e scrittori. Crea o apri un workspace per iniziare.",
 		"freePlan": "Piano Gratuito",
@@ -27,7 +27,7 @@
 		"firstTime": {
 			"eyebrow": "Configurazione iniziale",
 			"title": "Collega i provider prima di iniziare a scrivere",
-			"description": "Aggiungi i token API che Friday deve usare su questo dispositivo. Puoi lasciare vuoto qualsiasi provider e configurarlo più tardi nelle Impostazioni.",
+			"description": "Aggiungi i token API che Kucedr deve usare su questo dispositivo. Puoi lasciare vuoto qualsiasi provider e configurarlo più tardi nelle Impostazioni.",
 			"tokenPlaceholder": "Incolla il token API",
 			"footer": "Puoi aggiornare i token dei provider in qualsiasi momento dalla pagina Provider nelle Impostazioni.",
 			"save": "Salva e continua",
@@ -228,7 +228,7 @@
 		},
 		"persona": {
 			"title": "Persona",
-			"description": "Visualizza in anteprima la persona vocale animata di Friday.",
+			"description": "Visualizza in anteprima la persona vocale animata di Kucedr.",
 			"preview": "Anteprima",
 			"previewDescription": "Scegli uno stato per visualizzarne il movimento e la risposta.",
 			"states": {
@@ -290,9 +290,9 @@
 			"menuBar": "Barra dei Menu",
 			"menuBarDescription": "Mostra o nascondi l'icona dell'app nella barra dei menu",
 			"keepAwake": "Mantieni il computer attivo",
-			"keepAwakeDescription": "Mantieni attivi il computer e lo schermo mentre Friday è in esecuzione",
+			"keepAwakeDescription": "Mantieni attivi il computer e lo schermo mentre Kucedr è in esecuzione",
 			"appData": "Dati Applicazione",
-			"appDataDescription": "Cartella in cui Friday salva impostazioni e log dell'applicazione",
+			"appDataDescription": "Cartella in cui Kucedr salva impostazioni e log dell'applicazione",
 			"openAppData": "Apri Cartella",
 			"dataFolder": "Cartella Dati",
 			"openDataFolder": "Apri Cartella"
@@ -302,7 +302,7 @@
 			"actionsDescription": "Apri i pannelli richiesti del sistema operativo e controlla il comportamento energetico in background.",
 			"mediaPermissions": {
 				"title": "Permessi media",
-				"description": "Controlla l'accesso a fotocamera e microfono usato dalle funzionalita di Friday."
+				"description": "Controlla l'accesso a fotocamera e microfono usato dalle funzionalita di Kucedr."
 			},
 			"media": {
 				"open": "Apri dettagli",
@@ -345,7 +345,7 @@
 			},
 			"capabilities": {
 				"title": "Capacita di sistema",
-				"description": "Riferimento di cio che Friday puo usare tramite il sistema operativo.",
+				"description": "Riferimento di cio che Kucedr puo usare tramite il sistema operativo.",
 				"groups": {
 					"core": {
 						"title": "Accesso desktop base",
@@ -475,11 +475,11 @@
 		},
 		"microphone": {
 			"title": "Permessi microfono",
-			"description": "Controlla se Friday puo registrare audio dal campo prompt.",
+			"description": "Controlla se Kucedr puo registrare audio dal campo prompt.",
 			"recording": "Registrazione audio",
-			"recordingDescription": "Consenti la registrazione dal microfono nel campo prompt di Friday.",
+			"recordingDescription": "Consenti la registrazione dal microfono nel campo prompt di Kucedr.",
 			"systemPermission": "Permesso di sistema",
-			"systemPermissionDescription": "Accesso al microfono del sistema operativo per Friday.",
+			"systemPermissionDescription": "Accesso al microfono del sistema operativo per Kucedr.",
 			"actions": {
 				"activate": "Attiva",
 				"check": "Controlla",
@@ -503,11 +503,11 @@
 		},
 		"camera": {
 			"title": "Permessi fotocamera",
-			"description": "Controlla se Friday puo usare la webcam.",
+			"description": "Controlla se Kucedr puo usare la webcam.",
 			"access": "Accesso fotocamera",
-			"accessDescription": "Consenti alle funzionalita di Friday di usare la fotocamera.",
+			"accessDescription": "Consenti alle funzionalita di Kucedr di usare la fotocamera.",
 			"systemPermission": "Permesso di sistema",
-			"systemPermissionDescription": "Accesso alla fotocamera del sistema operativo per Friday.",
+			"systemPermissionDescription": "Accesso alla fotocamera del sistema operativo per Kucedr.",
 			"actions": {
 				"activate": "Attiva",
 				"check": "Controlla",
@@ -681,7 +681,7 @@
 			"disabled": "Disattivata",
 			"nextRun": "Prossima",
 			"schedulesTitle": "Attivita programmate",
-			"schedulesDescription": "Pianificazioni cron persistenti salvate da Friday.",
+			"schedulesDescription": "Pianificazioni cron persistenti salvate da Kucedr.",
 			"jobsTitle": "Job registrati",
 			"jobsDescription": "Job node-cron locali al processo registrati dall'app.",
 			"status": {
@@ -834,7 +834,7 @@
 			}
 		},
 		"permissions": {
-			"locationsNotice": "Le posizioni attendibili consentono strumenti file e comandi in sandbox. Le posizioni bloccate hanno la precedenza. Friday chiede conferma prima di usare strumenti altrove o fuori dalla sandbox.",
+			"locationsNotice": "Le posizioni attendibili consentono strumenti file e comandi in sandbox. Le posizioni bloccate hanno la precedenza. Kucedr chiede conferma prima di usare strumenti altrove o fuori dalla sandbox.",
 			"locationsTitle": "Posizioni",
 			"locationsDescription": "Scegli quali strumenti possono usare ogni cartella e le relative sottocartelle.",
 			"workspaceDescription": "Area di lavoro · include sottocartelle · sempre attendibile",
@@ -923,12 +923,12 @@
 		},
 		"providers": {
 			"title": "Provider",
-			"description": "Collega i provider AI e configura i modelli usati da Friday.",
+			"description": "Collega i provider AI e configura i modelli usati da Kucedr.",
 			"storeApiKeys": "Salva le chiavi API dei provider",
 			"storeApiKeysDescription": "Aggiungi o aggiorna le chiavi API per i provider AI supportati.",
 			"modelsApiKeys": "Chiavi API dei modelli",
 			"apiKeysTitle": "Chiavi API dei modelli",
-			"apiKeysDescription": "Gestisci le chiavi API usate da Friday per i modelli AI e i provider.",
+			"apiKeysDescription": "Gestisci le chiavi API usate da Kucedr per i modelli AI e i provider.",
 			"mlModelsDescription": "Configura il tuo modello AI principale e il provider.",
 			"showOtherProviders": "Mostra altri modelli",
 			"hideOtherProviders": "Nascondi altri modelli",
@@ -951,7 +951,7 @@
 			"saving": "Salvataggio...",
 			"keySaved": "Chiave API salvata",
 			"keyMissing": "Chiave API mancante",
-			"localNote": "Le chiavi restano nella cartella dati locale di Friday e vengono usate solo per i provider collegati. Puoi revocarle in qualsiasi momento."
+			"localNote": "Le chiavi restano nella cartella dati locale di Kucedr e vengono usate solo per i provider collegati. Puoi revocarle in qualsiasi momento."
 		},
 		"searchEngine": {
 			"description": "Scegli il provider di ricerca web usato dall'assistente.",
@@ -971,7 +971,7 @@
 			"selected": "Selezionato",
 			"connect": "Connetti",
 			"use": "Usa",
-			"localNote": "Le chiavi API restano nei dati locali di Friday e vengono inviate solo al provider di ricerca selezionato.",
+			"localNote": "Le chiavi API restano nei dati locali di Kucedr e vengono inviate solo al provider di ricerca selezionato.",
 			"errors": {
 				"load": "Impossibile caricare le impostazioni del motore di ricerca.",
 				"save": "Impossibile salvare la chiave API del motore di ricerca.",
@@ -1098,7 +1098,7 @@
 			"selectModel": "Seleziona un modello",
 			"authentication": "Autenticazione",
 			"codexAuthDescription": "Collega un account ChatGPT Plus o Pro con il flusso dispositivo Codex.",
-			"apiKeyDescription": "Usa la chiave API salvata nelle impostazioni Provider di Friday.",
+			"apiKeyDescription": "Usa la chiave API salvata nelle impostazioni Provider di Kucedr.",
 			"connected": "Collegato",
 			"notConnected": "Non collegato",
 			"connect": "Collega",
@@ -1123,12 +1123,12 @@
 			"saving": "Salvataggio…",
 			"saved": "Salvato",
 			"deviceCode": "Usa questo codice dispositivo per autorizzare Codex:",
-			"deviceCodeHelp": "OpenAI può indicare che il codice proviene dal terminale; Friday mostra qui lo stesso codice. Copialo nella pagina di accesso.",
+			"deviceCodeHelp": "OpenAI può indicare che il codice proviene dal terminale; Kucedr mostra qui lo stesso codice. Copialo nella pagina di accesso.",
 			"copyCode": "Copia codice",
 			"waitingForAuthorization": "In attesa dell'autorizzazione…",
 			"completeLogin": "Completa l'accesso nel browser.",
 			"openLogin": "Apri accesso",
-			"toolWarning": "Pi non fornisce una sandbox. Gli strumenti di coding completo usano i permessi file e shell del tuo account desktop e non applicano le regole di autorizzazione dell'Agent di Friday.",
+			"toolWarning": "Pi non fornisce una sandbox. Gli strumenti di coding completo usano i permessi file e shell del tuo account desktop e non applicano le regole di autorizzazione dell'Agent di Kucedr.",
 			"apiKeyMissing": "Salva una chiave API per {{provider}} nei Provider prima di avviare il coder.",
 			"loadError": "Impossibile caricare le impostazioni Coder.",
 			"saveError": "Impossibile salvare le impostazioni Coder.",
@@ -1137,16 +1137,16 @@
 		},
 		"modelServices": {
 			"title": "Servizi modello",
-			"description": "Rivedi i servizi modello con incarichi specifici disponibili in Friday.",
+			"description": "Rivedi i servizi modello con incarichi specifici disponibili in Kucedr.",
 			"subtitle": "Configura le assegnazioni dei modelli che ogni servizio usa per il suo incarico.",
 			"detailsTitle": "Dettagli servizio modello",
 			"history": "Cronologia",
 			"allModelServices": "Tutti i servizi modello",
 			"identity": "Identita",
 			"configuration": "Configurazione",
-			"fridayBreadcrumb": "Friday",
+			"kucedrBreadcrumb": "Kucedr",
 			"assistantName": "Agent",
-			"fridayDescription": "Chat, strumenti e piani",
+			"kucedrDescription": "Chat, strumenti e piani",
 			"speechTranscriberName": "Trascrivi",
 			"speechTranscriberDescription": "Modelli speech-to-text",
 			"speechConfigurationSubtitle": "Scegli provider e modello di trascrizione.",
@@ -1168,14 +1168,14 @@
 			"testRealtimeStart": "Avvia",
 			"testRealtimeStop": "Ferma",
 			"testTranscribeDescription": "Prova la trascrizione in tempo reale e da registrazione con i modelli selezionati.",
-			"testTranscribeHint": "Esempio: premi Registra e di' \"Ciao Friday, prova uno due tre\", poi ferma per vedere la trascrizione.",
+			"testTranscribeHint": "Esempio: premi Registra e di' \"Ciao Kucedr, prova uno due tre\", poi ferma per vedere la trascrizione.",
 			"testTranscribeRecord": "Registra",
 			"testTranscribeStop": "Ferma e trascrivi",
 			"testTranscribeTranscribing": "Trascrizione…",
 			"testTranscribeEmpty": "Nessun parlato rilevato.",
 			"testTranscribeError": "Trascrizione vocale non riuscita.",
 			"testVoiceDescription": "Pronuncia un testo di esempio con il modello vocale selezionato.",
-			"testVoiceExample": "Ciao, sono Friday. Questo è un esempio della voce selezionata.",
+			"testVoiceExample": "Ciao, sono Kucedr. Questo è un esempio della voce selezionata.",
 			"testVoicePlaceholder": "Inserisci il testo da pronunciare",
 			"testVoiceSpeak": "Pronuncia",
 			"testVoiceSpeaking": "Pronuncia in corso…",
@@ -1228,7 +1228,7 @@
 			"thinkingMode": "Modalità Ragionamento",
 			"thinkingModeDescription": "Abilita il ragionamento esteso per attività complesse",
 			"effort": "Impegno di ragionamento",
-			"effortDescription": "Budget di ragionamento per le risposte di Friday.",
+			"effortDescription": "Budget di ragionamento per le risposte di Kucedr.",
 			"effortOptions": {
 				"none": "Nessuno",
 				"minimal": "Minimo",
@@ -1251,7 +1251,7 @@
 			"openFolderError": "Impossibile aprire la cartella delle extension.",
 			"deleteAction": "Elimina {{name}}",
 			"deleteTitle": "Elimina extension",
-			"deleteDescription": "Eliminare {{name}}? La cartella verrà rimossa definitivamente da Friday e non potrà essere recuperata.",
+			"deleteDescription": "Eliminare {{name}}? La cartella verrà rimossa definitivamente da Kucedr e non potrà essere recuperata.",
 			"deleting": "Eliminazione...",
 			"deleteError": "Impossibile eliminare l'extension.",
 			"refresh": "Aggiorna",
@@ -1272,7 +1272,7 @@
 		},
 		"plugins": {
 			"title": "Plugin installati",
-			"description": "Plugin che aggiungono provider, abilità, extension e altro a Friday.",
+			"description": "Plugin che aggiungono provider, abilità, extension e altro a Kucedr.",
 			"refresh": "Aggiorna",
 			"upload": "Carica plugin",
 			"uploading": "Caricamento...",
@@ -1285,7 +1285,7 @@
 		},
 		"skills": {
 			"title": "Abilità installate",
-			"description": "Carica, scarica, ispeziona o rimuovi le abilità locali disponibili per Friday.",
+			"description": "Carica, scarica, ispeziona o rimuovi le abilità locali disponibili per Kucedr.",
 			"refresh": "Aggiorna",
 			"upload": "Carica abilità",
 			"uploading": "Caricamento...",
@@ -1317,7 +1317,7 @@
 			"detailDiagnostics": "Diagnostica",
 			"empty": "Nessuna abilità installata",
 			"emptyDescription": "Importa una cartella che contiene SKILL.md.",
-			"confirmDelete": "Eliminare {{name}}? La cartella dell'abilità verra rimossa da Friday.",
+			"confirmDelete": "Eliminare {{name}}? La cartella dell'abilità verra rimossa da Kucedr.",
 			"loadError": "Impossibile caricare le abilità.",
 			"uploadError": "Impossibile caricare l'abilità.",
 			"downloadError": "Impossibile scaricare l'abilità.",
@@ -1326,9 +1326,9 @@
 			"openFolderError": "Impossibile aprire la cartella dell'abilità."
 		},
 		"channels": {
-			"description": "Scegli quali canali di messaggistica Friday puo collegare.",
+			"description": "Scegli quali canali di messaggistica Kucedr puo collegare.",
 			"defaultTitle": "Canale predefinito",
-			"defaultDescription": "Canale usato da Friday quando non ne viene indicato uno.",
+			"defaultDescription": "Canale usato da Kucedr quando non ne viene indicato uno.",
 			"defaultPlaceholder": "Nessun canale predefinito",
 			"errors": {
 				"load": "Impossibile caricare i canali.",
@@ -1383,7 +1383,7 @@
 			"removeGroupAllowFrom": "Rimuovi {{value}}",
 			"noGroupAllowFrom": "Nessuna route gruppo consentita.",
 			"llmModel": "Modello LLM",
-			"llmModelDescription": "Modello usato da Friday per ragionare e rispondere ai messaggi.",
+			"llmModelDescription": "Modello usato da Kucedr per ragionare e rispondere ai messaggi.",
 			"sttModel": "Modello STT",
 			"sttModelDescription": "Modello vocale usato per trascrivere i messaggi vocali in ingresso.",
 			"ttsModel": "Modello TTS",
@@ -1439,13 +1439,13 @@
 			"enabled": "Abilita RAG",
 			"enabledDescription": "Indicizzazione dei documenti e ricerca dell'assistente.",
 			"embeddingConsent": "Invia il testo dei documenti per gli embedding",
-			"embeddingConsentDescription": "Friday può inviare parti dei documenti al provider di embedding. Le modifiche a provider o modello richiedono un nuovo consenso.",
+			"embeddingConsentDescription": "Kucedr può inviare parti dei documenti al provider di embedding. Le modifiche a provider o modello richiedono un nuovo consenso.",
 			"embeddingModelTitle": "Modello di embedding",
 			"embeddingModelDescription": "Modello usato per incorporare i documenti RAG per la ricerca vettoriale.",
 			"configurationTitle": "Configurazione",
 			"indexName": "Nome indice",
 			"indexNameDescription": "Nome dell'indice locale, usato anche dal mirror Pinecone.",
-			"indexNamePlaceholder": "friday",
+			"indexNamePlaceholder": "kucedr",
 			"documentsDescription": "I file di testo nelle cartelle e sottocartelle selezionate vengono suddivisi, incorporati e salvati localmente.",
 			"sourceFolder": "Cartelle sorgente",
 			"sourcePlaceholder": "Scegli una o più cartelle contenenti file di testo",
@@ -1456,7 +1456,7 @@
 			"saveError": "Impossibile salvare le impostazioni RAG.",
 			"scheduleTitle": "Automazione",
 			"scheduleFrequency": "Frequenza di indicizzazione",
-			"scheduleDescription": "Scegli ogni quanto Friday controlla le cartelle selezionate per file nuovi o modificati.",
+			"scheduleDescription": "Scegli ogni quanto Kucedr controlla le cartelle selezionate per file nuovi o modificati.",
 			"scheduleOptions": {
 				"off": "Disattivata",
 				"every4h": "Ogni 4 ore",
@@ -1488,11 +1488,11 @@
 			"ragIndex": "Indice locale completo della conoscenza",
 			"ragIndexDescription": "Tutti i namespace, le parti e i vettori locali. I dati remoti sono esclusi.",
 			"ragNamespace": "Namespace locale attivo",
-			"ragNamespaceDescription": "Solo il namespace Friday locale attualmente pubblicato.",
+			"ragNamespaceDescription": "Solo il namespace Kucedr locale attualmente pubblicato.",
 			"remoteNamespace": "Namespace Pinecone",
-			"remoteNamespaceDescription": "Solo il namespace remoto di Friday corrispondente; l'indice Pinecone non viene mai eliminato.",
-			"remoteAllNamespaces": "Tutti i namespace Pinecone di Friday",
-			"remoteAllNamespacesDescription": "Tutti i namespace di Friday nell'indice Pinecone configurato; gli altri namespace e l'indice restano intatti.",
+			"remoteNamespaceDescription": "Solo il namespace remoto di Kucedr corrispondente; l'indice Pinecone non viene mai eliminato.",
+			"remoteAllNamespaces": "Tutti i namespace Pinecone di Kucedr",
+			"remoteAllNamespacesDescription": "Tutti i namespace di Kucedr nell'indice Pinecone configurato; gli altri namespace e l'indice restano intatti.",
 			"wiki": "Wiki gestita",
 			"wikiDescription": "Pagine compilate e stato dell'app per la destinazione configurata.",
 			"loadError": "Impossibile caricare gli ambiti di gestione dati.",
@@ -1511,7 +1511,7 @@
 			"requireReview": "Rivedi le modifiche importanti",
 			"requireReviewDescription": "Richiedi approvazione per le modifiche importanti.",
 			"lintOnStartup": "Controlla all'avvio",
-			"lintOnStartupDescription": "Controlla la Wiki all'avvio di Friday.",
+			"lintOnStartupDescription": "Controlla la Wiki all'avvio di Kucedr.",
 			"configurationTitle": "Configurazione",
 			"modelTitle": "Modello Wiki",
 			"modelDescription": "Scegli il modello che mantiene la Wiki.",
@@ -1523,7 +1523,7 @@
 			"pickTarget": "Scegli la cartella della wiki generata",
 			"scheduleTitle": "Automazione",
 			"scheduleFrequency": "Frequenza di generazione",
-			"scheduleDescription": "Scegli ogni quanto Friday elabora le fonti nuove o modificate.",
+			"scheduleDescription": "Scegli ogni quanto Kucedr elabora le fonti nuove o modificate.",
 			"scheduleOptions": {
 				"off": "Disattivata",
 				"every4h": "Ogni 4 ore",
@@ -2363,7 +2363,7 @@
 		"saveError": "Impossibile salvare le modifiche. Il campo è ancora aperto per riprovare."
 	},
 	"toolPermission": {
-		"title": "Consentire a Friday di {{action}}?",
+		"title": "Consentire a Kucedr di {{action}}?",
 		"hostAccess": "Accesso host",
 		"destructiveOperation": "Operazione distruttiva",
 		"outsideLocations": "Fuori dalle posizioni attendibili",

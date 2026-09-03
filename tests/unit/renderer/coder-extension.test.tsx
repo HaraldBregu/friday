@@ -1,14 +1,14 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { app, coder as coderApi } from '@friday/sdk';
+import { app, coder as coderApi } from '@kucedr/sdk';
 import { useCoderWorkspace } from '../../../extensions/coder/src/hooks/workspace';
 import { useConfiguration } from '../../../extensions/coder/src/hooks/configuration';
 import { useProjectInstructions } from '../../../extensions/coder/src/hooks/instructions';
 import { canLeaveInstructions } from '../../../extensions/coder/src/navigation';
 
 jest.mock(
-	'@friday/sdk',
+	'@kucedr/sdk',
 	() => ({
-		isFriday: () => true,
+		isKucedr: () => true,
 		app: {
 			openExternalUrl: jest.fn(),
 			getExtensionStoreValue: jest.fn(),
@@ -39,8 +39,8 @@ jest.mock(
 
 const project = {
 	id: 'project-1',
-	name: 'friday',
-	directory: '/workspace/friday',
+	name: 'kucedr',
+	directory: '/workspace/kucedr',
 	kind: 'agent-workspace' as const,
 	createdAt: '2026-08-20T10:00:00.000Z',
 	lastOpenedAt: '2026-08-20T10:00:00.000Z',
@@ -73,7 +73,7 @@ const otherSession = {
 
 const projectInstructions = {
 	projectId: project.id,
-	activeFilePath: '/workspace/friday/AGENTS.md',
+	activeFilePath: '/workspace/kucedr/AGENTS.md',
 	activeFileName: 'AGENTS.md',
 	content: '# Initial',
 	exists: true,
@@ -81,7 +81,7 @@ const projectInstructions = {
 	revision: 'revision-1',
 	loadedSources: [
 		{ path: '/global/AGENTS.md', scope: 'coder-global' as const },
-		{ path: '/workspace/friday/AGENTS.md', scope: 'workspace' as const },
+		{ path: '/workspace/kucedr/AGENTS.md', scope: 'workspace' as const },
 	],
 };
 
@@ -294,12 +294,12 @@ it('allows explicit empty-file creation and preserves dirty content after a save
 
 	act(() => result.current.setContent('# Local edit'));
 	(coderApi.saveProjectInstructions as jest.Mock).mockRejectedValueOnce(
-		new Error('Coder project instructions changed outside Friday. Reload before saving.')
+		new Error('Coder project instructions changed outside Kucedr. Reload before saving.')
 	);
 	await act(async () => result.current.save());
 	expect(result.current.content).toBe('# Local edit');
 	expect(result.current.dirty).toBe(true);
-	expect(result.current.error).toContain('changed outside Friday');
+	expect(result.current.error).toContain('changed outside Kucedr');
 });
 
 it('guards navigation away from dirty instructions', () => {

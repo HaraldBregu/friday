@@ -1,7 +1,7 @@
 {
-	"productName": "Friday",
-	"appId": "com.friday.friday",
-	"copyright": "© 2026 Friday Project. All rights reserved.",
+	"productName": "Kucedr",
+	"appId": "com.kucedr.kucedr",
+	"copyright": "© 2026 Kucedr Project. All rights reserved.",
 	"files": [
 		"out/**",
 		"resources/**",
@@ -14,17 +14,17 @@
 	"fileAssociations": [
 		{
 			"ext": "tsrct",
-			"name": "Friday Document",
-			"description": "Friday Document File",
-			"mimeType": "application/x-friday-document",
+			"name": "Kucedr Document",
+			"description": "Kucedr Document File",
+			"mimeType": "application/x-kucedr-document",
 			"role": "Manager",
 			"icon": "./resources/icons/icon.png"
 		}
 	],
 	"protocols": [
 		{
-			"name": "Friday Authentication",
-			"schemes": ["friday"]
+			"name": "Kucedr Authentication",
+			"schemes": ["kucedr"]
 		}
 	],
 	"publish": null,
@@ -51,28 +51,28 @@
 		"icon": "./resources/icons/mac/icon.icns",
 		"extendInfo": {
 			"LSApplicationCategoryType": "public.app-category.utilities",
-			"NSMicrophoneUsageDescription": "Friday needs access to your microphone for audio recording features.",
-			"NSCameraUsageDescription": "Friday needs access to your camera for video recording features.",
-			"NSBluetoothAlwaysUsageDescription": "Friday needs access to Bluetooth to connect and manage Bluetooth devices.",
-			"NSBluetoothPeripheralUsageDescription": "Friday needs access to Bluetooth peripherals for device connectivity.",
+			"NSMicrophoneUsageDescription": "Kucedr needs access to your microphone for audio recording features.",
+			"NSCameraUsageDescription": "Kucedr needs access to your camera for video recording features.",
+			"NSBluetoothAlwaysUsageDescription": "Kucedr needs access to Bluetooth to connect and manage Bluetooth devices.",
+			"NSBluetoothPeripheralUsageDescription": "Kucedr needs access to Bluetooth peripherals for device connectivity.",
 			"CFBundleDocumentTypes": [
 				{
-					"CFBundleTypeName": "Friday File",
+					"CFBundleTypeName": "Kucedr File",
 					"CFBundleTypeIconFile": "fileIcon.icns",
 					"CFBundleTypeExtensions": ["tsrct"],
 					"CFBundleTypeRole": "Manager",
 					"LSHandlerRank": "Owner",
-					"LSItemContentTypes": ["com.friday.friday.document"]
+					"LSItemContentTypes": ["com.kucedr.kucedr.document"]
 				}
 			],
 			"UTExportedTypeDeclarations": [
 				{
-					"UTTypeIdentifier": "com.friday.friday.document",
-					"UTTypeDescription": "Friday File",
+					"UTTypeIdentifier": "com.kucedr.kucedr.document",
+					"UTTypeDescription": "Kucedr File",
 					"UTTypeConformsTo": ["public.data"],
 					"UTTypeTagSpecification": {
 						"public.filename-extension": ["tsrct"],
-						"public.mime-type": ["application/x-friday-document"]
+						"public.mime-type": ["application/x-kucedr-document"]
 					}
 				}
 			]
@@ -112,22 +112,22 @@
 		"category": "Utility",
 		"artifactName": "${productName}-${version}.${ext}",
 		"icon": "./resources/icons/png",
-		"maintainer": "Friday Project",
+		"maintainer": "Kucedr Project",
 		"synopsis": "Your desktop AI copilot for everyday tasks",
-		"description": "Friday is a cross-platform desktop AI assistant that turns conversations into actions. Type or speak a request, attach images or PDFs, and let the agent work with files, run commands, research the web, create media, or automate recurring tasks.",
-		"vendor": "Friday Project",
-		"executableName": "friday-desktop",
+		"description": "Kucedr is a cross-platform desktop AI assistant that turns conversations into actions. Type or speak a request, attach images or PDFs, and let the agent work with files, run commands, research the web, create media, or automate recurring tasks.",
+		"vendor": "Kucedr Project",
+		"executableName": "kucedr-desktop",
 		"desktop": {
 			"entry": {
 				"Type": "Application",
-				"Name": "Friday",
+				"Name": "Kucedr",
 				"Comment": "Your desktop AI copilot for everyday tasks",
-				"Icon": "friday",
+				"Icon": "kucedr",
 				"Terminal": false,
 				"Categories": "Office;WordProcessor;AI;",
-				"MimeType": "application/x-friday-document;",
+				"MimeType": "application/x-kucedr-document;",
 				"StartupNotify": true,
-				"StartupWMClass": "Friday"
+				"StartupWMClass": "Kucedr"
 			}
 		},
 		"extraResources": [
@@ -140,7 +140,7 @@
 	},
 	"deb": {
 		"packageCategory": "utils",
-		"maintainer": "Friday Project <contact@friday.org>",
+		"maintainer": "Kucedr Project <contact@kucedr.org>",
 		"depends": [
 			"libgtk-3-0",
 			"libnss3",
@@ -176,7 +176,7 @@
 		"artifactName": "${productName}.${ext}",
 		"forceCodeSigning": true,
 		"signtoolOptions": {
-			"publisherName": "Friday Project"
+			"publisherName": "Kucedr Project"
 		},
 		"requestedExecutionLevel": "asInvoker",
 		"extraResources": [
@@ -191,7 +191,7 @@
 		"oneClick": false,
 		"allowToChangeInstallationDirectory": true,
 		"createDesktopShortcut": true,
-		"shortcutName": "Friday",
+		"shortcutName": "Kucedr",
 		"multiLanguageInstaller": true,
 		"warningsAsErrors": false,
 		"deleteAppDataOnUninstall": false,

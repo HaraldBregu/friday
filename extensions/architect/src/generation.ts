@@ -1,4 +1,4 @@
-import type { CatalogModel } from '@friday/sdk';
+import type { CatalogModel } from '@kucedr/sdk';
 
 export function selectGenerationModel(
 	catalog: CatalogModel[],

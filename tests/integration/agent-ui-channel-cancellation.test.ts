@@ -7,7 +7,7 @@ const mockAdapterOnStatus = jest.fn();
 let mockInboundHandler: ((message: unknown) => void) | undefined;
 
 jest.mock('../../src/main/shared/agent_location', () => ({
-	agentLocation: () => '/tmp/friday-agent-integration',
+	agentLocation: () => '/tmp/kucedr-agent-integration',
 }));
 jest.mock('../../src/main/tasks', () => ({
 	initTask: jest.fn(),

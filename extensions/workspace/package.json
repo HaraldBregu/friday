@@ -2,7 +2,7 @@
 	"name": "workspace",
 	"private": true,
 	"version": "1.0.0",
-	"description": "Friday workspace extension.",
+	"description": "Kucedr workspace extension.",
 	"keywords": [
 		"utility"
 	],
@@ -21,7 +21,7 @@
 		"@codemirror/state": "^6.7.1",
 		"@codemirror/view": "^6.43.6",
 		"@excalidraw/excalidraw": "^0.18.1",
-		"@friday/sdk": "file:../../packages/sdk",
+		"@kucedr/sdk": "file:../../packages/sdk",
 		"@iconify-json/logos": "^1.2.12",
 		"@iconify-json/mdi": "^1.2.3",
 		"@lezer/highlight": "^1.2.3",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { app, isFriday, type AppThemeData } from '@friday/sdk';
+import { app, isKucedr, type AppThemeData } from '@kucedr/sdk';
 
 const fallbackTheme: AppThemeData = {
 	themeMode: 'light',
@@ -20,10 +20,10 @@ const themeVariables = [
 	['focus', 'ring'],
 ] as const;
 
-export function useFridayTheme(): AppThemeData {
+export function useKucedrTheme(): AppThemeData {
 	const [theme, setTheme] = useState(fallbackTheme);
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		let active = true;
 		app
 			.getThemeData()

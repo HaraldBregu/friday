@@ -9,7 +9,7 @@ jest.mock('../../../../src/main/agent/knowledge/wiki', () => ({ getWikiRepositor
 import { DataController } from '../../../../src/main/data/data_controller';
 
 it('exports and purges only manifest-owned pages and target-scoped wiki state', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-data-wiki-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-data-wiki-'));
 	const target = path.join(root, 'target');
 	const state = path.join(root, 'managed', 'state');
 	const evidence = path.join(root, 'managed', 'evidence');

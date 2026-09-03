@@ -27,7 +27,7 @@ export class Tray {
 		const icon = nativeImage.createFromPath(path.join(resourceRoot(), 'resources/icons/icon.png'));
 
 		this.tray = new ElectronTray(icon.resize({ width: 16, height: 16 }));
-		this.tray.setToolTip('Friday');
+		this.tray.setToolTip('Kucedr');
 
 		this.tray.on('click', () => {
 			this.callbacks.onToggleApp();
@@ -84,7 +84,7 @@ export class Tray {
 
 		this.contextMenu = Menu.buildFromTemplate([
 			{
-				label: isVisible ? m.hideFriday || 'Hide Friday' : m.showFriday || 'Show Friday',
+				label: isVisible ? m.hideKucedr || 'Hide Kucedr' : m.showKucedr || 'Show Kucedr',
 				click: () => this.callbacks.onToggleApp(),
 			},
 			{

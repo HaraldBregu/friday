@@ -99,8 +99,8 @@ jobs:
         shell: pwsh
         run: |
           $version = '${{ needs.prepare.outputs.version }}'
-          $installer = "dist/Friday-$version.exe"
-          $portable = "dist/Friday-Portable-$version-x64.exe"
+          $installer = "dist/Kucedr-$version.exe"
+          $portable = "dist/Kucedr-Portable-$version-x64.exe"
           foreach ($artifact in @($installer, $portable)) {
             if (!(Test-Path $artifact -PathType Leaf) -or (Get-Item $artifact).Length -eq 0) {
               throw "Missing or empty Windows release artifact: $artifact"
@@ -115,12 +115,12 @@ jobs:
         shell: bash
         run: |
           version='${{ needs.prepare.outputs.version }}'
-          test -s "dist/Friday-${version}.AppImage"
-          test -s "dist/Friday-${version}.tar.gz"
-          test -s "dist/Friday-${version}.deb"
+          test -s "dist/Kucedr-${version}.AppImage"
+          test -s "dist/Kucedr-${version}.tar.gz"
+          test -s "dist/Kucedr-${version}.deb"
       - uses: actions/upload-artifact@v7
         with:
-          name: friday-${{ needs.prepare.outputs.version }}-${{ matrix.platform }}
+          name: kucedr-${{ needs.prepare.outputs.version }}-${{ matrix.platform }}
           path: |
             dist/*.dmg
             dist/*.pkg
@@ -142,7 +142,7 @@ jobs:
           path: dist
       - uses: softprops/action-gh-release@v3
         with:
-          name: Friday v${{ needs.prepare.outputs.version }}
+          name: Kucedr v${{ needs.prepare.outputs.version }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: dist/*

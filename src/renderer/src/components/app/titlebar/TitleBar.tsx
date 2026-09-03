@@ -78,7 +78,7 @@ export const TitleBar = React.memo(function TitleBar({
 			aria-label={homeButtonLabel}
 		>
 			<GradientSphere size={18} mode="css" className="pointer-events-none" />
-			Friday
+			Kucedr
 		</Button>
 	) : !isOnboarding ? (
 		<Button

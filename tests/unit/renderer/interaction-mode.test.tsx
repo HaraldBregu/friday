@@ -43,12 +43,12 @@ it('migrates the home alias mode to the resolved session key', async () => {
 
 	view.rerender(<Harness sessionId="resolved" />);
 	expect(screen.getByText('plan')).toBeInTheDocument();
-	const stored = JSON.parse(localStorage.getItem('friday-interaction-modes') ?? '{}');
+	const stored = JSON.parse(localStorage.getItem('kucedr-interaction-modes') ?? '{}');
 	expect(stored).toEqual({ home: 'plan', resolved: 'plan' });
 
 	view.rerender(<Harness sessionId="home" />);
 	await user.click(screen.getByRole('button', { name: 'Finish' }));
-	expect(JSON.parse(localStorage.getItem('friday-interaction-modes') ?? '{}')).toEqual({
+	expect(JSON.parse(localStorage.getItem('kucedr-interaction-modes') ?? '{}')).toEqual({
 		resolved: 'plan',
 	});
 });

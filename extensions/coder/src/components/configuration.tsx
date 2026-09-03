@@ -4,7 +4,7 @@ import {
 	type CoderProviderId,
 	type CoderThinkingLevel,
 	type CoderToolMode,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 import { AlertTriangle, Check, Copy, ExternalLink } from 'lucide-react';
 
 import { Alert } from '@/components/ui/alert';
@@ -111,7 +111,7 @@ export function Configuration({ onDone }: { onDone: () => void }) {
 								description={
 									provider.id === 'openai-codex'
 										? 'ChatGPT subscription device login'
-										: 'Uses the API key saved in Friday Providers'
+										: 'Uses the API key saved in Kucedr Providers'
 								}
 							>
 								<span className="flex items-center gap-1 text-[11px] text-muted-foreground">

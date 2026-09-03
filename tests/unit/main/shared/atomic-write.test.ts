@@ -4,7 +4,7 @@ import path from 'node:path';
 import { atomicWrite } from '../../../../src/main/shared/atomic_write';
 
 it('replaces a text file atomically and removes its temporary file', async () => {
-	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-atomic-write-'));
+	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-atomic-write-'));
 	const target = path.join(directory, 'state.md');
 	try {
 		await fs.writeFile(target, 'before', 'utf8');
@@ -17,7 +17,7 @@ it('replaces a text file atomically and removes its temporary file', async () =>
 });
 
 it('keeps the target intact and cleans up when replacement fails', async () => {
-	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-atomic-write-'));
+	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-atomic-write-'));
 	const target = path.join(directory, 'state.md');
 	await fs.writeFile(target, 'before', 'utf8');
 	const rename = jest.spyOn(fs, 'rename').mockRejectedValueOnce(new Error('rename failed'));

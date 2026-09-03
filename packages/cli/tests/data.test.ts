@@ -1,26 +1,26 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { fridayDataDirectory } from '../src/data.js';
+import { kucedrDataDirectory } from '../src/data.js';
 
 test('resolves the Electron userData location on each platform', () => {
 	assert.equal(
-		fridayDataDirectory({ platform: 'darwin', home: '/Users/ada', env: {} }),
-		'/Users/ada/Library/Application Support/Friday'
+		kucedrDataDirectory({ platform: 'darwin', home: '/Users/ada', env: {} }),
+		'/Users/ada/Library/Application Support/Kucedr'
 	);
 	assert.equal(
-		fridayDataDirectory({
+		kucedrDataDirectory({
 			platform: 'win32',
 			home: 'C:\\Users\\Ada',
 			env: { APPDATA: 'C:\\Users\\Ada\\AppData\\Roaming' },
 		}),
-		'C:\\Users\\Ada\\AppData\\Roaming/Friday'
+		'C:\\Users\\Ada\\AppData\\Roaming/Kucedr'
 	);
 	assert.equal(
-		fridayDataDirectory({
+		kucedrDataDirectory({
 			platform: 'linux',
 			home: '/home/ada',
 			env: { XDG_CONFIG_HOME: '/tmp/config' },
 		}),
-		'/tmp/config/Friday'
+		'/tmp/config/Kucedr'
 	);
 });

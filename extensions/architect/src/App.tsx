@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { isFriday, win } from '@friday/sdk';
+import { isKucedr, win } from '@kucedr/sdk';
 import { Brief } from './components/brief';
 import { Canvas } from './components/canvas';
 import { Header } from './components/header';
@@ -11,7 +11,7 @@ export default function App() {
 	useTheme();
 	const studio = useStudio();
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		win.setTitlebarOptions({ title: 'Architect', leftButtons: [], rightButtons: [] });
 		return () => win.setTitlebarOptions(null);
 	}, []);

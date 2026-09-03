@@ -33,7 +33,7 @@ function controlRun(runId: string): ControlledRun {
 }
 
 jest.mock('../../../../src/main/shared/agent_location', () => ({
-	agentLocation: () => '/tmp/friday-agent-session-lifecycle',
+	agentLocation: () => '/tmp/kucedr-agent-session-lifecycle',
 }));
 jest.mock('../../../../src/main/tasks', () => ({
 	initTask: jest.fn(),

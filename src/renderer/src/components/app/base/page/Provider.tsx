@@ -22,7 +22,7 @@ import {
 const SIDEBAR_COOKIE_NAME = 'page_sidebar_layout_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_KEYBOARD_SHORTCUT = '';
-const SIDEBAR_WIDTH_STORAGE_KEY = 'friday_sidebar_width';
+const SIDEBAR_WIDTH_STORAGE_KEY = 'kucedr_sidebar_width';
 
 interface ProviderProps {
 	readonly children: ReactNode;

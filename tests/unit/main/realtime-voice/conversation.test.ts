@@ -8,7 +8,7 @@ import { realtimeVoiceHistory } from '../../../../src/main/agent/realtime_voice/
 const SESSION_ID = '11111111-1111-4111-8111-111111111111';
 
 it('persists only finalized voice transcripts at their reserved turn position', () => {
-	const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-voice-conversation-'));
+	const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-voice-conversation-'));
 	const location = path.join(temporaryRoot, 'agent');
 	try {
 		const conversation = realtimeVoiceConversationFactory({ location })(SESSION_ID, 'model');

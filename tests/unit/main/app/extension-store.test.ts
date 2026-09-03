@@ -7,7 +7,7 @@ describe('extension storage', () => {
 	let root: string;
 
 	beforeEach(() => {
-		root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-store-'));
+		root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-store-'));
 	});
 
 	afterEach(() => {
@@ -91,7 +91,7 @@ describe('extension storage', () => {
 		if (process.platform === 'win32') return;
 		const storage = new ExtensionStorage(root);
 		await storage.writeFile('draw', 'safe/file.bin', new Uint8Array([1]));
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-outside-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-outside-'));
 		try {
 			fs.rmSync(path.join(root, 'draw', 'files', 'safe'), { recursive: true });
 			fs.symlinkSync(outside, path.join(root, 'draw', 'files', 'safe'));
@@ -125,7 +125,7 @@ describe('extension storage', () => {
 		const storage = new ExtensionStorage(root);
 		storage.set('draw', 'config', { ready: true });
 		const namespace = path.join(root, 'draw');
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-values-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-values-'));
 		try {
 			fs.rmSync(namespace, { recursive: true });
 			fs.symlinkSync(outside, namespace);

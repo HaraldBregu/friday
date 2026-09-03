@@ -16,7 +16,7 @@ import { CoderInstructions } from '../../../../src/main/coder/instructions';
 const timestamp = '2026-08-22T08:00:00.000Z';
 
 it('uses Pi filename precedence, reports inherited sources, and isolates workspace saves', async () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-instructions-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-instructions-'));
 	const agentDirectory = path.join(root, 'coder-global');
 	const projectsDirectory = path.join(root, 'projects');
 	const firstDirectory = path.join(projectsDirectory, 'first');
@@ -80,7 +80,7 @@ it('uses Pi filename precedence, reports inherited sources, and isolates workspa
 });
 
 it('creates AGENTS.md and preserves an explicitly saved empty file', async () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-instructions-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-instructions-'));
 	const agentDirectory = path.join(root, 'coder-global');
 	const projectDirectory = path.join(root, 'project');
 	mkdirSync(agentDirectory);
@@ -115,7 +115,7 @@ it('creates AGENTS.md and preserves an explicitly saved empty file', async () =>
 });
 
 it('rejects stale revisions without overwriting external edits', async () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-instructions-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-instructions-'));
 	const agentDirectory = path.join(root, 'coder-global');
 	const projectDirectory = path.join(root, 'project');
 	mkdirSync(agentDirectory);
@@ -136,13 +136,13 @@ it('rejects stale revisions without overwriting external edits', async () => {
 	writeFileSync(filePath, 'external edit');
 
 	await expect(
-		instructions.save(project, { content: 'Friday edit', expectedRevision: initial.revision })
-	).rejects.toThrow('changed outside Friday');
+		instructions.save(project, { content: 'Kucedr edit', expectedRevision: initial.revision })
+	).rejects.toThrow('changed outside Kucedr');
 	expect(readFileSync(filePath, 'utf8')).toBe('external edit');
 });
 
 it('reports symbolic links as read-only and rejects saving them', async () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-instructions-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-instructions-'));
 	const agentDirectory = path.join(root, 'coder-global');
 	const projectDirectory = path.join(root, 'project');
 	mkdirSync(agentDirectory);
@@ -170,7 +170,7 @@ it('reports symbolic links as read-only and rejects saving them', async () => {
 });
 
 it('rejects existing and submitted content above 256 KiB', async () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-instructions-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-instructions-'));
 	const agentDirectory = path.join(root, 'coder-global');
 	const projectDirectory = path.join(root, 'project');
 	mkdirSync(agentDirectory);

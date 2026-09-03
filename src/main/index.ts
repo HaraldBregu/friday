@@ -3,9 +3,9 @@ import path from 'node:path';
 import { authLinks } from './cloud/links';
 
 if (process.defaultApp && process.argv[1]) {
-	app.setAsDefaultProtocolClient('friday', process.execPath, [path.resolve(process.argv[1])]);
+	app.setAsDefaultProtocolClient('kucedr', process.execPath, [path.resolve(process.argv[1])]);
 } else {
-	app.setAsDefaultProtocolClient('friday');
+	app.setAsDefaultProtocolClient('kucedr');
 }
 
 authLinks.pushArguments(process.argv);

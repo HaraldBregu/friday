@@ -27,17 +27,17 @@ export function AuthStep(): React.JSX.Element {
 	const title = recovery
 		? 'Choose a new password'
 		: mode === 'signUp'
-			? 'Create your Friday account'
+			? 'Create your Kucedr account'
 			: mode === 'forgot'
 				? 'Reset your password'
 				: 'Welcome back';
 	const description = recovery
 		? 'Your recovery link is valid. Set a new password to continue.'
 		: mode === 'signUp'
-			? 'Create an account to sync Friday securely across your devices.'
+			? 'Create an account to sync Kucedr securely across your devices.'
 			: mode === 'forgot'
 				? 'We will email you a secure recovery link.'
-				: 'Sign in to open your Friday workspace.';
+				: 'Sign in to open your Kucedr workspace.';
 
 	const switchMode = (next: Mode): void => {
 		setMode(next);
@@ -92,7 +92,7 @@ export function AuthStep(): React.JSX.Element {
 					<CardHeader>
 						<h1 className="text-base font-medium leading-snug">Supabase is not configured</h1>
 						<CardDescription>
-							Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then restart Friday.
+							Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then restart Kucedr.
 						</CardDescription>
 					</CardHeader>
 				</Card>
@@ -302,7 +302,7 @@ export function AuthStep(): React.JSX.Element {
 											? 'Already have an account? Sign in'
 											: mode === 'forgot'
 												? 'Back to sign in'
-												: 'New to Friday? Create an account'}
+												: 'New to Kucedr? Create an account'}
 									</Button>
 								) : null}
 							</form>

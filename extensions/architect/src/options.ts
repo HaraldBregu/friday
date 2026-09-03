@@ -1,4 +1,4 @@
-import type { CatalogModel } from '@friday/sdk';
+import type { CatalogModel } from '@kucedr/sdk';
 import type { GenerationBrief } from './types';
 
 export function createGenerationOptions(

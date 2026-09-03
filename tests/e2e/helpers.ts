@@ -16,7 +16,7 @@ export async function launchApp(): Promise<{
 	page: Page;
 	userDataDir: string;
 }> {
-	const userDataDir = await mkdtemp(path.join(os.tmpdir(), 'friday-e2e-'));
+	const userDataDir = await mkdtemp(path.join(os.tmpdir(), 'kucedr-e2e-'));
 	let app: ElectronApplication | undefined;
 	try {
 		app = await electron.launch({
@@ -26,7 +26,7 @@ export async function launchApp(): Promise<{
 				...process.env,
 				NODE_ENV: 'production',
 				ELECTRON_RENDERER_URL: '',
-				FRIDAY_E2E_DATA_ROOT: userDataDir,
+				KUCEDR_E2E_DATA_ROOT: userDataDir,
 			},
 		});
 		const page = await app.firstWindow();

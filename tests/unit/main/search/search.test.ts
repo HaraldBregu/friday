@@ -121,12 +121,12 @@ describe('search adapters', () => {
 			})
 		);
 
-		await expect(searchBrave({ query: 'friday', count: 3 }, 'brave-key')).resolves.toEqual({
-			query: 'friday',
+		await expect(searchBrave({ query: 'kucedr', count: 3 }, 'brave-key')).resolves.toEqual({
+			query: 'kucedr',
 			results: [{ title: 'Brave result', url: 'https://brave.example', description: 'Text' }],
 		});
 		const [url, init] = (global.fetch as jest.Mock).mock.calls[0] as [URL, RequestInit];
-		expect(url.toString()).toBe('https://api.search.brave.com/res/v1/web/search?q=friday&count=3');
+		expect(url.toString()).toBe('https://api.search.brave.com/res/v1/web/search?q=kucedr&count=3');
 		expect(init.headers).toEqual({
 			Accept: 'application/json',
 			'X-Subscription-Token': 'brave-key',
@@ -140,8 +140,8 @@ describe('search adapters', () => {
 			})
 		);
 
-		await expect(searchTavily({ query: 'friday', count: 4 }, 'tavily-key')).resolves.toEqual({
-			query: 'friday',
+		await expect(searchTavily({ query: 'kucedr', count: 4 }, 'tavily-key')).resolves.toEqual({
+			query: 'kucedr',
 			results: [{ title: 'Tavily result', url: 'https://tavily.example', description: 'Text' }],
 		});
 		expect(global.fetch).toHaveBeenCalledWith(
@@ -154,7 +154,7 @@ describe('search adapters', () => {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					query: 'friday',
+					query: 'kucedr',
 					max_results: 4,
 					search_depth: 'basic',
 					include_answer: false,
@@ -166,7 +166,7 @@ describe('search adapters', () => {
 
 	it('reports provider failures without changing the normalized API', async () => {
 		(global.fetch as jest.Mock).mockResolvedValue(response({}, 401, 'Unauthorized'));
-		await expect(searchTavily({ query: 'friday', count: 5 }, 'bad-key')).rejects.toThrow(
+		await expect(searchTavily({ query: 'kucedr', count: 5 }, 'bad-key')).rejects.toThrow(
 			'Tavily search failed (401): Unauthorized'
 		);
 	});
@@ -216,14 +216,14 @@ describe('generic web search', () => {
 		(global.fetch as jest.Mock).mockResolvedValue(response({ web: { results: [] } }));
 
 		const [webSearchTool] = getSearchWebTools();
-		const output = await webSearchTool.run({ query: 'friday' });
-		expect(JSON.parse(output as string)).toEqual({ query: 'friday', results: [] });
+		const output = await webSearchTool.run({ query: 'kucedr' });
+		expect(JSON.parse(output as string)).toEqual({ query: 'kucedr', results: [] });
 		const [url] = (global.fetch as jest.Mock).mock.calls[0] as [URL];
 		expect(url.searchParams.get('count')).toBe('5');
 	});
 
 	it('explains how to select a search engine', async () => {
-		await expect(searchWeb({ query: 'friday' })).rejects.toThrow(
+		await expect(searchWeb({ query: 'kucedr' })).rejects.toThrow(
 			'Select a search engine in Settings > Agent'
 		);
 	});

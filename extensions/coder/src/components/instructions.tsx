@@ -101,7 +101,7 @@ export function Instructions({
 
 					{editor.instructions && !editor.instructions.editable ? (
 						<Alert className="border-destructive/30 bg-destructive/5 text-destructive">
-							<AlertTriangle /> This file is a symbolic link and cannot be edited in Friday.
+							<AlertTriangle /> This file is a symbolic link and cannot be edited in Kucedr.
 						</Alert>
 					) : null}
 					{editor.error ? (

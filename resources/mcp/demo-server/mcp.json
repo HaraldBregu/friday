@@ -1,6 +1,6 @@
 {
-	"id": "friday-demo",
-	"name": "Friday Demo Tools",
+	"id": "kucedr-demo",
+	"name": "Kucedr Demo Tools",
 	"type": "stdio",
 	"command": "node",
 	"args": ["server.mjs"],

@@ -170,7 +170,7 @@ const handle = (message) => {
 			result: {
 				protocolVersion: message.params?.protocolVersion ?? '2025-06-18',
 				capabilities: { tools: { listChanged: false } },
-				serverInfo: { name: 'friday-configured-demo', version: '1.0.0' },
+				serverInfo: { name: 'kucedr-configured-demo', version: '1.0.0' },
 				instructions: 'Demo tools using values supplied through the local MCP environment.',
 			},
 		});

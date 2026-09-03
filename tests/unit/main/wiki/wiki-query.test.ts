@@ -22,7 +22,7 @@ const source: WikiSource = {
 
 describe('wiki-first query retrieval', () => {
 	it('prioritizes exact aliases, traverses related pages, and separates raw evidence', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-query-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-query-'));
 		const target = path.join(root, 'wiki');
 		const archive = path.join(root, 'memory.md');
 		const repository = getWikiRepository(target);
@@ -96,7 +96,7 @@ describe('wiki-first query retrieval', () => {
 	});
 
 	it('returns only active compiled pages with usable review state', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-query-filter-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-query-filter-'));
 		const target = path.join(root, 'wiki');
 		await applyWikiUpdate(target, source, {
 			pages: [

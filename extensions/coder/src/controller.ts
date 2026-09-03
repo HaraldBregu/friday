@@ -6,7 +6,7 @@ import type {
 	CoderSessionSummary,
 	CoderThinkingLevel,
 	CoderToolMode,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 
 export type RunState = 'loading' | 'idle' | 'running' | 'error';
 

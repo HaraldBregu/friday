@@ -1,7 +1,7 @@
 # Terminal IPC Architecture
 
-Friday provides a backend API for local interactive shells backed by real operating-system
-pseudoterminals. It does not implement a terminal renderer in the main Friday UI.
+Kucedr provides a backend API for local interactive shells backed by real operating-system
+pseudoterminals. It does not implement a terminal renderer in the main Kucedr UI.
 
 ## Data flow
 
@@ -64,7 +64,7 @@ cross-platform artifacts cannot be fully validated from one host OS.
 
 ## Current scope
 
-The main Friday renderer currently has no terminal UI. Extension views cannot consume this layer.
+The main Kucedr renderer currently has no terminal UI. Extension views cannot consume this layer.
 Tabs, split panes, display serialization, and SSH backends are not part of the current scope. PTYs
 live in the Electron main process and end when their owner reloads, closes, crashes, or the
 application quits.

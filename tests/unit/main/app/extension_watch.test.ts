@@ -28,9 +28,9 @@ describe('extension folder watcher', () => {
 		const onChange = jest.fn();
 		const onError = jest.fn();
 
-		const stop = watchExtensions(onChange, onError, '/tmp/friday');
+		const stop = watchExtensions(onChange, onError, '/tmp/kucedr');
 
-		expect(watch).toHaveBeenCalledWith(path.join('/tmp/friday', 'extensions'), {
+		expect(watch).toHaveBeenCalledWith(path.join('/tmp/kucedr', 'extensions'), {
 			ignoreInitial: true,
 			followSymlinks: false,
 			awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 25 },

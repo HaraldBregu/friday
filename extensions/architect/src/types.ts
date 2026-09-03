@@ -1,4 +1,4 @@
-import type { CatalogModel, ImageSource } from '@friday/sdk';
+import type { CatalogModel, ImageSource } from '@kucedr/sdk';
 
 export type CropRatio = 'original' | '1:1' | '4:3' | '3:2' | '16:9';
 

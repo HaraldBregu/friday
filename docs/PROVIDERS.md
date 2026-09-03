@@ -1,22 +1,22 @@
 # Provider Reference
 
-Friday ships 23 provider manifests under `resources/providers`. This page is the canonical
+Kucedr ships 23 provider manifests under `resources/providers`. This page is the canonical
 human-readable inventory of those built-in providers, the services they expose in the catalog,
 and whether the current runtime can execute each service.
 
 The inventory covers model, search, and database providers. Telegram and Discord are
-messaging channels and are documented in [Friday Feature Reference](FEATURES.md#messaging-channels).
+messaging channels and are documented in [Kucedr Feature Reference](FEATURES.md#messaging-channels).
 MCP servers and extensions are integrations rather than providers.
 
 ## Support status
 
 | Status       | Meaning                                                                                        |
 | ------------ | ---------------------------------------------------------------------------------------------- |
-| Available    | The service has both a catalog entry and an execution path in Friday.                          |
+| Available    | The service has both a catalog entry and an execution path in Kucedr.                          |
 | Partial      | Execution code exists, but a normal configuration or selection path is incomplete.             |
 | Mixed        | At least one cataloged capability works, while another capability is catalog only.             |
-| Catalog only | Friday can display or select the service, but the runtime has no execution adapter for it.     |
-| Code only    | Adapter support exists, but Friday does not ship a provider manifest that makes it selectable. |
+| Catalog only | Kucedr can display or select the service, but the runtime has no execution adapter for it.     |
+| Code only    | Adapter support exists, but Kucedr does not ship a provider manifest that makes it selectable. |
 
 A manifest is not proof that a service is executable. The provider-specific factories under
 `src/main/models/adapters` determine runtime support.
@@ -33,8 +33,8 @@ See [Settings UI](ui/SETTINGS.md) for the complete Settings navigation and persi
 4. Run the test offered by the settings page, when present, before relying on the provider in an
    agent run.
 
-Provider credentials and selections are stored in Friday's local application-data directory.
-Requests, attachments, and credentials are sent to the selected provider when Friday invokes its
+Provider credentials and selections are stored in Kucedr's local application-data directory.
+Requests, attachments, and credentials are sent to the selected provider when Kucedr invokes its
 API. Provider billing, quotas, regional availability, safety rules, and data-retention policies
 still apply.
 
@@ -79,7 +79,7 @@ manifest.
 ## Model and service catalog
 
 Names and IDs in this section match the built-in manifests exactly. IDs are the values persisted in
-Friday's settings and sent to provider adapters.
+Kucedr's settings and sent to provider adapters.
 
 ### Chat and research
 
@@ -174,7 +174,7 @@ Every model in this table has a runtime adapter and can power Home's realtime vo
 | Code only | BGE-M3   | No bundled manifest or model ID                                                                      |
 
 The `bge` adapter targets a self-hosted OpenAI-compatible embeddings endpoint. It defaults to
-`http://localhost:8080/v1/embeddings`; `BGE_BASE_URL` overrides that endpoint. Because Friday does
+`http://localhost:8080/v1/embeddings`; `BGE_BASE_URL` overrides that endpoint. Because Kucedr does
 not ship a `bge` manifest, it does not appear in the normal model picker unless a compatible custom
 manifest supplies the provider and model entry.
 
@@ -191,12 +191,12 @@ selection.
 
 ## Custom and plugin providers
 
-Friday merges bundled manifests with provider folders from its application-data `providers`
+Kucedr merges bundled manifests with provider folders from its application-data `providers`
 directory. A local provider with the same normalized ID overrides the bundled manifest, and the
 catalog watches the directory for changes. The current Settings UI does not open this directory or
 import provider folders.
 
-Provider plugins use the same folder shape. See [Friday plugins](PLUGINS.md) for the complete plugin
+Provider plugins use the same folder shape. See [Kucedr plugins](PLUGINS.md) for the complete plugin
 layout.
 
 A provider manifest requires `providerId`, `providerName`, and a `services` array. Each service

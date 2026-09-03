@@ -1,13 +1,13 @@
-import { app, isFriday } from '@friday/sdk';
+import { app, isKucedr } from '@kucedr/sdk';
 
 import { defaultProject } from './defaults';
 import { readMedia } from './read';
 import type { Project } from './types';
 
 export async function loadProject(): Promise<Project> {
-	const stored = isFriday()
+	const stored = isKucedr()
 		? await app.getExtensionStoreValue('project-v1')
-		: JSON.parse(localStorage.getItem('friday-videomaker-project-v1') ?? 'null');
+		: JSON.parse(localStorage.getItem('kucedr-videomaker-project-v1') ?? 'null');
 	if (!stored || typeof stored !== 'object' || !Array.isArray((stored as Project).clips)) {
 		return defaultProject;
 	}

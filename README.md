@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="resources/icons/icon-rounded.png" alt="Friday logo" width="144" />
+  <img src="resources/icons/icon-rounded.png" alt="Kucedr logo" width="144" />
 </p>
 
-<h1 align="center">Friday</h1>
+<h1 align="center">Kucedr</h1>
 
 <p align="center">
   <strong>Your desktop AI copilot for everyday tasks.</strong>
 </p>
 
-Friday is a cross-platform desktop AI assistant that turns conversations into actions. Type or speak a request, attach images or PDFs, and let the agent work with files, run commands, research the web, create media, or automate a recurring task.
+Kucedr is a cross-platform desktop AI assistant that turns conversations into actions. Type or speak a request, attach images or PDFs, and let the agent work with files, run commands, research the web, create media, or automate a recurring task.
 
-You choose the providers and models behind each AI capability. Friday keeps its settings, provider keys, conversations, and workspace data on your machine, while requests are sent only to the AI providers and connected services you configure.
+You choose the providers and models behind each AI capability. Kucedr keeps its settings, provider keys, conversations, and workspace data on your machine, while requests are sent only to the AI providers and connected services you configure.
 
-## What Friday Can Do
+## What Kucedr Can Do
 
 - **Work with your computer** — read, create, and edit files; apply precise patches; and run commands or long-lived processes.
 - **Understand more than text** — accept image and PDF attachments, transcribe speech, and read responses aloud.
@@ -23,17 +23,17 @@ You choose the providers and models behind each AI capability. Friday keeps its 
 - **Automate routines** — create recurring schedules and periodic checklist-based health runs.
 - **Remember useful context** — maintain durable memory, personalization files, conversation history, and a local working directory.
 - **Compile persistent knowledge** — archive immutable evidence, incrementally maintain a cited Markdown wiki, query it before raw sources, and review risky changes.
-- **Chat from other apps** — connect Telegram or Discord channels to reach Friday away from the desktop app.
+- **Chat from other apps** — connect Telegram or Discord channels to reach Kucedr away from the desktop app.
 
-Friday runs on Windows, macOS, and Linux, with English and Italian interfaces and light, dark, and system themes.
+Kucedr runs on Windows, macOS, and Linux, with English and Italian interfaces and light, dark, and system themes.
 
 ## Control and Privacy
 
-- Provider API keys and Friday's application data are stored locally.
+- Provider API keys and Kucedr's application data are stored locally.
 - Prompts, attachments, and tool data may be sent to the providers, MCP servers, websites, or messaging channels you configure.
 - File writes, edits, patches, and command execution are governed by the agent permission policy.
 - Tool activity is streamed into the conversation so you can follow what the agent is doing.
-- Friday does not claim formal certification for regulated data.
+- Kucedr does not claim formal certification for regulated data.
 
 ## Technology
 
@@ -51,7 +51,7 @@ npm ci
 npm run dev
 ```
 
-The root install includes the Electron app, `@friday/sdk`, and `@friday/cli` through npm
+The root install includes the Electron app, `@kucedr/sdk`, and `@kucedr/cli` through npm
 workspaces and one lockfile.
 
 On first launch, follow the [Start Page Flow](docs/ui/START.md) to sign in or continue local-only,
@@ -69,16 +69,16 @@ npm run dev-linux
 
 ### Command-line interface
 
-The TypeScript CLI lives in `packages/cli`. It launches the desktop app, installs validated Friday
+The TypeScript CLI lives in `packages/cli`. It launches the desktop app, installs validated Kucedr
 plugins, and includes an interactive terminal interface:
 
 ```bash
 npm run cli:build
 npm link ./packages/cli
 
-friday
-friday install package-one
-friday tui
+kucedr
+kucedr install package-one
+kucedr tui
 ```
 
 Inside the TUI, enter `/install package-one`. See
@@ -112,23 +112,23 @@ npm run dist:linux:portable  # Linux AppImage and tar.gz archive
 
 ### Portable releases
 
-On Windows, download `Friday-Portable-<version>-x64.exe` and run it directly. It temporarily
-extracts its signed application files while Friday is running, but does not install shortcuts,
+On Windows, download `Kucedr-Portable-<version>-x64.exe` and run it directly. It temporarily
+extracts its signed application files while Kucedr is running, but does not install shortcuts,
 file associations, or uninstall records and does not require administrator access.
 
 On Linux, download the AppImage, mark it executable, and launch it. If AppImage mounting or FUSE
-is unavailable, extract the `.tar.gz` release and run `friday-desktop` from the extracted folder.
+is unavailable, extract the `.tar.gz` release and run `kucedr-desktop` from the extracted folder.
 Neither option requires a package installation.
 
-Friday settings, conversations, workspace files, and generated data remain under
-`%USERPROFILE%\.friday` on Windows or `$HOME/.friday` on Linux. Electron runtime data remains in
-`%APPDATA%\Friday` on Windows or `$XDG_CONFIG_HOME/Friday` on Linux, normally
-`$HOME/.config/Friday`. Portable updates are manual: close Friday and replace the executable or
+Kucedr settings, conversations, workspace files, and generated data remain under
+`%USERPROFILE%\.kucedr` on Windows or `$HOME/.kucedr` on Linux. Electron runtime data remains in
+`%APPDATA%\Kucedr` on Windows or `$XDG_CONFIG_HOME/Kucedr` on Linux, normally
+`$HOME/.config/Kucedr`. Portable updates are manual: close Kucedr and replace the executable or
 extracted application; the profile data remains in place.
 
 Portable packaging does not bypass AppLocker, WDAC, Linux `noexec`, endpoint security, or network
 policy. Protected command execution may require administrator or IT setup, and browser automation
-requires an installed, permitted Google Chrome. Friday reports these limitations without preventing
+requires an installed, permitted Google Chrome. Kucedr reports these limitations without preventing
 chat and other supported features from running.
 
 ## Project Structure
@@ -139,7 +139,7 @@ chat and other supported features from running.
 - `src/shared` contains cross-process types and API contracts.
 - `src/main/terminal` contains the PTY lifecycle behind the typed terminal IPC API. See [Terminal IPC Architecture](docs/TERMINAL.md).
 - `packages/cli` contains the publishable TypeScript command-line and terminal interface.
-- `packages/sdk` contains the publishable typed client for Friday's local API.
+- `packages/sdk` contains the publishable typed client for Kucedr's local API.
 - `src/main/agent` contains sessions, tools, skills, memory, schedules, health runs, sandboxing, and permission policy.
 - `src/main/models` contains provider-specific model integrations. See
   [Provider Reference](docs/PROVIDERS.md) for the built-in catalog and runtime support matrix.

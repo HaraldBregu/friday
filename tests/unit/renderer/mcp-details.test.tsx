@@ -74,7 +74,7 @@ describe('MCP details', () => {
 		server = {
 			id: 'local',
 			source: 'local',
-			path: '/home/user/.friday/mcp/servers/local',
+			path: '/home/user/.kucedr/mcp/servers/local',
 			data: {
 				type: 'stdio',
 				name: 'Local files',
@@ -93,7 +93,7 @@ describe('MCP details', () => {
 		const envKey = screen.getByLabelText('Environment variables (optional)');
 		const envValue = screen.getByLabelText('Value', { selector: '#mcp-env-value' });
 		await user.type(envKey, 'DEMO_COMPANY');
-		await user.type(envValue, 'Friday Studio');
+		await user.type(envValue, 'Kucedr Studio');
 		await user.click(screen.getByRole('button', { name: 'Add environment variable' }));
 		await user.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -102,7 +102,7 @@ describe('MCP details', () => {
 				'local',
 				expect.objectContaining({
 					type: 'stdio',
-					env: { MODE: 'dev', DEMO_COMPANY: 'Friday Studio' },
+					env: { MODE: 'dev', DEMO_COMPANY: 'Kucedr Studio' },
 					cwd: '/local',
 					require_approval: 'always',
 				})

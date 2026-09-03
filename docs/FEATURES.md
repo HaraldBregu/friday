@@ -1,6 +1,6 @@
-# Friday Feature Reference
+# Kucedr Feature Reference
 
-Friday is a cross-platform Electron desktop assistant that turns chat requests into model responses, tool calls, local file and process work, web research, generated media, background checks, and messaging-channel replies.
+Kucedr is a cross-platform Electron desktop assistant that turns chat requests into model responses, tool calls, local file and process work, web research, generated media, background checks, and messaging-channel replies.
 
 This document describes the feature set present in the current source tree, grouped from most to least central to the product, and orders items within each group the same way. It distinguishes working behavior from surfaces that are only partially wired so that a visible setting or catalog entry is not mistaken for an end-to-end capability.
 
@@ -28,7 +28,7 @@ This document describes the feature set present in the current source tree, grou
 
 ## Product overview
 
-Friday provides:
+Kucedr provides:
 
 - Persistent, streaming conversations with multiple local chat sessions.
 - An agent loop that can use files, patches, commands, long-running processes, the web, a browser, memory, skills, MCP tools, media generation, automation tools, and one-level subagents.
@@ -42,7 +42,7 @@ Friday provides:
 
 ## 1. Core conversation experience
 
-The chat surface is the primary way users interact with Friday, so its setup, input, and rendering behavior are documented first.
+The chat surface is the primary way users interact with Kucedr, so its setup, input, and rendering behavior are documented first.
 
 See [Home UI](ui/HOME.md) for the layout, session, composer, message, tool, and voice behavior
 contract.
@@ -51,7 +51,7 @@ contract.
 
 The first launch uses a single `/start` flow with five visible stages: **Welcome**, **Account**,
 **Model**, **Search**, and **Models**. Account sign-in is optional; users
-can continue in local-only mode. After sign-in or local-only continuation, Friday checks for a
+can continue in local-only mode. After sign-in or local-only continuation, Kucedr checks for a
 stored Assistant provider and model. A complete configuration opens Home, while an incomplete one
 continues through setup. A restored signed-in user runs this check automatically and skips Welcome
 and Account.
@@ -66,7 +66,7 @@ See [Start Page Flow](ui/START.md) for routing, authentication branches, navigat
 validation, persistence, and completion rules. The same provider keys and service selections can
 be changed later in Settings.
 
-Provider API keys are stored in Friday's local application data and are masked after saving. Requests and credentials are still sent to the configured provider as required for authentication and inference.
+Provider API keys are stored in Kucedr's local application data and are masked after saving. Requests and credentials are still sent to the configured provider as required for authentication and inference.
 
 ### Chat input
 
@@ -106,8 +106,8 @@ picker.
 
 ### Voice input and playback
 
-- With a streaming speech-to-text model, Friday captures mono PCM audio and appends partial and final transcript events live.
-- With a batch-only model, Friday records audio locally, submits it when recording stops, and appends the returned transcript.
+- With a streaming speech-to-text model, Kucedr captures mono PCM audio and appends partial and final transcript events live.
+- With a batch-only model, Kucedr records audio locally, submits it when recording stops, and appends the returned transcript.
 - Dictation includes microphone permission checks, elapsed time, a waveform, confirm, cancel, and
   error states. The current dictation panel does not expose mute.
 - Assistant responses can be read aloud through the configured text-to-speech provider.
@@ -141,11 +141,11 @@ There is a clear-messages API in the runtime, but the current Chat History scree
 
 ## 2. Agent runtime and automation
 
-This group covers what makes Friday an agent rather than a chat window: the tool-calling loop, its permission model, and the automation surfaces (skills, MCP, schedules, health checks) built on top of it.
+This group covers what makes Kucedr an agent rather than a chat window: the tool-calling loop, its permission model, and the automation surfaces (skills, MCP, schedules, health checks) built on top of it.
 
 ### Agent runtime
 
-Friday uses an iterative tool-calling loop:
+Kucedr uses an iterative tool-calling loop:
 
 1. Build a system prompt from the base assistant contract, tool descriptions, workspace metadata, the live filesystem inventory, and any skill loaded during the run. Editable profile and memory files plus installed-skill routing metadata are prepended separately as user-controlled context.
 2. Stream a model turn and collect text, reasoning continuity where supported, and tool calls.
@@ -227,7 +227,7 @@ Rule resolution is deny-first:
 Important boundaries:
 
 - Normal `exec` calls run inside the operating-system command sandbox. Trusted and blocked exec paths are also applied to sandbox reads and writes.
-- A command that needs an outside directory must declare it in `additionalRoots`. Friday asks before spawning the command; a one-time approval extends only that sandboxed invocation.
+- A command that needs an outside directory must declare it in `additionalRoots`. Kucedr asks before spawning the command; a one-time approval extends only that sandboxed invocation.
 - A command that intentionally needs host execution must use `elevated: true`. Host execution always requires interactive approval and cannot be persisted as a trusted location.
 - Windows does not support per-invocation filesystem overrides. An outside location must be trusted persistently before a Windows sandboxed command can use it.
 - On macOS and Linux, permission edits apply to newly wrapped commands without stopping already-running sandbox sessions. Windows sandbox policy changes require reinitialization and may stop active sandboxed commands.
@@ -257,7 +257,7 @@ The Home slash menu searches installed skills, and the agent can load a selected
 
 ### MCP servers
 
-Friday supports two MCP transport types:
+Kucedr supports two MCP transport types:
 
 | Transport   | Configuration                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -271,7 +271,7 @@ MCP settings provide:
 - Add and edit dialogs. Server ID and transport type are fixed after creation.
 - Detail-page configuration, testing, and removal for configured servers; filesystem packages remain file-authoritative and are edited through the same detail workflow.
 - OAuth authorization for HTTP servers without a bearer token, including reauthorization.
-- Dynamic discovery of local server packages from `~/.friday/mcp/servers`.
+- Dynamic discovery of local server packages from `~/.kucedr/mcp/servers`.
 - Folder upload, local-folder access, manual refresh, and a live connection test that reports tool count and latency for every local or remote server.
 
 Each discovered local server lives in its own folder and contains an `mcp.json` manifest:
@@ -290,7 +290,7 @@ Each discovered local server lives in its own folder and contains an `mcp.json` 
 }
 ```
 
-The folder name is used as the ID when `id` is omitted. IDs use lowercase letters, numbers, and single hyphens. Relative `cwd` values are resolved from the package folder; omitting `cwd` also runs the command from that folder. Friday rescans the directory whenever settings or an agent run reads the MCP registry, so adding or removing a valid folder does not require an app restart. Explicitly configured servers take precedence over a discovered package with the same ID, and malformed or duplicate local packages are reported in Settings instead of preventing other servers from loading.
+The folder name is used as the ID when `id` is omitted. IDs use lowercase letters, numbers, and single hyphens. Relative `cwd` values are resolved from the package folder; omitting `cwd` also runs the command from that folder. Kucedr rescans the directory whenever settings or an agent run reads the MCP registry, so adding or removing a valid folder does not require an app restart. Explicitly configured servers take precedence over a discovered package with the same ID, and malformed or duplicate local packages are reported in Settings instead of preventing other servers from loading.
 
 A dependency-free package with three sample tools is available at `resources/mcp/demo-server` and can be selected directly with **Upload local**.
 
@@ -303,7 +303,7 @@ Current limits:
 
 ### Scheduled tasks
 
-Friday persists cron schedule records with:
+Kucedr persists cron schedule records with:
 
 - A name and optional description.
 - A cron expression.
@@ -326,7 +326,7 @@ Scheduled agent actions run as background agents with the full tool catalog by d
 
 ### Periodic health checks
 
-`HEALTH.md` defines a checklist that Friday can run in the background.
+`HEALTH.md` defines a checklist that Kucedr can run in the background.
 
 Available behavior:
 
@@ -344,7 +344,7 @@ The Health settings screen exposes provider, model, interval, target, direct pol
 
 ### Personalization, workspace, and memory
 
-Friday maintains an agent workspace in local application data with these Markdown files:
+Kucedr maintains an agent workspace in local application data with these Markdown files:
 
 | File           | Purpose                                                         |
 | -------------- | --------------------------------------------------------------- |
@@ -362,7 +362,7 @@ While `BOOTSTRAP.md` exists, it is included in the user-controlled workspace con
 
 ### Persistent LLM Wiki
 
-Friday's optional LLM Wiki is an additive knowledge-compilation layer. It snapshots supported source files into checksum-addressed immutable evidence, uses the configured text model to create or incrementally enrich Markdown pages, and stores claim-level source IDs and locators. Page changes, `index.md`, and `log.md` are staged and validated before the generated wiki directory is replaced.
+Kucedr's optional LLM Wiki is an additive knowledge-compilation layer. It snapshots supported source files into checksum-addressed immutable evidence, uses the configured text model to create or incrementally enrich Markdown pages, and stores claim-level source IDs and locators. Page changes, `index.md`, and `log.md` are staged and validated before the generated wiki directory is replaced.
 
 The normal main assistant receives wiki tools only while the wiki is enabled. Query tools search exact titles and aliases before metadata, full text, and linked pages. Raw evidence is returned separately for quotations, exact facts, low-confidence matches, or contradictions. Existing Pinecone RAG remains unchanged and independent.
 
@@ -462,7 +462,7 @@ audio file menu on right-click. It has no search, filter, refresh, or delete too
 
 ## 5. Messaging channels
 
-Friday includes Telegram and Discord bot adapters. Enabled channels with tokens are started when the app becomes ready.
+Kucedr includes Telegram and Discord bot adapters. Enabled channels with tokens are started when the app becomes ready.
 
 ### Shared behavior
 
@@ -546,7 +546,7 @@ no enable/disable control.
 
 - View application name and version.
 - Enable or disable the tray/menu-bar icon.
-- Keep the computer and display active while Friday is running.
+- Keep the computer and display active while Kucedr is running.
 - Open the application-data folder.
 - Select English or Italian.
 - Select light, dark, or system theme; system mode follows OS theme changes.
@@ -554,12 +554,12 @@ no enable/disable control.
 ### Media permissions and tests
 
 - System pages are available for Microphone, Camera, and Screen capture.
-- On macOS, Friday displays microphone/camera permission status, can request access, and opens the relevant System Settings pane.
+- On macOS, Kucedr displays microphone/camera permission status, can request access, and opens the relevant System Settings pane.
 - Screen capture opens its OS settings pane.
 - Microphone can be recorded and played back.
 - Camera and screen capture show a live preview, can record, stop, retry, and play the result.
 - On non-macOS platforms, the explicit system permission status is reported as unknown and the current application-level microphone/camera toggle handlers do not disable capture.
-- Display capture automatically chooses the first source returned by Electron; Friday does not present its own source picker.
+- Display capture automatically chooses the first source returned by Electron; Kucedr does not present its own source picker.
 
 ### Window, tray, and native menus
 
@@ -573,7 +573,7 @@ no enable/disable control.
 
 ### Local data
 
-Friday stores configuration and working data below Electron's application-data directory:
+Kucedr stores configuration and working data below Electron's application-data directory:
 
 | Area        | Stored data                                                                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -606,8 +606,8 @@ Known boundaries:
 
 - Provider secrets can be read by trusted renderer code through the provider preload API.
 - Some MCP behaviors (see [MCP servers](#mcp-servers)) run outside the centralized tool-policy system.
-- Trusted background callers bypass only Friday's stored tool policy. Capability allowlists, sandboxing, OS controls, and tool-internal authorization remain in force.
-- Friday does not claim formal certification for regulated data.
+- Trusted background callers bypass only Kucedr's stored tool policy. Capability allowlists, sandboxing, OS controls, and tool-internal authorization remain in force.
+- Kucedr does not claim formal certification for regulated data.
 
 ## 8. Platform and packaging
 

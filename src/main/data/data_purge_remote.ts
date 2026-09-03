@@ -15,14 +15,14 @@ export async function purgeRemoteRagNamespaces(
 	const seenTokens = new Set<string>();
 	do {
 		const page = await index.listNamespaces({
-			prefix: 'friday-',
+			prefix: 'kucedr-',
 			limit: 100,
 			...(paginationToken ? { paginationToken } : {}),
 		});
 		for (const namespace of page.namespaces ?? []) {
 			const name = namespace.name ?? '';
 			if (
-				!/^friday-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+				!/^kucedr-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
 					name
 				)
 			) {

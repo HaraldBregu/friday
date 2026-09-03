@@ -7,7 +7,7 @@ import { getWikiRepository } from '../../../../src/main/agent/knowledge/wiki/wik
 
 describe('wiki lint', () => {
 	it('reports structural and provenance findings and safely rebuilds a drifted index', async () => {
-		const target = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-lint-'));
+		const target = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-lint-'));
 		const repository = getWikiRepository(target);
 		await import('node:fs/promises').then(({ mkdir }) =>
 			mkdir(path.join(target, 'concepts'), { recursive: true })

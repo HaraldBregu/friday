@@ -1,5 +1,5 @@
 {
-	"appTitle": "Friday",
+	"appTitle": "Kucedr",
 	"welcome": {
 		"tagline": "An intelligent text editor for developers and writers. Create or open a workspace to get started.",
 		"freePlan": "Free Plan",
@@ -27,7 +27,7 @@
 		"firstTime": {
 			"eyebrow": "First-time configuration",
 			"title": "Connect your providers before you start writing",
-			"description": "Add the API tokens you want Friday to use on this device. Leave any provider blank if you want to configure it later in Settings.",
+			"description": "Add the API tokens you want Kucedr to use on this device. Leave any provider blank if you want to configure it later in Settings.",
 			"tokenPlaceholder": "Paste API token",
 			"footer": "You can revisit provider tokens at any time from the Providers settings page.",
 			"save": "Save and Continue",
@@ -228,7 +228,7 @@
 		},
 		"persona": {
 			"title": "Persona",
-			"description": "Preview Friday's animated voice persona.",
+			"description": "Preview Kucedr's animated voice persona.",
 			"preview": "Preview",
 			"previewDescription": "Choose a state to preview its motion and response.",
 			"states": {
@@ -291,9 +291,9 @@
 			"menuBar": "Menu Bar",
 			"menuBarDescription": "Show or hide the app icon in the menu bar",
 			"keepAwake": "Keep Computer Active",
-			"keepAwakeDescription": "Keep the computer and display awake while Friday is running",
+			"keepAwakeDescription": "Keep the computer and display awake while Kucedr is running",
 			"appData": "Application Data",
-			"appDataDescription": "Folder where Friday stores application settings and logs",
+			"appDataDescription": "Folder where Kucedr stores application settings and logs",
 			"openAppData": "Open Folder",
 			"dataFolder": "Data Folder",
 			"openDataFolder": "Open Folder"
@@ -303,7 +303,7 @@
 			"actionsDescription": "Open required operating system panels and control background power behavior.",
 			"mediaPermissions": {
 				"title": "Media permissions",
-				"description": "Control camera and microphone access used by Friday features."
+				"description": "Control camera and microphone access used by Kucedr features."
 			},
 			"media": {
 				"open": "Open details",
@@ -346,7 +346,7 @@
 			},
 			"capabilities": {
 				"title": "System capabilities",
-				"description": "Reference of what Friday can use through the operating system.",
+				"description": "Reference of what Kucedr can use through the operating system.",
 				"groups": {
 					"core": {
 						"title": "Core desktop access",
@@ -476,11 +476,11 @@
 		},
 		"microphone": {
 			"title": "Microphone permissions",
-			"description": "Control whether Friday can record audio from the prompt input.",
+			"description": "Control whether Kucedr can record audio from the prompt input.",
 			"recording": "Audio recording",
-			"recordingDescription": "Allow prompt input microphone recording inside Friday.",
+			"recordingDescription": "Allow prompt input microphone recording inside Kucedr.",
 			"systemPermission": "System permission",
-			"systemPermissionDescription": "Current operating system microphone access for Friday.",
+			"systemPermissionDescription": "Current operating system microphone access for Kucedr.",
 			"actions": {
 				"activate": "Activate",
 				"check": "Check",
@@ -504,11 +504,11 @@
 		},
 		"camera": {
 			"title": "Camera permissions",
-			"description": "Control whether Friday can use the webcam.",
+			"description": "Control whether Kucedr can use the webcam.",
 			"access": "Camera access",
-			"accessDescription": "Allow Friday features to use the camera.",
+			"accessDescription": "Allow Kucedr features to use the camera.",
 			"systemPermission": "System permission",
-			"systemPermissionDescription": "Current operating system camera access for Friday.",
+			"systemPermissionDescription": "Current operating system camera access for Kucedr.",
 			"actions": {
 				"activate": "Activate",
 				"check": "Check",
@@ -682,7 +682,7 @@
 			"disabled": "Disabled",
 			"nextRun": "Next",
 			"schedulesTitle": "Scheduled tasks",
-			"schedulesDescription": "Durable cron schedules saved by Friday.",
+			"schedulesDescription": "Durable cron schedules saved by Kucedr.",
 			"jobsTitle": "Registered jobs",
 			"jobsDescription": "Process-local node-cron jobs registered by the app.",
 			"status": {
@@ -835,7 +835,7 @@
 			}
 		},
 		"permissions": {
-			"locationsNotice": "Trusted locations allow file tools and sandboxed commands. Blocked locations take precedence. Friday asks before using tools anywhere else or running outside the sandbox.",
+			"locationsNotice": "Trusted locations allow file tools and sandboxed commands. Blocked locations take precedence. Kucedr asks before using tools anywhere else or running outside the sandbox.",
 			"locationsTitle": "Locations",
 			"locationsDescription": "Choose which tools may use each folder and its subfolders.",
 			"workspaceDescription": "Workspace · includes subfolders · always trusted",
@@ -924,12 +924,12 @@
 		},
 		"providers": {
 			"title": "Providers",
-			"description": "Connect AI providers and configure the models Friday uses.",
+			"description": "Connect AI providers and configure the models Kucedr uses.",
 			"storeApiKeys": "Store provider API keys",
 			"storeApiKeysDescription": "Add or update API keys for supported AI providers.",
 			"modelsApiKeys": "Models API keys",
 			"apiKeysTitle": "Models API keys",
-			"apiKeysDescription": "Manage the API keys Friday uses for AI models and providers.",
+			"apiKeysDescription": "Manage the API keys Kucedr uses for AI models and providers.",
 			"mlModelsDescription": "Configure your main AI model and provider.",
 			"showOtherProviders": "Show other models",
 			"hideOtherProviders": "Hide other models",
@@ -952,7 +952,7 @@
 			"saving": "Saving...",
 			"keySaved": "API key saved",
 			"keyMissing": "API key missing",
-			"localNote": "Keys stay in Friday's local app data folder and are only used for providers you connect. You can revoke them anytime."
+			"localNote": "Keys stay in Kucedr's local app data folder and are only used for providers you connect. You can revoke them anytime."
 		},
 		"searchEngine": {
 			"description": "Choose the web search provider used by the assistant.",
@@ -972,7 +972,7 @@
 			"selected": "Selected",
 			"connect": "Connect",
 			"use": "Use",
-			"localNote": "API keys stay in Friday's local app data and are only sent to the selected search provider.",
+			"localNote": "API keys stay in Kucedr's local app data and are only sent to the selected search provider.",
 			"errors": {
 				"load": "Could not load search engine settings.",
 				"save": "Could not save the search engine API key.",
@@ -1099,7 +1099,7 @@
 			"selectModel": "Select a model",
 			"authentication": "Authentication",
 			"codexAuthDescription": "Connect a ChatGPT Plus or Pro account with the Codex device flow.",
-			"apiKeyDescription": "Uses the API key saved in Friday's Providers settings.",
+			"apiKeyDescription": "Uses the API key saved in Kucedr's Providers settings.",
 			"connected": "Connected",
 			"notConnected": "Not connected",
 			"connect": "Connect",
@@ -1124,12 +1124,12 @@
 			"saving": "Saving…",
 			"saved": "Saved",
 			"deviceCode": "Use this device code to authorize Codex:",
-			"deviceCodeHelp": "OpenAI may say the code came from a terminal; Friday is displaying that same code here. Copy it into the sign-in page.",
+			"deviceCodeHelp": "OpenAI may say the code came from a terminal; Kucedr is displaying that same code here. Copy it into the sign-in page.",
 			"copyCode": "Copy code",
 			"waitingForAuthorization": "Waiting for authorization…",
 			"completeLogin": "Complete the sign-in in your browser.",
 			"openLogin": "Open sign-in",
-			"toolWarning": "Pi does not provide a sandbox. Full coding tools run with your desktop account's file and shell permissions and do not use Friday's Agent permission rules.",
+			"toolWarning": "Pi does not provide a sandbox. Full coding tools run with your desktop account's file and shell permissions and do not use Kucedr's Agent permission rules.",
 			"apiKeyMissing": "Save an API key for {{provider}} in Providers before running the coder.",
 			"loadError": "Unable to load Coder settings.",
 			"saveError": "Unable to save Coder settings.",
@@ -1138,16 +1138,16 @@
 		},
 		"modelServices": {
 			"title": "Model services",
-			"description": "Review the job-specific model services available to Friday.",
+			"description": "Review the job-specific model services available to Kucedr.",
 			"subtitle": "Configure the model assignments each service uses for its job.",
 			"detailsTitle": "Model Service Details",
 			"history": "History",
 			"allModelServices": "All model services",
 			"identity": "Identity",
 			"configuration": "Configuration",
-			"fridayBreadcrumb": "Friday",
+			"kucedrBreadcrumb": "Kucedr",
 			"assistantName": "Agent",
-			"fridayDescription": "Chat, tools, and planning",
+			"kucedrDescription": "Chat, tools, and planning",
 			"speechTranscriberName": "Transcribe",
 			"speechTranscriberDescription": "Speech-to-text models",
 			"speechConfigurationSubtitle": "Choose the transcription provider and model.",
@@ -1169,14 +1169,14 @@
 			"testRealtimeStart": "Start",
 			"testRealtimeStop": "Stop",
 			"testTranscribeDescription": "Try realtime and recorded transcription with the selected models.",
-			"testTranscribeHint": "Example: press Record and say \"Hello Friday, testing one two three\", then stop to see the transcript.",
+			"testTranscribeHint": "Example: press Record and say \"Hello Kucedr, testing one two three\", then stop to see the transcript.",
 			"testTranscribeRecord": "Record",
 			"testTranscribeStop": "Stop & transcribe",
 			"testTranscribeTranscribing": "Transcribing…",
 			"testTranscribeEmpty": "No speech detected.",
 			"testTranscribeError": "Speech transcription failed.",
 			"testVoiceDescription": "Speak sample text with the selected voice model.",
-			"testVoiceExample": "Hi, I'm Friday. This is a sample of the selected voice.",
+			"testVoiceExample": "Hi, I'm Kucedr. This is a sample of the selected voice.",
 			"testVoicePlaceholder": "Enter text to speak",
 			"testVoiceSpeak": "Speak",
 			"testVoiceSpeaking": "Speaking…",
@@ -1229,7 +1229,7 @@
 			"thinkingMode": "Thinking Mode",
 			"thinkingModeDescription": "Enable extended reasoning for complex tasks",
 			"effort": "Reasoning effort",
-			"effortDescription": "Reasoning budget for Friday responses.",
+			"effortDescription": "Reasoning budget for Kucedr responses.",
 			"effortOptions": {
 				"none": "None",
 				"minimal": "Minimal",
@@ -1252,7 +1252,7 @@
 			"openFolderError": "Unable to open the extensions folder.",
 			"deleteAction": "Delete {{name}}",
 			"deleteTitle": "Delete extension",
-			"deleteDescription": "Delete {{name}}? This permanently removes its folder from Friday and cannot be undone.",
+			"deleteDescription": "Delete {{name}}? This permanently removes its folder from Kucedr and cannot be undone.",
 			"deleting": "Deleting...",
 			"deleteError": "Unable to delete the extension.",
 			"refresh": "Refresh",
@@ -1273,7 +1273,7 @@
 		},
 		"plugins": {
 			"title": "Installed plugins",
-			"description": "Plugins that add providers, skills, extensions, and more to Friday.",
+			"description": "Plugins that add providers, skills, extensions, and more to Kucedr.",
 			"refresh": "Refresh",
 			"upload": "Upload Plugin",
 			"uploading": "Uploading...",
@@ -1286,7 +1286,7 @@
 		},
 		"skills": {
 			"title": "Installed skills",
-			"description": "Upload, download, inspect, or remove local skills available to Friday.",
+			"description": "Upload, download, inspect, or remove local skills available to Kucedr.",
 			"refresh": "Refresh",
 			"upload": "Upload Skill",
 			"uploading": "Uploading...",
@@ -1318,7 +1318,7 @@
 			"detailDiagnostics": "Diagnostics",
 			"empty": "No skills installed",
 			"emptyDescription": "Import a folder that contains SKILL.md.",
-			"confirmDelete": "Delete {{name}}? This removes the skill folder from Friday.",
+			"confirmDelete": "Delete {{name}}? This removes the skill folder from Kucedr.",
 			"loadError": "Unable to load skills.",
 			"uploadError": "Unable to upload skill.",
 			"downloadError": "Unable to download skill.",
@@ -1327,9 +1327,9 @@
 			"openFolderError": "Unable to open skill folder."
 		},
 		"channels": {
-			"description": "Choose which messaging channels Friday can connect to.",
+			"description": "Choose which messaging channels Kucedr can connect to.",
 			"defaultTitle": "Default channel",
-			"defaultDescription": "Channel Friday uses when no channel is named.",
+			"defaultDescription": "Channel Kucedr uses when no channel is named.",
 			"defaultPlaceholder": "No default channel",
 			"errors": {
 				"load": "Could not load channels.",
@@ -1384,7 +1384,7 @@
 			"removeGroupAllowFrom": "Remove {{value}}",
 			"noGroupAllowFrom": "No group routes allowed.",
 			"llmModel": "LLM model",
-			"llmModelDescription": "Model used by Friday to reason and answer channel messages.",
+			"llmModelDescription": "Model used by Kucedr to reason and answer channel messages.",
 			"sttModel": "STT model",
 			"sttModelDescription": "Speech model used to transcribe inbound voice messages.",
 			"ttsModel": "TTS model",
@@ -1440,13 +1440,13 @@
 			"enabled": "Enable RAG",
 			"enabledDescription": "Document indexing and assistant search.",
 			"embeddingConsent": "Send document text for embeddings",
-			"embeddingConsentDescription": "Let Friday send document chunks to the embedding provider. Changing provider or model requires new consent.",
+			"embeddingConsentDescription": "Let Kucedr send document chunks to the embedding provider. Changing provider or model requires new consent.",
 			"embeddingModelTitle": "Embedding model",
 			"embeddingModelDescription": "Model used to embed RAG documents for vector search.",
 			"configurationTitle": "Configuration",
 			"indexName": "Index name",
 			"indexNameDescription": "Local knowledge index name, also used by the Pinecone mirror.",
-			"indexNamePlaceholder": "friday",
+			"indexNamePlaceholder": "kucedr",
 			"documentsDescription": "Text files in selected folders and subfolders are chunked, embedded, and stored locally.",
 			"sourceFolder": "Source folders",
 			"sourcePlaceholder": "Choose one or more folders containing text files",
@@ -1457,7 +1457,7 @@
 			"saveError": "Unable to save RAG settings.",
 			"scheduleTitle": "Automation",
 			"scheduleFrequency": "Indexing frequency",
-			"scheduleDescription": "Choose how often Friday checks the selected folders for new or changed files.",
+			"scheduleDescription": "Choose how often Kucedr checks the selected folders for new or changed files.",
 			"scheduleOptions": {
 				"off": "Off",
 				"every4h": "Every 4 hours",
@@ -1489,11 +1489,11 @@
 			"ragIndex": "Full local knowledge index",
 			"ragIndexDescription": "All local namespaces, chunks, and vectors. Remote data is excluded.",
 			"ragNamespace": "Active local namespace",
-			"ragNamespaceDescription": "Only the currently published local Friday namespace.",
+			"ragNamespaceDescription": "Only the currently published local Kucedr namespace.",
 			"remoteNamespace": "Pinecone namespace",
-			"remoteNamespaceDescription": "Only the matching Friday-owned remote namespace; the Pinecone index is never deleted.",
-			"remoteAllNamespaces": "All Friday Pinecone namespaces",
-			"remoteAllNamespacesDescription": "Every Friday-owned namespace in the configured Pinecone index; unrelated namespaces and the index remain.",
+			"remoteNamespaceDescription": "Only the matching Kucedr-owned remote namespace; the Pinecone index is never deleted.",
+			"remoteAllNamespaces": "All Kucedr Pinecone namespaces",
+			"remoteAllNamespacesDescription": "Every Kucedr-owned namespace in the configured Pinecone index; unrelated namespaces and the index remain.",
 			"wiki": "Managed wiki",
 			"wikiDescription": "Compiled pages and app-owned state for the configured target.",
 			"loadError": "Unable to load data-management scopes.",
@@ -1512,7 +1512,7 @@
 			"requireReview": "Review major changes",
 			"requireReviewDescription": "Require approval for major wiki changes.",
 			"lintOnStartup": "Lint on startup",
-			"lintOnStartupDescription": "Check wiki integrity when Friday starts.",
+			"lintOnStartupDescription": "Check wiki integrity when Kucedr starts.",
 			"configurationTitle": "Configuration",
 			"modelTitle": "Wiki model",
 			"modelDescription": "Choose the model that maintains the wiki.",
@@ -1524,7 +1524,7 @@
 			"pickTarget": "Choose generated wiki folder",
 			"scheduleTitle": "Automation",
 			"scheduleFrequency": "Generation frequency",
-			"scheduleDescription": "Choose how often Friday processes new or changed sources.",
+			"scheduleDescription": "Choose how often Kucedr processes new or changed sources.",
 			"scheduleOptions": {
 				"off": "Off",
 				"every4h": "Every 4 hours",
@@ -2364,7 +2364,7 @@
 		"saveError": "Failed to save changes. The field is still open so you can retry."
 	},
 	"toolPermission": {
-		"title": "Allow Friday to {{action}}?",
+		"title": "Allow Kucedr to {{action}}?",
 		"hostAccess": "Host access",
 		"destructiveOperation": "Destructive operation",
 		"outsideLocations": "Outside trusted locations",

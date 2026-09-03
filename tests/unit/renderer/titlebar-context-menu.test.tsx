@@ -9,7 +9,7 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/components/ui/gradient-sphere', () => ({
-	GradientSphere: () => <span data-testid="friday-logo" />,
+	GradientSphere: () => <span data-testid="kucedr-logo" />,
 }));
 
 const showContextMenu = jest.fn();
@@ -150,10 +150,10 @@ it('renders a transparent titlebar without visible title text', () => {
 	expect(titleBar).toHaveClass('bg-transparent');
 	expect(titleBar).not.toHaveClass('app-translucent-surface');
 	expect(within(titleBar as HTMLElement).queryByText('Application Name')).not.toBeInTheDocument();
-	expect(within(titleBar as HTMLElement).queryByText('Friday')).not.toBeInTheDocument();
+	expect(within(titleBar as HTMLElement).queryByText('Kucedr')).not.toBeInTheDocument();
 });
 
-it('shows the Friday logo and label inside the Home button on Settings', async () => {
+it('shows the Kucedr logo and label inside the Home button on Settings', async () => {
 	const user = userEvent.setup();
 
 	render(
@@ -167,8 +167,8 @@ it('shows the Friday logo and label inside the Home button on Settings', async (
 	);
 	const homeButton = screen.getByRole('button', { name: 'titleBar.home' });
 
-	expect(within(homeButton).getByTestId('friday-logo')).toBeInTheDocument();
-	expect(within(homeButton).getByText('Friday')).toBeInTheDocument();
+	expect(within(homeButton).getByTestId('kucedr-logo')).toBeInTheDocument();
+	expect(within(homeButton).getByText('Kucedr')).toBeInTheDocument();
 
 	await user.click(homeButton);
 

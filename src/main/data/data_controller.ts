@@ -251,7 +251,7 @@ function describeScope(scope: DataScope): string {
 		return `remote Pinecone namespace ${scope.generation} in ${scope.indexName}`;
 	}
 	if (scope.mode === 'remote_all_namespaces') {
-		return `all Friday-owned remote Pinecone namespaces in ${scope.indexName}`;
+		return `all Kucedr-owned remote Pinecone namespaces in ${scope.indexName}`;
 	}
 	return `all local RAG data in ${scope.indexName}`;
 }

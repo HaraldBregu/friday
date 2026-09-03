@@ -1,6 +1,6 @@
 # Settings UI
 
-Settings is Friday's configuration workspace after setup. It combines application preferences,
+Settings is Kucedr's configuration workspace after setup. It combines application preferences,
 assistant and provider selection, background work, knowledge, permissions, messaging channels,
 and integrations under `/settings`.
 
@@ -79,7 +79,7 @@ Settings uses both immediate and explicit persistence:
 ### Account
 
 Account should show local or signed-in status and the current email when available. Local users can
-start sign-in; signed-in users can sign out and continue using Friday on the device. A sign-out
+start sign-in; signed-in users can sign out and continue using Kucedr on the device. A sign-out
 failure should appear inline.
 
 ### General
@@ -110,7 +110,7 @@ System should link to separate Microphone, Camera, and Screen capture pages.
 
 On platforms where explicit operating-system status is unavailable, permission status may remain
 unknown. Screen testing uses the display source supplied by Electron and does not provide an
-additional Friday source picker.
+additional Kucedr source picker.
 
 ## Assistant and Coder
 
@@ -193,12 +193,12 @@ options that belonged to the previous model rather than carrying incompatible va
 
 ## Cloud storage
 
-Cloud should use the signed-in Friday account's private Supabase storage directly. It should not
+Cloud should use the signed-in Kucedr account's private Supabase storage directly. It should not
 show a storage provider, profile selector, endpoint, bucket, or storage credentials.
 
 Cloud should allow the user to:
 
-- include known Friday folders and additional folders selected from the system picker;
+- include known Kucedr folders and additional folders selected from the system picker;
 - select an automatic sync interval or edit the cron expression;
 - save or cancel sync changes;
 - run a backup immediately;
@@ -254,7 +254,7 @@ add HTTP or local-command servers.
 Server details should support test, enable/disable, edit, OAuth where configured, approval policy,
 deferred-loading preference, and confirmed removal of configured servers. Local package changes
 should be written to that package's `mcp.json`; configured server changes should be written to
-Friday settings. Registry and connection diagnostics should remain visible.
+Kucedr settings. Registry and connection diagnostics should remain visible.
 
 ### A2A agents
 

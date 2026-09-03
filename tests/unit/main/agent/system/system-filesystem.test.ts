@@ -11,7 +11,7 @@ describe('agent filesystem prompt', () => {
 	let root: string;
 
 	beforeEach(async () => {
-		root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-agent-filesystem-'));
+		root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-agent-filesystem-'));
 	});
 
 	afterEach(async () => {

@@ -26,7 +26,7 @@ it.each([
 
 	function TestHomeAgent() {
 		const agent = useHomeAgent({ setMode: jest.fn() });
-		return <textarea ref={agent.inputRef} aria-label="Message Friday" />;
+		return <textarea ref={agent.inputRef} aria-label="Message Kucedr" />;
 	}
 
 	render(
@@ -38,5 +38,5 @@ it.each([
 	fireEvent.keyDown(window, { key: 'n', ...modifier });
 
 	expect(setSessionId).toHaveBeenCalledWith(sessionId);
-	expect(screen.getByRole('textbox', { name: 'Message Friday' })).toHaveFocus();
+	expect(screen.getByRole('textbox', { name: 'Message Kucedr' })).toHaveFocus();
 });

@@ -14,9 +14,9 @@ jest.mock('../../../../src/main/shared/user_data_location', () => ({
 import { readRagManifest, writeRagManifest } from '../../../../src/main/agent/knowledge/rag/rag_manifest';
 
 const manifest = {
-	indexName: 'friday',
-	activeNamespace: 'friday-a1b2c3d4',
-	artifactFile: 'embeddings-friday-a1b2c3d4.json',
+	indexName: 'kucedr',
+	activeNamespace: 'kucedr-a1b2c3d4',
+	artifactFile: 'embeddings-kucedr-a1b2c3d4.json',
 	providerId: 'openai',
 	modelId: 'text-embedding-3-small',
 	dimensions: 1536,

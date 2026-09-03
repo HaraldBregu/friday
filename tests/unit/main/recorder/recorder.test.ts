@@ -10,7 +10,7 @@ describe('recorder capture ownership', () => {
 
 	beforeEach(async () => {
 		jest.clearAllMocks();
-		directory = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-recorder-'));
+		directory = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-recorder-'));
 	});
 
 	afterEach(async () => {

@@ -1,15 +1,15 @@
 {
-	"id": "friday-configured-demo",
-	"name": "Friday Configured Demo",
+	"id": "kucedr-configured-demo",
+	"name": "Kucedr Configured Demo",
 	"type": "stdio",
 	"command": "node",
 	"args": ["server.mjs"],
 	"cwd": ".",
 	"env": {
-		"DEMO_COMPANY": "Friday Studio",
+		"DEMO_COMPANY": "Kucedr Studio",
 		"DEMO_CURRENCY": "EUR",
 		"DEMO_TAX_RATE": "22",
-		"DEMO_SIGN_OFF": "The Friday Studio team"
+		"DEMO_SIGN_OFF": "The Kucedr Studio team"
 	},
 	"require_approval": "always",
 	"enabled": true

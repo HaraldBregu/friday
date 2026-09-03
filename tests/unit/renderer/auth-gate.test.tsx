@@ -10,7 +10,7 @@ import { useOnboarding } from '../../../src/renderer/src/contexts/useOnboarding'
 import StartPage from '../../../src/renderer/src/pages/start/StartPage';
 
 jest.mock('../../../src/renderer/src/components/app/base/logo-view', () => ({
-	LogoView: () => <span aria-label="Friday" />,
+	LogoView: () => <span aria-label="Kucedr" />,
 }));
 
 jest.mock('../../../src/renderer/src/pages/start/components/SetupProviderStep', () => ({
@@ -134,7 +134,7 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 it.each(['/home', '/settings/account'])(
 	'preserves %s when a configured signed-in session is refreshed',
 	async (path) => {
-		sessionStorage.setItem('friday-onboarding-started', 'true');
+		sessionStorage.setItem('kucedr-onboarding-started', 'true');
 		window.auth = authApi({
 			status: 'signedIn',
 			persistence: 'encrypted',
@@ -284,7 +284,7 @@ it('takes skipped sign-in to setup in place when configuration is incomplete', a
 	await user.click(await screen.findByRole('button', { name: 'Skip and continue' }));
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
-	expect(localStorage.getItem('friday-auth-local-only')).toBeNull();
+	expect(localStorage.getItem('kucedr-auth-local-only')).toBeNull();
 });
 
 it('keeps a configured user in the app after signing out', async () => {

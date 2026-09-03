@@ -1,4 +1,4 @@
-# Contributing to Friday
+# Contributing to Kucedr
 
 Thanks for your interest in contributing! This document describes how to set up the project, the quality bar for changes, and the conventions used in this repository.
 
@@ -36,8 +36,8 @@ npm run typecheck
 npm run build
 npm run test:packages
 npm run build:packages
-npm pack --dry-run --workspace @friday/sdk
-npm pack --dry-run --workspace @friday/cli
+npm pack --dry-run --workspace @kucedr/sdk
+npm pack --dry-run --workspace @kucedr/cli
 ```
 
 Additional commands:
@@ -87,7 +87,7 @@ See [SECURITY.md](SECURITY.md) for the security policy.
 
 ## Reporting Issues
 
-Open a GitHub issue at the [project repository](https://github.com/HaraldBregu/friday) with steps to reproduce, expected vs. actual behavior, and your platform (OS, app version). For security vulnerabilities, do **not** open a public issue — follow [SECURITY.md](SECURITY.md) instead.
+Open a GitHub issue at the [project repository](https://github.com/HaraldBregu/kucedr) with steps to reproduce, expected vs. actual behavior, and your platform (OS, app version). For security vulnerabilities, do **not** open a public issue — follow [SECURITY.md](SECURITY.md) instead.
 
 ## License
 

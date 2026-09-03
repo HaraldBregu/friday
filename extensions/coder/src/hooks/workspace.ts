@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	app,
 	coder as coderApi,
-	isFriday,
+	isKucedr,
 	type CoderProject,
 	type CoderResponseEvent,
 	type CoderRunMode,
 	type CoderSessionBlock,
 	type CoderSessionSummary,
 	type CoderSettings,
-} from '@friday/sdk';
+} from '@kucedr/sdk';
 
 import type { CoderBlock, CoderController, RunState } from '@/controller';
 
@@ -25,9 +25,9 @@ const previewSettings: CoderSettings = {
 };
 const previewProjects: CoderProject[] = [
 	{
-		id: 'friday',
-		name: 'friday',
-		directory: '/workspace/friday',
+		id: 'kucedr',
+		name: 'kucedr',
+		directory: '/workspace/kucedr',
 		kind: 'agent-workspace',
 		createdAt: previewTimestamp,
 		lastOpenedAt: previewTimestamp,
@@ -46,14 +46,14 @@ const previewProjects: CoderProject[] = [
 const previewSessions: CoderSessionSummary[] = [
 	{
 		id: 'session-1',
-		projectId: 'friday',
+		projectId: 'kucedr',
 		title: 'Remember recent commands',
 		createdAt: previewTimestamp,
 		updatedAt: previewTimestamp,
 		messageCount: 5,
 	},
 ];
-const previewSessionsByProject = { friday: previewSessions, website: [] };
+const previewSessionsByProject = { kucedr: previewSessions, website: [] };
 const previewBlocks: CoderBlock[] = [
 	{
 		id: 'preview-user',
@@ -82,7 +82,7 @@ const previewBlocks: CoderBlock[] = [
 ];
 
 export function useCoderWorkspace(): CoderController {
-	const preview = !isFriday();
+	const preview = !isKucedr();
 	const activeRunIdRef = useRef('');
 	const cancelRequestedRef = useRef(false);
 	const runningRef = useRef(false);
@@ -96,7 +96,7 @@ export function useCoderWorkspace(): CoderController {
 	);
 	const [blocks, setBlocks] = useState<CoderBlock[]>(preview ? previewBlocks : []);
 	const [activeProjectId, setActiveProjectId] = useState<string | undefined>(
-		preview ? 'friday' : undefined
+		preview ? 'kucedr' : undefined
 	);
 	const [activeSessionId, setActiveSessionId] = useState<string | undefined>(
 		preview ? 'session-1' : undefined
@@ -108,7 +108,7 @@ export function useCoderWorkspace(): CoderController {
 	const [runLabel, setRunLabel] = useState(preview ? 'Preview' : 'Loading');
 	const [error, setError] = useState('');
 	const [leftOpen, setLeftOpen] = useState(true);
-	const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>(preview ? ['friday'] : []);
+	const [expandedProjectIds, setExpandedProjectIds] = useState<string[]>(preview ? ['kucedr'] : []);
 	const [busy, setBusy] = useState(!preview);
 	const sessions = activeProjectId ? (sessionsByProject[activeProjectId] ?? []) : [];
 
@@ -116,8 +116,8 @@ export function useCoderWorkspace(): CoderController {
 		async (projectId: string, preferredSessionId?: string): Promise<void> => {
 			if (preview) {
 				setActiveProjectId(projectId);
-				setActiveSessionId(projectId === 'friday' ? 'session-1' : undefined);
-				setBlocks(projectId === 'friday' ? previewBlocks : []);
+				setActiveSessionId(projectId === 'kucedr' ? 'session-1' : undefined);
+				setBlocks(projectId === 'kucedr' ? previewBlocks : []);
 				return;
 			}
 			const sequence = ++loadSequenceRef.current;
@@ -407,7 +407,7 @@ export function useCoderWorkspace(): CoderController {
 		const project = projects.find((item) => item.id === activeProjectId);
 		if (!requestInput || !project || !project.available || runningRef.current) return;
 		if (!settings.modelId.trim()) {
-			setError('Select and connect a model in Friday Settings → Coder before starting.');
+			setError('Select and connect a model in Kucedr Settings → Coder before starting.');
 			setRunState('error');
 			setRunLabel('Setup needed');
 			return;

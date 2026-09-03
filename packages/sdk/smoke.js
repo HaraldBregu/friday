@@ -6,7 +6,7 @@ import {
 	coder,
 	connect,
 	isExtensionStoreValue,
-	isFriday,
+	isKucedr,
 	models,
 	terminal,
 	win,
@@ -14,7 +14,7 @@ import {
 
 // --- embedded mode: bound to the app's preload globals ----------------------
 
-assert.equal(isFriday(), false);
+assert.equal(isKucedr(), false);
 assert.throws(() => app.getTheme, /unavailable/);
 assert.throws(() => agent.getWorkspaceLocation, /unavailable/);
 assert.throws(() => coder.getSettings, /unavailable/);
@@ -55,7 +55,7 @@ globalThis.app = {
 	onThemeModeChanged: () => () => undefined,
 };
 globalThis.agent = {
-	getWorkspaceLocation: async () => '/tmp/friday-workspace',
+	getWorkspaceLocation: async () => '/tmp/kucedr-workspace',
 	listWorkspaceFiles: async () => [workspaceFile],
 	readWorkspaceFile: async (filePath) => `content:${filePath}`,
 	readWorkspaceAsset: async () => ({ mimeType: 'image/png', data: new Uint8Array([1, 2, 3]) }),
@@ -80,8 +80,8 @@ const coderSettings = {
 };
 const coderProject = {
 	id: 'project-1',
-	name: 'friday-workspace',
-	directory: '/tmp/friday-workspace',
+	name: 'kucedr-workspace',
+	directory: '/tmp/kucedr-workspace',
 	kind: 'agent-workspace',
 	createdAt: '2026-08-20T10:00:00.000Z',
 	lastOpenedAt: '2026-08-20T10:00:00.000Z',
@@ -89,13 +89,13 @@ const coderProject = {
 };
 const coderInstructions = {
 	projectId: coderProject.id,
-	activeFilePath: '/tmp/friday-workspace/AGENTS.md',
+	activeFilePath: '/tmp/kucedr-workspace/AGENTS.md',
 	activeFileName: 'AGENTS.md',
 	content: '# Instructions',
 	exists: true,
 	editable: true,
 	revision: 'revision-1',
-	loadedSources: [{ path: '/tmp/friday-workspace/AGENTS.md', scope: 'workspace' }],
+	loadedSources: [{ path: '/tmp/kucedr-workspace/AGENTS.md', scope: 'workspace' }],
 };
 globalThis.coder = {
 	getSettings: async () => coderSettings,
@@ -159,7 +159,7 @@ globalThis.terminalAPI = {
 	create: async (request) => ({
 		...request,
 		shell: '/bin/zsh',
-		cwd: request.cwd ?? '/tmp/friday-workspace',
+		cwd: request.cwd ?? '/tmp/kucedr-workspace',
 		createdAt: 1,
 	}),
 	write: () => undefined,
@@ -193,7 +193,7 @@ globalThis.win = {
 	onTitlebarSidebarWidthChanged: () => () => undefined,
 };
 
-assert.equal(isFriday(), true);
+assert.equal(isKucedr(), true);
 assert.equal(isExtensionStoreValue({ color: 'blue', sizes: [1, 2] }), true);
 assert.equal(isExtensionStoreValue({ invalid: Number.NaN }), false);
 assert.deepEqual(await app.getThemeData(), {
@@ -213,10 +213,10 @@ const writeExtensionStoreFile = globalThis.app.writeExtensionStoreFile;
 delete globalThis.app.writeExtensionStoreFile;
 assert.throws(
 	() => app.writeExtensionStoreFile,
-	/app\.writeExtensionStoreFile.*update the Friday host/
+	/app\.writeExtensionStoreFile.*update the Kucedr host/
 );
 globalThis.app.writeExtensionStoreFile = writeExtensionStoreFile;
-assert.equal(await agent.getWorkspaceLocation(), '/tmp/friday-workspace');
+assert.equal(await agent.getWorkspaceLocation(), '/tmp/kucedr-workspace');
 assert.deepEqual(await agent.listWorkspaceFiles(), [workspaceFile]);
 assert.equal(await agent.readWorkspaceFile('USER.md'), 'content:USER.md');
 assert.deepEqual(await agent.readWorkspaceAsset('photo.png'), {
@@ -338,7 +338,7 @@ const server = createServer(async (req, res) => {
 	assert.equal(req.headers.authorization, 'Bearer secret');
 	if (req.url === '/health') {
 		res.writeHead(200, { 'content-type': 'application/json' });
-		res.end(JSON.stringify({ name: 'friday', version: '1.0.0' }));
+		res.end(JSON.stringify({ name: 'kucedr', version: '1.0.0' }));
 		return;
 	}
 	if (req.url === '/events') {
@@ -357,7 +357,7 @@ const server = createServer(async (req, res) => {
 			success: true,
 			data:
 				channel === 'agent:workspace:location:get'
-					? '/tmp/friday-workspace'
+					? '/tmp/kucedr-workspace'
 					: channel === 'agent:workspace:files:list'
 						? [workspaceFile]
 						: channel === 'agent:workspace:file:read'
@@ -370,26 +370,26 @@ const server = createServer(async (req, res) => {
 });
 
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-const friday = connect({ url: `http://127.0.0.1:${server.address().port}`, token: 'secret' });
+const kucedr = connect({ url: `http://127.0.0.1:${server.address().port}`, token: 'secret' });
 
-assert.deepEqual(await friday.ping(), { name: 'friday', version: '1.0.0' });
-assert.throws(() => friday.app.getExtensionStoreValue, /not available over the API/);
-await friday.app.getThemeData();
-assert.equal(await friday.agent.getWorkspaceLocation(), '/tmp/friday-workspace');
-assert.deepEqual(await friday.agent.listWorkspaceFiles(), [workspaceFile]);
-assert.equal(await friday.agent.readWorkspaceFile('USER.md'), 'content:USER.md');
-assert.deepEqual(await friday.agent.readWorkspaceAsset('photo.png'), {
+assert.deepEqual(await kucedr.ping(), { name: 'kucedr', version: '1.0.0' });
+assert.throws(() => kucedr.app.getExtensionStoreValue, /not available over the API/);
+await kucedr.app.getThemeData();
+assert.equal(await kucedr.agent.getWorkspaceLocation(), '/tmp/kucedr-workspace');
+assert.deepEqual(await kucedr.agent.listWorkspaceFiles(), [workspaceFile]);
+assert.equal(await kucedr.agent.readWorkspaceFile('USER.md'), 'content:USER.md');
+assert.deepEqual(await kucedr.agent.readWorkspaceAsset('photo.png'), {
 	mimeType: 'image/png',
 	data: new Uint8Array([1, 2, 3]),
 });
-await friday.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
-await friday.agent.writeWorkspaceFile('diagram.mmd', 'flowchart LR');
-await friday.agent.createWorkspaceFile('', 'draft.md');
-await friday.agent.createWorkspaceDirectory('notes', 'ideas');
-await friday.agent.moveWorkspaceEntry('draft.md', 'notes');
-await friday.agent.renameWorkspaceEntry('notes/draft.md', 'idea.md');
-await friday.agent.deleteWorkspaceFile('old.md');
-await friday.agent.deleteWorkspaceDirectory('archive');
+await kucedr.agent.writeWorkspaceMarkdown('USER.md', '# Updated');
+await kucedr.agent.writeWorkspaceFile('diagram.mmd', 'flowchart LR');
+await kucedr.agent.createWorkspaceFile('', 'draft.md');
+await kucedr.agent.createWorkspaceDirectory('notes', 'ideas');
+await kucedr.agent.moveWorkspaceEntry('draft.md', 'notes');
+await kucedr.agent.renameWorkspaceEntry('notes/draft.md', 'idea.md');
+await kucedr.agent.deleteWorkspaceFile('old.md');
+await kucedr.agent.deleteWorkspaceDirectory('archive');
 
 assert.deepEqual(
 	calls.map((call) => call.channel),
@@ -412,7 +412,7 @@ assert.deepEqual(
 
 // events reach subscribers over the stream
 const seen = [];
-friday.app.onChannelsStatusChanged((event) => seen.push(event));
+kucedr.app.onChannelsStatusChanged((event) => seen.push(event));
 await new Promise((resolve) => setTimeout(resolve, 100));
 stream.write(
 	`data: ${JSON.stringify({ channel: 'app:channels:status-changed', data: { ok: 1 } })}\n\n`
@@ -420,7 +420,7 @@ stream.write(
 await new Promise((resolve) => setTimeout(resolve, 100));
 assert.deepEqual(seen, [{ ok: 1 }]);
 
-friday.close();
+kucedr.close();
 server.close();
 stream?.end();
 

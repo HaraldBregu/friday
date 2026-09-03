@@ -5,7 +5,7 @@ import path from 'node:path';
 import matter from 'gray-matter';
 
 jest.mock('../../../../src/main/agent/knowledge/wiki/wiki_location', () => ({
-	wikiLocation: () => '/tmp/friday-wiki-provenance-data',
+	wikiLocation: () => '/tmp/kucedr-wiki-provenance-data',
 }));
 
 import { applyWikiUpdate } from '../../../../src/main/agent/knowledge/wiki/wiki_apply_update';
@@ -23,10 +23,10 @@ import { verifyWikiEvidence } from '../../../../src/main/agent/knowledge/wiki/wi
 
 describe('wiki evidence provenance', () => {
 	it('computes excerpt hashes and rejects locator, hash, and archive tampering durably', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-provenance-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-provenance-'));
 		const target = path.join(root, 'wiki');
 		const archive = path.join(root, 'evidence.md');
-		const content = '# Evidence\nFriday stores durable facts.\nA final line.\n';
+		const content = '# Evidence\nKucedr stores durable facts.\nA final line.\n';
 		const checksum = createHash('sha256').update(content).digest('hex');
 		const source: WikiSource = {
 			absolutePath: archive,
@@ -63,7 +63,7 @@ describe('wiki evidence provenance', () => {
 			sourceId: source.sourceId,
 			locator: 'lines 2-2',
 			evidenceType: 'direct',
-			excerptHash: createHash('sha256').update('Friday stores durable facts.').digest('hex'),
+			excerptHash: createHash('sha256').update('Kucedr stores durable facts.').digest('hex'),
 		});
 		await expect(
 			verifyWikiEvidence(
@@ -84,12 +84,12 @@ describe('wiki evidence provenance', () => {
 						path: 'facts.md',
 						title: 'Durable facts',
 						summary: 'Verified source-backed facts.',
-						content: 'Friday stores durable facts.',
+						content: 'Kucedr stores durable facts.',
 						sources: ['evidence.md'],
 						claims: [
 							{
 								id: 'claim-durable',
-								statement: 'Friday stores durable facts.',
+								statement: 'Kucedr stores durable facts.',
 								evidence: [
 									{
 										sourceId: source.sourceId!,
@@ -130,7 +130,7 @@ describe('wiki evidence provenance', () => {
 	});
 
 	it('rolls back stale claims and publishes lineage only after a successful transaction', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-lineage-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-lineage-'));
 		const target = path.join(root, 'wiki');
 		const sourcePath = path.join(root, 'notes.md');
 		const repository = getWikiRepository(target);

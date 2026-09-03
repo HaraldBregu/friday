@@ -1,7 +1,7 @@
 {
-	"name": "@friday/sdk",
+	"name": "@kucedr/sdk",
 	"version": "0.1.0",
-	"description": "Typed client for the Friday desktop app API",
+	"description": "Typed client for the Kucedr desktop app API",
 	"type": "module",
 	"main": "./dist/packages/sdk/index.js",
 	"types": "./dist/packages/sdk/index.d.ts",
@@ -19,12 +19,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HaraldBregu/friday.git",
+		"url": "git+https://github.com/HaraldBregu/kucedr.git",
 		"directory": "packages/sdk"
 	},
-	"homepage": "https://github.com/HaraldBregu/friday/tree/main/packages/sdk#readme",
+	"homepage": "https://github.com/HaraldBregu/kucedr/tree/main/packages/sdk#readme",
 	"bugs": {
-		"url": "https://github.com/HaraldBregu/friday/issues"
+		"url": "https://github.com/HaraldBregu/kucedr/issues"
 	},
 	"scripts": {
 		"clean": "rimraf dist",
@@ -43,7 +43,7 @@
 		"typescript": "^5.9.2"
 	},
 	"keywords": [
-		"friday",
+		"kucedr",
 		"sdk"
 	],
 	"author": "Harald Bregu <harald.bregu@gmail.com>",

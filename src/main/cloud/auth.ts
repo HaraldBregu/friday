@@ -225,7 +225,7 @@ export class AuthService {
 
 	async handleDeepLink(value: string): Promise<AuthState> {
 		const url = new URL(value);
-		if (url.protocol !== 'friday:' || url.hostname !== 'auth' || url.pathname !== '/callback') {
+		if (url.protocol !== 'kucedr:' || url.hostname !== 'auth' || url.pathname !== '/callback') {
 			throw new Error('The authentication link is invalid.');
 		}
 		if (url.searchParams.has('error')) throw new Error('The authentication link was rejected.');
@@ -286,7 +286,7 @@ export class AuthService {
 
 	private accountMismatchError(): Error {
 		const error = new Error(
-			'This local Friday profile belongs to another account. Use that account or a separate operating-system profile.'
+			'This local Kucedr profile belongs to another account. Use that account or a separate operating-system profile.'
 		);
 		error.name = 'AccountMismatchError';
 		return error;

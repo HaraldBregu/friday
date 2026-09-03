@@ -291,7 +291,7 @@ describe('RealtimeVoiceManager', () => {
 	});
 
 	it('replays persisted transcripts on restart without leaking another chat history', async () => {
-		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-voice-manager-'));
+		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-voice-manager-'));
 		const requests: RealtimeVoiceAdapterRequest[] = [];
 		const adapterEmits: RealtimeVoiceAdapterEventHandler[] = [];
 		const manager = new RealtimeVoiceManager({

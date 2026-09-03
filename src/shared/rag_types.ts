@@ -1,4 +1,4 @@
-export const DEFAULT_RAG_INDEX_NAME = 'friday';
+export const DEFAULT_RAG_INDEX_NAME = 'kucedr';
 
 export interface RagConfiguration {
 	enabled: boolean;

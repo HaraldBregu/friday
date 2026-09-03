@@ -5,11 +5,11 @@ import { resolveLaunchTarget } from '../src/launch.js';
 test('resolves platform launch targets without invoking a shell', () => {
 	assert.deepEqual(resolveLaunchTarget({ platform: 'darwin', env: {} }), {
 		command: 'open',
-		args: ['-a', 'Friday'],
+		args: ['-a', 'Kucedr'],
 		detached: false,
 	});
 	assert.deepEqual(resolveLaunchTarget({ platform: 'linux', env: {} }), {
-		command: 'friday-desktop',
+		command: 'kucedr-desktop',
 		args: [],
 		detached: true,
 	});
@@ -20,7 +20,7 @@ test('resolves platform launch targets without invoking a shell', () => {
 			exists: () => true,
 		}),
 		{
-			command: 'C:\\Local/Programs/Friday/Friday.exe',
+			command: 'C:\\Local/Programs/Kucedr/Kucedr.exe',
 			args: [],
 			detached: true,
 		}
@@ -28,10 +28,10 @@ test('resolves platform launch targets without invoking a shell', () => {
 	assert.deepEqual(
 		resolveLaunchTarget({
 			platform: 'linux',
-			env: { FRIDAY_APP_PATH: '/opt/Friday.AppImage' },
+			env: { KUCEDR_APP_PATH: '/opt/Kucedr.AppImage' },
 		}),
 		{
-			command: '/opt/Friday.AppImage',
+			command: '/opt/Kucedr.AppImage',
 			args: [],
 			detached: true,
 		}

@@ -7,7 +7,7 @@ describe('realPath', () => {
 	let tempDir: string;
 
 	beforeEach(() => {
-		tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-policy-'));
+		tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-policy-'));
 	});
 
 	afterEach(() => {

@@ -1,21 +1,21 @@
-# Friday plugins
+# Kucedr plugins
 
-Friday discovers user-installed plugins from:
+Kucedr discovers user-installed plugins from:
 
 ```text
 <Electron userData>/plugins/<plugin-id>/manifest.json
 ```
 
-Install a published or local plugin with the Friday CLI:
+Install a published or local plugin with the Kucedr CLI:
 
 ```sh
-friday install package-one
-friday install ./path/to/plugin
+kucedr install package-one
+kucedr install ./path/to/plugin
 ```
 
-Use `friday tui` for the interactive terminal interface, then enter `/install package-one`.
+Use `kucedr tui` for the interactive terminal interface, then enter `/install package-one`.
 The CLI fetches npm packages without running lifecycle scripts, validates their manifest and
-contributed files, and installs them atomically. Restart Friday after installation.
+contributed files, and installs them atomically. Restart Kucedr after installation.
 
 The installed application directory is not used because packaged application files may be read-only
 or replaced by an update. Plugin IDs and contribution IDs use lowercase kebab-case. The plugin folder
@@ -94,18 +94,18 @@ A provider contribution only declares its `id`; the definition lives in `provide
 }
 ```
 
-Provider credentials do not belong in the manifest. They remain in Friday's provider settings store.
+Provider credentials do not belong in the manifest. They remain in Kucedr's provider settings store.
 Only declarative OpenAI-compatible chat providers are supported; custom executable provider adapters
 are not loaded into the Electron main process.
 
-Extension entries must be relative HTML paths inside the plugin folder. Friday verifies that each entry is
-a regular file and remains inside its plugin before exposing it. Plugin extensions run without Friday's
+Extension entries must be relative HTML paths inside the plugin folder. Kucedr verifies that each entry is
+a regular file and remains inside its plugin before exposing it. Plugin extensions run without Kucedr's
 preload API.
 
 Skills must contain `SKILL.md`. Language and theme contributions are JSON assets. MCP server
 contributions contain connection metadata but no credentials. Channel entries are cataloged as
 contained JavaScript modules but are not executed by this foundation; channel activation will require
-an explicit trust decision and lifecycle integration with Friday's channel registry.
+an explicit trust decision and lifecycle integration with Kucedr's channel registry.
 
 The main-process `PluginRepository` is the filesystem source of truth. It validates manifests, returns
 structured scan issues, rejects provider ID collisions, and catalogs providers, skills, extensions, MCP

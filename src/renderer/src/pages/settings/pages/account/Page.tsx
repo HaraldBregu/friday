@@ -45,7 +45,7 @@ const AccountPage: React.FC = () => {
 						description={
 							localOnly
 								? 'Sign in to sync your data across devices.'
-								: 'You can continue using Friday on this device after signing out.'
+								: 'You can continue using Kucedr on this device after signing out.'
 						}
 					>
 						{localOnly ? (

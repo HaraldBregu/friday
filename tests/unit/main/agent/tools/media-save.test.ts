@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-const agentDir = path.join(os.tmpdir(), 'friday-media-save-test');
+const agentDir = path.join(os.tmpdir(), 'kucedr-media-save-test');
 
 jest.mock('../../../../../src/main/shared/agent_location', () => ({
 	agentLocation: (): string => agentDir,

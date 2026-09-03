@@ -1,6 +1,6 @@
-# Friday Landing Page Build Prompt
+# Kucedr Landing Page Build Prompt
 
-Build a polished, responsive product landing page for **Friday**, a cross-platform desktop AI copilot that turns conversations into actions and turns useful work into reusable knowledge.
+Build a polished, responsive product landing page for **Kucedr**, a cross-platform desktop AI copilot that turns conversations into actions and turns useful work into reusable knowledge.
 
 This document is the source prompt for the page. Use the approved positioning and copy below. Keep every product claim consistent with the current implementation, especially the distinctions between Skills, the Knowledge Base, the LLM Wiki, and Extensions.
 
@@ -8,17 +8,17 @@ This document is the source prompt for the page. Use the approved positioning an
 
 The page should help a technically curious knowledge worker, developer, researcher, or AI power user understand three things within the first screen:
 
-1. Friday is a desktop agent that can act, not just chat.
-2. Friday can reuse workflows and ground answers in the user's own material.
+1. Kucedr is a desktop agent that can act, not just chat.
+2. Kucedr can reuse workflows and ground answers in the user's own material.
 3. The user chooses the providers, knowledge sources, and extensions behind the experience.
 
-The primary conversion is downloading Friday. The secondary conversion is viewing the project on GitHub. Documentation is the tertiary path.
+The primary conversion is downloading Kucedr. The secondary conversion is viewing the project on GitHub. Documentation is the tertiary path.
 
 Use these destinations unless the host project provides equivalent route constants:
 
-- **Download Friday:** `https://github.com/HaraldBregu/friday/releases`
-- **View on GitHub:** `https://github.com/HaraldBregu/friday`
-- **Read the docs:** `https://github.com/HaraldBregu/friday/tree/main/docs`
+- **Download Kucedr:** `https://github.com/HaraldBregu/kucedr/releases`
+- **View on GitHub:** `https://github.com/HaraldBregu/kucedr`
+- **Read the docs:** `https://github.com/HaraldBregu/kucedr/tree/main/docs`
 
 Do not add pricing, testimonials, customer logos, usage counters, or a newsletter form. No verified source material exists for them.
 
@@ -28,12 +28,12 @@ Do not add pricing, testimonials, customer logos, usage counters, or a newslette
 
 **Existing product tagline:** Your desktop AI copilot for everyday tasks.
 
-**Landing-page promise:** Friday connects action, reusable expertise, source-grounded retrieval, durable knowledge, and focused mini-apps in one desktop assistant.
+**Landing-page promise:** Kucedr connects action, reusable expertise, source-grounded retrieval, durable knowledge, and focused mini-apps in one desktop assistant.
 
 **Core narrative:**
 
 ```text
-Ask Friday to do the work
+Ask Kucedr to do the work
   -> activate the right reusable Skill
   -> retrieve evidence from the Knowledge Base
   -> build on durable knowledge in the LLM Wiki
@@ -48,7 +48,7 @@ Use the user-facing name **RAG** in application navigation. Marketing copy may i
 
 Use a compact sticky navigation bar.
 
-- Friday logo and wordmark on the left.
+- Kucedr logo and wordmark on the left.
 - Anchor links: **Product**, **Skills**, **Knowledge**, **Extensions**, **Control**.
 - Secondary action: **GitHub**.
 - Primary action: **Download**.
@@ -72,12 +72,12 @@ Turn conversations into action. Turn your work into lasting knowledge.
 **Supporting copy**
 
 ```text
-Friday works with your files, tools, and chosen AI providers—then makes the useful parts reusable through Skills, semantic document search, a source-aware LLM Wiki, and custom Extensions.
+Kucedr works with your files, tools, and chosen AI providers—then makes the useful parts reusable through Skills, semantic document search, a source-aware LLM Wiki, and custom Extensions.
 ```
 
 **Actions**
 
-- Primary: **Download Friday**
+- Primary: **Download Kucedr**
 - Secondary: **View on GitHub**
 
 **Supporting line**
@@ -93,7 +93,7 @@ Show four concise capability labels near the hero visual:
 - Source-aware LLM Wiki
 - Custom Extensions
 
-The hero visual should look like the real Friday desktop application, not a generic browser chat mockup. Show one request moving through visible activity states such as loading a skill, searching knowledge, reading a wiki page, and updating a local file. Do not invent a marketplace, team workspace, or autonomous background task result.
+The hero visual should look like the real Kucedr desktop application, not a generic browser chat mockup. Show one request moving through visible activity states such as loading a skill, searching knowledge, reading a wiki page, and updating a local file. Do not invent a marketplace, team workspace, or autonomous background task result.
 
 ### 3. Product foundation
 
@@ -106,17 +106,17 @@ One assistant, from request to result.
 **Section copy**
 
 ```text
-Type or speak a request, attach images or PDFs, and let Friday work across files, commands, the web, browser interactions, and generated media. Tool activity streams into the conversation, while permission controls govern sensitive file and command actions.
+Type or speak a request, attach images or PDFs, and let Kucedr work across files, commands, the web, browser interactions, and generated media. Tool activity streams into the conversation, while permission controls govern sensitive file and command actions.
 ```
 
 Present a short four-step flow:
 
 1. **Ask** — Start with a natural-language request and the context that matters.
-2. **Act** — Friday selects tools, works through the task, and shows its activity.
+2. **Act** — Kucedr selects tools, works through the task, and shows its activity.
 3. **Ground** — The assistant retrieves relevant source excerpts or compiled wiki knowledge.
 4. **Reuse** — Save the workflow as a Skill or give it a focused interface through an Extension.
 
-Use this section as context, not as a complete inventory of every Friday feature.
+Use this section as context, not as a complete inventory of every Kucedr feature.
 
 ### 4. Skills
 
@@ -131,22 +131,22 @@ Reusable expertise
 **Heading**
 
 ```text
-Teach Friday the way you work.
+Teach Kucedr the way you work.
 ```
 
 **Body copy**
 
 ```text
-Turn repeatable workflows into portable Agent Skills. Friday routes requests with lightweight skill metadata, loads the full instructions only when they are relevant, and can use the scripts, references, and assets bundled with each skill.
+Turn repeatable workflows into portable Agent Skills. Kucedr routes requests with lightweight skill metadata, loads the full instructions only when they are relevant, and can use the scripts, references, and assets bundled with each skill.
 ```
 
 **Feature points**
 
 - Import agentskills.io-compatible folders built around `SKILL.md`.
-- Let Friday select an enabled skill by intent, or request one explicitly.
+- Let Kucedr select an enabled skill by intent, or request one explicitly.
 - Inspect a skill's identity, authoring metadata, tool requirements, connectors, and tags.
 - Enable, disable, download, refresh, or delete local skills from Settings.
-- See a clear activity state in chat whenever Friday loads a skill.
+- See a clear activity state in chat whenever Kucedr loads a skill.
 
 **Supporting callout**
 
@@ -154,7 +154,7 @@ Turn repeatable workflows into portable Agent Skills. Friday routes requests wit
 Full instructions arrive only when the task needs them—reusable expertise without placing every playbook into every prompt.
 ```
 
-For the visual, show the installed Skills list beside a chat activity row that reads **Using skill**. Optional supporting files may appear as small script, reference, and asset cards. Do not imply that Friday includes a skill marketplace, a visual skill builder, semantic skill search, or runtime enforcement of every declared metadata field.
+For the visual, show the installed Skills list beside a chat activity row that reads **Using skill**. Optional supporting files may appear as small script, reference, and asset cards. Do not imply that Kucedr includes a skill marketplace, a visual skill builder, semantic skill search, or runtime enforcement of every declared metadata field.
 
 ### 5. Knowledge system
 
@@ -175,7 +175,7 @@ Find the source. Keep the insight.
 **Intro copy**
 
 ```text
-Friday uses two complementary knowledge layers. The Knowledge Base retrieves relevant excerpts from indexed text. The LLM Wiki turns changing source material into structured, interlinked Markdown that can be checked, reviewed, and reused.
+Kucedr uses two complementary knowledge layers. The Knowledge Base retrieves relevant excerpts from indexed text. The LLM Wiki turns changing source material into structured, interlinked Markdown that can be checked, reviewed, and reused.
 ```
 
 Present the two features as equal, connected panels rather than competing products.
@@ -191,7 +191,7 @@ Search your documents by meaning.
 **Card copy**
 
 ```text
-Choose one or more folders of text, create a semantic index with your selected embedding provider and Pinecone, and let Friday retrieve matching excerpts with their source paths. Generate the index on demand, keep it refreshed on a schedule, and test searches directly in Settings.
+Choose one or more folders of text, create a semantic index with your selected embedding provider and Pinecone, and let Kucedr retrieve matching excerpts with their source paths. Generate the index on demand, keep it refreshed on a schedule, and test searches directly in Settings.
 ```
 
 **Feature points**
@@ -215,7 +215,7 @@ Build knowledge that improves as sources change.
 **Card copy**
 
 ```text
-Compile Markdown, text, JSON, CSV, and log files into a persistent, interlinked Markdown wiki. Friday preserves source evidence, maintains traceable claims and contradictions, validates every staged update, and incrementally skips sources that have not changed.
+Compile Markdown, text, JSON, CSV, and log files into a persistent, interlinked Markdown wiki. Kucedr preserves source evidence, maintains traceable claims and contradictions, validates every staged update, and incrementally skips sources that have not changed.
 ```
 
 **Feature points**
@@ -230,7 +230,7 @@ Compile Markdown, text, JSON, CSV, and log files into a persistent, interlinked 
 **Supporting callout**
 
 ```text
-The wiki gives Friday durable synthesis. Raw evidence and the Knowledge Base remain available when an answer needs exact wording or broader retrieval.
+The wiki gives Kucedr durable synthesis. Raw evidence and the Knowledge Base remain available when an answer needs exact wording or broader retrieval.
 ```
 
 For the visual, show source files flowing into interlinked Markdown pages with small evidence, confidence, and contradiction markers. Avoid depicting the wiki as vector search or claiming that every high-impact change always requires review.
@@ -260,13 +260,13 @@ Focused interfaces
 **Heading**
 
 ```text
-Make Friday fit the workflow.
+Make Kucedr fit the workflow.
 ```
 
 **Body copy**
 
 ```text
-Extensions are local web mini-apps that open in their own Friday windows and can use the exposed app API. Build a focused interface for a dashboard, workspace utility, or repeatable workflow without turning the main conversation into a control panel.
+Extensions are local web mini-apps that open in their own Kucedr windows and can use the exposed app API. Build a focused interface for a dashboard, workspace utility, or repeatable workflow without turning the main conversation into a control panel.
 ```
 
 **Feature points**
@@ -276,12 +276,12 @@ Extensions are local web mini-apps that open in their own Friday windows and can
 - Browse installed apps by title, description, and category.
 - Inspect metadata, open an extension in a dedicated resizable window, or delete it with confirmation.
 - Launch installed extensions from Settings, the native app menu, or the tray menu.
-- Build typed in-app integrations with `@friday/sdk`.
+- Build typed in-app integrations with `@kucedr/sdk`.
 
 **Trust note**
 
 ```text
-Extensions run in Electron's sandboxed web runtime, but installed code can access broad Friday APIs. Install extensions only from sources you trust.
+Extensions run in Electron's sandboxed web runtime, but installed code can access broad Kucedr APIs. Install extensions only from sources you trust.
 ```
 
 For the visual, show the installed Extensions list opening a separate utility window. Do not claim an extension marketplace, signed extensions, per-extension permissions, enable/disable controls, or hot reload of an already-open extension window.
@@ -299,7 +299,7 @@ Your setup. Your providers. Your control.
 **Body copy**
 
 ```text
-Friday stores provider keys, settings, conversations, workspace data, Skills, Extensions, and generated wiki files on the user's machine. The user selects the providers and connected services behind chat, speech, media, search, embeddings, and knowledge generation.
+Kucedr stores provider keys, settings, conversations, workspace data, Skills, Extensions, and generated wiki files on the user's machine. The user selects the providers and connected services behind chat, speech, media, search, embeddings, and knowledge generation.
 ```
 
 **Control points**
@@ -308,7 +308,7 @@ Friday stores provider keys, settings, conversations, workspace data, Skills, Ex
 - Sensitive actions can surface **Deny**, **Allow once**, and **Always allow** choices.
 - Tool activity remains visible in the conversation.
 - The app uses Electron sandboxing, context isolation, disabled Node integration, and web security.
-- Friday runs on macOS, Windows, and Linux, with light, dark, and system themes.
+- Kucedr runs on macOS, Windows, and Linux, with light, dark, and system themes.
 
 Include this disclosure in readable body text, not hidden in a tooltip or footer:
 
@@ -329,12 +329,12 @@ Build an assistant around the way you work.
 **Supporting copy**
 
 ```text
-Start with a conversation. Add the skills, knowledge, providers, and extensions that make Friday yours.
+Start with a conversation. Add the skills, knowledge, providers, and extensions that make Kucedr yours.
 ```
 
 **Actions**
 
-- Primary: **Download Friday**
+- Primary: **Download Kucedr**
 - Secondary: **Explore the source**
 
 Add a compact platform line: **Available for macOS, Windows, and Linux. Open source under the MIT License.**
@@ -345,7 +345,7 @@ Include links for GitHub, Documentation, Releases, Security, Contributing, and L
 
 ## Visual direction
 
-Use Friday's existing product identity rather than generic AI imagery.
+Use Kucedr's existing product identity rather than generic AI imagery.
 
 - Use `resources/icons/icon-rounded.png` as the primary brand mark.
 - Start with near-black or deep graphite foundations and restrained off-white surfaces.
@@ -380,16 +380,16 @@ The page should feel capable, precise, and personal. Avoid a noisy cyberpunk aes
 **Title**
 
 ```text
-Friday — Desktop AI that turns knowledge into action
+Kucedr — Desktop AI that turns knowledge into action
 ```
 
 **Description**
 
 ```text
-Friday is a cross-platform desktop AI copilot with reusable Skills, a source-aware LLM Wiki, semantic document search, and custom Extensions.
+Kucedr is a cross-platform desktop AI copilot with reusable Skills, a source-aware LLM Wiki, semantic document search, and custom Extensions.
 ```
 
-Use the same core message for Open Graph and social metadata. Use the Friday icon or a product-composition image, not a fabricated customer or performance statistic.
+Use the same core message for Open Graph and social metadata. Use the Kucedr icon or a product-composition image, not a fabricated customer or performance statistic.
 
 ## Accuracy guardrails
 
@@ -412,7 +412,7 @@ The finished page must not imply capabilities that are only planned, partial, or
 
 The landing page is complete when:
 
-- The hero explains Friday's category, action capability, and knowledge advantage without scrolling.
+- The hero explains Kucedr's category, action capability, and knowledge advantage without scrolling.
 - Skills, Knowledge Base, LLM Wiki, and Extensions each receive a distinct, implementation-accurate explanation.
 - The relationship between retrieval and compiled wiki knowledge is visually and verbally clear.
 - The privacy section distinguishes local storage from processing by configured external services.
@@ -434,5 +434,5 @@ Use these repository sources to validate final copy and product visuals:
 - [LLM Wiki settings](../src/renderer/src/pages/settings/pages/wiki/Page.tsx)
 - [Extensions settings](../src/renderer/src/pages/settings/pages/extensions/Page.tsx)
 - [Extension window](../src/main/extensions/extension_render.ts)
-- [Friday SDK](../packages/sdk/README.md)
+- [Kucedr SDK](../packages/sdk/README.md)
 - [Brand icon](../resources/icons/icon-rounded.png)

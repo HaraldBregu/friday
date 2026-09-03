@@ -142,8 +142,8 @@ const realtimeVoiceStatusLabels: Record<RealtimeVoiceUiStatus, string> = {
 	'checking-permission': 'Checking microphone…',
 	connecting: 'Connecting…',
 	listening: 'Listening…',
-	thinking: 'Friday is responding…',
-	speaking: 'Friday is speaking…',
+	thinking: 'Kucedr is responding…',
+	speaking: 'Kucedr is speaking…',
 	ending: 'Ending…',
 	error: 'Voice conversation ended',
 };
@@ -719,7 +719,7 @@ function PageContent(): ReactElement {
 					className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
 				>
 					<span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-						{agent.isLoading ? 'Friday is responding' : 'Friday is ready'}
+						{agent.isLoading ? 'Kucedr is responding' : 'Kucedr is ready'}
 					</span>
 					<ChatContainerRoot className="min-h-0 p-0 [scrollbar-gutter:auto]">
 						<ChatContainerContent
@@ -810,7 +810,7 @@ function PageContent(): ReactElement {
 							/>
 							<PromptEditor
 								placeholder="Ask anything"
-								ariaLabel="Message Friday"
+								ariaLabel="Message Kucedr"
 								value={agent.input}
 								onValueChange={agent.setInput}
 								onPlanCommandChange={(active) => {

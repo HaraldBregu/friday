@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { isFriday, win } from '@friday/sdk';
+import { isKucedr, win } from '@kucedr/sdk';
 
 import { Configuration } from '@/components/configuration';
 import { Header } from '@/components/header';
@@ -27,7 +27,7 @@ export default function App() {
 				: [coder.activeProject?.name, activeSession?.title].filter(Boolean).join(' · ') || 'Coder';
 
 	const syncTitlebar = useCallback((open: boolean): void => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		win.setTitlebarOptions({
 			title,
 			leftButtons: [
@@ -57,12 +57,12 @@ export default function App() {
 	}, [coder.leftOpen, syncTitlebar]);
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		return () => win.setTitlebarOptions(null);
 	}, []);
 
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		return win.onTitlebarButtonClick((buttonId) => {
 			if (buttonId === 'toggle-sidebar') setSidebarVisibility(!coder.leftOpen);
 		});

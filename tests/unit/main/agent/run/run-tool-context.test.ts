@@ -162,7 +162,7 @@ describe('exec path approval', () => {
 
 describe('per-run file access', () => {
 	it('reuses a successful read directory only in the originating run', async () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-read-context-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-read-context-'));
 		const read = jest.fn().mockResolvedValue('content');
 		const tool = fakeTool('read', read);
 		const first = createRunContext().fileAccess;
@@ -200,7 +200,7 @@ describe('per-run file access', () => {
 	});
 
 	it('allows editing only the exact file newly created in the same run', async () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-create-context-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-create-context-'));
 		const target = path.join(root, 'one', 'example.txt');
 		const other = path.join(root, 'two', 'example.txt');
 		getPermissions.mockReturnValue({
@@ -255,7 +255,7 @@ describe('per-run file access', () => {
 	});
 
 	it('does not remember failed reads or failed file creation', async () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-failed-context-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-failed-context-'));
 		const readPath = path.join(root, 'read.txt');
 		const writePath = path.join(root, 'write.txt');
 		getPermissions.mockReturnValue({
@@ -289,7 +289,7 @@ describe('per-run file access', () => {
 	});
 
 	it('does not let a contextual grant override a configured deny', async () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-deny-context-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-deny-context-'));
 		const target = path.join(root, 'example.txt');
 		const fileAccess = createRunContext().fileAccess;
 		fileAccess.readDirectories.add(root);

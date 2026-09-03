@@ -437,7 +437,7 @@ export function execTool(
 		id: 'bash',
 		name: 'Execute command',
 		description:
-			'Run a shell command in a filesystem sandbox. Commands are trusted by working directory. Declare every directory accessed outside workdir in additionalRoots so Friday can request permission before execution. ' +
+			'Run a shell command in a filesystem sandbox. Commands are trusted by working directory. Declare every directory accessed outside workdir in additionalRoots so Kucedr can request permission before execution. ' +
 			'For an intentional host operation, retry with elevated: true to request approval. Set background or yieldMs for long-running commands, timeout to stop slow commands, and pty for TTY-only CLIs.',
 		planSafe: interactionMode === 'plan',
 		inputSchema: execInputSchema,

@@ -191,7 +191,7 @@ export default function A2aPage(): React.JSX.Element {
 					<SettingsEmptyState
 						icon={Bot}
 						title="No A2A agents"
-						description="Add a remote agent to make delegation available to Friday."
+						description="Add a remote agent to make delegation available to Kucedr."
 					/>
 				) : (
 					<div className="divide-y divide-border">

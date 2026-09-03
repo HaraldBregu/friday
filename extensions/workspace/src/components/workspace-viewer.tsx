@@ -1,6 +1,6 @@
 import { AlertCircle, Check, FileText, LoaderCircle, Save } from 'lucide-react';
 import { useEffect } from 'react';
-import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@friday/sdk';
+import type { WorkspaceFileKind, WorkspaceTreeEntry } from '@kucedr/sdk';
 
 import { FileViewer } from '@/components/viewer';
 import { FileInformation } from '@/components/information';

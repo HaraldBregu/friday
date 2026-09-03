@@ -74,7 +74,7 @@ it('creates an account and shows the confirmation state', async () => {
 			<AuthStep />
 		</AuthProvider>
 	);
-	await user.click(screen.getByRole('button', { name: 'New to Friday? Create an account' }));
+	await user.click(screen.getByRole('button', { name: 'New to Kucedr? Create an account' }));
 	await user.type(screen.getByLabelText('Email'), 'new@example.test');
 	await user.type(screen.getByLabelText('Password'), 'valid-password');
 	await user.type(screen.getByLabelText('Confirm password'), 'valid-password');

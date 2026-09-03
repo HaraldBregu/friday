@@ -26,7 +26,7 @@ describe('target-scoped wiki repository', () => {
 	});
 
 	it('canonicalizes targets and isolates all state in app-owned paths', async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), 'friday-wiki-repositories-'));
+		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-repositories-'));
 		const firstTarget = path.join(root, 'first');
 		const secondTarget = path.join(root, 'second');
 		const first = getWikiRepository(firstTarget);

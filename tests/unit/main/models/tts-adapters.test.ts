@@ -270,7 +270,7 @@ it('maps Mistral voice, reference audio, cache, metadata, and format options', a
 			ref_audio: 'data:audio/wav;base64,QQ==',
 			response_format: 'wav',
 			prompt_cache_key: 'cache-1',
-			metadata: { source: 'friday' },
+			metadata: { source: 'kucedr' },
 		},
 	});
 
@@ -281,7 +281,7 @@ it('maps Mistral voice, reference audio, cache, metadata, and format options', a
 		refAudio: 'data:audio/wav;base64,QQ==',
 		responseFormat: 'wav',
 		promptCacheKey: 'cache-1',
-		metadata: { source: 'friday' },
+		metadata: { source: 'kucedr' },
 		stream: false,
 	});
 	expect(mistralListVoices).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
 jest.mock('../../../../../src/main/shared/user_data_location', () => ({
-	userDataLocation: () => '/tmp/friday-health-test',
+	userDataLocation: () => '/tmp/kucedr-health-test',
 }));
 
 import {

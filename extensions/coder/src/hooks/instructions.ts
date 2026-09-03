@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { coder, type CoderProjectInstructions } from '@friday/sdk';
+import { coder, type CoderProjectInstructions } from '@kucedr/sdk';
 
 interface InstructionsState {
 	readonly projectId?: string;

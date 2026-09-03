@@ -19,7 +19,7 @@ describe('session persistence', () => {
 	let temporaryRoot: string;
 
 	beforeEach(() => {
-		temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-session-persist-'));
+		temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-persist-'));
 	});
 
 	afterEach(() => {

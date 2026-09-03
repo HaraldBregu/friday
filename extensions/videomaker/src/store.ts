@@ -1,10 +1,10 @@
-import { app, isFriday } from '@friday/sdk';
+import { app, isKucedr } from '@kucedr/sdk';
 
 import { openDatabase } from './database';
 
 export async function storeMedia(id: string, file: File): Promise<string> {
 	const assetPath = `media/${id}`;
-	if (isFriday()) {
+	if (isKucedr()) {
 		await app.writeExtensionStoreFile(assetPath, new Uint8Array(await file.arrayBuffer()));
 		return assetPath;
 	}

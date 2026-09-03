@@ -1,10 +1,10 @@
 {
-	"name": "@friday/cli",
+	"name": "@kucedr/cli",
 	"version": "0.1.0",
-	"description": "Command-line and terminal interface for Friday",
+	"description": "Command-line and terminal interface for Kucedr",
 	"type": "module",
 	"bin": {
-		"friday": "./dist/bin.js"
+		"kucedr": "./dist/bin.js"
 	},
 	"main": "./dist/bin.js",
 	"types": "./dist/bin.d.ts",
@@ -18,12 +18,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HaraldBregu/friday.git",
+		"url": "git+https://github.com/HaraldBregu/kucedr.git",
 		"directory": "packages/cli"
 	},
-	"homepage": "https://github.com/HaraldBregu/friday/tree/main/packages/cli#readme",
+	"homepage": "https://github.com/HaraldBregu/kucedr/tree/main/packages/cli#readme",
 	"bugs": {
-		"url": "https://github.com/HaraldBregu/friday/issues"
+		"url": "https://github.com/HaraldBregu/kucedr/issues"
 	},
 	"scripts": {
 		"clean": "rimraf dist",
@@ -51,7 +51,7 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"keywords": [
-		"friday",
+		"kucedr",
 		"cli",
 		"tui",
 		"plugins"

@@ -11,8 +11,8 @@ import { extensionsRoot } from './extensions/extension_root';
 import { isExtensionId } from './extensions/extension_id';
 
 const LOCAL_RESOURCE_SCHEME = 'local-resource';
-export const EXTENSION_RESOURCE_SCHEME = 'friday-extension';
-export const EXTENSION_SESSION_PARTITION = 'persist:friday-extensions';
+export const EXTENSION_RESOURCE_SCHEME = 'kucedr-extension';
+export const EXTENSION_SESSION_PARTITION = 'persist:kucedr-extensions';
 
 export function registerLocalResourceProtocolScheme(): void {
 	protocol.registerSchemesAsPrivileged([

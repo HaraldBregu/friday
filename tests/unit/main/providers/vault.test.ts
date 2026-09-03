@@ -155,7 +155,7 @@ describe('local provider vault', () => {
 	});
 
 	it('applies private directory and file permissions', () => {
-		const directory = mkdtempSync(path.join(os.tmpdir(), 'friday-provider-vault-'));
+		const directory = mkdtempSync(path.join(os.tmpdir(), 'kucedr-provider-vault-'));
 		const file = path.join(directory, 'provider-vault.json');
 		try {
 			writeFileSync(file, '{}', { mode: 0o666 });

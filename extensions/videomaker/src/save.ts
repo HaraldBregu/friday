@@ -1,4 +1,4 @@
-import { app, isFriday, type ExtensionStoreValue } from '@friday/sdk';
+import { app, isKucedr, type ExtensionStoreValue } from '@kucedr/sdk';
 
 import type { Project } from './types';
 
@@ -7,9 +7,9 @@ export async function saveProject(project: Project): Promise<void> {
 		...project,
 		clips: project.clips.map((clip) => ({ ...clip, src: '' })),
 	};
-	if (isFriday()) {
+	if (isKucedr()) {
 		await app.setExtensionStoreValue('project-v1', stored as unknown as ExtensionStoreValue);
 		return;
 	}
-	localStorage.setItem('friday-videomaker-project-v1', JSON.stringify(stored));
+	localStorage.setItem('kucedr-videomaker-project-v1', JSON.stringify(stored));
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { CoderProjectStore } from '../../../../src/main/coder/projects';
 
 it('persists canonical external projects and removes only their metadata', () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-projects-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-projects-'));
 	const projectDirectory = path.join(root, 'project');
 	const aliasDirectory = path.join(root, 'project-alias');
 	mkdirSync(projectDirectory);
@@ -27,7 +27,7 @@ it('persists canonical external projects and removes only their metadata', () =>
 });
 
 it('rejects renderer-style relative or unavailable project paths', () => {
-	const root = mkdtempSync(path.join(os.tmpdir(), 'friday-coder-projects-'));
+	const root = mkdtempSync(path.join(os.tmpdir(), 'kucedr-coder-projects-'));
 	const store = new CoderProjectStore(root, []);
 
 	expect(() => store.add('relative/project')).toThrow('must be absolute');

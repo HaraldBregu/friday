@@ -36,8 +36,8 @@ describe('sessionPath', () => {
 	});
 
 	it('rejects a UUID symlink that resolves outside the sessions root', () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-sessions-'));
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-outside-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-sessions-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-outside-'));
 		try {
 			fs.symlinkSync(
 				outside,
@@ -54,8 +54,8 @@ describe('sessionPath', () => {
 	});
 
 	it('rejects a session file symlink that resolves outside the sessions root', () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-sessions-'));
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-outside-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-sessions-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-outside-'));
 		try {
 			const folder = path.join(root, SESSION_ID);
 			fs.mkdirSync(folder);

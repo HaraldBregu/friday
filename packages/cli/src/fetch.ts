@@ -23,7 +23,7 @@ export async function preparePluginSource(spec: string): Promise<PreparedPluginS
 		if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
 	}
 
-	const temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-cli-'));
+	const temporaryDirectory = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-cli-'));
 	const dispose = async (): Promise<void> => {
 		await fs.rm(temporaryDirectory, { recursive: true, force: true });
 	};

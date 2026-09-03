@@ -170,7 +170,7 @@ const McpPage = (): React.JSX.Element => {
 					<SettingsEmptyState
 						icon={PlugZap}
 						title="No MCP servers"
-						description="Add a server or upload a local package to make its tools available to Friday."
+						description="Add a server or upload a local package to make its tools available to Kucedr."
 					/>
 				) : (
 					registry.servers.map((server) => (

@@ -1,7 +1,7 @@
 const pty = require('node-pty');
 
 async function main() {
-	const marker = 'FRIDAY_PTY_OK';
+	const marker = 'KUCEDR_PTY_OK';
 	const windows = process.platform === 'win32';
 	const shell = windows ? process.env.ComSpec || 'cmd.exe' : '/bin/sh';
 	const processHandle = pty.spawn(shell, [], {

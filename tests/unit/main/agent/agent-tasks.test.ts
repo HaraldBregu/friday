@@ -3,7 +3,7 @@ const mockSetTaskRunner = jest.fn();
 const mockStartTask = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('../../../../src/main/shared/agent_location', () => ({
-	agentLocation: () => '/tmp/friday-agent-tasks',
+	agentLocation: () => '/tmp/kucedr-agent-tasks',
 }));
 jest.mock('../../../../src/main/tasks', () => ({
 	associateSession: (...args: unknown[]) => mockAssociateSession(...args),

@@ -34,7 +34,7 @@ describe('protocol security', () => {
 		const extensionHandler = jest.mocked(extension.protocol.handle).mock.calls[0][1] as (
 			request: Request
 		) => Promise<Response>;
-		const privatePath = '/tmp/friday-private.txt';
+		const privatePath = '/tmp/kucedr-private.txt';
 		const request = new Request(`local-resource://file${privatePath}`);
 
 		await expect(extensionHandler(request)).resolves.toMatchObject({ status: 403 });

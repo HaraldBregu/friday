@@ -17,7 +17,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["src/*"],
-			"@friday/sdk": ["../../packages/sdk/index.ts"]
+			"@kucedr/sdk": ["../../packages/sdk/index.ts"]
 		}
 	},
 	"include": ["src", "../../packages/sdk/index.ts", "../../src/shared/**/*.ts"]

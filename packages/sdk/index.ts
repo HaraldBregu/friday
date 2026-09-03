@@ -4,7 +4,7 @@ import type { TerminalApi } from '../../src/shared/terminal';
 export {
 	connect,
 	type ConnectOptions,
-	type FridayClient,
+	type KucedrClient,
 	type RemoteAppApi,
 	type WorkspaceAgentApi,
 } from './connect';
@@ -98,11 +98,11 @@ function bridge<T extends object>(name: string): T {
 				| undefined;
 			if (!api)
 				throw new Error(
-					`@friday/sdk: "${name}" is unavailable — this code must run inside the Friday app.`
+					`@kucedr/sdk: "${name}" is unavailable — this code must run inside the Kucedr app.`
 				);
 			if (!(key in api)) {
 				throw new Error(
-					`@friday/sdk: "${name}.${String(key)}" is unavailable — update the Friday host.`
+					`@kucedr/sdk: "${name}.${String(key)}" is unavailable — update the Kucedr host.`
 				);
 			}
 			const value = api[key];
@@ -134,7 +134,7 @@ function hasAppMethods(api: unknown): api is AppApi {
 	return true;
 }
 
-export function isFriday(): boolean {
-	const fridayApp = (globalThis as Record<string, unknown>).app;
-	return hasAppMethods(fridayApp);
+export function isKucedr(): boolean {
+	const kucedrApp = (globalThis as Record<string, unknown>).app;
+	return hasAppMethods(kucedrApp);
 }

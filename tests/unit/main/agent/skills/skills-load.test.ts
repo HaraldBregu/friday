@@ -7,7 +7,7 @@ import type { SkillInfo, SkillRegistrySnapshot } from '../../../../../src/shared
 
 describe('activateSkill', () => {
 	it('returns exact instructions, canonical root, hash, and contained resources', async () => {
-		const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-skill-load-'));
+		const parent = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-skill-load-'));
 		const root = path.join(parent, 'writer');
 		const source = '---\nname: writer\ndescription: Writes\nallowed-tools: read\n---\nExact body';
 		try {

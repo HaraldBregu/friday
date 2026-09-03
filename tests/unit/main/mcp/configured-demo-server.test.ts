@@ -22,14 +22,14 @@ describe('configured demo MCP server', () => {
 
 	it('loads the required server values from its manifest', () => {
 		expect(demo).toMatchObject({
-			id: 'friday-configured-demo',
+			id: 'kucedr-configured-demo',
 			data: {
 				type: 'stdio',
 				env: {
-					DEMO_COMPANY: 'Friday Studio',
+					DEMO_COMPANY: 'Kucedr Studio',
 					DEMO_CURRENCY: 'EUR',
 					DEMO_TAX_RATE: '22',
-					DEMO_SIGN_OFF: 'The Friday Studio team',
+					DEMO_SIGN_OFF: 'The Kucedr Studio team',
 				},
 			},
 		});
@@ -65,7 +65,7 @@ describe('configured demo MCP server', () => {
 		});
 
 		expect(configuration.content).toEqual([
-			expect.objectContaining({ text: expect.stringContaining('Company: Friday Studio') }),
+			expect.objectContaining({ text: expect.stringContaining('Company: Kucedr Studio') }),
 		]);
 		expect(quote.structuredContent).toEqual({
 			subtotal: 200,
@@ -74,7 +74,7 @@ describe('configured demo MCP server', () => {
 			currency: 'EUR',
 		});
 		expect(message.content).toEqual([
-			expect.objectContaining({ text: expect.stringContaining('The Friday Studio team') }),
+			expect.objectContaining({ text: expect.stringContaining('The Kucedr Studio team') }),
 		]);
 	});
 });

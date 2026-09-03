@@ -218,7 +218,7 @@ const McpDetailsPage: React.FC = () => {
 				description={
 					server.source === 'local'
 						? 'Changes are saved to this package’s mcp.json.'
-						: 'Changes are saved in Friday settings.'
+						: 'Changes are saved in Kucedr settings.'
 				}
 			>
 				<SettingsPanel>

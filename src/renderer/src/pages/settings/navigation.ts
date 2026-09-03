@@ -60,8 +60,8 @@ export const SETTINGS_MODEL_SERVICE_ITEMS: readonly SettingsModelServiceItem[] =
 		id: AGENTS.assistant,
 		path: '/settings/assistant',
 		labelKey: 'settings.modelServices.assistantName',
-		descriptionKey: 'settings.modelServices.fridayDescription',
-		keywords: 'friday service default provider model',
+		descriptionKey: 'settings.modelServices.kucedrDescription',
+		keywords: 'kucedr service default provider model',
 		icon: Bot,
 	},
 	{

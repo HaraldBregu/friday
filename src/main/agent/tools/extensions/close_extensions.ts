@@ -5,7 +5,7 @@ import { tool } from '../tool';
 export const closeExtensionsTool = tool({
 	id: 'close_extensions',
 	name: 'Close extensions',
-	description: 'Request closure of one or more open Friday extensions by exact ID.',
+	description: 'Request closure of one or more open Kucedr extensions by exact ID.',
 	inputSchema: z.object({
 		ids: z
 			.union([z.string().trim().min(1), z.array(z.string().trim().min(1)).min(1)])

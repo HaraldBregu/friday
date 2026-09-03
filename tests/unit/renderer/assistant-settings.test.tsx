@@ -87,7 +87,7 @@ const mockCatalog = [
 jest.mock('react-i18next', () => {
 	const translations: Record<string, string> = {
 		'settings.modelServices.assistantName': 'Agent',
-		'settings.modelServices.fridayDescription': 'Chat, tools, and planning',
+		'settings.modelServices.kucedrDescription': 'Chat, tools, and planning',
 		'settings.modelServices.configuration': 'Configuration',
 		'settings.modelServices.subtitle': 'Configure model assignments',
 		'settings.modelServices.imageAssistantName': 'Image',

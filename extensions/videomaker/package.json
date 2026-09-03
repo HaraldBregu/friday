@@ -1,8 +1,8 @@
 {
-	"name": "friday-videomaker",
+	"name": "kucedr-videomaker",
 	"private": true,
 	"version": "1.0.0",
-	"description": "A Remotion-powered video editor for Friday.",
+	"description": "A Remotion-powered video editor for Kucedr.",
 	"keywords": [
 		"creative"
 	],
@@ -20,7 +20,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@friday/sdk": "file:../../packages/sdk",
+		"@kucedr/sdk": "file:../../packages/sdk",
 		"@remotion/media": "4.0.513",
 		"@remotion/player": "4.0.513",
 		"@remotion/web-renderer": "4.0.513",

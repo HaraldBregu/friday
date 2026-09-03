@@ -20,33 +20,33 @@ export function resolveLaunchTarget(options: LaunchOptions = {}): LaunchTarget {
 	const platform = options.platform ?? process.platform;
 	const exists = options.exists ?? fs.existsSync;
 
-	if (env.FRIDAY_APP_PATH) {
-		return { command: env.FRIDAY_APP_PATH, args: [], detached: true };
+	if (env.KUCEDR_APP_PATH) {
+		return { command: env.KUCEDR_APP_PATH, args: [], detached: true };
 	}
 
 	if (platform === 'darwin') {
-		return { command: 'open', args: ['-a', 'Friday'], detached: false };
+		return { command: 'open', args: ['-a', 'Kucedr'], detached: false };
 	}
 
 	if (platform === 'win32') {
 		const candidates = [
-			env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'Programs', 'Friday', 'Friday.exe'),
-			env.ProgramFiles && path.join(env.ProgramFiles, 'Friday', 'Friday.exe'),
-			env['ProgramFiles(x86)'] && path.join(env['ProgramFiles(x86)'], 'Friday', 'Friday.exe'),
+			env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'Programs', 'Kucedr', 'Kucedr.exe'),
+			env.ProgramFiles && path.join(env.ProgramFiles, 'Kucedr', 'Kucedr.exe'),
+			env['ProgramFiles(x86)'] && path.join(env['ProgramFiles(x86)'], 'Kucedr', 'Kucedr.exe'),
 		].filter((candidate): candidate is string => Boolean(candidate));
 		const executable = candidates.find(exists);
 		if (executable) return { command: executable, args: [], detached: true };
 		return {
 			command: 'explorer.exe',
-			args: ['shell:AppsFolder\\com.friday.friday'],
+			args: ['shell:AppsFolder\\com.kucedr.kucedr'],
 			detached: false,
 		};
 	}
 
-	return { command: 'friday-desktop', args: [], detached: true };
+	return { command: 'kucedr-desktop', args: [], detached: true };
 }
 
-export async function launchFriday(options: LaunchOptions = {}): Promise<void> {
+export async function launchKucedr(options: LaunchOptions = {}): Promise<void> {
 	const target = resolveLaunchTarget(options);
 	const spawnProcess = options.spawn ?? spawn;
 	const child = spawnProcess(target.command, [...target.args], {
@@ -63,7 +63,7 @@ export async function launchFriday(options: LaunchOptions = {}): Promise<void> {
 		}
 		child.once('close', (code) => {
 			if (code === 0) resolve();
-			else reject(new Error(`Could not launch Friday (exit code ${code ?? 'unknown'}).`));
+			else reject(new Error(`Could not launch Kucedr (exit code ${code ?? 'unknown'}).`));
 		});
 	});
 

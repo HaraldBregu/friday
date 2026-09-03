@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { app, isFriday } from '@friday/sdk';
+import { app, isKucedr } from '@kucedr/sdk';
 
 export function useTheme() {
 	useEffect(() => {
-		if (!isFriday()) return;
+		if (!isKucedr()) return;
 		let active = true;
 		const apply = (theme: { isDark: boolean; colors: Record<string, string> }) => {
 			if (!active) return;

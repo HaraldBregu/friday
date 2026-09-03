@@ -7,7 +7,7 @@ import { preparePluginSource } from '../src/fetch.js';
 import { createPluginFixture } from './fixture.js';
 
 test('packs and extracts a package spec without running scripts', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-fetch-test-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-fetch-test-'));
 	try {
 		const fixture = await createPluginFixture(root);
 		const source = await preparePluginSource(`file:${fixture}`);

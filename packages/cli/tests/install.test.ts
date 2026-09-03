@@ -7,7 +7,7 @@ import { installPlugin } from '../src/install.js';
 import { createPluginFixture } from './fixture.js';
 
 test('installs a local plugin and requires force to replace it', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-install-test-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-install-test-'));
 	const dataDir = path.join(root, 'data');
 	try {
 		const fixture = await createPluginFixture(root);
@@ -34,7 +34,7 @@ test('installs a local plugin and requires force to replace it', async () => {
 });
 
 test('rejects a plugin with a missing contributed file', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-invalid-test-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-invalid-test-'));
 	try {
 		const fixture = await createPluginFixture(root);
 		await fs.rm(path.join(fixture, 'skills', 'hello', 'SKILL.md'));
@@ -48,7 +48,7 @@ test('rejects a plugin with a missing contributed file', async () => {
 });
 
 test('rejects duplicate contribution ids', async () => {
-	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-duplicate-test-'));
+	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-duplicate-test-'));
 	try {
 		const fixture = await createPluginFixture(root);
 		const manifestPath = path.join(fixture, 'manifest.json');

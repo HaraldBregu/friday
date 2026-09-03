@@ -1,4 +1,4 @@
-# Friday Configured Demo MCP Server
+# Kucedr Configured Demo MCP Server
 
 A dependency-free local MCP server demonstrating both server configuration values and tool inputs.
 
@@ -18,7 +18,7 @@ The included values are non-secret examples. Do not commit real credentials to t
 1. Open **Settings → MCP**.
 2. Choose **Upload local**.
 3. Select this `configured-demo-server` folder.
-4. Click **Test Friday Configured Demo**. Friday should report three tools.
+4. Click **Test Kucedr Configured Demo**. Kucedr should report three tools.
 
 ## Tools and call-time inputs
 

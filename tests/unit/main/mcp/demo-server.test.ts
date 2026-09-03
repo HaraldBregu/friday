@@ -18,7 +18,7 @@ describe('demo MCP server', () => {
 	let client: McpClient;
 
 	beforeAll(async () => {
-		client = await connect('friday-demo', demo, 5_000);
+		client = await connect('kucedr-demo', demo, 5_000);
 	});
 
 	afterAll(async () => {
@@ -27,7 +27,7 @@ describe('demo MCP server', () => {
 
 	it('is a valid uploadable local package', () => {
 		expect(readLocalMcpServer(directory)).toMatchObject({
-			id: 'friday-demo',
+			id: 'kucedr-demo',
 			source: 'local',
 			data: { type: 'stdio', command: 'node', args: ['server.mjs'], cwd: directory },
 		});
@@ -43,14 +43,14 @@ describe('demo MCP server', () => {
 	});
 
 	it('runs every demo tool', async () => {
-		const echo = await callTool(client, 'echo', { message: 'Hello Friday' });
+		const echo = await callTool(client, 'echo', { message: 'Hello Kucedr' });
 		const addition = await callTool(client, 'add_numbers', { a: 2, b: 3 });
 		const checklist = await callTool(client, 'create_checklist', {
 			title: 'Demo',
 			items: ['Upload server', 'Test tools'],
 		});
 
-		expect(echo.content).toEqual([{ type: 'text', text: 'Hello Friday' }]);
+		expect(echo.content).toEqual([{ type: 'text', text: 'Hello Kucedr' }]);
 		expect(addition.content).toEqual([{ type: 'text', text: '5' }]);
 		expect(checklist.content).toEqual([
 			{ type: 'text', text: '## Demo\n\n- [ ] Upload server\n- [ ] Test tools' },

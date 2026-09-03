@@ -10,17 +10,17 @@ it('merges the macOS login-shell environment without losing inherited values', a
 	const manager = new EnvironmentManager(
 		logger as never,
 		'darwin',
-		{ PATH: '/usr/bin', FRIDAY_VALUE: 'preserved' },
+		{ PATH: '/usr/bin', KUCEDR_VALUE: 'preserved' },
 		readShellEnvironment
 	);
 
 	await expect(manager.get('/bin/zsh')).resolves.toMatchObject({
 		PATH: '/opt/homebrew/bin:/usr/bin',
 		NVM_DIR: '/Users/test/.nvm',
-		FRIDAY_VALUE: 'preserved',
+		KUCEDR_VALUE: 'preserved',
 		TERM: 'xterm-256color',
 		COLORTERM: 'truecolor',
-		TERM_PROGRAM: 'Friday',
+		TERM_PROGRAM: 'Kucedr',
 	});
 	expect(readShellEnvironment).toHaveBeenCalledWith('/bin/zsh');
 });

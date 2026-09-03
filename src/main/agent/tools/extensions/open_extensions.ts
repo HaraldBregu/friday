@@ -7,7 +7,7 @@ export function openExtensionsTool(windowFactory: WindowFactory) {
 	return tool({
 		id: 'open_extensions',
 		name: 'Open extensions',
-		description: 'Open one or more installed Friday extensions by exact ID.',
+		description: 'Open one or more installed Kucedr extensions by exact ID.',
 		inputSchema: z.object({
 			ids: z
 				.union([z.string().trim().min(1), z.array(z.string().trim().min(1)).min(1)])

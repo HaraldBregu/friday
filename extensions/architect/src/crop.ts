@@ -1,4 +1,4 @@
-import type { ImageResult } from '@friday/sdk';
+import type { ImageResult } from '@kucedr/sdk';
 import type { CropSettings } from './types';
 
 export function cropImage(source: string, settings: CropSettings): Promise<ImageResult> {

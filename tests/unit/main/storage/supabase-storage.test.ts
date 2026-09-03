@@ -22,11 +22,11 @@ it('uploads backups to the signed-in user prefix with overwrite enabled', async 
 	upload.mockResolvedValue({ error: null });
 	const data = new Uint8Array([1, 2, 3]);
 
-	await putObject(auth, 'friday/v1/agent/note.md', data, 'text/markdown');
+	await putObject(auth, 'kucedr/v1/agent/note.md', data, 'text/markdown');
 
 	expect(from).toHaveBeenCalledWith('user-files');
 	expect(upload).toHaveBeenCalledWith(
-		'11111111-1111-4111-8111-111111111111/backups/friday/v1/agent/note.md',
+		'11111111-1111-4111-8111-111111111111/backups/kucedr/v1/agent/note.md',
 		data,
 		{ contentType: 'text/markdown', upsert: true }
 	);
@@ -38,9 +38,9 @@ it('downloads backups from the signed-in user prefix', async () => {
 		error: null,
 	});
 
-	await expect(getObject(auth, 'friday/v1/agent/note.md')).resolves.toEqual(new Uint8Array([4, 5]));
+	await expect(getObject(auth, 'kucedr/v1/agent/note.md')).resolves.toEqual(new Uint8Array([4, 5]));
 	expect(download).toHaveBeenCalledWith(
-		'11111111-1111-4111-8111-111111111111/backups/friday/v1/agent/note.md'
+		'11111111-1111-4111-8111-111111111111/backups/kucedr/v1/agent/note.md'
 	);
 });
 
@@ -62,21 +62,21 @@ it('recursively lists Supabase folders without exposing the user prefix', async 
 			error: null,
 		});
 
-	await expect(listObjects(auth, 'friday/v1/agent/')).resolves.toEqual([
+	await expect(listObjects(auth, 'kucedr/v1/agent/')).resolves.toEqual([
 		{
-			key: 'friday/v1/agent/notes/today.md',
+			key: 'kucedr/v1/agent/notes/today.md',
 			size: 12,
 			lastModified: '2026-09-01T12:00:00.000Z',
 		},
 	]);
 	expect(list).toHaveBeenNthCalledWith(
 		1,
-		'11111111-1111-4111-8111-111111111111/backups/friday/v1/agent',
+		'11111111-1111-4111-8111-111111111111/backups/kucedr/v1/agent',
 		expect.objectContaining({ limit: 100, offset: 0 })
 	);
 	expect(list).toHaveBeenNthCalledWith(
 		2,
-		'11111111-1111-4111-8111-111111111111/backups/friday/v1/agent/notes',
+		'11111111-1111-4111-8111-111111111111/backups/kucedr/v1/agent/notes',
 		expect.objectContaining({ limit: 100, offset: 0 })
 	);
 });
@@ -87,7 +87,7 @@ it('requires a signed-in user before accessing storage', async () => {
 		getClient: jest.fn(),
 	} as never;
 
-	await expect(putObject(signedOut, 'friday/v1/file', new Uint8Array())).rejects.toThrow(
+	await expect(putObject(signedOut, 'kucedr/v1/file', new Uint8Array())).rejects.toThrow(
 		'Sign in to use sync'
 	);
 });

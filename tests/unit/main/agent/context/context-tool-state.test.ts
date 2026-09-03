@@ -11,7 +11,7 @@ import {
 } from '../../../../../src/main/agent/context';
 
 describe('tool context state', () => {
-	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-context-'));
+	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-context-'));
 
 	it('stores the tool name, canonical path, and directory', () => {
 		const context = createRunContext().fileAccess;

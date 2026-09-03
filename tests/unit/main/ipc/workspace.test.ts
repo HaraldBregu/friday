@@ -60,7 +60,7 @@ describe('workspace files', () => {
 	});
 
 	it('resolves existing files inside the real workspace', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		const directory = path.join(root, 'notes');
 		const file = path.join(directory, 'idea.md');
 		const dottedFile = path.join(root, '..notes.md');
@@ -78,7 +78,7 @@ describe('workspace files', () => {
 	});
 
 	it('lists file size and creation and update dates', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		const directory = path.join(root, 'notes');
 		const file = path.join(directory, 'idea.md');
 		await fs.mkdir(directory);
@@ -106,8 +106,8 @@ describe('workspace files', () => {
 	});
 
 	it('rejects traversal and symlink escapes', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
-		const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-outside-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
+		const outside = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-outside-'));
 		const outsideFile = path.join(outside, 'private.md');
 		await fs.writeFile(outsideFile, '# Private');
 		await fs.symlink(outsideFile, path.join(root, 'linked.md'));
@@ -119,7 +119,7 @@ describe('workspace files', () => {
 	});
 
 	it('writes Markdown and reads typed binary assets', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		const markdown = path.join(root, 'notes.md');
 		const text = path.join(root, 'notes.txt');
 		const image = path.join(root, 'photo.png');
@@ -146,7 +146,7 @@ describe('workspace files', () => {
 	});
 
 	it('writes every editable workspace document kind', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		const files = ['notes.md', 'flow.mmd', 'sketch.excalidraw', 'canvas.tldr'];
 		for (const file of files) await fs.writeFile(path.join(root, file), 'Before');
 		await fs.writeFile(path.join(root, 'notes.txt'), 'Before');
@@ -163,7 +163,7 @@ describe('workspace files', () => {
 	});
 
 	it('creates files and folders without overwriting existing entries', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		await fs.mkdir(path.join(root, 'notes'));
 
 		await expect(createWorkspaceEntry(root, '', 'draft.md', 'file')).resolves.toBe('draft.md');
@@ -184,7 +184,7 @@ describe('workspace files', () => {
 	});
 
 	it('recursively deletes folders but never the workspace root or a file', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		await fs.mkdir(path.join(root, 'folder'));
 		await fs.writeFile(path.join(root, 'folder', 'note.md'), '# Note');
 		await fs.writeFile(path.join(root, 'note.md'), '# Note');
@@ -198,7 +198,7 @@ describe('workspace files', () => {
 	});
 
 	it('does not follow workspace symlinks when deleting', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		const targetFile = path.join(root, 'target.md');
 		const targetDirectory = path.join(root, 'target');
 		await fs.writeFile(targetFile, '# Keep');
@@ -218,7 +218,7 @@ describe('workspace files', () => {
 	});
 
 	it('moves files and folders without overwriting or creating directory cycles', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		await fs.mkdir(path.join(root, 'source'));
 		await fs.mkdir(path.join(root, 'destination'));
 		await fs.writeFile(path.join(root, 'source', 'note.md'), '# Note');
@@ -259,7 +259,7 @@ describe('workspace files', () => {
 	});
 
 	it('renames files and folders without overwriting or escaping the workspace', async () => {
-		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-workspace-'));
 		await fs.mkdir(path.join(root, 'folder'));
 		await fs.writeFile(path.join(root, 'folder', 'note.md'), '# Note');
 		await fs.writeFile(path.join(root, 'existing.md'), '# Existing');

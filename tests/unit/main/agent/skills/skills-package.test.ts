@@ -6,8 +6,8 @@ import { validateSkillPackage } from '../../../../../src/main/agent/skills/skill
 
 describe('validateSkillPackage', () => {
 	it('rejects oversized resources and escaping symlinks', () => {
-		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-skill-package-'));
-		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-skill-package-outside-'));
+		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-skill-package-'));
+		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-skill-package-outside-'));
 		try {
 			fs.writeFileSync(path.join(root, 'large.bin'), '');
 			fs.truncateSync(path.join(root, 'large.bin'), SKILL_RESOURCE_MAX_BYTES + 1);

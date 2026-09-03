@@ -37,17 +37,17 @@ function loadCatalog(): Catalog {
 	return cache;
 }
 
-/** Every model in Friday's local provider catalog, each carrying the provider that serves it. */
+/** Every model in Kucedr's local provider catalog, each carrying the provider that serves it. */
 export function loadModels(): readonly CatalogModel[] {
 	return loadCatalog().models;
 }
 
-/** Every database across ~/.friday/providers/<id>/manifest.json. */
+/** Every database across ~/.kucedr/providers/<id>/manifest.json. */
 export function loadDatabases(): readonly CatalogService[] {
 	return loadCatalog().databases;
 }
 
-/** Every web search provider across ~/.friday/providers/<id>/manifest.json. */
+/** Every web search provider across ~/.kucedr/providers/<id>/manifest.json. */
 export function loadWebSearches(): readonly CatalogWebSearch[] {
 	return loadCatalog().webSearches;
 }

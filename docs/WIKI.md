@@ -1,6 +1,6 @@
 # LLM Wiki
 
-Friday's LLM Wiki is a persistent knowledge-compilation layer inside the existing assistant. It preserves source evidence, incrementally maintains interlinked Markdown pages, and gives the normal agent focused wiki tools without replacing its model client, loop, prompt builder, memory, RAG, IPC, or response pipeline.
+Kucedr's LLM Wiki is a persistent knowledge-compilation layer inside the existing assistant. It preserves source evidence, incrementally maintains interlinked Markdown pages, and gives the normal agent focused wiki tools without replacing its model client, loop, prompt builder, memory, RAG, IPC, or response pipeline.
 
 ## Enable and configure the wiki
 
@@ -45,11 +45,11 @@ Main agent loop
        -> review, lint, and audit services
 ```
 
-Ingest uses Friday's existing `LlmModel`. The source and relevant current pages are operation-specific context; the full wiki, schema, index, and log are never appended to every chat request. Retrieved source text is untrusted evidence, not executable instructions.
+Ingest uses Kucedr's existing `LlmModel`. The source and relevant current pages are operation-specific context; the full wiki, schema, index, and log are never appended to every chat request. Retrieved source text is untrusted evidence, not executable instructions.
 
 ## Storage
 
-The default layout below the Friday application-data directory is:
+The default layout below the Kucedr application-data directory is:
 
 ```text
 ├── settings/
@@ -155,7 +155,7 @@ An operation ID is stable for the source checksum. Retrying identical bytes does
 
 ### Example ingest
 
-Place `memory-report.md` in the configured raw folder, then ask Friday:
+Place `memory-report.md` in the configured raw folder, then ask Kucedr:
 
 ```text
 Ingest memory-report.md into the wiki.
@@ -173,7 +173,7 @@ The result reports processed/skipped sources, created/updated pages, claims, con
 
 ### Generation progress and limits
 
-The settings screen reports the current source and whether Friday is preparing, generating, saving, or cancelling it. **Cancel** aborts the active model request and leaves already completed sources integrated.
+The settings screen reports the current source and whether Kucedr is preparing, generating, saving, or cancelling it. **Cancel** aborts the active model request and leaves already completed sources integrated.
 
 To prevent an unresponsive provider from blocking the entire run indefinitely:
 
@@ -206,7 +206,7 @@ Tool results distinguish `wiki_page` synthesis from `raw_source` evidence and in
 Compare compiled wiki memory with raw-source RAG. Verify exact claims against primary evidence, then save the comparison.
 ```
 
-Friday can first call:
+Kucedr can first call:
 
 ```json
 {
@@ -229,7 +229,7 @@ Automatic ingest can add or preserve a contradiction only as `unresolved`. It ca
 - `superseded`;
 - `resolved-by-review`.
 
-Major rewrites of established synthesis or comparison pages are staged as review items. Each item records the proposed update, reason, evidence source IDs, affected pages, risk, and rollback note. `review_wiki_changes` always invokes Friday's interactive approval UI before approval or rejection is executed. Approved contradiction changes may transition out of `unresolved`; ordinary ingest may not.
+Major rewrites of established synthesis or comparison pages are staged as review items. Each item records the proposed update, reason, evidence source IDs, affected pages, risk, and rollback note. `review_wiki_changes` always invokes Kucedr's interactive approval UI before approval or rejection is executed. Approved contradiction changes may transition out of `unresolved`; ordinary ingest may not.
 
 Use `get_recent_wiki_activity` to see recent log entries and pending review IDs.
 
@@ -286,9 +286,9 @@ Back up the application-data `wiki/` directory before changing paths or review p
 
 To stop using the subsystem, turn off **Enable wiki knowledge**. This removes wiki tools from new main-agent runs and stops scheduling without deleting evidence or pages.
 
-Failed operations automatically restore the previous complete generated directory and record the rollback. For a successful operation that must be reverted later, restore the generated wiki directory and state JSON files from Git, cloud sync, or a filesystem backup; immutable evidence snapshots do not need to be replaced. Friday does not yet keep permanent post-commit page versions after the transaction backup is released.
+Failed operations automatically restore the previous complete generated directory and record the rollback. For a successful operation that must be reverted later, restore the generated wiki directory and state JSON files from Git, cloud sync, or a filesystem backup; immutable evidence snapshots do not need to be replaced. Kucedr does not yet keep permanent post-commit page versions after the transaction backup is released.
 
-Code rollback is additive: revert the wiki commits or install an earlier Friday build. Existing Markdown and evidence files are ordinary local data and can remain in place for a later re-enable.
+Code rollback is additive: revert the wiki commits or install an earlier Kucedr build. Existing Markdown and evidence files are ordinary local data and can remain in place for a later re-enable.
 
 ## Known limitations
 

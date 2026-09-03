@@ -106,8 +106,8 @@ const handle = (message) => {
 			result: {
 				protocolVersion: message.params?.protocolVersion ?? '2025-06-18',
 				capabilities: { tools: { listChanged: false } },
-				serverInfo: { name: 'friday-demo', version: '1.0.0' },
-				instructions: 'Harmless demo tools for testing Friday MCP integration.',
+				serverInfo: { name: 'kucedr-demo', version: '1.0.0' },
+				instructions: 'Harmless demo tools for testing Kucedr MCP integration.',
 			},
 		});
 		return;

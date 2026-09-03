@@ -7,7 +7,7 @@ import { redoFileOperation } from '../../../../../src/main/agent/history/redo';
 import type { FileHistory } from '../../../../../src/main/agent/history/types';
 import { undoFileOperation } from '../../../../../src/main/agent/history/undo';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-history-'));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-history-'));
 let history: FileHistory;
 
 beforeEach(() => { history = { operations: [] }; });

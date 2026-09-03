@@ -79,7 +79,7 @@ const headerValue = (value: string): string => value.replace(/\r?\n/g, ' ').trim
 const encodedSubject = (value: string): string => `=?UTF-8?B?${base64(value)}?=`;
 
 const messageBody = (args: z.infer<typeof toolsSchema>): string => {
-	const boundary = `friday-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+	const boundary = `kucedr-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 	const headers = [
 		`From: ${headerValue(args.from)}`,
 		`To: ${asArray(args.to as string | string[])
