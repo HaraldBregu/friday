@@ -44,7 +44,6 @@ export interface CloudChatMessageInput {
 export interface CloudFile {
 	id: string;
 	sessionId: string;
-	objectPath: string;
 	fileName: string;
 	mimeType: string;
 	sizeBytes: number;
@@ -61,7 +60,7 @@ export interface CloudFileUpload {
 
 export interface CloudChange {
 	sessionId: string;
-	event: 'INSERT' | 'UPDATE' | 'DELETE';
+	event: 'created' | 'updated' | 'deleted';
 }
 
 export interface CloudApi {
