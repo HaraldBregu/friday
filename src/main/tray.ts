@@ -24,9 +24,7 @@ export class Tray {
 	}
 
 	create(): void {
-		const icon = nativeImage.createFromPath(
-			path.join(resourceRoot(), 'resources/icons/icon.png')
-		);
+		const icon = nativeImage.createFromPath(path.join(resourceRoot(), 'resources/icons/icon.png'));
 
 		this.tray = new ElectronTray(icon.resize({ width: 16, height: 16 }));
 		this.tray.setToolTip('Friday');
