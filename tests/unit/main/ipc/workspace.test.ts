@@ -197,6 +197,24 @@ describe('workspace files', () => {
 		await fs.rm(root, { recursive: true });
 	});
 
+	it('does not follow workspace symlinks when deleting', async () => {
+		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
+		const targetFile = path.join(root, 'target.md');
+		const targetDirectory = path.join(root, 'target');
+		await fs.writeFile(targetFile, '# Keep');
+		await fs.mkdir(targetDirectory);
+		await fs.writeFile(path.join(targetDirectory, 'keep.md'), '# Keep');
+		await fs.symlink(targetFile, path.join(root, 'file-link.md'));
+		await fs.symlink(targetDirectory, path.join(root, 'directory-link'));
+
+		await expect(deleteWorkspaceFile(root, 'file-link.md')).rejects.toThrow('symlinks');
+		await expect(deleteWorkspaceDirectory(root, 'directory-link')).rejects.toThrow('symlinks');
+		await expect(fs.readFile(targetFile, 'utf8')).resolves.toBe('# Keep');
+		await expect(fs.readFile(path.join(targetDirectory, 'keep.md'), 'utf8')).resolves.toBe('# Keep');
+
+		await fs.rm(root, { recursive: true });
+	});
+
 	it('moves files and folders without overwriting or creating directory cycles', async () => {
 		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'friday-workspace-'));
 		await fs.mkdir(path.join(root, 'source'));
