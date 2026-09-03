@@ -4,6 +4,7 @@ import { splitRecord } from './mcp_split_record';
 import type { McpOAuthState, McpRecord } from './mcp_types';
 import { listLocalMcpServers } from './mcp_local_list';
 import { mcpLocalRoot } from './mcp_local_root';
+import { mergeMcpRecord } from './mcp_record_merge';
 
 export function getMcpServers(): McpSettings {
 	const servers: McpSettings = {};
@@ -20,7 +21,7 @@ export function setMcpServers(servers: McpSettings): void {
 	const current = new Map(getMcpServersState().map((record) => [record.id, record]));
 	const next: McpRecord[] = [];
 	for (const [id, data] of Object.entries(servers)) {
-		next.push({ ...current.get(id), id, ...data } as McpRecord);
+		next.push(mergeMcpRecord(id, data, current.get(id)));
 	}
 	setMcpServersState(next);
 }

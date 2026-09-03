@@ -7,6 +7,7 @@ import { importLocalMcpServers } from './mcp_local_import';
 import { readLocalMcpServer } from './mcp_local_read';
 import { mcpLocalDiscoveryRoots, mcpLocalRoot } from './mcp_local_root';
 import { setLocalMcpEnvironment } from './mcp_store_state';
+import { localMcpIdentity } from './mcp_local_identity';
 
 export function configureLocalMcpServer(
 	id: string,
@@ -93,7 +94,6 @@ export function configureLocalMcpServer(
 		enabled: input.enabled ?? serverData.enabled,
 	};
 
-	setLocalMcpEnvironment(server.id, input.env);
 	try {
 		writeFileSync(temporaryPath, `${JSON.stringify(next, null, '\t')}\n`, 'utf8');
 		renameSync(temporaryPath, manifestPath);
@@ -101,5 +101,8 @@ export function configureLocalMcpServer(
 		if (existsSync(temporaryPath)) rmSync(temporaryPath);
 	}
 
+	const configured = readLocalMcpServer(serverPath);
+	if (configured.data.type !== 'stdio') throw new Error('Expected a local MCP server.');
+	setLocalMcpEnvironment(server.id, localMcpIdentity(configured.data), input.env);
 	return readLocalMcpServer(serverPath);
 }
