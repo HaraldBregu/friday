@@ -22,11 +22,7 @@ import {
 	Wrench,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useNow } from '@/components/hooks/use-now';
 import { cn } from '@/lib/utils';
 import { formatDuration } from './duration';
@@ -118,8 +114,7 @@ function ToolInput({ input }: { readonly input: unknown }) {
 			<div className="max-h-40 overflow-auto rounded-sm bg-muted/40 px-2 py-1.5 font-mono text-xs text-muted-foreground">
 				{Object.entries(input).map(([key, value]) => (
 					<div key={key} className="mb-0.5 break-words last:mb-0">
-						<span className="text-foreground/70">{key}:</span>{' '}
-						<span>{formatValue(value)}</span>
+						<span className="text-foreground/70">{key}:</span> <span>{formatValue(value)}</span>
 					</div>
 				))}
 			</div>
@@ -142,7 +137,14 @@ function ToolOutput({ output }: { readonly output: unknown }) {
 	);
 }
 
-function Tool({ toolPart, label, defaultOpen = false, hideIcon = false, className, style }: ToolProps) {
+function Tool({
+	toolPart,
+	label,
+	defaultOpen = false,
+	hideIcon = false,
+	className,
+	style,
+}: ToolProps) {
 	const [isOpen, setIsOpen] = useState(defaultOpen);
 	const { state, toolCallId } = toolPart;
 	const input = toolPart.input ?? (toolPart.inputText ? { raw: toolPart.inputText } : undefined);

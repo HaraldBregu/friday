@@ -4,15 +4,15 @@ import { handleExternalLinkClick, isExternalHref } from '@/lib/external-links';
 function markdownLink(className: string): NonNullable<Components['a']> {
 	return function MarkdownLink({ children, href }) {
 		return (
-		<a
-			href={href}
-			target={isExternalHref(href) ? '_blank' : undefined}
-			rel={isExternalHref(href) ? 'noreferrer' : undefined}
-			onClick={(event) => handleExternalLinkClick(event, href)}
-			className={className}
-		>
-			{children}
-		</a>
+			<a
+				href={href}
+				target={isExternalHref(href) ? '_blank' : undefined}
+				rel={isExternalHref(href) ? 'noreferrer' : undefined}
+				onClick={(event) => handleExternalLinkClick(event, href)}
+				className={className}
+			>
+				{children}
+			</a>
 		);
 	};
 }
@@ -20,9 +20,7 @@ function markdownLink(className: string): NonNullable<Components['a']> {
 export const markdownComponents: Partial<Components> = {
 	p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0">{children}</p>,
 	ul: ({ children }) => <ul className="my-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
-	ol: ({ children }) => (
-		<ol className="my-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>
-	),
+	ol: ({ children }) => <ol className="my-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
 	li: ({ children }) => <li className="pl-1">{children}</li>,
 	a: markdownLink(
 		'font-medium text-link underline decoration-link/30 underline-offset-4 hover:opacity-80'
@@ -38,9 +36,7 @@ export const markdownComponents: Partial<Components> = {
 	h4: ({ children }) => <h4 className="mb-2 mt-1 text-base font-semibold">{children}</h4>,
 	h5: ({ children }) => <h5 className="mb-2 mt-1 text-sm font-semibold">{children}</h5>,
 	h6: ({ children }) => (
-		<h6 className="mb-2 mt-1 text-xs font-semibold uppercase text-muted-foreground">
-			{children}
-		</h6>
+		<h6 className="mb-2 mt-1 text-xs font-semibold uppercase text-muted-foreground">{children}</h6>
 	),
 	hr: () => <hr className="my-4 border-border" />,
 	table: ({ children }) => (

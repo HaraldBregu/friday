@@ -7,11 +7,7 @@ import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { isTaskToolType } from '@/components/prompt-kit/task';
 import { Tool, toolIcon } from '@/components/prompt-kit/tool';
 import { Button } from '@/components/ui/button';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import type { AgentToolPart } from '../context';
 import { isToolRunning, toolGroupLabel, toolPartLabel } from './tool-label';
@@ -44,9 +40,7 @@ function staggerStyle(index: number): { animationDelay: string } {
 }
 
 function isLiveTool(tool: AgentToolPart): boolean {
-	return (
-		tool.durationMs === undefined && tool.startedAtMs !== undefined && isToolRunning(tool)
-	);
+	return tool.durationMs === undefined && tool.startedAtMs !== undefined && isToolRunning(tool);
 }
 
 function ToolTypeSection({ group }: { readonly group: ToolTypeGroup }): ReactElement {
@@ -56,8 +50,7 @@ function ToolTypeSection({ group }: { readonly group: ToolTypeGroup }): ReactEle
 	const kindIcon = toolIcon(group.tools[0]);
 	const hasLiveTool = group.tools.some(isLiveTool);
 	const now = useNow(hasLiveTool);
-	const hasDuration =
-		hasLiveTool || group.tools.some((tool) => tool.durationMs !== undefined);
+	const hasDuration = hasLiveTool || group.tools.some((tool) => tool.durationMs !== undefined);
 	const durationMs = group.tools.reduce((total, tool) => {
 		if (tool.durationMs !== undefined) return total + tool.durationMs;
 		if (isLiveTool(tool) && tool.startedAtMs !== undefined)
