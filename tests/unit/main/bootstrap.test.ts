@@ -1,3 +1,5 @@
+jest.mock('../../../src/main/channels', () => ({ createChannelRegistry: jest.fn() }));
+
 import { cleanup, type MainServices } from '../../../src/main/bootstrap';
 
 it('settles storage operations before cloud and auth teardown', async () => {
