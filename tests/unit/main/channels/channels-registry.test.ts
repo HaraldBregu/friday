@@ -94,6 +94,30 @@ describe('createChannelRegistry', () => {
 		).rejects.toThrow(/telegram channel is not running/);
 	});
 
+	it('waits for running adapters to stop during shutdown', async () => {
+		let finishStop: (() => void) | undefined;
+		mockAdapterStop.mockReturnValueOnce(
+			new Promise<void>((resolve) => {
+				finishStop = resolve;
+			})
+		);
+		const registry = createChannelRegistry(deps());
+		await registry.start('telegram');
+
+		const destroying = registry.destroy();
+		let destroyed = false;
+		void destroying.then(() => {
+			destroyed = true;
+		});
+		await Promise.resolve();
+
+		expect(mockAdapterStop).toHaveBeenCalledTimes(1);
+		expect(destroyed).toBe(false);
+		finishStop?.();
+		await destroying;
+		expect(destroyed).toBe(true);
+	});
+
 	it('routes an inbound chat through its derived bot session', async () => {
 		const send = jest.fn().mockResolvedValue('reply');
 		const registry = createChannelRegistry(deps({ send } as unknown as Agent));
