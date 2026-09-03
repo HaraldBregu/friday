@@ -16,10 +16,10 @@ export async function connectA2aAgent(
 	try {
 		validateA2aAuthentication(authentication, url);
 		let card = await discoverA2aAgent(url, authentication, requestSignal);
-		let client = await createA2aClient(card, authentication, url);
+		let client = await createA2aClient(card, authentication, url, signal);
 		if (authentication.credential && card.capabilities?.extendedAgentCard) {
 			card = await client.getAgentCard({ signal: requestSignal });
-			client = await createA2aClient(card, authentication, url);
+			client = await createA2aClient(card, authentication, url, signal);
 		}
 		return { card, client };
 	} catch (error) {

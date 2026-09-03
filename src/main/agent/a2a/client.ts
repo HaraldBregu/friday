@@ -10,7 +10,8 @@ const supportedBindings = new Set(['jsonrpc', 'http+json']);
 export async function createA2aClient(
 	card: AgentCard,
 	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader' | 'clientId'>,
-	discoveryUrl: string
+	discoveryUrl: string,
+	signal?: AbortSignal
 ): Promise<Client> {
 	if (!card || typeof card.name !== 'string' || !card.name.trim()) {
 		throw new Error('Invalid A2A Agent Card: name is required.');
@@ -109,7 +110,12 @@ export async function createA2aClient(
 				? oauthScheme.value.oauth2MetadataUrl
 				: undefined;
 		if (!metadataUrl) throw new Error('A2A Agent Card does not advertise OAuth metadata.');
-		tokenProvider = await createA2aTokenProvider(metadataUrl, endpoint.href, authentication);
+		tokenProvider = await createA2aTokenProvider(
+			metadataUrl,
+			endpoint.href,
+			authentication,
+			signal
+		);
 	}
 	const fetchImpl = createA2aFetch(authentication, tokenProvider);
 	const compatibleCard = { ...card, supportedInterfaces: [supportedInterface] };

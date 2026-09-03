@@ -1,18 +1,32 @@
 import { randomUUID } from 'node:crypto';
 import type { JWK } from 'jose';
 import type { A2aAgent } from '../../../shared/a2a_types';
+import { createBoundedFetch } from '../../shared/bounded_fetch';
+
+const MAX_A2A_WIRE_BYTES = 256_000;
+const A2A_REQUEST_TIMEOUT_MS = 15_000;
 
 export async function createA2aTokenProvider(
 	metadataUrl: string,
 	resource: string,
-	authentication: Pick<A2aAgent, 'clientId' | 'credential'>
+	authentication: Pick<A2aAgent, 'clientId' | 'credential'>,
+	signal?: AbortSignal
 ): Promise<() => Promise<string>> {
 	const origin = new URL(resource).origin;
 	const metadataTarget = new URL(metadataUrl);
 	if (metadataTarget.protocol !== 'https:' || metadataTarget.origin !== origin) {
 		throw new Error('A2A OAuth metadata must use the configured HTTPS origin.');
 	}
-	const metadataResponse = await fetch(metadataTarget, { redirect: 'error' });
+	const boundedFetch = createBoundedFetch(
+		MAX_A2A_WIRE_BYTES,
+		'A2A OAuth response exceeded the 256 KB wire limit.'
+	);
+	const metadataTimeout = AbortSignal.timeout(A2A_REQUEST_TIMEOUT_MS);
+	const metadataSignal = signal ? AbortSignal.any([signal, metadataTimeout]) : metadataTimeout;
+	const metadataResponse = await boundedFetch(metadataTarget, {
+		redirect: 'error',
+		signal: metadataSignal,
+	});
 	if (!metadataResponse.ok)
 		throw new Error(`A2A OAuth discovery failed: ${await metadataResponse.text()}`);
 	const metadata = (await metadataResponse.json()) as {
@@ -50,7 +64,9 @@ export async function createA2aTokenProvider(
 			.setExpirationTime(now + 120)
 			.setJti(randomUUID())
 			.sign(key);
-		const response = await fetch(tokenEndpoint, {
+		const timeout = AbortSignal.timeout(A2A_REQUEST_TIMEOUT_MS);
+		const requestSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
+		const response = await boundedFetch(tokenEndpoint, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({
@@ -62,6 +78,7 @@ export async function createA2aTokenProvider(
 				resource,
 			}),
 			redirect: 'error',
+			signal: requestSignal,
 		});
 		if (!response.ok) throw new Error(`A2A OAuth token request failed: ${await response.text()}`);
 		const value = (await response.json()) as { access_token?: unknown; expires_in?: unknown };

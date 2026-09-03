@@ -1,5 +1,6 @@
 import type { A2aAgent } from '../../../shared/a2a_types';
 import { validateA2aAuthentication } from './validate';
+import { createBoundedFetch } from '../../shared/bounded_fetch';
 
 const MAX_A2A_WIRE_BYTES = 256_000;
 
@@ -7,6 +8,10 @@ export function createA2aFetch(
 	authentication: Pick<A2aAgent, 'authType' | 'credential' | 'apiKeyHeader' | 'clientId'>,
 	tokenProvider?: () => Promise<string>
 ): typeof fetch {
+	const boundedFetch = createBoundedFetch(
+		MAX_A2A_WIRE_BYTES,
+		'A2A response exceeded the 256 KB wire limit.'
+	);
 	return async (input, init) => {
 		const request = new Request(input, init);
 		validateA2aAuthentication(authentication, request.url);
@@ -25,29 +30,6 @@ export function createA2aFetch(
 		) {
 			headers.set(authentication.apiKeyHeader, authentication.credential);
 		}
-		const response = await fetch(request, { headers, redirect: 'error' });
-		const contentLength = Number(response.headers.get('content-length') ?? 0);
-		if (contentLength > MAX_A2A_WIRE_BYTES) {
-			throw new Error('A2A response exceeded the 256 KB wire limit.');
-		}
-		if (!response.body) return response;
-		let receivedBytes = 0;
-		const body = response.body.pipeThrough(
-			new TransformStream<Uint8Array, Uint8Array>({
-				transform(chunk, controller) {
-					receivedBytes += chunk.byteLength;
-					if (receivedBytes > MAX_A2A_WIRE_BYTES) {
-						controller.error(new Error('A2A response exceeded the 256 KB wire limit.'));
-						return;
-					}
-					controller.enqueue(chunk);
-				},
-			})
-		);
-		return new Response(body, {
-			status: response.status,
-			statusText: response.statusText,
-			headers: response.headers,
-		});
+		return boundedFetch(request, { headers, redirect: 'error' });
 	};
 }
