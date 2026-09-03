@@ -17,8 +17,6 @@ export function sealMcpRecord(record: McpRecord): {
 	if (!isSafeStorageAvailable()) {
 		return { record: stored as McpStoredRecord, volatileSecrets: secrets };
 	}
-	stored.encryptedSecrets = safeStorage
-		.encryptString(JSON.stringify(secrets))
-		.toString('base64');
+	stored.encryptedSecrets = safeStorage.encryptString(JSON.stringify(secrets)).toString('base64');
 	return { record: stored as McpStoredRecord };
 }
