@@ -8,7 +8,7 @@ export default defineConfig({
 	publicDir: false,
 	resolve: {
 		alias: {
-			'@kucedr/sdk': path.resolve(import.meta.dirname, '../../packages/sdk/index.ts'),
+			'@kucedr/sdk': path.resolve(import.meta.dirname, '../../../packages/sdk/index.ts'),
 		},
 	},
 });
