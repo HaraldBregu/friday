@@ -88,23 +88,21 @@ function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Elem
 		}
 	}, [media.permission, t]);
 
-	const openSettings = useCallback((pane: SystemPreferencePaneId): void => {
-		setPermissionError('');
-		void window.app.openSystemPreference(pane).catch((error: unknown) => {
-			setPermissionError(errorMessage(error, t('settings.system.errors.openPreference')));
-		});
-	}, [t]);
+	const openSettings = useCallback(
+		(pane: SystemPreferencePaneId): void => {
+			setPermissionError('');
+			void window.app.openSystemPreference(pane).catch((error: unknown) => {
+				setPermissionError(errorMessage(error, t('settings.system.errors.openPreference')));
+			});
+		},
+		[t]
+	);
 
 	return (
 		<SettingsPageShell>
-			<SettingsPageHeader
-				title={t(media.titleKey)}
-				description={t(media.descriptionKey)}
-			/>
+			<SettingsPageHeader title={t(media.titleKey)} description={t(media.descriptionKey)} />
 
-			{permissionError && (
-				<SettingsNotice variant="destructive">{permissionError}</SettingsNotice>
-			)}
+			{permissionError && <SettingsNotice variant="destructive">{permissionError}</SettingsNotice>}
 
 			<SettingsSection title={t('settings.system.mediaPermissions.title')}>
 				<SettingsPanel>
@@ -126,7 +124,9 @@ function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Elem
 								<Button
 									variant="outline"
 									size="xs"
-									onClick={() => openSettings(media.permission === 'camera' ? 'Camera' : 'Microphone')}
+									onClick={() =>
+										openSettings(media.permission === 'camera' ? 'Camera' : 'Microphone')
+									}
 								>
 									<Settings className="size-3" />
 									{t('settings.camera.actions.openSettings')}
