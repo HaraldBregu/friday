@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,11 +9,7 @@ import googleIcon from '@resources/providers/google/images/fallback_lobehub/svg/
 
 type Mode = 'signIn' | 'signUp' | 'forgot';
 
-type AuthStepProps = {
-	readonly onSkip?: () => void;
-};
-
-export function AuthStep({ onSkip }: AuthStepProps = {}): React.JSX.Element {
+export function AuthStep(): React.JSX.Element {
 	const { state } = useAuth();
 	const [mode, setMode] = useState<Mode>('signIn');
 	const [email, setEmail] = useState('');
@@ -319,14 +315,6 @@ export function AuthStep({ onSkip }: AuthStepProps = {}): React.JSX.Element {
 						) : null}
 					</CardContent>
 				</Card>
-				{!recovery && onSkip ? (
-					<div className="mt-4 flex justify-end">
-						<Button type="button" variant="ghost" size="sm" onClick={onSkip}>
-							Skip and continue
-							<ArrowRight className="size-3.5" aria-hidden="true" />
-						</Button>
-					</div>
-				) : null}
 			</div>
 		</div>
 	);

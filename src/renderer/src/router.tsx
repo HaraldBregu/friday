@@ -13,6 +13,7 @@ import {
 	PageLoadingSkeleton,
 } from './components/app/base/PageLoadingSkeleton';
 import { TitleBar } from './components/app/titlebar/TitleBar';
+import { Button } from './components/ui/button';
 import { Layout as SettingsLayout, SettingsBreadcrumb } from './pages/settings';
 import { SettingsPageSkeleton } from './pages/settings/components';
 import { SETTINGS_MODEL_SERVICE_ITEMS } from './pages/settings/navigation';
@@ -29,6 +30,7 @@ import StartPage from './pages/start/StartPage';
 import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
 import { useOnboarding } from './contexts/useOnboarding';
+import { useAuth } from './contexts/AuthContext';
 
 const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));
@@ -113,6 +115,7 @@ function RootRouteComponent(): React.JSX.Element {
 	const previousSidebarOpen = useRef(state.sidebarOpen);
 
 	const { phase } = useOnboarding();
+	const { state: authState, skipSignIn } = useAuth();
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
 	const hasSidebar = isHome || isSettings;
@@ -156,7 +159,18 @@ function RootRouteComponent(): React.JSX.Element {
 							) : undefined
 						}
 						centerContentClassName={
-							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
+							phase === 'auth'
+								? 'left-1/2 right-auto -translate-x-1/2'
+								: isSettings && (isMobile || !state.sidebarOpen)
+									? 'left-28'
+									: undefined
+						}
+						rightContent={
+							phase === 'auth' && authState.status !== 'recovery' ? (
+								<Button type="button" variant="ghost" size="sm" onClick={skipSignIn}>
+									Skip
+								</Button>
+							) : undefined
 						}
 						onSearch={hasSidebar ? () => setCommandMenuOpen(true) : undefined}
 						style={

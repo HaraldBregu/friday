@@ -22,7 +22,7 @@ import { LandingStep } from './components/LandingStep';
 
 const StartPage: React.FC = () => {
 	const navigate = useNavigate();
-	const { state: authState, localOnly, skipSignIn, requireSignIn } = useAuth();
+	const { state: authState, localOnly, requireSignIn } = useAuth();
 	const { phase, start, restart, refreshConfiguration } = useOnboarding();
 	const [state, dispatch] = useReducer(setupReducer, undefined, createInitialSetupState);
 	const { step, serviceStates, loadingModels, savingConfig, errorMessage } = state;
@@ -132,7 +132,7 @@ const StartPage: React.FC = () => {
 
 	const content =
 		phase === 'auth' ? (
-			<AuthStep onSkip={skipSignIn} />
+			<AuthStep />
 		) : phase === 'setup' ? (
 			renderSetupStep()
 		) : (
