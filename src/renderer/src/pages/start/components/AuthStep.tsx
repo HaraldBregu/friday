@@ -94,8 +94,8 @@ export function AuthStep(): React.JSX.Element {
 							Kucedr account services are unavailable
 						</h1>
 						<CardDescription>
-							Sign-in and cloud sync are not available right now. You can continue using Kucedr
-							on this device.
+							Sign-in and cloud sync are not available right now. You can continue using Kucedr on
+							this device.
 						</CardDescription>
 					</CardHeader>
 				</Card>
