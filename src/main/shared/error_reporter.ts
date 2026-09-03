@@ -24,7 +24,6 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 	process.on('uncaughtException', (error, origin) => {
 		const message = error instanceof Error ? error.stack || error.message : String(error);
 		safetyNetLogger?.error('Process', `uncaughtException (${origin})`, { error: message });
-		// eslint-disable-next-line no-console
 		console.error(`[uncaughtException:${origin}]`, message);
 		requestTermination();
 	});
@@ -32,7 +31,6 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 	process.on('unhandledRejection', (reason) => {
 		const message = reason instanceof Error ? reason.stack || reason.message : String(reason);
 		safetyNetLogger?.error('Process', 'unhandledRejection', { reason: message });
-		// eslint-disable-next-line no-console
 		console.error('[unhandledRejection]', message);
 		requestTermination();
 	});
@@ -40,14 +38,12 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 	process.on('exit', (code) => {
 		const stack = new Error('exit trace').stack;
 		safetyNetLogger?.warn('Process', `process.exit(${code})`, { stack });
-		// eslint-disable-next-line no-console
 		console.error(`[process.exit] code=${code}`, stack);
 	});
 
 	for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGQUIT'] as const) {
 		process.on(signal, () => {
 			safetyNetLogger?.warn('Process', `Received ${signal}`);
-			// eslint-disable-next-line no-console
 			console.error(`[signal] ${signal}`);
 			requestTermination();
 		});

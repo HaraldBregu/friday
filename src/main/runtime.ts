@@ -83,14 +83,12 @@ setupProcessSafetyNet();
 // crashes produce dumps instead of only a generic Crashpad stderr line.
 try {
 	const crashDumpsPath = app.getPath('crashDumps');
-	// eslint-disable-next-line no-console
 	console.log(`[CrashReporter] crash dumps path: ${crashDumpsPath}`);
 	crashReporter.start({
 		submitURL: '',
 		uploadToServer: false,
 	});
 } catch (error) {
-	// eslint-disable-next-line no-console
 	console.error('[CrashReporter] Failed to start', error);
 }
 
@@ -264,7 +262,6 @@ app.on('before-quit', (event) => {
 	});
 	void shutdownPromise
 		.catch((error) => {
-			// eslint-disable-next-line no-console
 			console.error('[Shutdown] Cleanup failed', error);
 		})
 		.finally(() => {

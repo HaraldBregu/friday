@@ -1,4 +1,5 @@
 import { app } from 'electron';
+import { setupProcessSafetyNet } from '../../../../src/main/shared/error_reporter';
 
 describe('process safety net', () => {
 	const originalExitCode = process.exitCode;
@@ -10,15 +11,13 @@ describe('process safety net', () => {
 
 	it('requests a nonzero graceful shutdown after an uncaught exception', () => {
 		const listeners = new Map<string, (...args: never[]) => void>();
+		jest.spyOn(console, 'error').mockImplementation();
 		jest.spyOn(process, 'on').mockImplementation(((event: string, listener: never) => {
 			listeners.set(event, listener as (...args: never[]) => void);
 			return process;
 		}) as typeof process.on);
 		const logger = { error: jest.fn(), warn: jest.fn() };
-		jest.isolateModules(() => {
-			const { setupProcessSafetyNet } = require('../../../../src/main/shared/error_reporter');
-			setupProcessSafetyNet(logger);
-		});
+		setupProcessSafetyNet(logger as never);
 
 		listeners.get('uncaughtException')?.(new Error('fatal') as never, 'uncaughtException' as never);
 
