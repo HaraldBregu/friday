@@ -11,6 +11,7 @@ const listObjects = jest.fn();
 const getObject = jest.fn();
 
 jest.mock('node:fs', () => ({
+	default: { existsSync: () => false, realpathSync: (value: string) => value },
 	promises: { readFile, mkdir, lstat, writeFile, rename, rm },
 }));
 jest.mock('node:crypto', () => ({ randomUUID: () => 'restore' }));
