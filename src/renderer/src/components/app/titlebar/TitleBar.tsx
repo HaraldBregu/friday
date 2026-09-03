@@ -188,8 +188,7 @@ export const TitleBar = React.memo(function TitleBar({
 					</div>
 				)}
 
-					{/* ── Windows/Linux window controls ── */}
-					{!isMac && <WindowControls isMaximized={isMaximized} />}
+				{!isMac && <WindowControls isMaximized={isMaximized} />}
 			</TitleBarContainer>
 		</TitleBarProvider>
 	);

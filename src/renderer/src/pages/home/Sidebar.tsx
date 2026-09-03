@@ -194,7 +194,9 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 																);
 																if (isActive) setSessionId(crypto.randomUUID());
 															})
-															.catch(() => setActionError(t('settings.chatHistory.errors.delete')));
+															.catch(() =>
+																setActionError(t('settings.chatHistory.errors.delete'))
+															);
 													}
 														});
 												}}

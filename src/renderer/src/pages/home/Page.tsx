@@ -714,15 +714,15 @@ function PageContent(): ReactElement {
 					/>
 				}
 			>
-					<div
+				<div
 						data-slot="home-workspace"
 						className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground"
 					>
 					<span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-						{agent.isLoading ? 'Friday is responding' : ''}
+						{agent.isLoading ? 'Friday is responding' : 'Friday is ready'}
 					</span>
 					<ChatContainerRoot className="min-h-0 p-0 [scrollbar-gutter:auto]">
-					<ChatContainerContent
+						<ChatContainerContent
 						className={cn(
 							'mx-auto w-full max-w-4xl gap-5 px-4',
 							showEmptyConversation

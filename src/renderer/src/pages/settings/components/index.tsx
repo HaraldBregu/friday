@@ -21,10 +21,9 @@ export function SettingsPageShell({
 	children,
 	className,
 }: SettingsPageShellProps): React.JSX.Element {
-		return (
-			<div
-				role={variant === 'destructive' ? 'alert' : undefined}
-				className={cn(
+	return (
+		<div
+			className={cn(
 				'mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-8 sm:px-10 sm:py-10',
 				className
 			)}
@@ -168,6 +167,7 @@ export function SettingsRow({
 
 	return (
 		<div
+			role={variant === 'destructive' ? 'alert' : undefined}
 			className={cn(
 				'grid min-h-11 items-center gap-2 border-b border-border/60 px-3 py-2 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3',
 				className
