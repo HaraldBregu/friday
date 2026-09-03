@@ -74,9 +74,7 @@ describe('protocol security', () => {
 			headers: request.headers,
 		});
 		await expect(
-			extensionHandler(
-				new Request(`${EXTENSION_RESOURCE_SCHEME}://draw/..%2F..%2Fprivate.txt`)
-			)
+			extensionHandler(new Request(`${EXTENSION_RESOURCE_SCHEME}://draw/..%2F..%2Fprivate.txt`))
 		).resolves.toMatchObject({ status: 403 });
 		expect(net.fetch).toHaveBeenCalledTimes(1);
 	});

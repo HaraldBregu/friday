@@ -121,11 +121,11 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
 					return Boolean(
 						details.isMainFrame &&
-							(permission === 'clipboard-sanitized-write'
-								? isAppContents
-								: webContents &&
-									!extensionRegistry.has(webContents) &&
-									BrowserWindow.fromWebContents(webContents)) &&
+						(permission === 'clipboard-sanitized-write'
+							? isAppContents
+							: webContents &&
+								!extensionRegistry.has(webContents) &&
+								BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(
 							requestingOrigin,
 							details.requestingUrl,
@@ -155,11 +155,11 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				callback(
 					Boolean(
 						details.isMainFrame &&
-							(permission === 'clipboard-sanitized-write'
-								? isAppWindowWebContents(webContents, extensionRegistry)
-								: webContents &&
-									!extensionRegistry.has(webContents) &&
-									BrowserWindow.fromWebContents(webContents)) &&
+						(permission === 'clipboard-sanitized-write'
+							? isAppWindowWebContents(webContents, extensionRegistry)
+							: webContents &&
+								!extensionRegistry.has(webContents) &&
+								BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(undefined, details.requestingUrl, undefined)
 					)
 				);
@@ -237,8 +237,7 @@ function isTrustedRendererUrl(url?: string): boolean {
 	try {
 		const parsed = new URL(url);
 		return (
-			parsed.protocol === `${EXTENSION_RESOURCE_SCHEME}:` ||
-			isTrustedRendererOrigin(parsed.origin)
+			parsed.protocol === `${EXTENSION_RESOURCE_SCHEME}:` || isTrustedRendererOrigin(parsed.origin)
 		);
 	} catch {
 		return false;

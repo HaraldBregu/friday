@@ -54,8 +54,7 @@ export class WindowFactory {
 		try {
 			const exists = existsSync(this.preloadPath);
 			this.logger?.info('WindowFactory', `Preload file exists: ${exists}`);
-		} catch {
-		}
+		} catch {}
 	}
 
 	private getBaseWebPreferences(): Electron.WebPreferences {
