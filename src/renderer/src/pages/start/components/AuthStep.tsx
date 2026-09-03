@@ -87,16 +87,16 @@ export function AuthStep(): React.JSX.Element {
 
 	if (state.status === 'unconfigured') {
 		return (
-				<div className="flex min-h-full items-center justify-center px-6 py-8">
-					<Card className="w-full max-w-sm">
-						<CardHeader>
-							<h1 className="text-base font-medium leading-snug">
-								Kucedr account services are unavailable
-							</h1>
-							<CardDescription>
-								Sign-in and cloud sync are not available right now. You can continue using Kucedr
-								on this device.
-							</CardDescription>
+			<div className="flex min-h-full items-center justify-center px-6 py-8">
+				<Card className="w-full max-w-sm">
+					<CardHeader>
+						<h1 className="text-base font-medium leading-snug">
+							Kucedr account services are unavailable
+						</h1>
+						<CardDescription>
+							Sign-in and cloud sync are not available right now. You can continue using Kucedr
+							on this device.
+						</CardDescription>
 					</CardHeader>
 				</Card>
 			</div>
