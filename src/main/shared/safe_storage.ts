@@ -1,9 +1,9 @@
 import { safeStorage } from 'electron';
 
-type SafeStorageAvailability = Pick<
-	typeof safeStorage,
-	'isEncryptionAvailable' | 'getSelectedStorageBackend'
->;
+interface SafeStorageAvailability {
+	isEncryptionAvailable(): boolean;
+	getSelectedStorageBackend(): string;
+}
 
 export function isSafeStorageAvailable(
 	storage: SafeStorageAvailability = safeStorage,
