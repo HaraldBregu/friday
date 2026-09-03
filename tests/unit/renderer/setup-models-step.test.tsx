@@ -61,7 +61,7 @@ const SERVICE_STATES: ModelServiceStateMap = {
 };
 
 it('groups model services in one card', () => {
-	render(
+	const { container } = render(
 		<SetupModelsStep
 			serviceStates={SERVICE_STATES}
 			loadingModels={false}
@@ -71,6 +71,8 @@ it('groups model services in one card', () => {
 	);
 
 	const assistantGroup = screen.getByRole('region', { name: 'Model providers' });
+	expect(container.firstElementChild).not.toHaveClass('px-4', 'sm:px-6');
+	expect(assistantGroup.parentElement).toHaveClass('mt-6');
 	const serviceIds = ['assistant', 'voice', 'transcription', 'image', 'audio', 'video'];
 	for (const id of serviceIds) {
 		expect(within(assistantGroup).getByTestId(`setup-${id}`)).toHaveAttribute(

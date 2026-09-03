@@ -67,10 +67,10 @@ export function SetupModelsStep({
 	);
 
 	return (
-		<div className="mx-auto flex min-h-full w-full min-w-0 max-w-2xl flex-col justify-center px-4 py-8 sm:px-6">
+		<div className="mx-auto flex min-h-full w-full min-w-0 max-w-2xl flex-col justify-center py-8">
 			<SetupStepHeader title={STEP_COPY.models.title} description={STEP_COPY.models.description} />
 
-			<div className="mt-8 grid min-w-0 gap-6">
+			<div className="mt-6 grid min-w-0 gap-6">
 				<section aria-label="Model providers" className="min-w-0">
 					<Card size="sm" className="gap-0! p-0!">
 						<CardContent className="p-0!">
