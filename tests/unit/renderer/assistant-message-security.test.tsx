@@ -2,6 +2,19 @@ import { render, screen } from '@testing-library/react';
 import { AssistantMessage } from '../../../src/renderer/src/pages/home/components/AssistantMessage';
 import type { AgentMessage } from '../../../src/renderer/src/pages/home/context';
 
+jest.mock('react-markdown', () => ({ defaultUrlTransform: (url: string) => url }));
+jest.mock('@/components/prompt-kit/markdown', () => ({
+	Markdown: ({
+		children,
+		components,
+	}: {
+		children: string;
+		components: { img: (props: { src: string; alt: string }) => React.ReactNode };
+	}) => {
+		const image = /!\[([^\]]*)\]\(([^)]+)\)/.exec(children);
+		return image ? components.img({ alt: image[1], src: image[2] }) : <div>{children}</div>;
+	},
+}));
 jest.mock('@/pages/home/hooks', () => ({
 	useReadMessageAloud: () => ({
 		speak: jest.fn(),
