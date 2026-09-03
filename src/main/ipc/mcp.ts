@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, shell } from 'electron';
+import { dialog, shell } from 'electron';
 import { mkdirSync } from 'node:fs';
 import { auth } from '@modelcontextprotocol/sdk/client/auth.js';
 import type { EventBus } from '../event_bus';
