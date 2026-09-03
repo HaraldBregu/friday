@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 
 import { workspaceFileType } from '../../shared/workspace';
+import { atomicWrite } from '../shared/atomic_write';
 import { resolveWorkspaceFile } from './workspace';
 
 export async function writeWorkspaceMarkdown(
@@ -14,5 +15,5 @@ export async function writeWorkspaceMarkdown(
 	if (workspaceFileType(resolvedPath).kind !== 'markdown') {
 		throw new Error('Only Markdown workspace files can be edited.');
 	}
-	await fs.writeFile(resolvedPath, content, 'utf8');
+	await atomicWrite(resolvedPath, content);
 }

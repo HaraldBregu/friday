@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 
 import { workspaceFileType, type WorkspaceFileKind } from '../../shared/workspace';
+import { atomicWrite } from '../shared/atomic_write';
 import { resolveWorkspaceFile } from './workspace';
 
 const editableKinds = new Set<WorkspaceFileKind>(['markdown', 'mermaid', 'excalidraw', 'tldraw']);
@@ -16,5 +17,5 @@ export async function writeWorkspaceFile(
 	if (!editableKinds.has(workspaceFileType(resolvedPath).kind)) {
 		throw new Error('Workspace file type cannot be edited.');
 	}
-	await fs.writeFile(resolvedPath, content, 'utf8');
+	await atomicWrite(resolvedPath, content);
 }
