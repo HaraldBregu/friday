@@ -216,6 +216,6 @@ corresponding runtime factory; adding only a manifest makes the service catalog 
 - Runtime adapters: [`src/main/models/adapters`](../src/main/models/adapters)
 - Search integrations: [`src/main/search`](../src/main/search)
 - Pinecone RAG integration: [`src/main/agent/knowledge/rag`](../src/main/agent/knowledge/rag)
-- Supabase cloud backup: [`SUPABASE.md`](SUPABASE.md)
+- Supabase cloud API: [`SUPABASE.md`](SUPABASE.md)
 
 When a manifest changes, update this page in the same change and run `npm run quality:check`.
