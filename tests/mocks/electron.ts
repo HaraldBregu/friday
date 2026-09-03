@@ -3,6 +3,7 @@ export const app = {
 	getAppPath: (): string => process.cwd(),
 	getPath: (): string => process.cwd(),
 	getVersion: (): string => '0.0.0-test',
+	isPackaged: false,
 	isReady: jest.fn(() => true),
 	once: jest.fn(),
 	quit: jest.fn(),

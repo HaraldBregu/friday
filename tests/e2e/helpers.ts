@@ -1,5 +1,5 @@
 import { _electron as electron, type ElectronApplication, type Page } from '@playwright/test';
-import { mkdtemp } from 'node:fs/promises';
+import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,12 +17,24 @@ export async function launchApp(): Promise<{
 	userDataDir: string;
 }> {
 	const userDataDir = await mkdtemp(path.join(os.tmpdir(), 'friday-e2e-'));
-	const app = await electron.launch({
-		args: [`--user-data-dir=${userDataDir}`, MAIN_ENTRY],
-		// ponytail: force production renderer (loadFile) even if a dev URL leaked into env
-		env: { ...process.env, NODE_ENV: 'production', ELECTRON_RENDERER_URL: '' },
-	});
-	const page = await app.firstWindow();
-	await page.waitForLoadState('domcontentloaded');
-	return { app, page, userDataDir };
+	let app: ElectronApplication | undefined;
+	try {
+		app = await electron.launch({
+			args: [`--user-data-dir=${userDataDir}`, MAIN_ENTRY],
+			// ponytail: force production renderer (loadFile) even if a dev URL leaked into env
+			env: {
+				...process.env,
+				NODE_ENV: 'production',
+				ELECTRON_RENDERER_URL: '',
+				FRIDAY_E2E_DATA_ROOT: userDataDir,
+			},
+		});
+		const page = await app.firstWindow();
+		await page.waitForLoadState('domcontentloaded');
+		return { app, page, userDataDir };
+	} catch (error) {
+		await app?.close().catch(() => undefined);
+		await rm(userDataDir, { recursive: true, force: true });
+		throw error;
+	}
 }

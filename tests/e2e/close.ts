@@ -5,6 +5,9 @@ export async function closeApp(
 	app: ElectronApplication | undefined,
 	userDataDir: string | undefined
 ): Promise<void> {
-	await app?.close();
-	if (userDataDir) await rm(userDataDir, { recursive: true, force: true });
+	try {
+		await app?.close();
+	} finally {
+		if (userDataDir) await rm(userDataDir, { recursive: true, force: true });
+	}
 }
