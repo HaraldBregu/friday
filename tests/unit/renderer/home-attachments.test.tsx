@@ -68,17 +68,11 @@ jest.mock('@/components/audio-player', () => ({
 jest.mock('@/components/app/base/page', () => ({
 	PageContainer: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
 	Split: ({
-		sidebar,
 		children,
 	}: {
 		sidebar?: React.ReactNode;
 		children?: React.ReactNode;
-	}) => (
-		<div>
-			{sidebar}
-			{children}
-		</div>
-	),
+	}) => <div>{children}</div>,
 }));
 
 jest.mock('@resources/icons/icon.png', () => 'icon.png');
