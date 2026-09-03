@@ -28,6 +28,7 @@ import HomePage from './pages/home/Page';
 import StartPage from './pages/start/StartPage';
 import { usePageContext } from './components/app/base/page';
 import { StartupGate } from './auth/Gate';
+import { useOnboarding } from './contexts/useOnboarding';
 
 const AccountPage = lazy(() => import('./pages/settings/pages/account/Page'));
 const CloudPage = lazy(() => import('./pages/settings/pages/cloud/Page'));
@@ -111,6 +112,7 @@ function RootRouteComponent(): React.JSX.Element {
 	const [showSettingsBreadcrumb, setShowSettingsBreadcrumb] = useState(true);
 	const previousSidebarOpen = useRef(state.sidebarOpen);
 
+	const { phase } = useOnboarding();
 	const isHome = location.pathname === '/home';
 	const isSettings = location.pathname.startsWith('/settings');
 	const hasSidebar = isHome || isSettings;
@@ -147,7 +149,11 @@ function RootRouteComponent(): React.JSX.Element {
 				>
 					<TitleBar
 						centerContent={
-							isSettings && showSettingsBreadcrumb ? <SettingsBreadcrumb /> : undefined
+							phase === 'auth' ? (
+								<span className="text-sm font-medium">Kucedr</span>
+							) : isSettings && showSettingsBreadcrumb ? (
+								<SettingsBreadcrumb />
+							) : undefined
 						}
 						centerContentClassName={
 							isSettings && (isMobile || !state.sidebarOpen) ? 'left-28' : undefined
