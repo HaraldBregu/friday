@@ -8,6 +8,18 @@ let userDataDir: string;
 
 test.beforeAll(async () => {
 	({ app, page, userDataDir } = await launchApp());
+	await page.evaluate(async () => {
+		await window.agent.setProvider({
+			id: 'openai',
+			name: 'OpenAI',
+			baseUrl: 'https://api.openai.com/v1',
+		});
+		await window.agent.setModelId('gpt-5.6-luna');
+		window.sessionStorage.setItem('friday-auth-local-only', 'true');
+		window.sessionStorage.setItem('friday-onboarding-started', 'true');
+	});
+	await page.reload();
+	await expect(page).toHaveURL(/#\/home$/);
 });
 
 test.afterAll(async () => {
@@ -63,11 +75,11 @@ for (const route of routes) {
 	});
 }
 
-test('the start route mounts the unified onboarding flow', async () => {
+test('the start route redirects configured users to home', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/start';
 	});
-	await expect(page).toHaveURL(/#\/start$/);
+	await expect(page).toHaveURL(/#\/home$/);
 	await expect(page.locator('#root')).not.toBeEmpty();
 	await expect(page.getByText('errorBoundary.notFoundTitle')).toHaveCount(0);
 });
