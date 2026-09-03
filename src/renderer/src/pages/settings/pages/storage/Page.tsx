@@ -212,11 +212,9 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 			)}
 
 			{error && (
-				<div role="alert">
-					<SettingsNotice variant="destructive" icon={AlertTriangle}>
-						{error}
-					</SettingsNotice>
-				</div>
+				<SettingsNotice variant="destructive" icon={AlertTriangle}>
+					{error}
+				</SettingsNotice>
 			)}
 
 			{!storage ? (

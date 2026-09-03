@@ -162,11 +162,9 @@ const CoderPage: React.FC = () => {
 			<SettingsNotice>{t('settings.coder.harnessExplanation')}</SettingsNotice>
 
 			{error && (
-				<div role="alert">
-					<SettingsNotice variant="destructive" icon={AlertTriangle}>
-						{error}
-					</SettingsNotice>
-				</div>
+				<SettingsNotice variant="destructive" icon={AlertTriangle}>
+					{error}
+				</SettingsNotice>
 			)}
 
 			<SettingsPanel>

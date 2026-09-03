@@ -22,11 +22,9 @@ const AccountPage: React.FC = () => {
 		<SettingsPageShell>
 			<SettingsPageHeader title="Account" description="Manage your sign-in status." />
 			{error ? (
-				<div role="alert">
-					<SettingsNotice icon={AlertCircle} variant="destructive">
-						{error}
-					</SettingsNotice>
-				</div>
+				<SettingsNotice icon={AlertCircle} variant="destructive">
+					{error}
+				</SettingsNotice>
 			) : null}
 			<SettingsSection title="Identity">
 				<SettingsPanel>

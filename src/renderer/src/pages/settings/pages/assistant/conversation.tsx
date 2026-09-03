@@ -183,11 +183,6 @@ export default function RealtimeConversationConfiguration({
 					onChange={handleVoiceChange}
 				/>
 			</ModelProviderConfiguration>
-			{state.error && (
-				<span className="sr-only" role="alert">
-					{state.error}
-				</span>
-			)}
 		</>
 	);
 }
