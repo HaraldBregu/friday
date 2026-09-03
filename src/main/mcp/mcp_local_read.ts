@@ -75,10 +75,7 @@ export function readLocalMcpServer(directory: string): McpServerInfo {
 			: directory;
 	const command = manifest.command.trim();
 	const args = manifest.args as string[] | undefined;
-	const environment = getLocalMcpEnvironment(
-		id,
-		localMcpIdentity({ command, args, cwd })
-	);
+	const environment = getLocalMcpEnvironment(id, localMcpIdentity({ command, args, cwd }));
 	return {
 		id,
 		source: 'local',

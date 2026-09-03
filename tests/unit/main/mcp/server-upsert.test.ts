@@ -33,7 +33,11 @@ describe('MCP server upsert', () => {
 		});
 
 		expect(setMcpServersState).toHaveBeenCalledWith([
-			expect.objectContaining({ tokens: expect.any(Object), codeVerifier: 'verifier', enabled: false }),
+			expect.objectContaining({
+				tokens: expect.any(Object),
+				codeVerifier: 'verifier',
+				enabled: false,
+			}),
 		]);
 	});
 
@@ -65,7 +69,11 @@ describe('MCP server upsert', () => {
 		});
 
 		expect(setMcpServersState).toHaveBeenCalledWith([
-			expect.objectContaining({ tokens: expect.any(Object), codeVerifier: 'verifier', enabled: false }),
+			expect.objectContaining({
+				tokens: expect.any(Object),
+				codeVerifier: 'verifier',
+				enabled: false,
+			}),
 		]);
 	});
 

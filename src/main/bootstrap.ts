@@ -141,7 +141,7 @@ export async function cleanup(services: MainServices): Promise<void> {
 	await cloudService.destroy();
 	providerSyncService.destroy();
 	authService.destroy();
-    await channelRegistry.destroy();
+	await channelRegistry.destroy();
 	logger.info('Bootstrap', 'Cleanup complete');
 	logger.destroy();
 }

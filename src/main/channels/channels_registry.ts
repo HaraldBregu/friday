@@ -42,7 +42,7 @@ export interface ChannelRegistry {
 	restart(channel: ChannelType): Promise<void>;
 	send(message: ChannelOutboundMessage): Promise<ChannelMessageReceipt>;
 	getStatus(channel?: ChannelType): ChannelStatusEvent | undefined;
-  destroy(): Promise<void>;
+	destroy(): Promise<void>;
 }
 
 export function createChannelRegistry(dependencies: ChannelRegistryDependencies): ChannelRegistry {
@@ -124,8 +124,8 @@ export function createChannelRegistry(dependencies: ChannelRegistryDependencies)
 				message.content.type === 'text'
 					? message.content.text
 					: await transcribeVoice(await loadChannelVoice(message.content.voice), {
-								...channelModelSelection('stt'),
-							});
+							...channelModelSelection('stt'),
+						});
 			if (text.startsWith('/')) {
 				const command = text.split(/\s+/)[0].slice(1).split('@')[0].toLowerCase();
 				if (command === 'start') {
@@ -153,8 +153,8 @@ export function createChannelRegistry(dependencies: ChannelRegistryDependencies)
 			if (message.content.type === 'voice') {
 				try {
 					const voice = await synthesizeVoice(response, {
-							...channelModelSelection('tts'),
-						});
+						...channelModelSelection('tts'),
+					});
 					await reply({
 						type: 'voice',
 						voice: {
@@ -232,9 +232,9 @@ export function createChannelRegistry(dependencies: ChannelRegistryDependencies)
 		getStatus(channel = 'telegram') {
 			return statusCache.get(channel);
 		},
-    async destroy() {
-      await Promise.all([...adapters.keys()].map(stop));
-    },
+		async destroy() {
+			await Promise.all([...adapters.keys()].map(stop));
+		},
 	};
 }
 
