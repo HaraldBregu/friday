@@ -86,7 +86,8 @@ Friday reads an optional root `.env` file when the Electron main process starts.
 local credentials in `.env`; the file is ignored by Git. Provider credentials can also be
 configured from the application settings.
 
-See [Supabase](SUPABASE.md) for authentication and hosted API setup.
+See [Supabase](SUPABASE.md) for authentication, local Docker, schema, and hosted-project
+setup.
 
 ### Develop the SDK
 
