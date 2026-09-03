@@ -26,6 +26,7 @@ import type { IpcModule } from './core/module';
 import type { ExtensionRegistry } from '../extensions/extension_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
+import { parseMcpUrl } from '../mcp/url';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -77,8 +78,13 @@ function isMcpEntry(value: unknown): value is McpData {
 		);
 	}
 	if (value.type === 'http') {
+		if (typeof value.url !== 'string') return false;
+		try {
+			parseMcpUrl(value.url);
+		} catch {
+			return false;
+		}
 		return (
-			typeof value.url === 'string' &&
 			(value.token === undefined || typeof value.token === 'string') &&
 			(value.client_id === undefined || typeof value.client_id === 'string') &&
 			(value.client_secret === undefined || typeof value.client_secret === 'string') &&

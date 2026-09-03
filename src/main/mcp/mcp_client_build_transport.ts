@@ -8,6 +8,7 @@ import type { McpData } from '../../shared/mcp_types';
 import { createOAuthProvider } from './mcp_oauth_create_provider';
 import { getMcpOauth, saveMcpOauth } from './mcp_store';
 import { createMcpFetch } from './mcp_fetch';
+import { parseMcpUrl } from './url';
 
 export function buildTransport(id: string, data: McpData): Transport {
 	if (data.type === 'stdio') {
@@ -19,7 +20,7 @@ export function buildTransport(id: string, data: McpData): Transport {
 		});
 	}
 
-	const url = new URL(data.url);
+	const url = parseMcpUrl(data.url);
 	const headers = data.token ? { Authorization: `Bearer ${data.token}` } : undefined;
 
 	return new StreamableHTTPClientTransport(url, {

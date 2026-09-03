@@ -46,3 +46,12 @@ it('rejects an oversized Content-Length without consuming the body', async () =>
 	await expect(boundedFetch('https://mcp.example/rpc')).rejects.toThrow('1 MB wire limit');
 	expect(cancel).toHaveBeenCalledTimes(1);
 });
+
+it('requires HTTPS except for loopback development servers', () => {
+	expect(() =>
+		buildTransport('remote', { type: 'http', url: 'http://mcp.example/rpc', token: 'secret' })
+	).toThrow('Remote MCP servers must use HTTPS');
+	expect(() =>
+		buildTransport('local', { type: 'http', url: 'http://127.0.0.1:3000/rpc' })
+	).not.toThrow();
+});
