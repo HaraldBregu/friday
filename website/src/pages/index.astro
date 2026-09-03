@@ -1,205 +1,35 @@
 ---
-const features = [
-	'Work with files and run commands',
-	'Research the web and create media',
-	'Use your preferred AI providers',
-];
+import KucedrLandingPage from "../components/KucedrLandingPage.astro";
+import { buildHomepageStructuredData } from "../lib/structured-data";
+import Layout from "../layouts/Layout.astro";
+
+const locale = "en";
+const title = "Kucedr: A Personal AI Assistant for Your Desktop";
+const description = "Kucedr is a personal desktop AI assistant that works with files, searches the web, runs tools, and uses your chosen AI providers and permissions.";
+const siteBaseUrl = Astro.site ?? new URL("https://kucedr.haraldbregu.com");
+const structuredData = buildHomepageStructuredData({
+  description,
+  featureNames: ["Personal context and preferences", "Schedules and recurring plans", "Background tasks", "Connected tools and services", "Multi-step task completion", "Custom Extensions"],
+  locale,
+  siteBaseUrl,
+  tagline: "A personal AI assistant that turns requests into useful work on your desktop.",
+});
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<meta
-			name="description"
-			content="Kucedr is your desktop AI copilot for everyday tasks."
-		/>
-		<link rel="icon" type="image/png" href="/logo.png" />
-		<title>Kucedr — Your desktop AI copilot</title>
-	</head>
-	<body>
-		<main>
-			<nav aria-label="Main navigation">
-				<a class="brand" href="/">
-					<img src="/logo.png" alt="" width="40" height="40" />
-					Kucedr
-				</a>
-				<a class="nav-link" href="https://github.com/HaraldBregu/kucedr">GitHub</a>
-			</nav>
-
-			<section class="hero">
-				<div>
-					<p class="eyebrow">AI assistance, on your desktop</p>
-					<h1>Turn conversations into actions.</h1>
-					<p class="intro">
-						Kucedr helps you work with files, research the web, create media, and automate
-						everyday tasks—all from one private desktop app.
-					</p>
-					<div class="actions">
-						<a class="primary" href="https://github.com/HaraldBregu/kucedr/releases">Download Kucedr</a>
-						<a class="secondary" href="https://github.com/HaraldBregu/kucedr#readme">Learn more</a>
-					</div>
-				</div>
-
-				<div class="card">
-					<img src="/logo.png" alt="Kucedr logo" width="112" height="112" />
-					<h2>Your tools. Your models. Your workflow.</h2>
-					<ul>
-						{features.map((feature) => <li>{feature}</li>)}
-					</ul>
-				</div>
-			</section>
-		</main>
-	</body>
-</html>
-
-<style>
-	:global(*) {
-		box-sizing: border-box;
-	}
-
-	:global(body) {
-		margin: 0;
-		min-width: 320px;
-		background:
-			radial-gradient(circle at 75% 15%, rgba(77, 71, 255, 0.2), transparent 28rem),
-			#08090d;
-		color: #f7f7fa;
-		font-family:
-			Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	}
-
-	main {
-		width: min(1120px, calc(100% - 40px));
-		min-height: 100vh;
-		margin: 0 auto;
-	}
-
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 24px 0;
-	}
-
-	a {
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.brand {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		font-size: 1.1rem;
-		font-weight: 700;
-	}
-
-	.brand img {
-		border-radius: 12px;
-	}
-
-	.nav-link {
-		color: #b8b9c5;
-	}
-
-	.hero {
-		display: grid;
-		grid-template-columns: 1.25fr 0.75fr;
-		gap: 72px;
-		align-items: center;
-		padding: 110px 0;
-	}
-
-	.eyebrow {
-		margin: 0 0 18px;
-		color: #a78bfa;
-		font-size: 0.8rem;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-	}
-
-	h1 {
-		max-width: 720px;
-		margin: 0;
-		font-size: clamp(3.2rem, 8vw, 6.7rem);
-		line-height: 0.94;
-		letter-spacing: -0.065em;
-	}
-
-	.intro {
-		max-width: 620px;
-		margin: 30px 0;
-		color: #b8b9c5;
-		font-size: 1.15rem;
-		line-height: 1.7;
-	}
-
-	.actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-	}
-
-	.actions a {
-		padding: 13px 20px;
-		border-radius: 10px;
-		font-weight: 700;
-	}
-
-	.primary {
-		background: #f7f7fa;
-		color: #08090d;
-	}
-
-	.secondary {
-		border: 1px solid #30313b;
-	}
-
-	.card {
-		padding: 36px;
-		border: 1px solid #282934;
-		border-radius: 24px;
-		background: rgba(17, 18, 25, 0.78);
-		box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-	}
-
-	.card img {
-		border-radius: 28px;
-	}
-
-	h2 {
-		margin: 24px 0;
-		font-size: 1.5rem;
-		line-height: 1.3;
-	}
-
-	ul {
-		display: grid;
-		gap: 14px;
-		margin: 0;
-		padding: 0;
-		color: #b8b9c5;
-		list-style: none;
-	}
-
-	li::before {
-		margin-right: 10px;
-		color: #8b7bff;
-		content: "✦";
-	}
-
-	@media (max-width: 760px) {
-		.hero {
-			grid-template-columns: 1fr;
-			gap: 48px;
-			padding: 70px 0;
-		}
-
-		h1 {
-			font-size: clamp(3.2rem, 16vw, 5rem);
-		}
-	}
-</style>
+<Layout
+  alternatePath="/"
+  bodyClass="kucedr-landing-page"
+  description={description}
+  exactTitle
+  footerVariant="landing"
+  hideBackgroundEffects
+  hideHeader
+  image="/og/kucedr-personal-ai-assistant.png"
+  locale={locale}
+  ogDescription={description}
+  ogTitle={title}
+  structuredData={structuredData}
+  title={title}
+>
+  <KucedrLandingPage />
+</Layout>

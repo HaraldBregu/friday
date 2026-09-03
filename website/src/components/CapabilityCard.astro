@@ -1,0 +1,33 @@
+---
+import Icon from "./Icon.astro";
+
+const {
+  icon = "Sparkles",
+  label,
+  title,
+  description,
+  items = [],
+  note,
+} = Astro.props;
+---
+
+<article class="landing-card">
+  <div class="landing-card__head">
+    <span>{label}</span>
+    <div class="landing-card__icon">
+      <Icon name={icon} size={20} />
+    </div>
+  </div>
+  <h3>{title}</h3>
+  <p>{description}</p>
+  {
+    items.length ? (
+      <ul class="chip-list">
+        {items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    ) : null
+  }
+  {note ? <p class="landing-card__note">{note}</p> : null}
+</article>

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "capabilities": ["Assistant", "Speech-to-Text", "Text-to-Speech"],
+    "envVar": "OPENAI_API_KEY",
+    "models": [],
+    "note": "Can power chat, transcription, and speech depending on the models you choose in Kucedr settings.",
+    "docsUrl": "https://platform.openai.com/docs"
+  },
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "capabilities": ["Assistant"],
+    "envVar": "ANTHROPIC_API_KEY",
+    "models": [],
+    "note": "Assistant model provider for chat and tool-using agent turns.",
+    "docsUrl": "https://docs.anthropic.com/"
+  },
+  {
+    "id": "google",
+    "name": "Google",
+    "capabilities": ["Assistant", "Text-to-Speech", "Text-to-Image", "Text-to-Video"],
+    "envVar": "GEMINI_API_KEY",
+    "models": [],
+    "note": "Multi-capability provider for chat, speech, Gemini image generation, and Veo video generation.",
+    "docsUrl": "https://ai.google.dev/"
+  },
+  {
+    "id": "mistral",
+    "name": "Mistral AI",
+    "capabilities": ["Assistant", "Speech-to-Text"],
+    "envVar": "MISTRAL_API_KEY",
+    "models": [],
+    "note": "Assistant and transcription provider option.",
+    "docsUrl": "https://docs.mistral.ai/"
+  },
+  {
+    "id": "deepseek",
+    "name": "DeepSeek",
+    "capabilities": ["Assistant"],
+    "envVar": "DEEPSEEK_API_KEY",
+    "models": [],
+    "note": "Assistant model provider through a compatible API.",
+    "docsUrl": "https://api-docs.deepseek.com/"
+  },
+  {
+    "id": "qwen",
+    "name": "Qwen",
+    "capabilities": ["Assistant", "Speech-to-Text", "Text-to-Image", "Text-to-Video"],
+    "envVar": "DASHSCOPE_API_KEY",
+    "models": [],
+    "note": "Assistant, transcription, image (Qwen Image), and video (Wan) provider option.",
+    "docsUrl": "https://www.alibabacloud.com/help/en/model-studio/"
+  },
+  {
+    "id": "xai",
+    "name": "xAI",
+    "capabilities": ["Assistant", "Speech-to-Text"],
+    "envVar": "XAI_API_KEY",
+    "models": [],
+    "note": "Assistant and voice-capable provider option.",
+    "docsUrl": "https://docs.x.ai/"
+  },
+  {
+    "id": "elevenlabs",
+    "name": "ElevenLabs",
+    "capabilities": ["Speech-to-Text", "Text-to-Speech", "Music / Audio"],
+    "envVar": "ELEVENLABS_API_KEY",
+    "models": [],
+    "note": "Speech-to-text, text-to-speech, and Eleven Music and sound-effect generation.",
+    "docsUrl": "https://elevenlabs.io/docs"
+  },
+  {
+    "id": "deepgram",
+    "name": "Deepgram",
+    "capabilities": ["Speech-to-Text", "Text-to-Speech"],
+    "envVar": "DEEPGRAM_API_KEY",
+    "models": [],
+    "note": "Transcription and speech provider option.",
+    "docsUrl": "https://developers.deepgram.com/docs"
+  },
+  {
+    "id": "cartesia",
+    "name": "Cartesia",
+    "capabilities": ["Text-to-Speech"],
+    "envVar": "CARTESIA_API_KEY",
+    "models": [],
+    "note": "Text-to-speech provider option.",
+    "docsUrl": "https://docs.cartesia.ai/"
+  },
+  {
+    "id": "black-forest-labs",
+    "name": "Black Forest Labs",
+    "capabilities": ["Text-to-Image"],
+    "envVar": "BFL_API_KEY",
+    "models": [],
+    "note": "Image generation provider option.",
+    "docsUrl": "https://docs.bfl.ai/"
+  },
+  {
+    "id": "stability-ai",
+    "name": "Stability AI",
+    "capabilities": ["Text-to-Image", "Music / Audio"],
+    "envVar": "STABILITY_API_KEY",
+    "models": [],
+    "note": "Image generation and Stable Audio 2.5 music and sound generation.",
+    "docsUrl": "https://platform.stability.ai/docs"
+  },
+  {
+    "id": "ideogram",
+    "name": "Ideogram",
+    "capabilities": ["Text-to-Image"],
+    "envVar": "IDEOGRAM_API_KEY",
+    "models": [],
+    "note": "Image generation provider option.",
+    "docsUrl": "https://developer.ideogram.ai/"
+  },
+  {
+    "id": "openai-compatible",
+    "name": "OpenAI-compatible endpoint",
+    "capabilities": ["Assistant"],
+    "envVar": "CUSTOM_API_KEY",
+    "models": [],
+    "note": "Connect additional compatible providers by configuring the endpoint and key.",
+    "docsUrl": null
+  }
+]

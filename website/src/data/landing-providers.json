@@ -1,0 +1,258 @@
+[
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "capabilities": ["chat"],
+    "status": "available",
+    "href": "https://console.anthropic.com/settings/keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/anthropic.png"
+  },
+  {
+    "id": "black-forest-labs",
+    "name": "Black Forest Labs",
+    "capabilities": ["image"],
+    "status": "available",
+    "href": "https://dashboard.bfl.ai",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/bfl.png"
+  },
+  {
+    "id": "brave",
+    "name": "Brave",
+    "capabilities": ["search"],
+    "status": "available",
+    "href": "https://api-dashboard.search.brave.com/app/keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/brave-color.png"
+  },
+  {
+    "id": "cartesia",
+    "name": "Cartesia",
+    "capabilities": ["tts"],
+    "status": "available",
+    "href": "https://play.cartesia.ai/keys",
+    "iconUrl": "https://cartesia.ai/favicon.svg"
+  },
+  {
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "capabilities": ["storage"],
+    "status": "available",
+    "href": "https://dash.cloudflare.com",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/cloudflare-color.png"
+  },
+  {
+    "id": "cohere",
+    "name": "Cohere",
+    "capabilities": ["embeddings"],
+    "status": "available",
+    "href": "https://dashboard.cohere.com/api-keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/cohere-color.png"
+  },
+  {
+    "id": "deepgram",
+    "name": "Deepgram",
+    "capabilities": ["stt", "tts"],
+    "status": "available",
+    "href": "https://console.deepgram.com",
+    "iconUrl": "https://api.iconify.design/simple-icons/deepgram.svg?color=%23ffffff"
+  },
+  {
+    "id": "deepseek",
+    "name": "DeepSeek",
+    "capabilities": ["chat"],
+    "status": "available",
+    "href": "https://platform.deepseek.com/api_keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/deepseek-color.png"
+  },
+  {
+    "id": "elevenlabs",
+    "name": "ElevenLabs",
+    "capabilities": ["stt", "tts", "audio"],
+    "status": "available",
+    "href": "https://elevenlabs.io/app/settings/api-keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/elevenlabs.png"
+  },
+  {
+    "id": "google",
+    "name": "Google",
+    "capabilities": ["chat", "tts", "realtime", "image", "video", "audio"],
+    "status": "mixed",
+    "href": "https://aistudio.google.com/apikey",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/google-color.png"
+  },
+  {
+    "id": "ideogram",
+    "name": "Ideogram",
+    "capabilities": ["image"],
+    "status": "available",
+    "href": "https://ideogram.ai/manage-api",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/ideogram.png"
+  },
+  {
+    "id": "jina",
+    "name": "Jina AI",
+    "capabilities": ["embeddings"],
+    "status": "available",
+    "href": "https://jina.ai/api-dashboard",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/jina.png"
+  },
+  {
+    "id": "kimi",
+    "name": "Kimi",
+    "capabilities": ["chat"],
+    "status": "available",
+    "href": "https://platform.moonshot.ai/console/api-keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/kimi-color.png"
+  },
+  {
+    "id": "kling",
+    "name": "Kling AI",
+    "capabilities": ["video", "audio"],
+    "status": "mixed",
+    "href": "https://app.klingai.com/global/dev",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/kling-color.png"
+  },
+  {
+    "id": "luma",
+    "name": "Luma AI",
+    "capabilities": ["realtime", "image", "video"],
+    "status": "mixed",
+    "href": "https://lumalabs.ai/dream-machine/api/keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/luma-color.png"
+  },
+  {
+    "id": "midjourney",
+    "name": "Midjourney",
+    "capabilities": ["image", "video"],
+    "status": "catalog",
+    "href": "https://www.midjourney.com/account",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/midjourney.png"
+  },
+  {
+    "id": "minimax",
+    "name": "MiniMax",
+    "capabilities": ["chat", "tts", "video", "audio"],
+    "status": "mixed",
+    "href": "https://platform.minimax.io/user-center/basic-information/interface-key",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/minimax-color.png"
+  },
+  {
+    "id": "mistral",
+    "name": "Mistral AI",
+    "capabilities": ["chat", "stt", "tts"],
+    "status": "available",
+    "href": "https://console.mistral.ai/api-keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/mistral-color.png"
+  },
+  {
+    "id": "nomic",
+    "name": "Nomic",
+    "capabilities": ["embeddings"],
+    "status": "available",
+    "href": "https://atlas.nomic.ai",
+    "iconUrl": "https://nomic.ai/favicon.svg"
+  },
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "capabilities": ["chat", "stt", "tts", "embeddings"],
+    "status": "available",
+    "href": "https://platform.openai.com/api-keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/openai.png"
+  },
+  {
+    "id": "perplexity",
+    "name": "Perplexity",
+    "capabilities": ["research"],
+    "status": "partial",
+    "href": "https://www.perplexity.ai/settings/api",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/perplexity-color.png"
+  },
+  {
+    "id": "pika",
+    "name": "Pika",
+    "capabilities": ["video"],
+    "status": "partial",
+    "href": "https://pika.art",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/pika.png"
+  },
+  {
+    "id": "pinecone",
+    "name": "Pinecone",
+    "capabilities": ["vector"],
+    "status": "available",
+    "href": "https://app.pinecone.io",
+    "iconUrl": "https://api.iconify.design/logos/pinecone-icon.svg"
+  },
+  {
+    "id": "qwen",
+    "name": "Qwen and Wan",
+    "capabilities": ["chat", "stt", "realtime", "image", "video"],
+    "status": "mixed",
+    "href": "https://modelstudio.console.alibabacloud.com",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/qwen-color.png"
+  },
+  {
+    "id": "reka",
+    "name": "Reka AI",
+    "capabilities": ["chat"],
+    "status": "available",
+    "href": "https://platform.reka.ai/apikeys",
+    "iconUrl": "https://framerusercontent.com/images/aMqw5yWAcPpvboavoAsQpHcOrUs.jpg"
+  },
+  {
+    "id": "runway",
+    "name": "Runway",
+    "capabilities": ["video"],
+    "status": "available",
+    "href": "https://dev.runwayml.com",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/runway.png"
+  },
+  {
+    "id": "stability-ai",
+    "name": "Stability AI",
+    "capabilities": ["image", "audio"],
+    "status": "available",
+    "href": "https://platform.stability.ai/account/keys",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/stability-color.png"
+  },
+  {
+    "id": "suno",
+    "name": "Suno",
+    "capabilities": ["audio"],
+    "status": "catalog",
+    "href": "https://suno.com/account",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/suno.png"
+  },
+  {
+    "id": "tavily",
+    "name": "Tavily",
+    "capabilities": ["search"],
+    "status": "available",
+    "href": "https://app.tavily.com/home",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/tavily-color.png"
+  },
+  {
+    "id": "voyage",
+    "name": "Voyage AI",
+    "capabilities": ["embeddings"],
+    "status": "available",
+    "href": "https://dashboard.voyageai.com",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/voyage-color.png"
+  },
+  {
+    "id": "xai",
+    "name": "xAI",
+    "capabilities": ["chat", "stt", "realtime", "image", "video"],
+    "status": "mixed",
+    "href": "https://console.x.ai",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/xai.png"
+  },
+  {
+    "id": "zai",
+    "name": "Z.ai",
+    "capabilities": ["chat"],
+    "status": "available",
+    "href": "https://z.ai/manage-apikey/apikey-list",
+    "iconUrl": "https://unpkg.com/@lobehub/icons-static-png@1.95.0/dark/zai.png"
+  }
+]

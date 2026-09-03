@@ -1,0 +1,157 @@
+---
+import { getCollection } from "astro:content";
+import DocCard from "../../../components/DocCard.astro";
+import DocsEffects from "../../../components/DocsEffects.astro";
+import Icon from "../../../components/Icon.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { categoryIcons, categoryId, docCategoryLabel, docsForLocale, docsPath, groupDocs } from "../../../lib/docs";
+import "../../../styles/kucedr-landing.css";
+import "../../../styles/docs-kucedr.css";
+
+const locale = "it";
+const docs = docsForLocale(await getCollection("docs"), locale);
+const groups = groupDocs(docs);
+const categoryCount = groups.length;
+const indexDocs = groups
+  .map((group) => group.items.find((doc) => doc.data.sourcePath.endsWith("/index.md")) ?? group.items[0])
+  .filter((doc): doc is NonNullable<typeof doc> => Boolean(doc));
+const primaryDoc = indexDocs[0];
+const secondaryDocs = indexDocs.slice(1, 4);
+---
+
+<Layout
+  bodyClass="docs-product-page"
+  alternatePath="/docs"
+  title="Documentazione"
+  description="Scopri come configurare Kucedr, scegliere i provider, usare gli strumenti e gestire automazione, memoria, canali e privacy."
+  footerVariant="landing"
+  headerVariant="landing"
+  hideBackgroundEffects
+  image="/og/kucedr-personal-ai-assistant.png"
+  wide={true}
+  locale={locale}
+>
+  <section class="section page-hero docs-hero">
+    <div class="shell docs-hero__inner" data-doc-reveal>
+      <div class="section-heading">
+        <p class="eyebrow">Documentazione</p>
+        <h1>Documentazione di Kucedr</h1>
+        <p>
+          Tutto ciò che ti serve per configurare Kucedr, capire come funziona
+          e usare al meglio strumenti, provider, canali e automazioni.
+        </p>
+        <div class="docs-hero__actions" aria-label="Link rapidi alla documentazione">
+          <a class="button button--primary" href={primaryDoc ? docsPath(primaryDoc.data.sourcePath, locale) : "#inizia-qui"}>
+            Inizia dalla panoramica
+            <Icon name="ArrowRight" size={16} />
+          </a>
+          <a class="button button--ghost" href="#sezioni">Sfoglia gli argomenti</a>
+        </div>
+      </div>
+      <div class="docs-hero__stats" aria-label="Riepilogo della documentazione">
+        <div>
+          <strong>{docs.length}</strong>
+          <span>guide disponibili</span>
+        </div>
+        <div>
+          <strong>{categoryCount}</strong>
+          <span>argomenti</span>
+        </div>
+        <div>
+          <strong>Open source</strong>
+          <span>documentazione pubblica</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--compact" id="sezioni">
+    <div class="shell docs-section-grid" aria-label="Sezioni della documentazione" data-doc-reveal>
+      {
+        groups.map((group) => (
+          <a class="docs-section-tile" href={`#${categoryId(group.category)}`}>
+            <span class="docs-section-tile__icon">
+              <Icon name={categoryIcons[group.category] ?? "BookOpen"} size={18} />
+            </span>
+            <span>
+              <strong>{docCategoryLabel(group.category, locale)}</strong>
+              <small>{group.items.length} {group.items.length === 1 ? "pagina" : "pagine"}</small>
+            </span>
+            <Icon name="ArrowRight" size={14} />
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section section--compact" id="inizia-qui">
+    <div class="shell" data-doc-reveal>
+      <header class="docs-group-head">
+        <Icon name="BookOpen" size={18} />
+        <h2>Inizia qui</h2>
+        <span>{indexDocs.length} guide per orientarti</span>
+      </header>
+      <div class="docs-start-grid">
+        {
+          primaryDoc ? (
+            <a class="docs-featured-guide" href={docsPath(primaryDoc.data.sourcePath, locale)}>
+              <span class="docs-featured-guide__label">
+                <Icon name={categoryIcons[primaryDoc.data.category] ?? "BookOpen"} size={16} />
+                Consigliato per iniziare
+              </span>
+              <strong>{primaryDoc.data.title}</strong>
+              <span>{primaryDoc.data.description}</span>
+              <span class="doc-card__link">
+                Apri la guida
+                <Icon name="ArrowRight" size={14} />
+              </span>
+            </a>
+          ) : null
+        }
+        <div class="docs-start-list">
+          {
+            secondaryDocs.map((doc) => (
+              <DocCard
+                title={doc.data.title}
+                description={doc.data.description}
+                href={docsPath(doc.data.sourcePath, locale)}
+                category={doc.data.category}
+                meta={docCategoryLabel(doc.data.category, locale)}
+                linkLabel="Leggi la guida"
+                icon={categoryIcons[doc.data.category] ?? "BookOpen"}
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    groups.map((group) => (
+      <section class="section section--compact docs-group-section" id={group.id}>
+        <div class="shell" data-doc-reveal>
+          <header class="docs-group-head">
+            <Icon name={group.icon} size={18} />
+            <h2>{docCategoryLabel(group.category, locale)}</h2>
+            <span>{group.items.length} {group.items.length === 1 ? "pagina" : "pagine"}</span>
+          </header>
+          <div class="docs-card-grid">
+            {group.items.map((doc) => (
+              <DocCard
+                title={doc.data.title}
+                description={doc.data.description}
+                href={docsPath(doc.data.sourcePath, locale)}
+                category={doc.data.category}
+                meta={docCategoryLabel(doc.data.category, locale)}
+                linkLabel="Leggi la guida"
+                icon={group.icon}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+  <DocsEffects />
+</Layout>

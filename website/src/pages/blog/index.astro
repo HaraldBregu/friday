@@ -1,0 +1,63 @@
+---
+import { getCollection } from "astro:content";
+import Icon from "../../components/Icon.astro";
+import ProductPageHero from "../../components/ProductPageHero.astro";
+import ProductPageLayout from "../../layouts/ProductPageLayout.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const readingTime = (body: string) => Math.max(1, Math.ceil(body.trim().split(/\s+/).length / 220));
+const slugFor = (id: string) => id.replace(/\.mdx?$/, "");
+const tagCount = new Set(posts.flatMap((post) => post.data.tags)).size;
+---
+
+<ProductPageLayout
+  description="Product updates, engineering notes, and integration guides for Kucedr."
+  image="/og/kucedr-journal-notes-for-builders.png"
+  title="Blog"
+>
+  <ProductPageHero
+    accent="Kucedr."
+    description="Product decisions, engineering notes, integration patterns, and practical lessons from building a local-first desktop assistant."
+    eyebrow="Blog"
+    jumps={[{ href: "#latest", icon: "BookOpen", label: "Latest notes" }]}
+    stats={[
+      { value: posts.length, label: "Published notes" },
+      { value: tagCount, label: "Topics" },
+      { value: "Open", label: "Build journal" },
+    ]}
+    statsLabel="Blog summary"
+    title="Notes from building Kucedr."
+  />
+
+  <section class="catalog-section" id="latest">
+    <div class="shell">
+      <header class="catalog-section__head">
+        <div class="catalog-section__title">
+          <span class="catalog-section-tag">01 / Latest notes</span>
+          <h2>Decisions, patterns, and progress.</h2>
+        </div>
+        <p class="catalog-section__aside">Short updates about the product, the architecture behind it, and the boundaries that keep agent work understandable.</p>
+      </header>
+      <div class="blog-product-grid">
+        {posts.map((post, index) => {
+          const slug = slugFor(post.id);
+          return (
+            <article class:list={["blog-product-card", index === 0 && "is-featured"]}>
+              <div class="blog-product-card__meta">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}</time>
+                <span>{readingTime(post.body)} min read</span>
+              </div>
+              <h2><a href={`/blog/${slug}`}>{post.data.title}</a></h2>
+              <p>{post.data.description}</p>
+              <div class="product-chip-list">{post.data.tags.map((tag) => <span>{tag}</span>)}</div>
+              <a class="blog-product-card__link" href={`/blog/${slug}`}>Read post <Icon name="ArrowRight" size={15} /></a>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+</ProductPageLayout>

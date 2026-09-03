@@ -1,0 +1,127 @@
+---
+import { localizedRoutePath, normalizeLocale, type Locale } from "../i18n";
+import { formatReleaseDate, getReleaseCopy, releasePath, releases } from "../lib/releases";
+import Icon from "./Icon.astro";
+import ProductPageHero from "./ProductPageHero.astro";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const latestRelease = releases.find((release) => release.latest) ?? releases[0];
+const downloadableReleases = releases.filter((release) => release.assets.length > 0).length;
+const route = (path: string) => localizedRoutePath(path, locale);
+const labels = locale === "it"
+  ? {
+      title: "Versioni",
+      description: "Note di versione di Kucedr, build con tag, cronologia del codice sorgente e download desktop per macOS, Windows e Linux.",
+      heroDescription: "Ogni versione di Kucedr contrassegnata da un tag, con un riepilogo delle modifiche, la cronologia del codice e gli installer pubblicati per quella build.",
+      eyebrow: "Archivio versioni",
+      allReleases: "Tutte le versioni",
+      githubTags: "Tag su GitHub",
+      latestTag: "Tag più recente",
+      taggedBuilds: "Build con tag",
+      downloadable: "Versioni scaricabili",
+      summary: "Riepilogo dell'archivio versioni",
+      heroTitle: "Versioni di Kucedr.",
+      sectionTag: "01 / Cronologia versioni",
+      sectionTitle: "Dalla prima beta all’ultima build.",
+      sectionAside: "Le pagine sono generate dai tag pubblicati di Kucedr. I pulsanti di download compaiono solo quando una build ha i relativi file di rilascio su GitHub.",
+      latest: "Più recente",
+      sourceTag: "Solo sorgente",
+      downloads: "download",
+      viewRelease: "Vedi versione",
+    }
+  : {
+      title: "Releases",
+      description: "Kucedr release notes, tagged builds, source history, and desktop downloads for macOS, Windows, and Linux.",
+      heroDescription: "Every tagged version of Kucedr, with a concise change summary, source history, and the installers published for that build.",
+      eyebrow: "Release archive",
+      allReleases: "All releases",
+      githubTags: "GitHub tags",
+      latestTag: "Latest tag",
+      taggedBuilds: "Tagged builds",
+      downloadable: "Downloadable releases",
+      summary: "Release archive summary",
+      heroTitle: "Kucedr releases.",
+      sectionTag: "01 / Version history",
+      sectionTitle: "From first beta to latest build.",
+      sectionAside: "Release pages are generated from Kucedr's published tags. Download buttons appear only when a tagged build has matching GitHub release artifacts.",
+      latest: "Latest",
+      sourceTag: "Source tag",
+      downloads: "downloads",
+      viewRelease: "View release",
+    };
+---
+
+<ProductPageLayout
+  alternatePath="/releases"
+  canonical={route("/releases")}
+  description={labels.description}
+  locale={locale}
+  title={labels.title}
+>
+  <ProductPageHero
+    accent="Kucedr"
+    description={labels.heroDescription}
+    eyebrow={labels.eyebrow}
+    jumps={[
+      { href: "#all-releases", icon: "History", label: labels.allReleases },
+      { href: "https://github.com/HaraldBregu/kucedr/tags", icon: "Github", label: labels.githubTags },
+    ]}
+    stats={[
+      { value: latestRelease.tag, label: labels.latestTag },
+      { value: releases.length, label: labels.taggedBuilds },
+      { value: downloadableReleases, label: labels.downloadable },
+    ]}
+    statsLabel={labels.summary}
+    title={labels.heroTitle}
+  />
+
+  <section class="catalog-section" id="all-releases">
+    <div class="shell">
+      <header class="catalog-section__head">
+        <div class="catalog-section__title">
+          <span class="catalog-section-tag">{labels.sectionTag}</span>
+          <h2>{labels.sectionTitle}</h2>
+        </div>
+        <p class="catalog-section__aside">{labels.sectionAside}</p>
+      </header>
+
+      <div class="release-grid">
+        {
+          releases.map((release, index) => {
+            const copy = getReleaseCopy(release, locale);
+            return (
+              <article class:list={["release-card", release.latest && "is-latest"]}>
+                <div class="release-card__topline">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <span class:list={["release-status", release.latest && "is-latest"]}>
+                    {release.latest ? labels.latest : copy.stage}
+                  </span>
+                </div>
+                <div class="release-card__content">
+                  <p class="release-card__date">{formatReleaseDate(release.publishedAt, "short", locale)}</p>
+                  <h2><a href={route(releasePath(release.tag))}>{release.name}</a></h2>
+                  <p>{copy.summary}</p>
+                </div>
+                <div class="release-card__footer">
+                  <div>
+                    <code>{release.tag}</code>
+                    <span>{release.assets.length > 0 ? `${release.assets.length} ${labels.downloads}` : labels.sourceTag}</span>
+                  </div>
+                  <a href={route(releasePath(release.tag))}>
+                    {labels.viewRelease}
+                    <Icon name="ArrowRight" size={15} />
+                  </a>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+</ProductPageLayout>

@@ -1,0 +1,58 @@
+---
+import ProductPageHero from "./ProductPageHero.astro";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+import type { Locale } from "../i18n";
+
+interface Section {
+  title: string;
+  paragraphs: string[];
+}
+
+interface Props {
+  locale: Locale;
+  alternatePath: string;
+  title: string;
+  description: string;
+  eyebrow: string;
+  heading: string;
+  intro: string;
+  updated: string;
+  sections: Section[];
+}
+
+const { locale, alternatePath, title, description, eyebrow, heading, intro, updated, sections } = Astro.props;
+---
+
+<ProductPageLayout {locale} {alternatePath} {title} {description}>
+  <ProductPageHero
+    accent={locale === "it" ? "controllo." : "control."}
+    description={intro}
+    eyebrow={eyebrow}
+    stats={[
+      { value: sections.length, label: locale === "it" ? "Sezioni" : "Sections" },
+      { value: locale === "it" ? "Chiaro" : "Plain", label: locale === "it" ? "Linguaggio" : "Language" },
+      { value: "2026", label: updated },
+    ]}
+    statsLabel={locale === "it" ? "Riepilogo documento" : "Document summary"}
+    title={heading}
+  />
+  <section class="catalog-section legal-product-section">
+    <div class="shell legal-product-layout">
+      <aside>
+        <span>{locale === "it" ? "In questa pagina" : "On this page"}</span>
+        <nav aria-label={locale === "it" ? "Sezioni legali" : "Legal sections"}>
+          {sections.map((section, index) => <a href={`#legal-${index + 1}`}>{String(index + 1).padStart(2, "0")} {section.title}</a>)}
+        </nav>
+      </aside>
+      <div class="legal-product-body">
+        {sections.map((section, index) => (
+          <section id={`legal-${index + 1}`}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <h2>{section.title}</h2>
+            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+</ProductPageLayout>

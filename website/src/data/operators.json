@@ -1,0 +1,156 @@
+[
+  {
+    "id": "assistant-chat",
+    "name": "Assistant chat",
+    "status": "implemented",
+    "description": "The main conversational agent. It answers in Markdown, shows tool activity, handles attachments, and saves local session history.",
+    "icon": "Bot",
+    "providers": ["Assistant provider", "Configured model", "Local history"],
+    "highlights": [
+      "Plain-language requests",
+      "Visible tool activity",
+      "Markdown, code blocks, and inline images",
+      "Local conversation history"
+    ]
+  },
+  {
+    "id": "agent-tools",
+    "name": "Agent tools",
+    "status": "implemented",
+    "description": "The action surface Kucedr uses to read and write files, run commands, search or browse the web, generate images, schedule work, load skills, and call MCP tools.",
+    "icon": "Terminal",
+    "providers": ["Local tools", "MCP servers", "Skills"],
+    "highlights": [
+      "Permission prompts for sensitive actions",
+      "File, shell, web, browser, image, schedule, skill, subagent, and MCP tools",
+      "Tool output treated as evidence",
+      "No account-changing action without authorization"
+    ]
+  },
+  {
+    "id": "voice",
+    "name": "Voice",
+    "status": "implemented",
+    "description": "Dictate prompts with speech-to-text and have Kucedr read replies aloud with the voice provider and model you choose.",
+    "icon": "Mic",
+    "providers": ["Speech-to-Text", "Text-to-Speech", "Microphone permission"],
+    "highlights": [
+      "Real-time dictation",
+      "Audio transcription",
+      "Read-aloud replies",
+      "Provider and voice model selection"
+    ]
+  },
+  {
+    "id": "image-generation",
+    "name": "Image generation",
+    "status": "implemented",
+    "description": "Create images from text descriptions in chat or a dedicated image workspace.",
+    "icon": "Image",
+    "providers": ["Text-to-Image provider", "Configured model"],
+    "highlights": [
+      "Generated images appear in conversation",
+      "Save generated images",
+      "Provider and model selection",
+      "Available as a chat tool and settings workspace"
+    ]
+  },
+  {
+    "id": "skills",
+    "name": "Skills",
+    "status": "implemented",
+    "description": "Reusable packaged workflows that teach Kucedr how to handle a class of work.",
+    "icon": "Workflow",
+    "providers": ["Personal skill library", "Enabled skills"],
+    "highlights": [
+      "Install, import, enable, and disable skills",
+      "Automatic discovery before answering",
+      "Declared tool and timeout limits",
+      "Selection and rejection audit trail"
+    ]
+  },
+  {
+    "id": "mcp-servers",
+    "name": "MCP servers",
+    "status": "implemented",
+    "description": "Connect remote HTTP or local stdio Model Context Protocol servers so their tools become available to the assistant.",
+    "icon": "PlugZap",
+    "providers": ["Remote MCP", "Local stdio MCP"],
+    "highlights": [
+      "HTTP servers with optional token or key auth",
+      "Local process servers",
+      "External tools without changing Kucedr",
+      "Tools exposed automatically after connection"
+    ]
+  },
+  {
+    "id": "channels",
+    "name": "Channels",
+    "status": "implemented",
+    "description": "Talk to Kucedr from Telegram and Discord today and receive replies back through the same channel. Slack, WhatsApp, and Email are planned adapters.",
+    "icon": "RadioTower",
+    "providers": ["Telegram", "Discord", "Slack coming soon", "WhatsApp coming soon", "Email coming soon"],
+    "highlights": [
+      "Bot-based messaging",
+      "Reliable delivery and reconnection",
+      "Allowlist, pairing, open, or deny DM policy",
+      "Separate channel secrets and enabled state"
+    ]
+  },
+  {
+    "id": "task-scheduler",
+    "name": "Task scheduler",
+    "status": "implemented",
+    "description": "Create recurring assistant jobs such as summaries, checks, and routine cleanup tasks.",
+    "icon": "Clock",
+    "providers": ["Cron schedule", "Scheduled assistant model"],
+    "highlights": [
+      "Create, update, pause, resume, list, and run schedules",
+      "Each schedule runs an agent turn",
+      "Provider and model selection for scheduled work",
+      "On-demand manual runs"
+    ]
+  },
+  {
+    "id": "health-checks",
+    "name": "Health checks",
+    "status": "implemented",
+    "description": "Run Kucedr periodically against a checklist you define and report back when something needs attention.",
+    "icon": "HeartHandshake",
+    "providers": ["Checklist", "Interval", "Health provider/model"],
+    "highlights": [
+      "Periodic checklist-driven runs",
+      "Configurable interval",
+      "Provider and model selection",
+      "Proactive status reports"
+    ]
+  },
+  {
+    "id": "memory",
+    "name": "Memory and personalization",
+    "status": "implemented",
+    "description": "Durable facts, preferences, identity, and workspace context help Kucedr respond with useful personal context.",
+    "icon": "Database",
+    "providers": ["Local memory", "User profile", "Workspace"],
+    "highlights": [
+      "Durable facts and preferences",
+      "User identity and tone context",
+      "Local workspace for produced files",
+      "Personalization stays on your device"
+    ]
+  },
+  {
+    "id": "media-video-audio",
+    "name": "Video and audio generation",
+    "status": "implemented",
+    "description": "Generate video, music, and sound effects from text with the provider and model you choose. Results are playable inline and saved to your local media library.",
+    "icon": "Video",
+    "providers": ["Text-to-Video", "Music / Audio"],
+    "highlights": [
+      "Text-to-video with your chosen provider and model",
+      "Music and sound-effect generation",
+      "Separate provider and model choices per media type",
+      "Saved to the local media library and playable in chat"
+    ]
+  }
+]

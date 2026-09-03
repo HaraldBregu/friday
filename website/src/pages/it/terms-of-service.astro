@@ -1,0 +1,41 @@
+---
+import LegalPage from "../../components/LegalPage.astro";
+
+const sections = [
+  {
+    title: "Accettazione",
+    paragraphs: ["Utilizzando il sito Kucedr o l'applicazione desktop Kucedr, accetti questi Termini di servizio. Se non li accetti, non utilizzare il sito o l'applicazione."],
+  },
+  {
+    title: "Uso del servizio",
+    paragraphs: [
+      "Kucedr è uno strumento desktop che può leggere e modificare file, eseguire comandi, usare servizi online e generare contenuti. Sei responsabile delle istruzioni che fornisci, dei file e delle cartelle che rendi accessibili, dei provider e delle integrazioni che colleghi e delle azioni che approvi.",
+      "Utilizza Kucedr nel rispetto delle leggi applicabili e dei termini dei servizi di terze parti. Non utilizzare Kucedr per attività illegali, per compromettere sistemi o account, o per trattare dati senza la necessaria autorizzazione.",
+    ],
+  },
+  {
+    title: "Provider e servizi di terze parti",
+    paragraphs: ["Kucedr può collegarsi a provider AI, servizi di ricerca, canali di messaggistica, server MCP e altri servizi scelti da te. Questi servizi sono indipendenti da Kucedr: sei responsabile delle credenziali, dei costi, dei permessi e del rispetto dei loro termini e delle loro policy."],
+  },
+  {
+    title: "Nessuna garanzia",
+    paragraphs: ["Kucedr è fornito così com'è e secondo disponibilità. Le risposte generate, le azioni degli strumenti e i contenuti prodotti possono contenere errori; verifica i risultati prima di usarli o condividerli. Nella misura consentita dalla legge, Harald Bregu non garantisce che il servizio sia sempre disponibile, accurato o privo di errori."],
+  },
+  {
+    title: "Modifiche e contatti",
+    paragraphs: ["Questi termini possono essere aggiornati quando cambiano il sito o l'applicazione. La data dell'ultimo aggiornamento sarà indicata nella pagina. Per domande, contatta Harald Bregu all'indirizzo harald.bregu@gmail.com."],
+  },
+];
+---
+
+<LegalPage
+  locale="it"
+  alternatePath="/terms-of-service"
+  title="Termini di servizio"
+  description="Termini per l'utilizzo del sito e dell'applicazione desktop Kucedr."
+  eyebrow="Termini"
+  heading="Termini di servizio di Kucedr."
+  intro="Le regole di base per utilizzare il sito e l'applicazione desktop Kucedr."
+  updated="Ultimo aggiornamento: 6 agosto 2026"
+  sections={sections}
+/>

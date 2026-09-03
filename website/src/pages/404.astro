@@ -1,0 +1,19 @@
+---
+import Icon from "../components/Icon.astro";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+---
+
+<ProductPageLayout title="Page not found" description="This page could not be found." noindex>
+  <section class="product-not-found">
+    <div class="shell product-not-found__inner">
+      <span aria-hidden="true">404</span>
+      <p class="catalog-eyebrow">Page not found</p>
+      <h1>This page is not available.</h1>
+      <p>The route may have moved, or the link may need to be updated.</p>
+      <a class="button button--primary" href="/">
+        Return home
+        <Icon name="ArrowRight" size={18} />
+      </a>
+    </div>
+  </section>
+</ProductPageLayout>

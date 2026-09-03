@@ -1,0 +1,52 @@
+[
+  {
+    "id": "telegram",
+    "name": "Telegram",
+    "runtime": "supported",
+    "dmPolicy": "allowlist",
+    "threadSupport": true,
+    "description": "Chat with Kucedr from Telegram using a bot connection. Messages run an agent turn and replies are delivered back to the same chat or thread.",
+    "configFields": ["Bot token", "Allow-from list", "Group allow-from list", "Default target", "DM policy"],
+    "docsUrl": "https://core.telegram.org/bots/api"
+  },
+  {
+    "id": "discord",
+    "name": "Discord",
+    "runtime": "supported",
+    "dmPolicy": "allowlist",
+    "threadSupport": true,
+    "description": "Chat with Kucedr from a Discord server or direct message. Messages run an agent turn and replies are routed back to the originating channel or thread.",
+    "configFields": ["Bot token", "Allow-from list", "Group allow-from list", "Default target", "DM policy"],
+    "docsUrl": "https://discord.com/developers/docs/intro"
+  },
+  {
+    "id": "slack",
+    "name": "Slack",
+    "runtime": "coming-soon",
+    "dmPolicy": "allowlist",
+    "threadSupport": true,
+    "description": "Planned workspace channel for team conversations, approvals, and assistant delivery back to the original Slack thread.",
+    "configFields": ["Bot token", "Signing secret", "Workspace allowlist", "Default target", "DM policy"],
+    "docsUrl": "https://api.slack.com/bot-users"
+  },
+  {
+    "id": "whatsapp",
+    "name": "WhatsApp",
+    "runtime": "coming-soon",
+    "dmPolicy": "pairing",
+    "threadSupport": false,
+    "description": "Planned mobile messaging channel for personal check-ins, quick requests, and assistant replies.",
+    "configFields": ["Business account", "Phone number", "Webhook URL", "Pairing policy"],
+    "docsUrl": "https://developers.facebook.com/docs/whatsapp"
+  },
+  {
+    "id": "email",
+    "name": "Email",
+    "runtime": "coming-soon",
+    "dmPolicy": "allowlist",
+    "threadSupport": true,
+    "description": "Planned asynchronous channel for brief requests, daily summaries, and follow-up workflows.",
+    "configFields": ["Mailbox", "SMTP or provider token", "Allowed sender list", "Default reply mode"],
+    "docsUrl": "https://datatracker.ietf.org/doc/html/rfc5322"
+  }
+]

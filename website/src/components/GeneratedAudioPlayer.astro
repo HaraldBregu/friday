@@ -1,0 +1,18 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="demo-generated demo-generated--audio">
+  <div class="demo-audio-player" role="img" aria-label={label}>
+    <span class="demo-audio-player__play" aria-hidden="true"><Icon name="Play" size={25} /></span>
+    <span class="demo-audio-player__track" aria-hidden="true"><i></i><b></b></span>
+    <time datetime="PT0S">0:00</time>
+    <span class="demo-audio-player__volume" aria-hidden="true"><Icon name="Volume2" size={25} /></span>
+  </div>
+</div>

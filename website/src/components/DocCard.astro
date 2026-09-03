@@ -1,0 +1,30 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  category: string;
+  icon?: string;
+  meta?: string;
+  linkLabel?: string;
+}
+
+const { title, description, href, category, icon = "BookOpen", meta = category, linkLabel = "Read docs" } = Astro.props;
+---
+
+<a class="doc-card" href={href}>
+  <div class="doc-card__top">
+    <span class="card-icon">
+      <Icon name={icon} size={18} />
+    </span>
+    <span>{meta}</span>
+  </div>
+  <h3>{title}</h3>
+  <p>{description}</p>
+  <span class="doc-card__link">
+    {linkLabel}
+    <Icon name="ArrowRight" size={14} />
+  </span>
+</a>

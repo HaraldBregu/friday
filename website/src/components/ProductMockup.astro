@@ -1,0 +1,563 @@
+---
+import { Image } from "astro:assets";
+import Icon from "./Icon.astro";
+import GeneratedAudioPlayer from "./GeneratedAudioPlayer.astro";
+import GeneratedVideoPlayer from "./GeneratedVideoPlayer.astro";
+import { getLocaleContent, normalizeLocale, type Locale } from "../i18n";
+
+interface Props {
+  locale?: Locale;
+  landingWorkflow?: boolean;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const landingWorkflow = Astro.props.landingWorkflow ?? false;
+const { productMockup } = getLocaleContent(locale);
+const demo = locale === "it" ? {
+  initialUser: "Aggiorna il brief di lancio usando le nostre fonti.",
+  skillIntro: "Per prima cosa carico il flusso di lavoro riutilizzabile per le release.",
+  skillSummary: "Usata 1 Skill",
+  skillTool: "Uso di release-brief",
+  skillResult: "Il flusso è pronto. Ora verificherò il brief rispetto alla tua conoscenza.",
+  knowledgeUser: "Confrontalo con le note indicizzate e la wiki del progetto.",
+  knowledgeIntro: "Sto confrontando gli estratti delle fonti con la pagina compilata della release.",
+  knowledgeSummary: "Conoscenza consultata",
+  knowledgeTool: "Ricerca nella Knowledge Base",
+  wikiTool: "Lettura di Release readiness",
+  knowledgeResult: "Ho trovato le decisioni basate sulle fonti e le domande aperte da riportare.",
+  editUser: "Applica queste modifiche al brief.",
+  editIntro: "Aggiornerò il file Markdown locale mantenendo intatti i riferimenti alle fonti.",
+  editSummary: "Aggiornato 1 file",
+  editTool: "Modifica di docs/release.md",
+  editResult: "Fatto. Ho aggiornato il brief di lancio con decisioni basate sulle fonti, domande aperte e prossimi passi.",
+  imagesUser: "Crea alcune direzioni visive per l’annuncio.",
+  imagesIntro: "Inizio con una proposta orizzontale dal forte contrasto.",
+  imagesSummary: "Creata 1 immagine",
+  imagesTool: "Generazione immagine",
+  imagesCaption: "Immagine generata",
+  sunAlt: "Illustrazione generata del Sole e della Terra nello spazio",
+  secondImageUser: "Prova anche una direzione più calda e artigianale.",
+  secondImageIntro: "Creo una seconda proposta con un carattere più narrativo.",
+  whaleAlt: "Illustrazione generata di una balena meccanica sospesa sopra un villaggio",
+  portraitUser: "Prova un’altra direzione con una composizione verticale.",
+  portraitIntro: "Creerò un concept verticale con più spazio per il titolo della campagna.",
+  portraitSummary: "Creata 1 immagine",
+  portraitTool: "Generazione immagine",
+  portraitCaption: "Immagine generata",
+  crystalAlt: "Illustrazione generata di un albero di cristallo sotto due pianeti",
+  videoUser: "Crea una scena naturalistica cinematografica per il teaser.",
+  videoIntro: "La trasformerò in un breve studio di movimento con una luce calda e drammatica.",
+  videoSummary: "Creato 1 video",
+  videoTool: "Crea video",
+  videoTokens: "219 tok",
+  videoCaption: "Video generato",
+  playVideo: "Riproduci video generato",
+  pauseVideo: "Metti in pausa il video generato",
+  muteVideo: "Disattiva l’audio del video",
+  unmuteVideo: "Attiva l’audio del video",
+  seekVideo: "Scorri il video generato",
+  fullscreenVideo: "Apri il video a schermo intero",
+  sunVideoLabel: "Anteprima dell’animazione generata di un leone accanto a una cascata",
+  secondVideoUser: "Prova una scena finale più calma in riva al mare.",
+  secondVideoIntro: "Creo una scena oceanica all’ora dorata con un ritmo visivo più lento.",
+  whaleVideoLabel: "Anteprima dell’animazione oceanica generata all’ora dorata",
+  musicUser: "Componi una colonna sonora che unisca il teaser.",
+  musicIntro: "Creerò una traccia strumentale con un’atmosfera elettronica cinematografica.",
+  musicSummary: "Creata 1 traccia",
+  musicTool: "Crea suono",
+  musicTokens: "191 tok",
+  songLabel: "Traccia musicale generata: colonna sonora del lancio",
+  songCoverAlt: "Illustrazione dell’albero di cristallo usata come copertina della colonna sonora",
+  songEyebrow: "Musica generata",
+  songTitle: "Colonna sonora del lancio",
+  songStatus: "Pronta",
+  songFormat: "WAV · 48 kHz",
+  songElapsed: "0:42",
+  songDuration: "2:48",
+  musicResult: "Fatto. La colonna sonora del lancio è pronta per l’anteprima.",
+  toolActivity: "Attività degli strumenti di Kucedr",
+  imageActivity: "Attività di generazione immagini di Kucedr",
+  videoActivity: "Attività di generazione video di Kucedr",
+  musicActivity: "Attività di generazione musica di Kucedr"
+} : {
+  initialUser: "Update the launch brief from our sources.",
+  skillIntro: "I’ll load your reusable release workflow first.",
+  skillSummary: "Used 1 skill",
+  skillTool: "Using release-brief",
+  skillResult: "The workflow is ready. Next I’ll verify the brief against your knowledge.",
+  knowledgeUser: "Check it against the indexed notes and project wiki.",
+  knowledgeIntro: "I’m comparing source excerpts with the compiled release page.",
+  knowledgeSummary: "Searched knowledge",
+  knowledgeTool: "Knowledge search",
+  wikiTool: "Read Release readiness",
+  knowledgeResult: "I found the sourced decisions and open questions that need to be reflected.",
+  editUser: "Apply those changes to the brief.",
+  editIntro: "I’ll update the local Markdown file and keep the source references intact.",
+  editSummary: "Updated 1 file",
+  editTool: "Edit docs/release.md",
+  editResult: "Done. I updated the launch brief with sourced decisions, open questions, and next steps.",
+  imagesUser: "Create a few visual directions for the announcement.",
+  imagesIntro: "I’ll start with one high-contrast, wide concept.",
+  imagesSummary: "Created 1 image",
+  imagesTool: "Generate image",
+  imagesCaption: "Generated image",
+  sunAlt: "Generated illustration of the Sun and Earth in space",
+  secondImageUser: "Try another direction with a warmer, crafted feel.",
+  secondImageIntro: "I’ll create a second concept with a more narrative character.",
+  whaleAlt: "Generated illustration of a clockwork whale floating above a village",
+  portraitUser: "Try one more direction with a vertical composition.",
+  portraitIntro: "I’ll create a portrait concept with more room for the campaign title.",
+  portraitSummary: "Created 1 image",
+  portraitTool: "Generate image",
+  portraitCaption: "Generated image",
+  crystalAlt: "Generated illustration of a crystal tree beneath two planets",
+  videoUser: "Create a cinematic wildlife scene for the teaser.",
+  videoIntro: "I’ll turn it into a short motion study with warm, dramatic light.",
+  videoSummary: "Created 1 video",
+  videoTool: "Create video",
+  videoTokens: "219 tok",
+  videoCaption: "Generated video",
+  playVideo: "Play generated video",
+  pauseVideo: "Pause generated video",
+  muteVideo: "Mute generated video",
+  unmuteVideo: "Unmute generated video",
+  seekVideo: "Seek generated video",
+  fullscreenVideo: "Open generated video in fullscreen",
+  sunVideoLabel: "Generated animation preview of a lion beside a waterfall",
+  secondVideoUser: "Try a calmer closing shot by the sea.",
+  secondVideoIntro: "I’ll create a golden-hour ocean scene with a slower visual rhythm.",
+  whaleVideoLabel: "Generated golden-hour ocean animation preview",
+  musicUser: "Compose a soundtrack to tie the teaser together.",
+  musicIntro: "I’ll create an instrumental track with a cinematic electronic feel.",
+  musicSummary: "Created 1 track",
+  musicTool: "Create sound",
+  musicTokens: "191 tok",
+  songLabel: "Generated music track: Launch soundtrack",
+  songCoverAlt: "Crystal tree artwork used as the launch soundtrack cover",
+  songEyebrow: "Generated music",
+  songTitle: "Launch soundtrack",
+  songStatus: "Ready",
+  songFormat: "WAV · 48 kHz",
+  songElapsed: "0:42",
+  songDuration: "2:48",
+  musicResult: "Done. The launch soundtrack is ready to preview.",
+  toolActivity: "Kucedr tool activity",
+  imageActivity: "Kucedr image generation activity",
+  videoActivity: "Kucedr video generation activity",
+  musicActivity: "Kucedr music generation activity"
+};
+const imagesByFile = Object.fromEntries(
+  Object.entries(import.meta.glob<{ default: ImageMetadata }>("../assets/library/*.jpeg", { eager: true })).map(
+    ([path, mod]) => [path.split("/").pop() ?? path, mod.default],
+  ),
+);
+---
+
+<div
+  class="product-window"
+  aria-label={productMockup.windowLabel}
+  data-demo-window
+  data-attachment-name={productMockup.attachedFile}
+  data-dictation-text={productMockup.dictationText}
+  data-listening-label={productMockup.listeningLabel}
+  data-reply={productMockup.interactiveReply}
+>
+  <div class="product-window__bar">
+    <div class="window-lights" aria-hidden="true">
+      <span class="window-lights__red"></span>
+      <span class="window-lights__yellow"></span>
+      <span></span>
+    </div>
+    <strong>Kucedr</strong>
+    <div class="product-window__bar-actions">
+      <button class="product-window__icon-btn" type="button" aria-label={productMockup.profileLabel}>
+        <Icon name="UserRound" size={19} />
+      </button>
+    </div>
+  </div>
+
+  <div class="product-window__body">
+    <div class="product-window__thread" aria-label={productMockup.conversationLabel} data-demo-thread>
+      {
+        landingWorkflow ? (
+          <>
+            <div class="chat-bubble chat-bubble--user">
+              {demo.initialUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.skillIntro}
+              </div>
+              <div class="chat-message--assistant">
+                {demo.skillResult}
+              </div>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.knowledgeUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.knowledgeIntro}
+              </div>
+              <div class="chat-message--assistant">
+                {demo.knowledgeResult}
+              </div>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.editUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.editIntro}
+              </div>
+              <div class="chat-message--assistant">
+                {demo.editResult}
+              </div>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.imagesUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.imagesIntro}
+              </div>
+              <figure class="demo-media">
+                <figcaption><Icon name="Image" size={14} />{demo.imagesCaption}</figcaption>
+                <div class="demo-media__image-grid">
+                  <img
+                    alt={demo.sunAlt}
+                    height="720"
+                    loading="lazy"
+                    src="/demo/image-1783269109315.jpeg"
+                    width="1280"
+                  />
+                </div>
+              </figure>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.secondImageUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.secondImageIntro}
+              </div>
+              <figure class="demo-media">
+                <figcaption><Icon name="Image" size={14} />{demo.imagesCaption}</figcaption>
+                <div class="demo-media__image-grid">
+                  <img
+                    alt={demo.whaleAlt}
+                    height="720"
+                    loading="lazy"
+                    src="/demo/image-1783437002924.jpeg"
+                    width="1280"
+                  />
+                </div>
+              </figure>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.portraitUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.portraitIntro}
+              </div>
+              <figure class="demo-media">
+                <figcaption><Icon name="Image" size={14} />{demo.portraitCaption}</figcaption>
+                <div class="demo-media__image-grid demo-media__image-grid--single">
+                  <img
+                    alt={demo.crystalAlt}
+                    height="1152"
+                    loading="lazy"
+                    src="/demo/image-1783437075249.jpeg"
+                    width="864"
+                  />
+                </div>
+              </figure>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.secondVideoUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.secondVideoIntro}
+              </div>
+              <GeneratedVideoPlayer
+                fullscreenLabel={demo.fullscreenVideo}
+                label={demo.whaleVideoLabel}
+                muteLabel={demo.muteVideo}
+                pauseLabel={demo.pauseVideo}
+                playLabel={demo.playVideo}
+                seekLabel={demo.seekVideo}
+                src="/demo/video-1786619008446.mp4"
+                unmuteLabel={demo.unmuteVideo}
+              />
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.musicUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.musicIntro}
+              </div>
+              <GeneratedAudioPlayer
+                label={demo.songLabel}
+              />
+              <div class="chat-message--assistant">
+                {demo.musicResult}
+              </div>
+            </article>
+
+            <div class="chat-bubble chat-bubble--user">
+              {demo.videoUser}
+            </div>
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {demo.videoIntro}
+              </div>
+              <GeneratedVideoPlayer
+                fullscreenLabel={demo.fullscreenVideo}
+                label={demo.sunVideoLabel}
+                muteLabel={demo.muteVideo}
+                pauseLabel={demo.pauseVideo}
+                playLabel={demo.playVideo}
+                seekLabel={demo.seekVideo}
+                src="/demo/video-1786447738614.mp4"
+                unmuteLabel={demo.unmuteVideo}
+              />
+            </article>
+          </>
+        ) : (
+          <>
+            <div class="chat-bubble chat-bubble--user chat-bubble--short">
+              {productMockup.chatUserGreeting}
+            </div>
+
+            <article class="assistant-turn">
+              <div class="chat-message--assistant">
+                {productMockup.chatAssistantGreeting}
+              </div>
+            </article>
+
+            {productMockup.chatMessages.map((message) =>
+              message.role === "user" ? (
+                <div class="chat-bubble chat-bubble--user">{message.text}</div>
+              ) : (
+                <article class="assistant-turn">
+                  <div class="chat-message--assistant">{message.text}</div>
+                </article>
+              )
+            )}
+
+            {productMockup.libraryFeed.map((item) => {
+              const image = imagesByFile[item.file];
+              return image ? (
+                <>
+                  <div class="chat-bubble chat-bubble--user">{item.user}</div>
+                  <article class="assistant-turn">
+                    <figure class="chat-image">
+                      <figcaption class="chat-image__head">
+                        <Icon name="Image" size={15} />
+                        <span>{productMockup.imageHeader}</span>
+                      </figcaption>
+                      <Image alt={item.user} class="chat-image__media" height={400} loading="lazy" src={image} width={640} />
+                      <p class="chat-image__caption">{item.reply}</p>
+                    </figure>
+                  </article>
+                </>
+              ) : null;
+            })}
+          </>
+        )
+      }
+
+    </div>
+
+    <div class="product-window__attachment" data-demo-attachment hidden>
+      <Icon name="FolderOpen" size={14} />
+      <span>{productMockup.attachedFile}</span>
+      <button aria-label={productMockup.removeAttachment} data-demo-remove type="button">
+        <Icon name="X" size={13} />
+      </button>
+    </div>
+
+    <form class="product-window__composer" aria-label={productMockup.composerLabel} data-demo-composer>
+      <button aria-label={productMockup.addAttachment} data-demo-attach type="button">
+        <Icon name="Plus" size={22} />
+      </button>
+      <input
+        aria-label={productMockup.composerPlaceholder}
+        autocomplete="off"
+        data-demo-input
+        placeholder={productMockup.composerPlaceholder}
+        type="text"
+      />
+      <button aria-label={productMockup.voiceInput} data-demo-voice type="button">
+        <Icon name="Mic" size={22} />
+      </button>
+      <button aria-label={productMockup.sendPrompt} class="composer-send" type="submit">
+        <Icon name="AudioLines" size={22} />
+      </button>
+    </form>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const windows = document.querySelectorAll("[data-demo-window]");
+
+    const appendUserMessage = (thread, text) => {
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble chat-bubble--user";
+      bubble.textContent = text;
+      thread.append(bubble);
+    };
+
+    const appendAssistantMessage = (thread, text) => {
+      const turn = document.createElement("article");
+      turn.className = "assistant-turn";
+
+      const message = document.createElement("div");
+      message.className = "chat-message--assistant";
+      message.textContent = text;
+
+      turn.append(message);
+      thread.append(turn);
+    };
+
+    windows.forEach((windowEl) => {
+      const thread = windowEl.querySelector("[data-demo-thread]");
+      const form = windowEl.querySelector("[data-demo-composer]");
+      const input = windowEl.querySelector("[data-demo-input]");
+      const attachButton = windowEl.querySelector("[data-demo-attach]");
+      const voiceButton = windowEl.querySelector("[data-demo-voice]");
+      const attachment = windowEl.querySelector("[data-demo-attachment]");
+      const removeAttachment = windowEl.querySelector("[data-demo-remove]");
+      if (!thread || !form || !input || !attachButton || !voiceButton || !attachment || !removeAttachment) return;
+
+      const scrollToLatest = () => {
+        thread.scrollTop = thread.scrollHeight;
+      };
+
+      scrollToLatest();
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendUserMessage(thread, text);
+        input.value = "";
+        attachment.hidden = true;
+        scrollToLatest();
+
+        window.setTimeout(() => {
+          appendAssistantMessage(thread, windowEl.dataset.reply || "I can help with that. What would you like to do next?");
+          scrollToLatest();
+        }, 420);
+      });
+
+      attachButton.addEventListener("click", () => {
+        attachment.hidden = !attachment.hidden;
+        input.focus();
+      });
+
+      removeAttachment.addEventListener("click", () => {
+        attachment.hidden = true;
+        input.focus();
+      });
+
+      voiceButton.addEventListener("click", () => {
+        windowEl.classList.add("is-listening");
+        input.placeholder = windowEl.dataset.listeningLabel || "Listening...";
+
+        window.setTimeout(() => {
+          input.value = windowEl.dataset.dictationText || "";
+          input.placeholder = input.getAttribute("aria-label") || "";
+          windowEl.classList.remove("is-listening");
+          input.focus();
+        }, 850);
+      });
+    });
+
+    const formatTime = (seconds) => {
+      if (!Number.isFinite(seconds)) return "0:00";
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes}:${Math.floor(seconds % 60).toString().padStart(2, "0")}`;
+    };
+
+    document.querySelectorAll("[data-demo-video]").forEach((player) => {
+      if (player.dataset.ready === "true") return;
+      player.dataset.ready = "true";
+
+      const video = player.querySelector("video");
+      const playButton = player.querySelector("[data-video-play]");
+      const progress = player.querySelector("[data-video-progress]");
+      const time = player.querySelector("[data-video-time]");
+      const volumeButton = player.querySelector("[data-video-volume]");
+      const fullscreenButton = player.querySelector("[data-video-fullscreen]");
+      if (!video || !playButton || !progress || !time || !volumeButton || !fullscreenButton) return;
+
+      const updatePlayback = () => {
+        const percent = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+        progress.value = String(percent);
+        progress.style.setProperty("--video-progress", `${percent}%`);
+        time.textContent = formatTime(video.currentTime);
+        time.dateTime = `PT${Math.floor(video.currentTime)}S`;
+      };
+
+      const updatePlayState = () => {
+        const playing = !video.paused && !video.ended;
+        player.classList.toggle("is-playing", playing);
+        playButton.setAttribute("aria-label", playing ? player.dataset.pauseLabel : player.dataset.playLabel);
+      };
+
+      const updateVolumeState = () => {
+        const unmuted = !video.muted;
+        player.classList.toggle("is-unmuted", unmuted);
+        volumeButton.setAttribute("aria-label", unmuted ? player.dataset.muteLabel : player.dataset.unmuteLabel);
+      };
+
+      playButton.addEventListener("click", () => {
+        if (video.paused) {
+          document.querySelectorAll("[data-demo-video] video").forEach((otherVideo) => {
+            if (otherVideo !== video) otherVideo.pause();
+          });
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+
+      progress.addEventListener("input", () => {
+        if (!video.duration) return;
+        video.currentTime = (Number(progress.value) / 100) * video.duration;
+        updatePlayback();
+      });
+
+      volumeButton.addEventListener("click", () => {
+        video.muted = !video.muted;
+        updateVolumeState();
+      });
+
+      fullscreenButton.addEventListener("click", () => {
+        player.requestFullscreen?.();
+      });
+
+      video.addEventListener("play", updatePlayState);
+      video.addEventListener("pause", updatePlayState);
+      video.addEventListener("ended", updatePlayState);
+      video.addEventListener("timeupdate", updatePlayback);
+      video.addEventListener("loadedmetadata", updatePlayback);
+      updatePlayState();
+      updateVolumeState();
+      updatePlayback();
+    });
+  })();
+</script>

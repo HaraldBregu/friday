@@ -1,0 +1,18 @@
+---
+import Layout from "./Layout.astro";
+import "../styles/kucedr-landing.css";
+import "../styles/catalog-pages.css";
+
+const props = Astro.props;
+---
+
+<Layout
+  {...props}
+  bodyClass="catalog-product-page"
+  footerVariant="landing"
+  headerVariant="landing"
+  hideBackgroundEffects
+  wide
+>
+  <slot />
+</Layout>

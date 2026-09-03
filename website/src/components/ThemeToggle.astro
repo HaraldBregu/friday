@@ -1,0 +1,14 @@
+---
+import Icon from "./Icon.astro";
+
+const { label = "Toggle color theme" } = Astro.props;
+---
+
+<button aria-label={label} aria-pressed="false" class="theme-toggle" data-theme-toggle title={label} type="button">
+  <span class="theme-toggle__icon theme-toggle__icon--sun">
+    <Icon name="Sun" size={18} />
+  </span>
+  <span class="theme-toggle__icon theme-toggle__icon--moon">
+    <Icon name="Moon" size={18} />
+  </span>
+</button>

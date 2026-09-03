@@ -1,0 +1,535 @@
+{
+  "links": {
+    "download": "https://github.com/HaraldBregu/kucedr/releases",
+    "github": "https://github.com/HaraldBregu/kucedr",
+    "docs": "https://github.com/HaraldBregu/kucedr/tree/main/docs",
+    "security": "https://github.com/HaraldBregu/kucedr/blob/main/SECURITY.md",
+    "contributing": "https://github.com/HaraldBregu/kucedr/blob/main/CONTRIBUTING.md",
+    "license": "https://github.com/HaraldBregu/kucedr/blob/main/LICENSE"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Public beta · macOS, Windows, and Linux",
+      "title": "The Personal Desktop AI Assistant",
+      "description": "Kucedr turns plain-language requests into useful work. It can edit files, search the web, use connected tools, and create media, all from one desktop app.",
+      "primary": "Download Kucedr",
+      "secondary": "See how it works",
+      "note": "Open-source software. Bring your own AI providers, follow tool activity, and choose which actions require approval.",
+      "capabilitiesLabel": "Ways Kucedr supports everyday work",
+      "capabilities": ["Remembers useful context", "Runs scheduled tasks", "Works across your tools", "Completes multi-step work"],
+      "showcase": {
+        "windowLabel": "Kucedr desktop assistant creating a visual from a natural-language request",
+        "history": "Open conversation history",
+        "profile": "Open profile",
+        "request": "Create a cinematic launch visual from my notes. Keep it calm, human, and ready to share.",
+        "copy": "Copy request",
+        "edit": "Edit request",
+        "tool": "Create visual",
+        "tokens": "187 tok",
+        "assetAlt": "Generated cinematic video",
+        "play": "Play generated visual",
+        "pause": "Pause generated visual",
+        "seek": "Seek generated visual",
+        "duration": "Generated visual duration",
+        "volume": "Adjust volume",
+        "mute": "Mute generated visual",
+        "unmute": "Unmute generated visual",
+        "fullscreen": "Open fullscreen",
+        "complete": "Done.",
+        "composer": "Ask anything",
+        "attach": "Add context",
+        "dictate": "Dictate request",
+        "voice": "Start voice conversation",
+        "audioPlay": "Play generated sound",
+        "audioPause": "Pause generated sound",
+        "audioSeek": "Seek generated sound",
+        "audioMute": "Mute generated sound",
+        "audioUnmute": "Unmute generated sound",
+        "openingAssistant": "Good morning. What would you like to create today?",
+        "openingUser": "Let’s turn the launch into a visual story, then give it sound and motion.",
+        "previousRequests": [
+          {
+            "type": "image",
+            "request": "Give the launch a warmer, handcrafted visual direction.",
+            "tool": "Created image",
+            "result": "Clockwork daydream",
+            "meta": "Ready",
+            "assetAlt": "Generated clockwork whale floating above a village"
+          },
+          {
+            "type": "sound",
+            "request": "Now compose a short sound identity that feels curious and calm.",
+            "tool": "Create sound",
+            "result": "6.2s",
+            "meta": "124 tok"
+          },
+          {
+            "type": "video",
+            "request": "Turn the strongest direction into a quiet motion study.",
+            "tool": "Created video",
+            "result": "Cinematic motion study",
+            "meta": "Ready",
+            "assetAlt": "Generated cinematic motion study",
+            "src": "/demo/video-1786619008446.mp4"
+          },
+          {
+            "type": "video",
+            "request": "Explore one more motion direction with a bolder sense of scale.",
+            "tool": "Created video",
+            "result": "Expansive motion concept",
+            "meta": "Ready",
+            "assetAlt": "Generated expansive cinematic motion concept",
+            "src": "/demo/video-1786447738614.mp4"
+          }
+        ]
+      },
+      "demo": {
+        "windowLabel": "Kucedr desktop assistant handling a weekly planning request",
+        "sidebarLabel": "Kucedr workspace",
+        "today": "Today",
+        "conversations": "Conversations",
+        "newConversation": "New conversation",
+        "conversationExamples": ["Weekly planning", "Client review", "Travel notes"],
+        "settings": "Settings",
+        "assistantStatus": "Personal assistant · Ready",
+        "request": "Plan the rest of my week, move anything flexible, and prepare me for the client review.",
+        "response": "I’ll use your current priorities and connected calendar, then keep an eye on changes.",
+        "activityLabel": "Kucedr task progress",
+        "activities": [
+          { "label": "Reviewed priorities and calendar", "state": "Done" },
+          { "label": "Prepared a focused weekly plan", "state": "Done" },
+          { "label": "Watch for scheduling changes", "state": "Scheduled" }
+        ],
+        "resultTitle": "Your week is organized",
+        "result": "Two focus blocks protected, one flexible meeting moved, and a client brief scheduled for the morning of the review.",
+        "background": "Background check active",
+        "composer": "Ask Kucedr anything…"
+      }
+    },
+    "personal": {
+      "eyebrow": "Personal, on your terms",
+      "title": "Kucedr remembers how you work.",
+      "description": "Choose the context Kucedr can remember and the tools it can use. Saved preferences and useful details carry across conversations, so you spend less time repeating yourself.",
+      "outcome": "Spend less time tracking routine work and more time on the decisions and ideas that need you.",
+      "capabilitiesLabel": "Personal assistant capabilities",
+      "capabilities": [
+        { "icon": "MessagesSquare", "title": "Remembers useful context", "description": "Save preferences and important details so you do not have to repeat them in every conversation." },
+        { "icon": "CalendarDays", "title": "Keeps work organized", "description": "Create schedules, reminders, and recurring tasks from the conversation." },
+        { "icon": "Clock", "title": "Runs scheduled tasks", "description": "Schedule suitable work to run in the background without watching every step." },
+        { "icon": "PlugZap", "title": "Connects to your tools", "description": "Add the external services and specialized tools you want Kucedr to use." },
+        { "icon": "Cloud", "title": "Finds information when needed", "description": "Search the web and retrieve information from connected sources for the task at hand." },
+        { "icon": "Workflow", "title": "Completes multi-step work", "description": "Kucedr can use several tools in sequence and return a concrete result." }
+      ]
+    },
+    "workflow": {
+      "eyebrow": "From request to result",
+      "title": "Describe the result you need.",
+      "description": "Kucedr selects the relevant context and tools, shows its progress in the conversation, and pauses when an action requires your approval.",
+      "stepsLabel": "How Kucedr helps you get things done",
+      "steps": [
+        { "number": "01", "icon": "MessageSquare", "title": "Make a request", "description": "Describe the result you want in your own words. No special commands needed." },
+        { "number": "02", "icon": "Layers", "title": "Kucedr gathers context", "description": "It uses the relevant preferences, files, tools, and services you have shared." },
+        { "number": "03", "icon": "Clock", "title": "Kucedr does the work", "description": "It works through each step and can run suitable tasks in the background." },
+        { "number": "04", "icon": "CheckCircle2", "title": "Review the result", "description": "You receive the finished work and can see the tool activity behind it." }
+      ],
+      "approvalLabel": "You make the final call",
+      "approvalTitle": "Your approval is required",
+      "approvalDescription": "Kucedr pauses before running an action covered by your approval rules.",
+      "approvalActions": ["Review action", "Approve and continue"]
+    },
+    "extensions": {
+      "eyebrow": "More than an assistant",
+      "title": "Focused tools for different kinds of work.",
+      "description": "Extensions add dedicated tools, workflows, and interfaces while keeping Kucedr’s core assistant experience. Add the ones that fit the way you work.",
+      "examplesLabel": "Workspace extension interface",
+      "ui": {
+        "windowLabel": "Three Kucedr extension interfaces",
+        "screenLabel": "Kucedr extension interface"
+      },
+      "screens": [
+        {
+          "id": "workspace",
+          "icon": "Layers",
+          "title": "Workspace",
+          "description": "Explore project files in a familiar tree, open structured Markdown, and review useful results without leaving the extension.",
+          "status": "Saved",
+          "meta": "Local files · Markdown",
+          "root": "Launch",
+          "files": ["briefs/", "research/", "campaign/", "assets/", "social/", "reviews/", "notes/", "exports/", "archive/"],
+          "items": [],
+          "document": {
+            "name": "launch-plan.md",
+            "path": "campaign/launch-plan.md",
+            "title": "Kucedr launch plan",
+            "summary": "A focused launch sequence across product, community, and social channels.",
+            "sectionTitle": "Launch milestones",
+            "saved": "Saved",
+            "save": "Save",
+            "itemLabel": "Milestone",
+            "detailLabel": "Owner",
+            "priceLabel": "Landing page",
+            "price": "Product team",
+            "airlineLabel": "Demo assets",
+            "airline": "Design team"
+          }
+        },
+        { "id": "design", "icon": "Shapes", "title": "Design Agent", "description": "Develop visual directions on a focused canvas with drawing tools, layers, and generated assets in one workspace.", "status": "Changes saved", "meta": "Desktop · Mobile · Components", "items": ["Hero artwork", "Desktop preview", "Mobile layout", "Download card"] },
+        { "id": "coding", "icon": "TerminalSquare", "title": "Coding Agent", "description": "Request a code change, then follow the tool calls, command output, and file updates in one focused conversation.", "status": "Task complete", "meta": "Files · Tools · Commands", "root": "Kucedr web", "files": ["src/", "public/", "scripts/", "docs/", "tests/", "config/"], "items": ["Inspect landing copy", "Run site checks", "Update content"], "chat": { "userLabel": "You", "agentLabel": "Agent", "request": "Review the landing-page copy and replace unclear product language.", "response": "I found several vague claims and placeholder labels. I’ll align them with the documented product behavior.", "followUp": "Keep the tone direct and user-friendly in both languages.", "finalResponse": "Updated the homepage copy, clarified privacy and permission language, and replaced the placeholder text.", "complete": "Landing copy updated", "selectedFile": "kucedr-landing.json" } }
+      ],
+      "note": "These examples are starting points. Extensions let you adapt Kucedr to your own tasks and workflows.",
+      "link": "Explore extensions"
+    },
+    "control": {
+      "eyebrow": "Privacy and control",
+      "title": "Choose what Kucedr can access and do.",
+      "description": "Set permissions for files, commands, providers, and connected services. Tool activity appears in the conversation, and protected actions pause for approval.",
+      "pointsLabel": "How you stay in control of Kucedr",
+      "points": [
+        { "icon": "Fingerprint", "title": "Choose what Kucedr can use", "description": "Select the files, providers, tools, and connected services available to Kucedr." },
+        { "icon": "Eye", "title": "Review tool activity", "description": "Follow tool calls, inputs, outputs, and status directly in the conversation." },
+        { "icon": "HeartHandshake", "title": "Set approval rules", "description": "Choose which actions can run automatically and which must ask first." }
+      ],
+      "disclosureTitle": "Understand when data leaves your device.",
+      "disclosure": "Kucedr stores its core app data locally. Prompts, attachments, and tool data may be sent to your AI providers and connected services when a task requires them.",
+      "panel": {
+        "title": "Your controls",
+        "setup": "Kucedr access",
+        "subtitle": "Configured by you",
+        "items": [
+          { "icon": "FolderOpen", "label": "Files and folders", "status": "Your permission rules" },
+          { "icon": "Cloud", "label": "Connected services", "status": "Only what you add" },
+          { "icon": "TerminalSquare", "label": "Protected actions", "status": "Approval required" },
+          { "icon": "Eye", "label": "Tool activity", "status": "Visible in chat" }
+        ]
+      }
+    },
+    "cta": {
+      "eyebrow": "Make Kucedr yours",
+      "title": "Start with a personal assistant. Add the tools you need.",
+      "description": "Use Kucedr for repetitive, multi-step work so you can focus on the decisions and ideas that need you.",
+      "primary": "Download Kucedr",
+      "secondary": "View on GitHub",
+      "platforms": "Available for macOS, Windows, and Linux."
+    }
+  },
+  "copy": {
+    "hero": {
+      "eyebrow": "Desktop AI copilot for macOS, Windows, and Linux",
+      "title": "Turn knowledge into action.",
+      "description": "Kucedr works with your files, tools, and chosen AI providers, then turns useful work into reusable Skills, grounded search, a source-aware LLM Wiki, and focused Extensions.",
+      "download": "Download Kucedr",
+      "github": "View on GitHub",
+      "note": "Bring your own providers. Keep control of the setup. Follow every tool action in the conversation.",
+      "capabilitiesLabel": "Kucedr knowledge and extension capabilities"
+    },
+    "foundation": {
+      "eyebrow": "Product foundation",
+      "title": "One assistant, from request to result.",
+      "description": "Type or speak a request, attach images or PDFs, and let Kucedr work across files, commands, the web, browser interactions, and generated media. Tool activity streams into the conversation, while permission controls govern sensitive file and command actions.",
+      "surfacesLabel": "product surfaces"
+    },
+    "providers": {
+      "eyebrow": "Provider ecosystem",
+      "title": "Choose the providers behind Kucedr.",
+      "description": "Kucedr ships 32 built-in provider manifests across chat, speech, media, embeddings, web search, vector retrieval, and object storage. Configure the services you want and keep each capability’s provider selection independent.",
+      "inventory": "32 built-in provider manifests",
+      "note": "Catalog and runtime coverage vary by capability.",
+      "gridLabel": "Built-in Kucedr providers",
+      "details": "Read the full provider reference",
+      "capabilityLabels": {
+        "chat": "Chat",
+        "research": "Research chat",
+        "stt": "Speech to text",
+        "tts": "Text to speech",
+        "realtime": "Realtime voice",
+        "image": "Image",
+        "video": "Video",
+        "audio": "Audio",
+        "embeddings": "Embeddings",
+        "search": "Web search",
+        "vector": "Vector database",
+        "storage": "Object storage"
+      }
+    },
+    "skills": {
+      "eyebrow": "Reusable expertise",
+      "title": "Teach Kucedr the way you work.",
+      "description": "Turn repeatable workflows into portable Agent Skills. Kucedr routes requests with lightweight skill metadata, loads the full instructions only when they are relevant, and can use the scripts, references, and assets bundled with each skill.",
+      "callout": "Full instructions arrive only when the task needs them. This provides reusable expertise without placing every playbook into every prompt."
+    },
+    "knowledge": {
+      "eyebrow": "Retrieval plus durable knowledge",
+      "title": "Find the source. Keep the insight.",
+      "description": "Kucedr uses two complementary knowledge layers. The Knowledge Base retrieves relevant excerpts from indexed text. The LLM Wiki turns changing source material into structured, interlinked Markdown that can be checked, reviewed, and reused.",
+      "baseTitle": "Search your documents by meaning.",
+      "baseDescription": "Choose one or more folders of text, create a semantic index with your selected embedding provider and Pinecone, and let Kucedr retrieve matching excerpts with their source paths. Generate the index on demand, keep it refreshed on a schedule, and test searches directly in Settings.",
+      "baseTech": "RAG-powered semantic retrieval",
+      "wikiTitle": "Build knowledge that improves as sources change.",
+      "wikiDescription": "Compile Markdown, text, JSON, CSV, and log files into a persistent, interlinked Markdown wiki. Kucedr preserves source evidence, maintains traceable claims and contradictions, validates every staged update, and incrementally skips sources that have not changed.",
+      "wikiTech": "Validated Markdown compilation",
+      "callout": "The wiki gives Kucedr durable synthesis. Raw evidence and the Knowledge Base remain available when an answer needs exact wording or broader retrieval.",
+      "comparisonEyebrow": "How they work together",
+      "comparisonTitle": "Two knowledge layers, distinct by design.",
+      "comparisonStatus": "Connected at answer time"
+    },
+    "extensions": {
+      "eyebrow": "Focused interfaces",
+      "title": "Small apps. The full power of Kucedr.",
+      "description": "Extensions are focused apps with access to Kucedr's AI agent and tools. Open a dedicated interface for events, notes, design, architecture, or any repeatable workflow while the same agent keeps the context and does the work.",
+      "trustTitle": "Install from sources you trust.",
+      "trustDescription": "Extensions run in Electron’s sandboxed web runtime, but installed code can access broad Kucedr APIs.",
+      "demo": {
+        "agentTitle": "Kucedr",
+        "agentQuestion": "What should we work on?",
+        "agentDescription": "Every extension shares the same agent, context, and permissioned tools.",
+        "connected": "Agent connected",
+        "accessLabel": "Extension capabilities",
+        "access": ["AI agent", "Workspace", "Tools"],
+        "workspaceTitle": "Workspace",
+        "installedLabel": "Your extensions",
+        "openLabel": "Open an extension",
+        "activityLabel": "Current workspace",
+        "agentActivityLabel": "Kucedr agent",
+        "agentFolderLabel": "Agent",
+        "savedLabel": "Saved",
+        "saveLabel": "Save",
+        "conversationTitle": "New conversation",
+        "modelLabel": "Agent + tools",
+        "chatUser": "Prepare launch week using the active extension.",
+        "assistantIntro": "I’ll inspect the extension context, check the workspace, and use the tools it exposes.",
+        "toolActivityLabel": "Using 2 tools",
+        "toolReadLabel": "Read extension context",
+        "toolActionLabel": "Check schedule conflicts",
+        "promptPlaceholder": "Ask Kucedr anything...",
+        "attachLabel": "Add context",
+        "sendLabel": "Send message"
+      },
+      "draw": {
+        "eyebrow": "Purpose-built extension",
+        "title": "A focused canvas, only for drawing.",
+        "description": "Draw is a dedicated extension for sketching, diagramming, and exploring visual ideas. It stays intentionally focused while remaining connected to Kucedr’s settings, agent, and tools.",
+        "settingsTitle": "Settings",
+        "settingsDescription": "Configure your application preferences",
+        "assistantLabel": "Assistant",
+        "drawTitle": "Draw",
+        "canvasHint": "To move the canvas, hold the spacebar while dragging or use the hand tool",
+        "menuLabel": "Canvas menu",
+        "libraryLabel": "Library",
+        "lockLabel": "Lock canvas",
+        "toolLabel": "Drawing tools",
+        "emptyTitle": "Draw",
+        "emptyDescription": "Sketch, connect, and explore ideas.",
+        "searchHint": "Search, commands, and canvas options.",
+        "drawHint": "Pick a tool and start drawing!",
+        "shortcutHint": "Shortcuts and help",
+        "helpLabel": "Help",
+        "sidebarItems": [
+          { "title": "General", "description": "App info and appearance", "icon": "Info" },
+          { "title": "System", "description": "System access and permissions", "icon": "Monitor" },
+          { "title": "Cloud", "description": "Cloud storage and sync", "icon": "Cloud" },
+          { "title": "Agent", "description": "Chat, tools, and planning", "icon": "Bot" },
+          { "title": "Skills", "description": "Installed agent skills", "icon": "Sparkles" },
+          { "title": "Knowledge Base", "description": "Document search and index", "icon": "Search" },
+          { "title": "LLM Wiki", "description": "Assistant knowledge and notes", "icon": "BookOpen" },
+          { "title": "Background tasks", "description": "Schedules and automation", "icon": "Clock" }
+        ]
+      }
+    },
+    "control": {
+      "eyebrow": "Control and privacy",
+      "title": "Your setup. Your providers. Your control.",
+      "description": "Kucedr stores provider keys, settings, conversations, workspace data, Skills, Extensions, and generated wiki files on the user’s machine. The user selects the providers and connected services behind chat, speech, media, search, embeddings, and knowledge generation.",
+      "disclosureTitle": "Local storage is not the same as on-device processing.",
+      "disclosure": "Local storage does not mean every operation stays on-device. Prompts, attachments, source text, document chunks, and tool data may be sent to the AI providers, Pinecone index, MCP servers, websites, or other connected services required for a requested feature."
+    },
+    "cta": {
+      "eyebrow": "Make it yours",
+      "title": "Build an assistant around the way you work.",
+      "description": "Start with a conversation. Add the skills, knowledge, providers, and extensions that make Kucedr yours.",
+      "download": "Download Kucedr",
+      "source": "Explore the source",
+      "platforms": "Available for macOS, Windows, and Linux. Open source under the MIT License."
+    }
+  },
+  "navigation": [
+    { "label": "Product", "href": "#product" },
+    { "label": "Capabilities", "href": "#personal" },
+    { "label": "How it works", "href": "#workflow" },
+    { "label": "Extensions", "href": "#extensions" },
+    { "label": "Docs", "href": "/docs" }
+  ],
+  "capabilities": [
+    { "label": "Reusable Skills", "icon": "Sparkles" },
+    { "label": "Semantic Knowledge Base", "icon": "Search" },
+    { "label": "Source-aware LLM Wiki", "icon": "BookOpen" },
+    { "label": "Custom Extensions", "icon": "PlugZap" }
+  ],
+  "foundationSteps": [
+    {
+      "number": "01",
+      "title": "Ask",
+      "description": "Start with a natural-language request and the context that matters.",
+      "icon": "MessageSquare",
+      "surfaces": ["Text", "Voice", "Images", "PDFs"]
+    },
+    {
+      "number": "02",
+      "title": "Act",
+      "description": "Kucedr selects tools, works through the task, and shows its activity.",
+      "icon": "TerminalSquare",
+      "surfaces": ["Files", "Commands", "Web", "Browser", "Media"]
+    },
+    {
+      "number": "03",
+      "title": "Ground",
+      "description": "The assistant retrieves relevant source excerpts or compiled wiki knowledge.",
+      "icon": "Search",
+      "surfaces": ["Knowledge Base", "LLM Wiki"]
+    },
+    {
+      "number": "04",
+      "title": "Reuse",
+      "description": "Save the workflow as a Skill or give it a focused interface through an Extension.",
+      "icon": "Layers",
+      "surfaces": ["Agent Skills", "Extensions"]
+    }
+  ],
+  "skillPoints": [
+    "Import agentskills.io-compatible folders built around SKILL.md.",
+    "Let Kucedr select an enabled skill by intent, or request one explicitly.",
+    "Inspect a skill's identity, authoring metadata, tool requirements, connectors, and tags.",
+    "Enable, disable, download, refresh, or delete local skills from Settings.",
+    "See a clear activity state in chat whenever Kucedr loads a skill."
+  ],
+  "knowledgeBasePoints": [
+    "Recursively indexes readable UTF-8 text while skipping binary files.",
+    "Uses the same embedding model for indexing and later queries.",
+    "Gives the main assistant relevant excerpts, paths, and relevance scores.",
+    "Supports manual generation and scheduled full index rebuilds.",
+    "Rejects common credential files and high-confidence secret content before indexing."
+  ],
+  "wikiPoints": [
+    "Generates concise source, concept, topic, project, comparison, synthesis, and question pages.",
+    "Records source-aware claims, confidence, relationships, contradictions, and open questions.",
+    "Keeps immutable evidence snapshots and an append-only operation log.",
+    "Stages and validates updates before atomically replacing the generated wiki.",
+    "Supports manual generation, cancellation, scheduled maintenance, linting, and review for major synthesis rewrites.",
+    "Stores the generated wiki as ordinary Markdown in a user-selected local folder."
+  ],
+  "knowledgeComparison": [
+    {
+      "label": "Best for",
+      "knowledgeBase": "Finding relevant source excerpts",
+      "wiki": "Maintaining reusable synthesis and relationships"
+    },
+    {
+      "label": "Input",
+      "knowledgeBase": "Readable text across selected folders",
+      "wiki": "Markdown, text, JSON, CSV, and logs"
+    },
+    {
+      "label": "Processing",
+      "knowledgeBase": "Remote embeddings and Pinecone vector search",
+      "wiki": "Selected text model and validated Markdown generation"
+    },
+    {
+      "label": "Result",
+      "knowledgeBase": "Ranked excerpts with paths and scores",
+      "wiki": "Interlinked pages with source-aware claims"
+    },
+    {
+      "label": "Refresh model",
+      "knowledgeBase": "Manual or scheduled full rebuild",
+      "wiki": "Incremental source-aware compilation"
+    }
+  ],
+  "extensionPoints": [
+    "Import one or more extension folders from Settings.",
+    "Use a validated manifest.json or standard package.json with a local HTML entry.",
+    "Browse installed apps by title, description, and category.",
+    "Inspect metadata, open an extension in a dedicated resizable window, or delete it with confirmation.",
+    "Launch installed extensions from Settings, the native app menu, or the tray menu.",
+    "Build typed in-app integrations with @kucedr/sdk."
+  ],
+  "extensionApps": [
+    {
+      "id": "events",
+      "name": "Events",
+      "category": "Planning",
+      "icon": "CalendarDays",
+      "accent": "#8b7cff",
+      "headline": "Launch week, organized.",
+      "description": "Coordinate the agenda, people, rooms, and reminders in one focused app.",
+      "badge": "3 events today",
+      "action": "Plan with Kucedr",
+      "agentUpdate": "Kucedr resolved two conflicts and prepared the launch briefing.",
+      "files": ["launch-week.event", "product-sync.md", "press-briefing.md", "attendee-list.csv", "venue-layout.json", "reminders.log"],
+      "items": [
+        { "time": "09:30", "title": "Product sync", "detail": "Design, engineering · Studio A", "state": "Ready" },
+        { "time": "13:00", "title": "Launch rehearsal", "detail": "8 attendees · Main stage", "state": "Updated" },
+        { "time": "16:30", "title": "Press briefing", "detail": "Agenda and notes attached", "state": "Draft" }
+      ]
+    },
+    {
+      "id": "notes",
+      "name": "Notes",
+      "category": "Knowledge",
+      "icon": "BookOpen",
+      "accent": "#ff708d",
+      "headline": "Ideas that stay connected.",
+      "description": "Capture meeting notes, link decisions, and turn loose thoughts into useful documents.",
+      "badge": "12 notes linked",
+      "action": "Organize with Kucedr",
+      "agentUpdate": "Kucedr linked the research notes and extracted four open decisions.",
+      "files": ["launch-narrative.md", "customer-interviews.md", "open-decisions.md", "research-digest.md", "meeting-notes.md", "source-links.json"],
+      "items": [
+        { "time": "Today", "title": "Launch narrative", "detail": "Connected to Brand direction", "state": "Edited" },
+        { "time": "Fri", "title": "Customer interviews", "detail": "7 sources · 24 highlights", "state": "Indexed" },
+        { "time": "Wed", "title": "Open decisions", "detail": "Owners and due dates added", "state": "4 open" }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "Design",
+      "category": "Creative",
+      "icon": "Image",
+      "accent": "#36c6f4",
+      "headline": "A clear creative workspace.",
+      "description": "Collect references, compare directions, and ask Kucedr to prepare production-ready assets.",
+      "badge": "Review in progress",
+      "action": "Create with Kucedr",
+      "agentUpdate": "Kucedr grouped the references and prepared three export variants.",
+      "files": ["interface-direction.fig", "campaign-imagery.board", "social-exports.json", "brand-tokens.json", "component-notes.md", "asset-manifest.csv"],
+      "items": [
+        { "time": "01", "title": "Interface direction", "detail": "Dark desktop system · 18 references", "state": "Selected" },
+        { "time": "02", "title": "Campaign imagery", "detail": "Three concepts ready to compare", "state": "Review" },
+        { "time": "03", "title": "Social exports", "detail": "Square, portrait, and landscape", "state": "Queued" }
+      ]
+    },
+    {
+      "id": "architecture",
+      "name": "Architecture",
+      "category": "Systems",
+      "icon": "Workflow",
+      "accent": "#6ed6a8",
+      "headline": "See the system, end to end.",
+      "description": "Map services, inspect dependencies, and keep architecture decisions beside the implementation.",
+      "badge": "All systems healthy",
+      "action": "Inspect with Kucedr",
+      "agentUpdate": "Kucedr traced the request path and found one dependency to decouple.",
+      "files": ["agent-gateway.arch", "knowledge-pipeline.arch", "extension-runtime.arch", "service-map.json", "decisions.md", "dependency-audit.log"],
+      "items": [
+        { "time": "API", "title": "Agent gateway", "detail": "7 routes · 99.98% availability", "state": "Healthy" },
+        { "time": "DATA", "title": "Knowledge pipeline", "detail": "Index, wiki, and local storage", "state": "Mapped" },
+        { "time": "APP", "title": "Extension runtime", "detail": "Sandbox and permission boundary", "state": "Review" }
+      ]
+    }
+  ],
+  "controlPoints": [
+    "File writes, edits, patches, and command execution follow the agent permission policy.",
+    "Sensitive actions can surface Deny, Allow once, and Always allow choices.",
+    "Tool activity remains visible in the conversation.",
+    "The app uses Electron sandboxing, context isolation, disabled Node integration, and web security.",
+    "Kucedr runs on macOS, Windows, and Linux, with light, dark, and system themes."
+  ]
+}

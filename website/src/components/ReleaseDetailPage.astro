@@ -1,0 +1,250 @@
+---
+import { localizedRoutePath, normalizeLocale, type Locale } from "../i18n";
+import { formatAssetSize, formatReleaseDate, getReleaseCopy, type Release } from "../lib/releases";
+import { socialImageObject } from "../lib/social-images";
+import Icon from "./Icon.astro";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+
+interface Props {
+  locale?: Locale;
+  release: Release;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const { release } = Astro.props;
+const copy = getReleaseCopy(release, locale);
+const publishedDate = new Date(release.publishedAt);
+const shortCommit = release.commit.slice(0, 7);
+const route = (path: string) => localizedRoutePath(path, locale);
+const canonicalPath = route(`/releases/${release.tag}`);
+const siteBaseUrl = Astro.site ?? new URL("https://kucedr.haraldbregu.com");
+const pageUrl = new URL(canonicalPath, siteBaseUrl).toString();
+const primaryImage = socialImageObject("default", siteBaseUrl, locale, pageUrl);
+const platformIcon = (platform: string) => platform === "macOS" ? "Apple" : platform === "Windows" ? "MonitorDown" : "TerminalSquare";
+const labels = locale === "it"
+  ? {
+      back: "Torna alle versioni",
+      installers: "installer",
+      sourceOnly: "Solo tag sorgente",
+      commit: "Commit",
+      chooseDownload: "Scegli un download",
+      browseSource: "Esplora il codice",
+      changed: "01 / Cosa è cambiato",
+      highlights: "Novità della versione.",
+      details: "Dettagli della versione",
+      version: "Versione",
+      channel: "Canale",
+      published: "Pubblicata",
+      artifacts: "File",
+      none: "Nessuno",
+      downloadsTag: "02 / Download",
+      chooseBuild: "Scegli la tua build.",
+      downloadsAside: "I file vengono serviti direttamente dalla versione verificata su GitHub. Scegli piattaforma, architettura e formato di installazione adatti al tuo computer.",
+      sourceCheckpoint: "02 / Checkpoint del codice",
+      noInstallers: "Questo tag non ha installer pubblicati.",
+      noInstallersDescription: `Kucedr ${release.tag} è conservata come tag sorgente tra due beta distribuite. Su GitHub puoi consultare il codice del tag o tutte le modifiche rispetto alla versione precedente.`,
+      historyTag: "03 / Codice e cronologia",
+      inspectCode: "Esamina il codice esatto.",
+      historyAside: "Ogni pagina rimanda al tag Git e al commit immutabili su cui si basa la versione.",
+      taggedSource: "Codice del tag",
+      comparison: "Confronto completo",
+      comparisonDescription: "Esamina commit e file modificati",
+      allTags: "Tutti i tag su GitHub",
+      allTagsDescription: "Consulta la cronologia completa dei tag",
+    }
+  : {
+      back: "Back to releases",
+      installers: "installers",
+      sourceOnly: "Source tag only",
+      commit: "Commit",
+      chooseDownload: "Choose a download",
+      browseSource: "Browse source",
+      changed: "01 / What changed",
+      highlights: "Release highlights.",
+      details: "Release details",
+      version: "Version",
+      channel: "Channel",
+      published: "Published",
+      artifacts: "Artifacts",
+      none: "None",
+      downloadsTag: "02 / Downloads",
+      chooseBuild: "Choose your build.",
+      downloadsAside: "These files are served directly from the verified GitHub release. Choose the platform, architecture, and installer format that matches your computer.",
+      sourceCheckpoint: "02 / Source checkpoint",
+      noInstallers: "This tag has no published installers.",
+      noInstallersDescription: `Kucedr ${release.tag} is preserved as a source tag between packaged beta releases. Browse the tagged source or review every change from the previous version on GitHub.`,
+      historyTag: "03 / Source and history",
+      inspectCode: "Inspect the exact code.",
+      historyAside: "Every page stays anchored to the immutable Git tag and commit behind the version.",
+      taggedSource: "Tagged source",
+      comparison: "Full comparison",
+      comparisonDescription: "Review commits and changed files",
+      allTags: "All GitHub tags",
+      allTagsDescription: "Browse the complete tag history",
+    };
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${pageUrl}#software-application`,
+      name: "Kucedr",
+      url: pageUrl,
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "macOS, Windows, Linux",
+      softwareVersion: release.tag,
+      datePublished: release.publishedAt,
+      description: copy.summary,
+      inLanguage: locale === "it" ? "it-IT" : "en",
+      codeRepository: release.sourceUrl,
+      image: { "@id": primaryImage["@id"] },
+      mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+      ...(release.assets.length > 0 ? { downloadUrl: release.assets.map((asset) => asset.url) } : {}),
+    },
+    primaryImage,
+  ],
+};
+---
+
+<ProductPageLayout
+  alternatePath={`/releases/${release.tag}`}
+  canonical={canonicalPath}
+  description={copy.summary}
+  locale={locale}
+  ogType="article"
+  publishedTime={publishedDate}
+  structuredData={structuredData}
+  tags={[release.tag, "release", copy.stage]}
+  title={release.name}
+>
+  <article class="release-detail">
+    <header class="product-article-hero release-detail-hero">
+      <div class="shell product-article-hero__inner">
+        <a class="product-back-link" href={route("/releases")}>
+          <Icon name="ArrowRight" size={15} />
+          {labels.back}
+        </a>
+        <p class="catalog-eyebrow">{release.tag} / {copy.stage}</p>
+        <h1>{release.name}</h1>
+        <p class="product-article-hero__lede">{copy.summary}</p>
+        <div class="product-article-meta">
+          <time datetime={publishedDate.toISOString()}>{formatReleaseDate(release.publishedAt, "long", locale)}</time>
+          <span>{release.assets.length > 0 ? `${release.assets.length} ${labels.installers}` : labels.sourceOnly}</span>
+          <span>{labels.commit} {shortCommit}</span>
+        </div>
+        <div class="release-hero-actions">
+          {
+            release.assets.length > 0 ? (
+              <a class="release-action release-action--primary" href="#downloads">
+                <Icon name="Download" size={16} />
+                {labels.chooseDownload}
+              </a>
+            ) : null
+          }
+          <a class="release-action" href={release.sourceUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="Github" size={16} />
+            {labels.browseSource}
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="catalog-section release-overview-section">
+      <div class="shell release-overview">
+        <div class="release-highlights">
+          <span class="catalog-section-tag">{labels.changed}</span>
+          <h2>{labels.highlights}</h2>
+          <ul>
+            {copy.highlights.map((highlight) => (
+              <li><Icon name="Check" size={17} /><span>{highlight}</span></li>
+            ))}
+          </ul>
+        </div>
+        <aside class="release-facts" aria-label={labels.details}>
+          <span>{labels.details}</span>
+          <dl>
+            <div><dt>{labels.version}</dt><dd>{release.tag}</dd></div>
+            <div><dt>{labels.channel}</dt><dd>{copy.stage}</dd></div>
+            <div><dt>{labels.published}</dt><dd>{formatReleaseDate(release.publishedAt, "short", locale)}</dd></div>
+            <div><dt>{labels.commit}</dt><dd><code>{shortCommit}</code></dd></div>
+            <div><dt>{labels.artifacts}</dt><dd>{release.assets.length || labels.none}</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    {
+      release.assets.length > 0 ? (
+        <section class="catalog-section is-tinted" id="downloads">
+          <div class="shell">
+            <header class="catalog-section__head">
+              <div class="catalog-section__title">
+                <span class="catalog-section-tag">{labels.downloadsTag}</span>
+                <h2>{labels.chooseBuild}</h2>
+              </div>
+              <p class="catalog-section__aside">{labels.downloadsAside}</p>
+            </header>
+            <div class="release-download-grid">
+              {release.assets.map((asset) => (
+                <a class="release-download" href={asset.url} target="_blank" rel="noopener noreferrer">
+                  <span class="release-download__icon"><Icon name={platformIcon(asset.platform)} size={20} /></span>
+                  <span class="release-download__copy">
+                    <strong>{asset.platform}</strong>
+                    <span>{asset.architecture} / {asset.format}</span>
+                    <small>{formatAssetSize(asset.size)}</small>
+                  </span>
+                  <Icon class="release-download__arrow" name="Download" size={17} />
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section class="catalog-section is-tinted" id="source">
+          <div class="shell release-source-notice">
+            <span class="release-source-notice__icon"><Icon name="GitBranch" size={22} /></span>
+            <div>
+              <span class="catalog-section-tag">{labels.sourceCheckpoint}</span>
+              <h2>{labels.noInstallers}</h2>
+              <p>{labels.noInstallersDescription}</p>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="catalog-section release-links-section">
+      <div class="shell">
+        <header class="catalog-section__head">
+          <div class="catalog-section__title">
+            <span class="catalog-section-tag">{labels.historyTag}</span>
+            <h2>{labels.inspectCode}</h2>
+          </div>
+          <p class="catalog-section__aside">{labels.historyAside}</p>
+        </header>
+        <div class="release-source-links">
+          <a href={release.sourceUrl} target="_blank" rel="noopener noreferrer">
+            <Icon name="Github" size={18} />
+            <span><strong>{labels.taggedSource}</strong><small>{release.tag} at {shortCommit}</small></span>
+            <Icon name="ArrowUpRight" size={16} />
+          </a>
+          {
+            release.compareUrl ? (
+              <a href={release.compareUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="GitBranch" size={18} />
+                <span><strong>{labels.comparison}</strong><small>{labels.comparisonDescription}</small></span>
+                <Icon name="ArrowUpRight" size={16} />
+              </a>
+            ) : (
+              <a href="https://github.com/HaraldBregu/kucedr/tags" target="_blank" rel="noopener noreferrer">
+                <Icon name="History" size={18} />
+                <span><strong>{labels.allTags}</strong><small>{labels.allTagsDescription}</small></span>
+                <Icon name="ArrowUpRight" size={16} />
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </section>
+  </article>
+</ProductPageLayout>

@@ -1,0 +1,444 @@
+{
+  "nav": [
+    { "label": "Product", "href": "#product" },
+    { "label": "Features", "href": "#features" },
+    { "label": "Docs", "href": "/docs" },
+    { "label": "Download", "href": "#download" }
+  ],
+  "release": {
+    "version": "v1.0.2",
+    "platform": "macOS / Windows / Linux",
+    "phase": "Public beta"
+  },
+  "hero": {
+    "eyebrow": "Local-first desktop AI assistant",
+    "headline": "Kucedr.",
+    "description": "Kucedr is a desktop agent that turns a request into finished work. Ask by text or voice, and it reads and edits files, runs commands, searches the web, drives a browser, and generates media, all with your own provider keys, on your own machine."
+  },
+  "demoSuggestions": [
+    {
+      "question": "Summarize my Telegram messages",
+      "answer": "You have 4 direct messages and 2 group threads. The thread worth your attention is #launch, where Priya is blocked on the API timeout question and tagged you 11 minutes ago."
+    },
+    {
+      "question": "Draft a polite decline to Maya",
+      "answer": "Hey Maya, thanks so much for the invite. I cannot make Thursday, but I would love to find another time. Want me to send a few options for next week?"
+    },
+    {
+      "question": "What did I do yesterday?",
+      "answer": "You spent the morning on the Kucedr landing page, shipped a small product update after lunch, and closed the laptop at 18:12."
+    }
+  ],
+  "heroPillars": [
+    { "icon": "Sparkles", "title": "Agent loop", "text": "It plans, calls tools, and keeps working until the task is done." },
+    { "icon": "Cpu", "title": "Cross provider", "text": "Pick a different provider and model for chat, voice, image, video, and audio." },
+    { "icon": "ShieldCheck", "title": "Local first", "text": "Keys, history, memory, and generated media stay in local app data." },
+    { "icon": "Cloud", "title": "Cloud backup", "text": "Back up the folders you choose to your own S3-compatible bucket." }
+  ],
+  "landingFeatures": [
+    {
+      "key": "01",
+      "status": "Chat",
+      "title": "Chat that acts",
+      "description": "Ask in plain language and Kucedr runs a tool loop until the work is done. It reads files, applies multi-file patches, runs shell commands, holds long-running processes open, searches the web, and drives a real browser."
+    },
+    {
+      "key": "02",
+      "status": "Local first",
+      "title": "Local and private",
+      "description": "Kucedr is an Electron desktop app. Provider keys, conversation history, memory, projects, and generated media live in your local application data, not in a hosted account."
+    },
+    {
+      "key": "03",
+      "status": "Permissioned",
+      "title": "Approval before action",
+      "description": "Every tool carries its own policy. File edits, shell commands, and patches ask by default, and each prompt offers deny, allow once, or always allow. Directory rules cover the folders you already trust."
+    },
+    {
+      "key": "04",
+      "status": "Voice",
+      "title": "Speak and listen",
+      "description": "Dictate into the prompt with live partial transcripts on streaming models, or record and transcribe in one pass. Replies read back through the text-to-speech provider you pick."
+    },
+    {
+      "key": "05",
+      "status": "Extensible",
+      "title": "Skills and MCP",
+      "description": "Install skills as local folders with a SKILL.md and call them from the slash menu. Connect remote HTTP or local stdio MCP servers and their tools join the toolset for the run."
+    },
+    {
+      "key": "06",
+      "status": "Automation",
+      "title": "Schedules and checks",
+      "description": "A HEALTH.md checklist runs in the background on your interval, skips while you are busy, and stays quiet unless something needs attention. Cron records persist and reload at startup."
+    }
+  ],
+  "howSteps": [
+    {
+      "label": "STEP 01",
+      "glyph": "Ask",
+      "title": "Make a request",
+      "description": "Type, dictate, or attach images and PDFs. The slash menu reaches installed skills, thread goals, and your schedule list without leaving the editor."
+    },
+    {
+      "label": "STEP 02",
+      "glyph": "Plan",
+      "title": "Pick tools",
+      "description": "Kucedr assembles each turn from your workspace files, saved memory, and the active project's instructions, then streams tool calls for files, commands, web, browser, media, MCP, or a subagent."
+    },
+    {
+      "label": "STEP 03",
+      "glyph": "Act",
+      "title": "Approve and verify",
+      "description": "Gated actions pause on a permission card. Every call lands in the transcript with its input, output, and duration, and the stop button aborts the run and any approval still pending."
+    }
+  ],
+  "quote": {
+    "text": "Unlike a website chatbot, Kucedr runs on your machine and works through the providers, credentials, and permissions you choose.",
+    "cite": "Kucedr product brief"
+  },
+  "landingMcp": [
+    {
+      "name": "Remote MCP servers",
+      "label": "Extension point",
+      "description": "Connect hosted tool servers over HTTP with a bearer token or OAuth. Enabled servers connect in parallel at the start of a run, expose their tools, and close when it ends.",
+      "icon": "PlugZap"
+    },
+    {
+      "name": "Local MCP servers",
+      "label": "Extension point",
+      "description": "Run stdio servers from your own machine with a command, arguments, environment variables, and a working directory. Unreachable servers are skipped for that run, not fatal.",
+      "icon": "Workflow"
+    },
+    {
+      "name": "Any MCP client tool",
+      "label": "Extension point",
+      "description": "Server tools arrive as mcp__server__tool and follow the same permission model, so a server can require approval before its tools are allowed to run.",
+      "icon": "Plus"
+    }
+  ],
+  "landingChannels": [
+    {
+      "name": "Telegram",
+      "status": "Live",
+      "description": "Long-polling bot with a 60-second health check and exponential reconnect. Replies split at 4,096 characters and return to the chat, message, and thread they came from.",
+      "icon": "Send"
+    },
+    {
+      "name": "Discord",
+      "status": "Live",
+      "description": "Bot for servers and DMs with thread and reply-reference support. Replies split at 2,000 characters and go back to the originating channel.",
+      "icon": "MessageSquare"
+    }
+  ],
+  "faqs": [
+    {
+      "question": "What is Kucedr?",
+      "answer": "Kucedr is a cross-platform Electron desktop assistant. You chat in plain language and it runs an agent loop over your files, shell, long-running processes, the web, a managed browser, memory, named project workspaces, skills, MCP tools, and media generation, up to twenty tool-using turns per request."
+    },
+    {
+      "question": "Does Kucedr send my data anywhere?",
+      "answer": "Kucedr is local-first. Settings, provider keys, conversation history, memory, projects, and generated media live in your local application data. Prompts, attachments, and tool inputs leave only for the providers, MCP servers, sites, channels, or storage endpoint a task actually needs. Keys are masked in the interface but stored in ordinary local config files, so treat that folder as sensitive."
+    },
+    {
+      "question": "Do I have to use one specific AI provider?",
+      "answer": "No. Add your own keys and pick a provider and model independently for the assistant, transcription, speech, image, video, audio, scheduled work, and health checks. Anthropic routes through the Messages API, OpenAI through the Responses API, and every other chat provider through the OpenAI-compatible Chat Completions path."
+    },
+    {
+      "question": "How does permissioning work?",
+      "answer": "Each tool carries its own policy with allow, ask, and deny rules. Reads, writes, and process control allow by default; edits, shell commands, and patches ask. The permission card offers deny, allow once, or always allow, and directories can be pre-authorized per tool. Command policy matches the command string, so it is a guardrail rather than an operating-system sandbox."
+    },
+    {
+      "question": "Can Kucedr work from outside the app?",
+      "answer": "Yes. Telegram and Discord bots route direct, group, and thread messages to the agent and reply in the same place. Each channel keeps its own token, direct-message policy (allowlist by default, or open and deny), sender allowlist, and reply model."
+    },
+    {
+      "question": "What can be automated?",
+      "answer": "Health checks run today: a HEALTH.md checklist on a one-minute, thirty-minute, or hourly interval, with optional active hours and date ranges, skipping while you are busy and reporting only when something needs attention. Recurring cron jobs can be created, paused, resumed, and listed in conversation; executing their prompts is still landing."
+    },
+    {
+      "question": "Which desktop platforms are supported?",
+      "answer": "Electron builds for Windows (NSIS, x64), macOS (PKG and DMG, Intel and Apple Silicon, hardened runtime), and Linux (AppImage and DEB). The interface ships English and Italian with light, dark, and system themes, though some first-run copy is still English only."
+    },
+    {
+      "question": "Is Kucedr certified for regulated data?",
+      "answer": "No. Kucedr makes no formal regulated-data certification claim. Provider keys, bot tokens, and MCP secrets sit in local config files rather than an encrypted vault, so review your providers' terms and your own disk security before handling sensitive material."
+    }
+  ],
+  "heroSignals": [
+    "Local-first desktop control",
+    "Provider choice",
+    "Permissioned tools",
+    "Visible history"
+  ],
+  "assistantStates": [
+    "thinking",
+    "reasoning",
+    "using tools",
+    "waiting for approval",
+    "answering",
+    "completed",
+    "cancelled",
+    "error"
+  ],
+  "promptSuggestions": [
+    "Inspect this folder and summarize the project",
+    "Draft a release note from recent changes",
+    "Run the test command after approval",
+    "Turn this recording into a task list"
+  ],
+  "toolCategories": [
+    "Read, write, edit, patch, copy, move, delete, inspect, and search local files",
+    "Run shell commands and manage longer-running processes",
+    "Search the web and fetch current pages or URLs",
+    "Drive a managed browser when a page needs real interaction",
+    "Generate images, video, music, and sound effects from text",
+    "Create, update, pause, resume, list, and run scheduled jobs",
+    "Save durable facts to memory and recall them later",
+    "Load reusable skills and run selected skill workflows",
+    "Use tools exposed by connected MCP servers"
+  ],
+  "providerCategories": [
+    "Assistant",
+    "Speech-to-Text",
+    "Text-to-Speech",
+    "Text-to-Image",
+    "Text-to-Video",
+    "Music / Audio",
+    "OpenAI-compatible endpoints"
+  ],
+  "providerExamples": [
+    "OpenAI",
+    "Anthropic",
+    "Google",
+    "xAI",
+    "Mistral",
+    "DeepSeek",
+    "Qwen",
+    "Kimi",
+    "Z.ai",
+    "MiniMax",
+    "ElevenLabs",
+    "Deepgram",
+    "Cartesia",
+    "Black Forest Labs",
+    "Midjourney",
+    "Kling",
+    "Runway",
+    "Luma",
+    "Stability AI",
+    "Ideogram",
+    "Pika",
+    "Suno",
+    "Reka",
+    "Perplexity"
+  ],
+  "voiceFeatures": [
+    "Microphone permission controls",
+    "Speech-to-text dictation into chat",
+    "Audio recording from the prompt input",
+    "Audio file attachments with preview and duration display",
+    "Provider and model selection for transcription",
+    "Text-to-speech configuration for read-aloud replies"
+  ],
+  "skillDetails": [
+    "id",
+    "format",
+    "version",
+    "category",
+    "safety",
+    "visibility",
+    "author",
+    "tools",
+    "tags",
+    "model visibility",
+    "folder",
+    "skill file",
+    "diagnostics"
+  ],
+  "skillUseCases": [
+    "Research briefs",
+    "Data quality checks",
+    "Release note drafting",
+    "Team-specific workflow instructions"
+  ],
+  "channelCatalog": [
+    "Telegram",
+    "Discord",
+    "Slack",
+    "WhatsApp",
+    "Email",
+    "future channel adapters"
+  ],
+  "channelSettings": [
+    "Enable or disable channel",
+    "Account label",
+    "Bot token or platform token",
+    "Phone number for phone-based channels",
+    "Server URL for server and workspace channels",
+    "Webhook URL",
+    "Default target",
+    "Direct message policy: allowlist, pairing, open, or deny",
+    "Allowed sender lists for direct messages and groups",
+    "Runtime status",
+    "Reliable delivery and reconnect behavior"
+  ],
+  "cronDetails": [
+    "List scheduled tasks",
+    "Enabled or disabled state",
+    "Schedule display",
+    "Next run and last run information",
+    "Details page with id, schedule, target, delivery, timestamps, prompt, and payload",
+    "Delete scheduled tasks"
+  ],
+  "heartbeatDetails": [
+    "Heartbeat runtime enable and pause control",
+    "Runner active or idle status",
+    "Configured agent count",
+    "Next due time",
+    "Timing controls with 5m, 15m, 30m, 1h, and disable presets",
+    "Optional active hours with start, end, and timezone",
+    "Last event status, timestamp, duration, channel, reason, and preview",
+    "Manual wake-now action",
+    "System event input that can be sent immediately or queued for the next heartbeat"
+  ],
+  "privacyNotes": [
+    "Kucedr is local-first but can connect to external AI providers, channels, and MCP servers when you configure them.",
+    "API keys, tokens, passwords, private keys, and credentials are secrets and should not be logged or exposed.",
+    "Provider keys are stored locally and only used for provider calls.",
+    "Settings, credentials, conversation history, memory, workspace paths, channel IDs, MCP server metadata, local files, and agent data are treated as private.",
+    "Users can inspect chat history size and clear conversation history.",
+    "Application data and user data folders can be opened from settings.",
+    "App settings include theme, language, translucency, menu bar visibility, keep-awake behavior, and microphone control.",
+    "Tool and MCP actions that write, delete, publish, send messages, or access private data should pass permission checks."
+  ],
+  "desktopFeatures": [
+    "Electron desktop app",
+    "Tray and menu bar support with show, hide, and quit",
+    "Theme modes: light, dark, and system",
+    "Translucency controls for light and dark themes",
+    "Language support: English and Italian",
+    "Keep computer active toggle for background work",
+    "Access to app data and user data folders",
+    "Navigation through settings sections and command/search surfaces",
+    "Error boundaries, loading states, empty states, and status notices"
+  ],
+  "technicalFoundation": [
+    "Electron, Node.js, TypeScript, React, Tailwind CSS, and shadcn-style components",
+    "Main-process services under src/main",
+    "Renderer code under src/renderer/src",
+    "Cross-process API contracts under src/shared and src/preload",
+    "Provider adapters behind a provider abstraction",
+    "Local stores for app settings, cron schedules, skills, apps, channels, memory, and session state",
+    "Testing with Jest, Testing Library, and Playwright",
+    "Packaging with electron-vite and electron-builder"
+  ],
+  "landingOperators": [
+    {
+      "name": "Assistant chat",
+      "description": "Run agent turns from a clean Markdown chat, with visible tool activity, session history, and permission prompts for sensitive actions.",
+      "icon": "Layers",
+      "status": "Live"
+    },
+    {
+      "name": "Voice",
+      "description": "Dictate requests with speech-to-text and have Kucedr read replies aloud through the voice provider and model you choose.",
+      "icon": "Bot",
+      "status": "Live"
+    },
+    {
+      "name": "Cron scheduler",
+      "description": "Create, update, pause, resume, list, and run recurring assistant jobs with their own instructions, provider, and model.",
+      "icon": "Clock",
+      "status": "Live"
+    },
+    {
+      "name": "Health checks",
+      "description": "Run periodic checklist-driven assistant checks and report back when something in your setup needs attention.",
+      "icon": "HeartHandshake",
+      "status": "Live"
+    },
+    {
+      "name": "Image generation",
+      "description": "Create images from text descriptions in chat or the image workspace using the provider and model you select.",
+      "icon": "Image",
+      "status": "Live"
+    },
+    {
+      "name": "Video and audio",
+      "description": "Generate video, music, and sound effects from text with the provider and model you choose, saved to your media library and playable in chat.",
+      "icon": "Video",
+      "status": "Live"
+    }
+  ],
+  "landingOperatorGroups": [
+    {
+      "label": "Assistant",
+      "description": "The tool loop that plans, asks for approval, and returns concrete results.",
+      "items": [
+        {
+          "name": "Assistant chat",
+          "description": "Streaming Markdown with syntax-highlighted code, tool calls grouped into collapsible activity summaries, per-session history, and permission cards on gated actions.",
+          "icon": "Layers",
+          "status": "Live"
+        }
+      ]
+    },
+    {
+      "label": "Generation",
+      "description": "Media operators for voice, images, video, and audio, each with its own saved provider and model.",
+      "items": [
+        {
+          "name": "Voice generation",
+          "description": "Six providers for transcription, streaming or batch, and seven for read-aloud playback: Cartesia, Deepgram, ElevenLabs, Google, MiniMax, Mistral, and OpenAI.",
+          "icon": "Volume2",
+          "status": "Live"
+        },
+        {
+          "name": "Image generation",
+          "description": "Seven providers with working adapters, from FLUX.2 and Gemini 3.1 Flash Image to Stable Image Ultra. Agent output saves to the media library and appears inline in chat.",
+          "icon": "Image",
+          "status": "Live"
+        },
+        {
+          "name": "Video generation",
+          "description": "Eight providers with working adapters: Veo 3.1, Kling 2.5 Turbo, Runway Gen-4, Ray 3, Hailuo 2.3, Pika, Wan 2.5, and Grok Imagine. Results play without leaving the conversation.",
+          "icon": "Video",
+          "status": "Live"
+        },
+        {
+          "name": "Audio generation",
+          "description": "Music and sound effects through Eleven Music, ElevenLabs Sound Effects, and Stable Audio 2.5, saved to a dated local library you can replay from Settings.",
+          "icon": "AudioLines",
+          "status": "Live"
+        }
+      ]
+    },
+    {
+      "label": "Automation",
+      "description": "Background work driven by your checklist and schedule, kept separate from media generation.",
+      "items": [
+        {
+          "name": "Cron scheduler",
+          "description": "Persistent schedule records with a cron expression, paused state, and their own provider and model. Create, pause, and list them in conversation; startup reloads what you saved. Running their prompts is still landing.",
+          "icon": "Clock",
+          "status": "Beta"
+        },
+        {
+          "name": "Health checks",
+          "description": "A HEALTH.md checklist on a one-minute, thirty-minute, or hourly interval, inside its own session, skipping while you are busy. A plain HEALTH_OK stays quiet; anything else is logged for you.",
+          "icon": "HeartHandshake",
+          "status": "Live"
+        }
+      ]
+    }
+  ],
+  "landingProviderGroups": [
+    { "label": "Assistant", "examples": ["OpenAI", "Anthropic", "Google", "xAI", "Mistral", "DeepSeek", "Qwen", "Kimi", "Z.ai", "MiniMax", "Reka", "Perplexity", "OpenAI-compatible"] },
+    { "label": "Speech-to-Text", "examples": ["OpenAI", "Deepgram", "ElevenLabs", "Mistral", "xAI", "Qwen"] },
+    { "label": "Text-to-Speech", "examples": ["OpenAI", "ElevenLabs", "Cartesia", "Deepgram", "Google", "MiniMax", "Mistral"] },
+    { "label": "Text-to-Image", "examples": ["Black Forest Labs", "Google", "Ideogram", "Luma", "Qwen", "Stability AI", "xAI"] },
+    { "label": "Text-to-Video", "examples": ["Google Veo", "Kling", "Runway", "Luma", "MiniMax", "Pika", "Qwen", "xAI"] },
+    { "label": "Music / Audio", "examples": ["ElevenLabs", "Stability AI"] }
+  ]
+}

@@ -1,0 +1,114 @@
+---
+import CTASection from "../components/CTASection.astro";
+import Icon from "../components/Icon.astro";
+import ProductPageHero from "../components/ProductPageHero.astro";
+import tools from "../data/tools.json";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+
+const groups = tools.reduce<Record<string, typeof tools>>((acc, tool) => {
+  acc[tool.category] = acc[tool.category] ?? [];
+  acc[tool.category].push(tool);
+  return acc;
+}, {});
+const groupEntries = Object.entries(groups);
+const categoryIcons: Record<string, string> = {
+  Files: "FolderOpen",
+  Shell: "Terminal",
+  Web: "Globe",
+  Media: "Image",
+  Automation: "Clock",
+  Extension: "PlugZap",
+};
+const categoryDescriptions: Record<string, string> = {
+  Files: "Read, create, and update workspace content while keeping file operations visible and permission-aware.",
+  Shell: "Run commands and manage longer processes when a task needs the local development environment.",
+  Web: "Research current information and work through browser-based tasks with the right access boundaries.",
+  Media: "Create images and other rich assets through the media providers configured in Kucedr.",
+  Automation: "Schedule recurring work and health checks so suitable tasks can continue in the background.",
+  Extension: "Add reusable skills, MCP servers, and specialist tool surfaces without changing the core assistant.",
+};
+const selectionSteps = [
+  { step: "01", title: "Policy check", desc: "Kucedr decides whether a tool is useful and keeps direct answers tool-free." },
+  { step: "02", title: "Candidate filtering", desc: "Permission boundaries narrow the available files, commands, accounts, and services." },
+  { step: "03", title: "Ranking", desc: "The assistant chooses the tool that best fits the requested outcome and current context." },
+  { step: "04", title: "Approval", desc: "Sensitive writes, deletions, publishing, messages, and private data access pause for confirmation." },
+  { step: "05", title: "Verification", desc: "Kucedr checks the result and returns a concrete answer, artifact, or completed action." },
+];
+---
+
+<ProductPageLayout
+  description="Kucedr's assistant uses permissioned tools for files, commands, web work, images, scheduling, skills, subagents, and MCP."
+  image="/og/kucedr-personal-ai-assistant.png"
+  title="Agent Tools"
+>
+  <ProductPageHero
+    accent="actually do."
+    description="Tools are Kucedr's hands: they connect a natural-language request to finished work while keeping sensitive actions behind clear approval."
+    eyebrow="Agent Tools"
+    jumpLabel="Tool categories"
+    jumps={[
+      ...groupEntries.map(([category]) => ({ href: `#${category.toLowerCase()}`, icon: categoryIcons[category] ?? "Sparkles", label: category })),
+      { href: "#selection", icon: "ShieldCheck", label: "Selection & safety" },
+    ]}
+    stats={[
+      { value: tools.length, label: "Tool families" },
+      { value: groupEntries.length, label: "Categories" },
+      { value: "Ask", label: "Sensitive actions" },
+    ]}
+    statsLabel="Tool catalog summary"
+    title="What Kucedr can actually do."
+  />
+
+  {groupEntries.map(([category, items], groupIndex) => (
+    <section class:list={["catalog-section", groupIndex % 2 === 1 && "is-tinted"]} id={category.toLowerCase()}>
+      <div class="shell">
+        <header class="catalog-section__head">
+          <div class="catalog-section__title">
+            <span class="catalog-section-tag">{String(groupIndex + 1).padStart(2, "0")} / {category}</span>
+            <h2>{category} tools</h2>
+          </div>
+          <p class="catalog-section__aside">{categoryDescriptions[category]}</p>
+        </header>
+
+        <div class="product-tile-grid">
+          {items.map((tool, index) => (
+            <article class="product-tile">
+              <div class="product-tile__top">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <i><Icon name={tool.icon} size={17} /></i>
+              </div>
+              <h3><code>{tool.name}</code></h3>
+              <p>{tool.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="catalog-section is-tinted" id="selection">
+    <div class="shell">
+      <header class="catalog-section__head">
+        <div class="catalog-section__title">
+          <span class="catalog-section-tag">07 / Selection & safety</span>
+          <h2>From request to verified result.</h2>
+        </div>
+        <p class="catalog-section__aside">Tool choice follows the task, available context, and permission policy at every step.</p>
+      </header>
+      <ol class="product-step-list">
+        {selectionSteps.map((item) => (
+          <li>
+            <span>{item.step}</span>
+            <div><h3>{item.title}</h3><p>{item.desc}</p></div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <CTASection
+    eyebrow="Permissioned actions"
+    title="Kucedr acts, but you stay in control."
+    description="The assistant will not send messages, change records, delete data, or touch production systems without clear authorization."
+  />
+</ProductPageLayout>

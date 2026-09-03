@@ -1,0 +1,68 @@
+---
+import DrawingExtensionDemo from "./DrawingExtensionDemo.astro";
+import ExtensionAppsDemo from "./ExtensionAppsDemo.astro";
+import KucedrLandingNav from "./KucedrLandingNav.astro";
+import Icon from "./Icon.astro";
+import landingEn from "../data/kucedr-landing.json";
+import landingIt from "../data/kucedr-landing-it.json";
+import { normalizeLocale, type Locale } from "../i18n";
+import "../styles/kucedr-landing.css";
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const landing = locale === "it" ? landingIt : landingEn;
+const { copy, extensionApps, extensionPoints } = landing;
+---
+
+<KucedrLandingNav home={false} locale={locale} />
+
+<section class="fr-section fr-extensions-page" id="extensions" aria-labelledby="extensions-title">
+  <div class="fr-shell">
+    <header class="fr-section-head fr-section-head--split fr-extensions-page__head" data-reveal>
+      <div>
+        <p class="fr-eyebrow"><span></span>{copy.extensions.eyebrow}</p>
+        <h1 id="extensions-title">{copy.extensions.title}</h1>
+      </div>
+      <p>{copy.extensions.description}</p>
+    </header>
+
+    <div class="fr-extensions-visual" data-reveal>
+      <ExtensionAppsDemo apps={extensionApps} labels={copy.extensions.demo} />
+    </div>
+
+    <div data-reveal>
+      <DrawingExtensionDemo labels={copy.extensions.draw} />
+    </div>
+
+    <div class="fr-extensions-details" data-reveal>
+      <ul class="fr-check-list">
+        {extensionPoints.map((point) => <li><Icon name="Check" size={14} /><span>{point}</span></li>)}
+      </ul>
+      <aside class="fr-trust-note">
+        <Icon name="ShieldCheck" size={17} />
+        <p><strong>{copy.extensions.trustTitle}</strong> {copy.extensions.trustDescription}</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+    const items = document.querySelectorAll("[data-reveal]");
+    document.documentElement.classList.add("fr-motion-ready");
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -8%", threshold: 0.08 });
+    items.forEach((item) => observer.observe(item));
+  })();
+</script>

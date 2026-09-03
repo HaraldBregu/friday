@@ -1,0 +1,17 @@
+[
+  {
+    "quote": "Kucedr turns loose requests into clear next actions. The useful part is not the chat, it is the follow-through.",
+    "name": "Mara Chen",
+    "role": "Engineering Lead, Northstar Labs"
+  },
+  {
+    "quote": "We use it as a coordination layer for code reviews, customer notes, and release checklists. It keeps context where the work happens.",
+    "name": "Jules Martin",
+    "role": "Founder, Relay Works"
+  },
+  {
+    "quote": "The permission model is practical. It can move quickly, but risky actions still stop at the right moment.",
+    "name": "Owen Patel",
+    "role": "Platform Engineer"
+  }
+]

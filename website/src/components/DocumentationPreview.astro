@@ -1,0 +1,73 @@
+---
+import { getCollection } from "astro:content";
+import DocCard from "./DocCard.astro";
+import Icon from "./Icon.astro";
+import { normalizeLocale, type Locale } from "../i18n";
+import { categoryIcons, docsPath, groupDocs } from "../lib/docs";
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const labels = locale === "it"
+  ? { eyebrow: "Documentazione", title: "Tutto ciò che serve per usare Kucedr.", coverage: "Copertura della documentazione", pages: "pagine docs", sections: "sezioni", staticValue: "Statico", staticLabel: "Contenuti Astro", browse: "Sfoglia tutta la documentazione" }
+  : { eyebrow: "Documentation", title: "Everything you need to use Kucedr.", coverage: "Documentation coverage", pages: "docs pages", sections: "sections", staticValue: "Static", staticLabel: "Astro content", browse: "Browse all documentation" };
+const docs = (await getCollection("docs")).sort((a, b) => a.data.sourcePath.localeCompare(b.data.sourcePath));
+const groups = groupDocs(docs);
+const featuredSources = [
+  "overview.md",
+  "features.md",
+  "providers.md",
+  "skills-and-mcp.md",
+  "channels.md",
+  "privacy.md",
+];
+const featuredDocs = featuredSources
+  .map((sourcePath) => docs.find((doc) => doc.data.sourcePath === sourcePath))
+  .filter((doc): doc is NonNullable<typeof doc> => Boolean(doc))
+  .slice(0, 6);
+---
+
+<section class="section reference-section docs-preview-section" id="docs">
+  <div class="shell">
+    <header class="reference-head">
+      <p class="eyebrow">{labels.eyebrow}</p>
+      <h2>{labels.title}</h2>
+    </header>
+
+    <div class="docs-preview-metrics" aria-label={labels.coverage}>
+      <div>
+        <strong>{docs.length}</strong>
+        <span>{labels.pages}</span>
+      </div>
+      <div>
+        <strong>{groups.length}</strong>
+        <span>{labels.sections}</span>
+      </div>
+      <div>
+        <strong>{labels.staticValue}</strong>
+        <span>{labels.staticLabel}</span>
+      </div>
+    </div>
+
+    <div class="docs-preview-grid">
+      {
+        featuredDocs.map((doc) => (
+          <DocCard
+            title={doc.data.title}
+            description={doc.data.description}
+            href={docsPath(doc.data.sourcePath)}
+            category={doc.data.category}
+            icon={categoryIcons[doc.data.category] ?? "BookOpen"}
+          />
+        ))
+      }
+    </div>
+
+    <a class="text-link section-link" href="/docs">
+      {labels.browse}
+      <Icon name="ArrowRight" size={16} />
+    </a>
+  </div>
+</section>

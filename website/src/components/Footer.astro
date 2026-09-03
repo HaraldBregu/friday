@@ -1,0 +1,199 @@
+---
+import socialLinks from "../data/social-links.json";
+import { getLocaleContent, localeMeta, locales, localizedRoutePath, normalizeLocale, type Locale } from "../i18n";
+import Icon from "./Icon.astro";
+
+interface Props {
+  locale?: Locale;
+  alternatePath?: string;
+  variant?: "default" | "landing";
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const alternatePath = Astro.props.alternatePath ?? Astro.url.pathname;
+const variant = Astro.props.variant ?? "default";
+const { site, ui } = getLocaleContent(locale);
+const landingGroupsEn = [
+  {
+    title: "Product",
+    links: [
+      { label: "Overview", href: "/#product" },
+      { label: "Capabilities", href: "/#personal" },
+      { label: "How it works", href: "/#workflow" },
+      { label: "Extensions", href: "/#extensions" },
+    ],
+  },
+  {
+    title: "Documentation",
+    links: [
+      { label: "Docs overview", href: "/docs" },
+      { label: "Getting started", href: "/docs/getting-started" },
+      { label: "Feature reference", href: "/docs/features" },
+      { label: "Skills and MCP", href: "/docs/skills-and-mcp" },
+      { label: "Privacy", href: "/docs/privacy" },
+    ],
+  },
+  {
+    title: "Explore",
+    links: [
+      { label: "Tools", href: "/tools" },
+      { label: "Providers", href: "/providers" },
+      { label: "Integrations", href: "/integrations" },
+      { label: "Community", href: "/community" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    title: "Project",
+    links: [
+      { label: "GitHub", href: "https://github.com/HaraldBregu/kucedr" },
+      { label: "Releases", href: "/releases" },
+      { label: "Security", href: "https://github.com/HaraldBregu/kucedr/blob/main/SECURITY.md" },
+      { label: "Contributing", href: "https://github.com/HaraldBregu/kucedr/blob/main/CONTRIBUTING.md" },
+      { label: "MIT License", href: "https://github.com/HaraldBregu/kucedr/blob/main/LICENSE" },
+    ],
+  },
+];
+const landingGroupsIt = [
+  {
+    title: "Prodotto",
+    links: [
+      { label: "Panoramica", href: "/#product" },
+      { label: "Funzionalità", href: "/#personal" },
+      { label: "Come funziona", href: "/#workflow" },
+      { label: "Estensioni", href: "/#extensions" },
+    ],
+  },
+  {
+    title: "Documentazione",
+    links: [
+      { label: "Panoramica", href: "/docs" },
+      { label: "Come iniziare", href: "/docs/getting-started" },
+      { label: "Funzionalità", href: "/docs/features" },
+      { label: "Skill e MCP", href: "/docs/skills-and-mcp" },
+      { label: "Privacy", href: "/docs/privacy" },
+    ],
+  },
+  {
+    title: "Esplora",
+    links: [
+      { label: "Strumenti", href: "/tools" },
+      { label: "Provider", href: "/providers" },
+      { label: "Integrazioni", href: "/integrations" },
+      { label: "Community", href: "/community" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
+  {
+    title: "Progetto",
+    links: [
+      { label: "GitHub", href: "https://github.com/HaraldBregu/kucedr" },
+      { label: "Versioni", href: "/releases" },
+      { label: "Sicurezza", href: "https://github.com/HaraldBregu/kucedr/blob/main/SECURITY.md" },
+      { label: "Contribuisci", href: "https://github.com/HaraldBregu/kucedr/blob/main/CONTRIBUTING.md" },
+      { label: "Licenza MIT", href: "https://github.com/HaraldBregu/kucedr/blob/main/LICENSE" },
+    ],
+  },
+];
+const landingGroups = locale === "it" ? landingGroupsIt : landingGroupsEn;
+const groups = variant === "landing" ? landingGroups : ui.footerGroups;
+const productHuntAlt = locale === "it" ? "Scopri Kucedr su Product Hunt" : "View Kucedr on Product Hunt";
+const footerHref = (href: string) => {
+  return /^https?:\/\//.test(href) ? href : localizedRoutePath(href, locale);
+};
+const localizedAlternatePath = (targetLocale: Locale) => localizedRoutePath(alternatePath, targetLocale);
+---
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href={localizedRoutePath("/", locale)}>
+        <img alt="" class="brand-logo" height="32" src="/icon-rounded.png" width="32" />
+        <span class="brand__text">
+          <span>{site.name}</span>
+          <small>{site.tagline}</small>
+        </span>
+      </a>
+      <p>{site.description}</p>
+      <div aria-label={ui.socialLinks} class="social-links">
+        {
+          socialLinks.map((link) => (
+            <a aria-label={link.label} href={link.url} target="_blank" rel="noopener noreferrer">
+              <Icon name={link.icon} size={18} />
+            </a>
+          ))
+        }
+      </div>
+      <a
+        class="footer-badge"
+        href="https://www.producthunt.com/products/kucedr-9?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-kucedr-9"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <img
+          alt={productHuntAlt}
+          class="footer-badge__img footer-badge__img--dark"
+          height="54"
+          loading="lazy"
+          src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1201431&theme=dark&t=1785138868780"
+          width="250"
+        />
+        <img
+          alt={productHuntAlt}
+          class="footer-badge__img footer-badge__img--light"
+          height="54"
+          loading="lazy"
+          src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1201431&theme=light&t=1785138868780"
+          width="250"
+        />
+      </a>
+      <div aria-label={ui.languageSwitcher} class="footer-language language-switcher">
+        {
+          locales.map((targetLocale) => (
+            <a
+              aria-current={targetLocale === locale ? "true" : undefined}
+              class:list={["language-switcher__link", targetLocale === locale && "is-active"]}
+              href={localizedAlternatePath(targetLocale)}
+              hreflang={localeMeta[targetLocale].hreflang}
+              lang={localeMeta[targetLocale].hreflang}
+            >
+              {localeMeta[targetLocale].shortLabel}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      groups.map((group) => (
+        <div class="footer-links">
+          <h2>{group.title}</h2>
+          {group.links.map((link) => {
+            const external = /^https?:\/\//.test(link.href);
+            return (
+              <a
+                href={footerHref(link.href)}
+                rel={external ? "noopener noreferrer" : undefined}
+                target={external ? "_blank" : undefined}
+              >
+                {link.label}
+              </a>
+            );
+          })}
+        </div>
+      ))
+    }
+  </div>
+  <div class="shell footer-bottom">
+    <span>Copyright {new Date().getFullYear()} {site.name}. {ui.footerRights}</span>
+    <div class="footer-bottom__meta">
+      <span>{ui.footerPermissionNote}</span>
+      <span class="footer-credit">
+        {ui.footerCredit}
+        <a href="https://haraldbregu.com" target="_blank" rel="noopener noreferrer">Harald Bregu</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://haraldbregu.com" target="_blank" rel="noopener noreferrer">haraldbregu.com</a>
+      </span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,117 @@
+---
+import socialLinks from "../data/social-links.json";
+import { getLocaleContent, normalizeLocale, type Locale } from "../i18n";
+import CTASection from "./CTASection.astro";
+import Icon from "./Icon.astro";
+import ProductPageHero from "./ProductPageHero.astro";
+import ProductPageLayout from "../layouts/ProductPageLayout.astro";
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const { communityPage } = getLocaleContent(locale);
+const copy = locale === "it"
+  ? {
+      accent: "insieme.",
+      title: "Costruiamo insieme un assistente più utile.",
+      description: "Kucedr cresce grazie a flussi di lavoro reali, documentazione chiara e contributi che mantengono ogni automazione comprensibile e sotto controllo.",
+      principles: "Principi della community",
+      places: "Canali della community",
+      open: "Progetto aperto",
+      missionTag: "01 / Come costruiamo",
+      missionTitle: "Utile, trasparente, condivisibile.",
+      missionDescription: "La community mantiene Kucedr vicino ai problemi reali e rende ogni nuova funzione comprensibile prima che diventi un'automazione.",
+      joinTag: "02 / Partecipa",
+      joinDescription: "Segui lo sviluppo, proponi miglioramenti e condividi flussi di lavoro utili anche ad altre persone.",
+    }
+  : {
+      accent: "together.",
+      title: "Build more useful AI, together.",
+      description: "Kucedr grows through real workflows, clear documentation, and contributions that keep automation legible and under human control.",
+      principles: "Community principles",
+      places: "Places to participate",
+      open: "Open project",
+      missionTag: "01 / How we build",
+      missionTitle: "Useful, inspectable, shareable.",
+      missionDescription: "The community keeps Kucedr close to real problems and makes each new capability understandable before it becomes automation.",
+      joinTag: "02 / Join in",
+      joinDescription: "Follow development, propose improvements, and share workflows that can help other people too.",
+    };
+---
+
+<ProductPageLayout
+  alternatePath="/community"
+  description={communityPage.description}
+  image="/og/kucedr-personal-ai-assistant.png"
+  locale={locale}
+  title={communityPage.title}
+>
+  <ProductPageHero
+    accent={copy.accent}
+    description={copy.description}
+    eyebrow={communityPage.eyebrow}
+    jumps={[
+      { href: "#principles", icon: "HeartHandshake", label: copy.principles },
+      { href: "#contribute", icon: "Users", label: communityPage.joinEyebrow },
+    ]}
+    stats={[
+      { value: communityPage.cards.length, label: copy.principles },
+      { value: socialLinks.length, label: copy.places },
+      { value: locale === "it" ? "Aperto" : "Open", label: copy.open },
+    ]}
+    statsLabel={communityPage.eyebrow}
+    title={copy.title}
+  />
+
+  <section class="catalog-section" id="principles">
+    <div class="shell">
+      <header class="catalog-section__head">
+        <div class="catalog-section__title">
+          <span class="catalog-section-tag">{copy.missionTag}</span>
+          <h2>{copy.missionTitle}</h2>
+        </div>
+        <p class="catalog-section__aside">{copy.missionDescription}</p>
+      </header>
+      <div class="product-tile-grid">
+        {communityPage.cards.map((card, index) => (
+          <article class="product-tile">
+            <div class="product-tile__top"><span>{String(index + 1).padStart(2, "0")}</span><i><Icon name={card.icon} size={18} /></i></div>
+            <h3>{card.title}</h3>
+            <p>{card.description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog-section is-tinted" id="contribute">
+    <div class="shell">
+      <header class="catalog-section__head">
+        <div class="catalog-section__title">
+          <span class="catalog-section-tag">{copy.joinTag}</span>
+          <h2>{communityPage.joinTitle}</h2>
+        </div>
+        <p class="catalog-section__aside">{copy.joinDescription}</p>
+      </header>
+      <div class="community-product-links">
+        {socialLinks.map((link, index) => (
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <Icon name={link.icon} size={18} />
+            <strong>{link.label}</strong>
+            <Icon name="ArrowUpRight" size={15} />
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    locale={locale}
+    eyebrow={communityPage.ctaEyebrow}
+    title={communityPage.ctaTitle}
+    description={communityPage.ctaDescription}
+  />
+</ProductPageLayout>

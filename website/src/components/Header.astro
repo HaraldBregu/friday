@@ -1,0 +1,103 @@
+---
+import Icon from "./Icon.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { getLocaleContent, localizedRoutePath, normalizeLocale, type Locale } from "../i18n";
+
+interface Props {
+  locale?: Locale;
+  alternatePath?: string;
+}
+
+const locale = normalizeLocale(Astro.props.locale);
+const { kucedr, ui } = getLocaleContent(locale);
+
+const visibleNav = kucedr.nav.filter((item) => item.href !== "#download");
+const primaryNav = visibleNav.filter((item) => item.href !== "/docs");
+const resourceNav = visibleNav.filter((item) => item.href === "/docs");
+const navHref = (href: string) => (href.startsWith("#") ? `${localizedRoutePath("/", locale)}${href}` : localizedRoutePath(href, locale));
+const navigationLabels = locale === "it"
+  ? { product: "Prodotto", extensions: "Estensioni" }
+  : { product: "Product", extensions: "Extensions" };
+const releaseUrl = "https://github.com/HaraldBregu/kucedr/releases";
+const navigationGroups = [
+  {
+    label: navigationLabels.product,
+    items: primaryNav.map((item) => ({ ...item, label: item.href === "#product" ? (locale === "it" ? "Panoramica" : "Overview") : item.label, href: navHref(item.href) })),
+  },
+];
+const extensionsItem = { label: navigationLabels.extensions, href: `${localizedRoutePath("/", locale)}#extensions` };
+const docsItem = resourceNav[0];
+---
+
+<header class="site-header">
+  <nav aria-label={ui.primaryNavigation} class="nav">
+    <a class="brand" href={`${localizedRoutePath("/", locale)}#product`}>
+      <img alt="" class="brand-logo" height="30" src="/icon-rounded.png" width="30" />
+      <span class="brand__text">Kucedr</span>
+    </a>
+    <div class="nav__links">
+      {navigationGroups.map((group) => (
+        <details class="nav-dropdown" data-nav-dropdown>
+          <summary>{group.label} <Icon name="ChevronDown" size={14} /></summary>
+          <div class="nav-dropdown__panel">
+            {group.items.map((item) => <a href={item.href}>{item.label}</a>)}
+          </div>
+        </details>
+      ))}
+      <a href={extensionsItem.href}>{extensionsItem.label}</a>
+      {docsItem && <a href={navHref(docsItem.href)}>{docsItem.label}</a>}
+    </div>
+    <div class="nav__actions">
+      <ThemeToggle label={ui.themeToggle} />
+      <a class="nav__cta nav__cta--primary" href={releaseUrl} target="_blank" rel="noopener noreferrer">
+        <Icon name="Download" size={16} />
+        {ui.downloadFallbackLabel}
+      </a>
+      <details class="nav-mobile" data-nav-mobile>
+        <summary aria-label={ui.primaryNavigation}>
+          <Icon class="nav-mobile__open" name="Menu" size={20} />
+          <Icon class="nav-mobile__close" name="X" size={20} />
+        </summary>
+        <div class="nav-mobile__panel">
+          {navigationGroups.map((group) => (
+            <details class="nav-mobile__group">
+              <summary>{group.label} <Icon name="ChevronDown" size={16} /></summary>
+              <div>
+                {group.items.map((item) => <a href={item.href}>{item.label}</a>)}
+              </div>
+            </details>
+          ))}
+          <a href={extensionsItem.href}>{extensionsItem.label}</a>
+          {docsItem && <a href={navHref(docsItem.href)}>{docsItem.label}</a>}
+        </div>
+      </details>
+    </div>
+  </nav>
+</header>
+
+<script is:inline>
+  // Same-page anchor links do not reload, so close the disclosure by hand.
+  (() => {
+    const menu = document.querySelector("[data-nav-mobile]");
+    const dropdowns = [...document.querySelectorAll("[data-nav-dropdown]")];
+    menu?.addEventListener("click", (event) => {
+      if (event.target.closest("a")) menu.open = false;
+    });
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener("toggle", () => {
+        if (!dropdown.open) return;
+        dropdowns.forEach((other) => {
+          if (other !== dropdown) other.open = false;
+        });
+      });
+    });
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-nav-dropdown]")) return;
+      dropdowns.forEach((dropdown) => { dropdown.open = false; });
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      dropdowns.forEach((dropdown) => { dropdown.open = false; });
+    });
+  })();
+</script>

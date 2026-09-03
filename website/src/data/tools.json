@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Read / write / edit files",
+    "category": "Files",
+    "description": "Open, create, and modify workspace files with safety checks and approval prompts before changes.",
+    "icon": "FolderOpen"
+  },
+  {
+    "name": "Apply patch",
+    "category": "Files",
+    "description": "Make precise, surgical edits to existing files when a targeted diff is safer than rewriting content.",
+    "icon": "GitBranch"
+  },
+  {
+    "name": "Run commands & processes",
+    "category": "Shell",
+    "description": "Execute shell commands and longer-running processes to build, test, inspect, or automate work.",
+    "icon": "Terminal"
+  },
+  {
+    "name": "Web search",
+    "category": "Web",
+    "description": "Look things up on the internet when a request needs fresh or verifiable information.",
+    "icon": "Search"
+  },
+  {
+    "name": "Web fetch",
+    "category": "Web",
+    "description": "Pull readable content from a specific page or URL and treat it as evidence for the answer.",
+    "icon": "Globe"
+  },
+  {
+    "name": "Web browser",
+    "category": "Web",
+    "description": "Drive a real browser to interact with pages when simple fetching is not enough.",
+    "icon": "Monitor"
+  },
+  {
+    "name": "Create image",
+    "category": "Media",
+    "description": "Generate images from text descriptions using the configured text-to-image provider and model.",
+    "icon": "Image"
+  },
+  {
+    "name": "Schedule (cron)",
+    "category": "Automation",
+    "description": "Create, update, pause, resume, list, delete, and run scheduled assistant jobs.",
+    "icon": "Clock"
+  },
+  {
+    "name": "Load skills",
+    "category": "Extension",
+    "description": "Pull in reusable skill instructions, references, templates, schemas, or optional executable behavior.",
+    "icon": "Workflow"
+  },
+  {
+    "name": "Subagents",
+    "category": "Extension",
+    "description": "Spin up focused helper agents for independent parts of larger work.",
+    "icon": "Layers"
+  },
+  {
+    "name": "MCP tools",
+    "category": "Extension",
+    "description": "Use tools exposed by connected Model Context Protocol servers.",
+    "icon": "PlugZap"
+  }
+]

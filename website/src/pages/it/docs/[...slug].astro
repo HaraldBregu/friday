@@ -1,0 +1,136 @@
+---
+import { getCollection, render } from "astro:content";
+import Icon from "../../../components/Icon.astro";
+import DocsEffects from "../../../components/DocsEffects.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { categoryIcons, compareDocs, docCategoryLabel, docsForLocale, docsPath, docsSlug, readingTime } from "../../../lib/docs";
+import { buildDocStructuredData } from "../../../lib/structured-data";
+import "../../../styles/kucedr-landing.css";
+import "../../../styles/docs-kucedr.css";
+
+const locale = "it";
+
+export async function getStaticPaths() {
+  const docs = docsForLocale(await getCollection("docs"), "it");
+
+  return docs.map((doc) => ({
+    params: { slug: docsSlug(doc.data.sourcePath) },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const allDocs = docsForLocale(await getCollection("docs"), locale).sort(compareDocs);
+const currentPath = docsPath(doc.data.sourcePath, locale);
+const alternatePath = docsPath(doc.data.sourcePath, "en");
+const currentIndex = allDocs.findIndex((item) => item.data.sourcePath === doc.data.sourcePath);
+const previousDoc = currentIndex > 0 ? allDocs[currentIndex - 1] : undefined;
+const nextDoc = currentIndex >= 0 && currentIndex < allDocs.length - 1 ? allDocs[currentIndex + 1] : undefined;
+const siblingDocs = allDocs.filter((item) => item.data.category === doc.data.category);
+const categoryLabel = docCategoryLabel(doc.data.category, locale);
+const { Content, headings } = await render(doc);
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3).slice(0, 12);
+const minutes = readingTime(doc.body);
+const structuredData = buildDocStructuredData({
+  category: categoryLabel,
+  description: doc.data.description,
+  locale,
+  path: currentPath,
+  siteBaseUrl: Astro.site ?? new URL("https://kucedr.haraldbregu.com"),
+  title: doc.data.title,
+});
+---
+
+<Layout
+  bodyClass="docs-product-page"
+  alternatePath={alternatePath}
+  canonical={currentPath}
+  title={doc.data.title}
+  description={doc.data.description}
+  footerVariant="landing"
+  headerVariant="landing"
+  hideBackgroundEffects
+  image="/og/kucedr-personal-ai-assistant.png"
+  structuredData={structuredData}
+  wide={true}
+  locale={locale}
+>
+  <section class="docs-reader">
+    <aside class="docs-sidebar" aria-label={`Documentazione: ${categoryLabel}`} data-doc-reveal>
+      <a class="back-link" href="/it/docs">
+        <Icon name="ArrowRight" size={15} class="back-link__icon" />
+        Tutta la documentazione
+      </a>
+      <div class="docs-sidebar__group">
+        <p>{categoryLabel}</p>
+        <nav>
+          {
+            siblingDocs.map((item) => (
+              <a class:list={[item.data.sourcePath === doc.data.sourcePath && "is-active"]} href={docsPath(item.data.sourcePath, locale)}>
+                {item.data.title}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </aside>
+
+    <article class="docs-article" data-doc-reveal>
+      <header class="docs-article__header">
+        <p class="eyebrow">
+          <Icon name={categoryIcons[doc.data.category] ?? "BookOpen"} size={14} />
+          {categoryLabel}
+        </p>
+        <h1>{doc.data.title}</h1>
+        {doc.data.description ? <p>{doc.data.description}</p> : null}
+        <div class="docs-article__meta">
+          <span>{minutes} min di lettura</span>
+          <span>{doc.data.sourcePath}</span>
+        </div>
+      </header>
+
+      <div class="article-body docs-content">
+        <Content />
+      </div>
+
+      <nav class="docs-pagination" aria-label="Paginazione della documentazione">
+        {
+          previousDoc ? (
+            <a href={docsPath(previousDoc.data.sourcePath, locale)}>
+              <span>Precedente</span>
+              <strong>{previousDoc.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+        {
+          nextDoc ? (
+            <a href={docsPath(nextDoc.data.sourcePath, locale)}>
+              <span>Successiva</span>
+              <strong>{nextDoc.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )
+        }
+      </nav>
+    </article>
+
+    {
+      tocHeadings.length > 0 ? (
+        <aside class="docs-toc" aria-label="In questa pagina" data-doc-reveal>
+          <p>In questa pagina</p>
+          <nav>
+            {tocHeadings.map((heading) => (
+              <a class={`depth-${heading.depth}`} href={`#${heading.slug}`}>
+                {heading.text}
+              </a>
+            ))}
+          </nav>
+        </aside>
+      ) : null
+    }
+  </section>
+  <DocsEffects />
+</Layout>
