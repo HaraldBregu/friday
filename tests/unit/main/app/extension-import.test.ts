@@ -34,9 +34,9 @@ describe('extension import', () => {
 		expect(fs.readFileSync(path.join(installed, 'index.html'), 'utf8')).toBe('installed');
 	});
 
-	it('rejects the privileged Coder extension identifier', () => {
+	it.each(['coder', 'workspace'])('rejects the privileged %s extension identifier', (id) => {
 		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-source-'));
-		const source = path.join(sourceRoot, 'coder');
+		const source = path.join(sourceRoot, id);
 		fs.mkdirSync(source, { recursive: true });
 
 		try {

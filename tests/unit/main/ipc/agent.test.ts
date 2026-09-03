@@ -22,14 +22,24 @@ describe('AgentIpc run ownership', () => {
 		const conversation = { execute } as unknown as Conversation;
 		const eventBus = { sendTo: jest.fn() } as unknown as EventBus;
 		const logger = { info: jest.fn() } as unknown as LoggerService;
-		const sender = {};
-		(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 7 });
-		new AgentIpc().register({ logger, agent, conversation }, eventBus);
+		const sender = { mainFrame: {} };
+		const event = { sender, senderFrame: sender.mainFrame };
+		(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 7, webContents: sender });
+		new AgentIpc().register(
+			{
+				logger,
+				agent,
+				conversation,
+				windows: { has: (id: number) => id === 7 } as never,
+				extensions: { has: () => false } as never,
+			},
+			eventBus
+		);
 		const handler = (channel: string) =>
 			(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
 		await expect(
-			handler(AgentChannels.send)({ sender }, 'hello', { runId: 'run-1' })
+			handler(AgentChannels.send)(event, 'hello', { runId: 'run-1' })
 		).resolves.toEqual({ success: true, data: 'reply' });
 		expect(execute).toHaveBeenCalledWith({
 			type: 'text',
@@ -50,7 +60,7 @@ describe('AgentIpc run ownership', () => {
 			expect.objectContaining({ runId: 'run-1' })
 		);
 
-		await expect(handler(AgentChannels.cancel)({ sender }, 'run-1')).resolves.toEqual({
+		await expect(handler(AgentChannels.cancel)(event, 'run-1')).resolves.toEqual({
 			success: true,
 			data: true,
 		});
@@ -66,6 +76,8 @@ describe('AgentIpc run ownership', () => {
 				logger: { info: jest.fn() } as unknown as LoggerService,
 				agent,
 				conversation: { execute: jest.fn() } as unknown as Conversation,
+				windows: { has: () => false } as never,
+				extensions: { has: () => false } as never,
 			},
 			{ sendTo: jest.fn() } as unknown as EventBus
 		);
@@ -73,11 +85,42 @@ describe('AgentIpc run ownership', () => {
 			([channel]) => channel === AgentChannels.cancel
 		)?.[1];
 
-		await expect(cancelHandler({ sender: {} }, 'run-1')).resolves.toEqual({
-			success: true,
-			data: false,
-		});
+		const sender = { mainFrame: {} };
+		await expect(
+			cancelHandler({ sender, senderFrame: sender.mainFrame }, 'run-1')
+		).resolves.toMatchObject({ success: false });
 		expect(cancel).not.toHaveBeenCalled();
+	});
+
+	it('rejects assistant execution and policy changes from extension views', async () => {
+		const execute = jest.fn();
+		const sender = { id: 22, mainFrame: {} };
+		const event = { sender, senderFrame: sender.mainFrame };
+		(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 7, webContents: sender });
+		new AgentIpc().register(
+			{
+				logger: { info: jest.fn() } as unknown as LoggerService,
+				agent: { config: { location: '/agent' } } as unknown as Agent,
+				conversation: { execute } as unknown as Conversation,
+				windows: { has: () => true } as never,
+				extensions: { has: () => true } as never,
+			},
+			{ sendTo: jest.fn() } as unknown as EventBus
+		);
+		const handler = (channel: string) =>
+			(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+		await expect(handler(AgentChannels.send)(event, 'unsafe')).resolves.toMatchObject({
+			success: false,
+		});
+		await expect(
+			handler(AgentChannels.policySet)(event, {
+				read: { allow: ['*'], deny: [] },
+				write: { allow: ['*'], deny: [] },
+				exec: { allow: ['*'], deny: [] },
+			})
+		).resolves.toMatchObject({ success: false });
+		expect(execute).not.toHaveBeenCalled();
 	});
 });
 

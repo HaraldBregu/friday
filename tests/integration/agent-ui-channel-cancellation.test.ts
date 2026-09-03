@@ -91,6 +91,7 @@ import type { EventBus } from '../../src/main/event_bus';
 import type { LoggerService } from '../../src/main/shared';
 import type { WindowFactory } from '../../src/main/window_factory';
 import type { ExecSandbox } from '../../src/main/agent/sandbox';
+import type { Conversation } from '../../src/main/agent/conversation';
 
 function deferred(): { promise: Promise<void>; resolve: () => void } {
 	let resolve = () => {};
@@ -156,10 +157,14 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		return jest.fn();
 	});
 	mockAdapterOnStatus.mockReturnValue(jest.fn());
-	const uiSender = {};
-	const otherSender = {};
+	const uiSender = { mainFrame: {} };
+	const otherSender = { mainFrame: {} };
 	(BrowserWindow.fromWebContents as jest.Mock).mockImplementation((sender) =>
-		sender === uiSender ? { id: 1 } : sender === otherSender ? { id: 2 } : null
+		sender === uiSender
+			? { id: 1, webContents: uiSender }
+			: sender === otherSender
+				? { id: 2, webContents: otherSender }
+				: null
 	);
 	const logger = {
 		info: jest.fn(),
@@ -175,15 +180,32 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		{} as WindowFactory,
 		{ reset: jest.fn() } as unknown as ExecSandbox
 	);
-	new AgentIpc().register({ logger, agent }, eventBus);
+	const conversation = {
+		execute: ({ message, options }: { message: string; options: unknown }) =>
+			agent.send(message, 'main', options as never),
+	} as unknown as Conversation;
+	new AgentIpc().register(
+		{
+			logger,
+			agent,
+			conversation,
+			windows: { has: (id: number) => id === 1 || id === 2 } as never,
+			extensions: { has: () => false } as never,
+		},
+		eventBus
+	);
 	const registry = createChannelRegistry({ logger, eventBus, agentService: agent });
 	await registry.start('telegram');
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
-	const uiResponse = handler(AgentChannels.send)({ sender: uiSender }, 'ui request', {
+	const uiResponse = handler(AgentChannels.send)(
+		{ sender: uiSender, senderFrame: uiSender.mainFrame },
+		'ui request',
+		{
 		runId: 'ui-run',
 		sessionId: 'ui-session',
-	});
+		}
+	);
 	mockInboundHandler?.({
 		channel: 'telegram',
 		accountId: 'account-1',
@@ -198,14 +220,18 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 	});
 	await Promise.all([uiStarted.promise, botStarted.promise]);
 
-	await expect(handler(AgentChannels.cancel)({ sender: otherSender }, 'ui-run')).resolves.toEqual({
-		success: true,
-		data: false,
-	});
-	await expect(handler(AgentChannels.cancel)({ sender: uiSender }, 'ui-run')).resolves.toEqual({
-		success: true,
-		data: true,
-	});
+	await expect(
+		handler(AgentChannels.cancel)(
+			{ sender: otherSender, senderFrame: otherSender.mainFrame },
+			'ui-run'
+		)
+	).resolves.toEqual({ success: true, data: false });
+	await expect(
+		handler(AgentChannels.cancel)(
+			{ sender: uiSender, senderFrame: uiSender.mainFrame },
+			'ui-run'
+		)
+	).resolves.toEqual({ success: true, data: true });
 	botRelease.resolve();
 	await replySent.promise;
 	await expect(uiResponse).resolves.toEqual({ success: true, data: '' });
@@ -213,6 +239,6 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		expect.objectContaining({ content: { type: 'text', text: 'bot reply' } })
 	);
 
-	registry.destroy();
+	await registry.destroy();
 	agent.cancelAll();
 });
