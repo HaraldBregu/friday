@@ -22,6 +22,10 @@ jest.mock('grammy/web', () => ({
 import { createTelegramAdapter } from '../../../../src/main/channels/adapters/telegram';
 
 describe('Telegram voice messages', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	it('registers received voice messages', () => {
 		createTelegramAdapter({ token: 'token' });
 
@@ -47,5 +51,24 @@ describe('Telegram voice messages', () => {
 			expect.any(Object)
 		);
 		expect(receipt.platformMessageIds).toEqual(['42']);
+	});
+
+	it('bounds the inbound message deduplication cache', () => {
+		const adapter = createTelegramAdapter({ token: 'token' });
+		const receive = jest.fn();
+		adapter.onMessage(receive);
+		const textHandler = mockOn.mock.calls.find(([event]) => event === 'message:text')?.[1];
+		const context = (messageId: number) => ({
+			message: { text: 'hello', message_id: messageId },
+			chat: { id: 1, type: 'private' },
+			from: { id: 2 },
+		});
+
+		for (let messageId = 1; messageId <= 10_001; messageId += 1) {
+			textHandler(context(messageId));
+		}
+		textHandler(context(1));
+
+		expect(receive).toHaveBeenCalledTimes(10_002);
 	});
 });

@@ -20,6 +20,7 @@ const TELEGRAM_MAX_MESSAGE_LENGTH = 4096;
 const TELEGRAM_HEALTH_CHECK_INTERVAL_MS = 60_000;
 const TELEGRAM_RECONNECT_INITIAL_DELAY_MS = 2_000;
 const TELEGRAM_RECONNECT_MAX_DELAY_MS = 60_000;
+const TELEGRAM_SEEN_MESSAGE_LIMIT = 10_000;
 
 export function createTelegramAdapter(options: TelegramAdapterOptions): ChannelAdapter {
 	const token = options.token.trim();
@@ -40,6 +41,10 @@ export function createTelegramAdapter(options: TelegramAdapterOptions): ChannelA
 		registerMessageHandlers(next, token, accountId, (message) => {
 			if (seenMessages.has(message.idempotencyKey)) return;
 			seenMessages.add(message.idempotencyKey);
+			if (seenMessages.size > TELEGRAM_SEEN_MESSAGE_LIMIT) {
+				const oldest = seenMessages.values().next().value;
+				if (oldest) seenMessages.delete(oldest);
+			}
 			for (const handler of messageHandlers) handler(message);
 		});
 		next.catch((error) => {
