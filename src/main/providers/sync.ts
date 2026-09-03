@@ -84,10 +84,7 @@ export class ProviderSyncService {
 		}));
 	}
 
-	getSummary(
-		kind: ProviderCredentialKind,
-		id: string
-	): ProviderCredentialSummary | undefined {
+	getSummary(kind: ProviderCredentialKind, id: string): ProviderCredentialSummary | undefined {
 		return this.listSummaries(kind).find((summary) => summary.id === id);
 	}
 
@@ -133,7 +130,8 @@ export class ProviderSyncService {
 		this.requirePassphrase(passphrase);
 		const remote = await this.requireUnlockedVault();
 		const identity = this.vault.identity();
-		if (!identity || identity.vaultId !== remote.vaultId) throw new Error('Provider vault is locked.');
+		if (!identity || identity.vaultId !== remote.vaultId)
+			throw new Error('Provider vault is locked.');
 		try {
 			const envelope = await wrapProviderDataKey(identity.key, passphrase, identity.vaultId);
 			await this.cloudPort().updateVault(identity.vaultId, envelope);
@@ -254,7 +252,9 @@ export class ProviderSyncService {
 		return `${record.kind}:${record.providerId}`;
 	}
 
-	private localRecord(record: Pick<ProviderVaultRecord, 'kind' | 'providerId'>): ProviderVaultRecord | undefined {
+	private localRecord(
+		record: Pick<ProviderVaultRecord, 'kind' | 'providerId'>
+	): ProviderVaultRecord | undefined {
 		const key = this.recordKey(record);
 		return this.vault.records().find((candidate) => this.recordKey(candidate) === key);
 	}

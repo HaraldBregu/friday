@@ -1,6 +1,9 @@
 import Store from 'electron-store';
 import type { AuthState } from '../../../../src/shared/auth_types';
-import type { ProviderCloudPort, ProviderVaultCloudRecord } from '../../../../src/main/providers/remote';
+import type {
+	ProviderCloudPort,
+	ProviderVaultCloudRecord,
+} from '../../../../src/main/providers/remote';
 import type {
 	ProviderKeyEnvelope,
 	ProviderVaultRecord,
@@ -122,11 +125,7 @@ class FakeCloud implements ProviderCloudPort {
 function newVault(): ProviderVault {
 	const store = new Store<ProviderVaultStoreState>({ defaults });
 	Object.defineProperty(store, 'path', { configurable: true, value: undefined });
-	return new ProviderVault(
-		store,
-		storage,
-		'darwin'
-	);
+	return new ProviderVault(store, storage, 'darwin');
 }
 
 it('recovers on a second device, retains dirty data offline, and converges tombstones', async () => {
