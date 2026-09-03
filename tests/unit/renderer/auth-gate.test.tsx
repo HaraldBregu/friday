@@ -199,7 +199,7 @@ it('preserves home when a skipped local-only session is refreshed', async () => 
 	).not.toBeInTheDocument();
 });
 
-it('moves from landing to auth and back without changing routes', async () => {
+it('moves from landing to auth without a back action or bottom navigation', async () => {
 	const user = userEvent.setup();
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderFlow('/start');
@@ -208,12 +208,7 @@ it('moves from landing to auth and back without changing routes', async () => {
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
 	expect(document.querySelector('footer')).not.toBeInTheDocument();
-	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
-
-	await user.click(screen.getByRole('button', { name: 'Back' }));
-	expect(
-		await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-	).toBeInTheDocument();
+	expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 });
 
