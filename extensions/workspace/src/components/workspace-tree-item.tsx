@@ -69,8 +69,8 @@ export function WorkspaceTreeItem({
 				role="treeitem"
 				tabIndex={0}
 				title={entry.path}
-				onDragStart={(event) => onDragStart(event, entry)}
-				onDragEnd={onDragEnd}
+				onDragStartCapture={(event) => onDragStart(event, entry)}
+				onDragEndCapture={onDragEnd}
 				onDragOver={(event) => onDragOver(event, entry)}
 				onDragLeave={(event) => onDragLeave(event, entry.path)}
 				onDrop={(event) => onDrop(event, entry)}
