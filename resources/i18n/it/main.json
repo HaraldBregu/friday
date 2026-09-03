@@ -1381,7 +1381,7 @@
 			"groupAllowFromPlaceholder": "id gruppo, stanza o canale",
 			"addGroupAllowFrom": "Aggiungi route gruppo",
 			"removeGroupAllowFrom": "Rimuovi {{value}}",
-			"noGroupAllowFrom": "Nessuna route gruppo limitata.",
+			"noGroupAllowFrom": "Nessuna route gruppo consentita.",
 			"llmModel": "Modello LLM",
 			"llmModelDescription": "Modello usato da Friday per ragionare e rispondere ai messaggi.",
 			"sttModel": "Modello STT",

@@ -54,7 +54,7 @@ describe('canReceive', () => {
 						voice: { mimeType: 'audio/ogg', byteLength: 1024, load },
 					},
 				}),
-				config()
+				config({ groupAllowFrom: ['c1'] })
 			)
 		).toEqual({ allowed: true });
 		expect(load).not.toHaveBeenCalled();
@@ -99,8 +99,8 @@ describe('canReceive', () => {
 	});
 
 	describe('group messages', () => {
-		it('allows when no group allowlist configured', () => {
-			expect(canReceive(message(), config())).toEqual({ allowed: true });
+		it('blocks all chats when no group allowlist is configured', () => {
+			expect(canReceive(message(), config()).reason).toBe('route_not_allowed');
 		});
 		it('blocks chats not on the group allowlist', () => {
 			expect(

@@ -40,7 +40,7 @@ export function canReceive(
 		return { allowed: true };
 	}
 	const groupAllowFrom = credential.groupAllowFrom ?? [];
-	if (groupAllowFrom.length > 0 && !groupAllowFrom.includes(message.chatId)) {
+	if (!groupAllowFrom.includes(message.chatId)) {
 		return { allowed: false, reason: 'route_not_allowed' };
 	}
 	return { allowed: true };
