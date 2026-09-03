@@ -82,7 +82,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('coder', () =>
 		new CoderIpc().register({ coder: coderService, extensionRegistry }, eventBus)
 	);
-	safeRegister('recorder', () => new RecorderIpc().register(undefined, eventBus));
+	safeRegister('recorder', () =>
+		new RecorderIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('tasks', () => new TaskIpc().register(undefined, eventBus));
 	safeRegister('mcp', () => new McpIpc().register(undefined, eventBus));
 	safeRegister('models', () => new ModelsIpc().register(undefined, eventBus));

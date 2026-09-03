@@ -127,7 +127,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 		});
 
 		targetSession.setDisplayMediaRequestHandler((request, callback) => {
-			const trusted = allowDisplayCapture && isTrustedDisplayCaptureUrl(request.frame?.url);
+		const trusted = allowDisplayCapture && isTrustedAppRendererUrl(request.frame?.url);
 			if (!trusted) {
 				callback({});
 				return;
@@ -175,7 +175,7 @@ function isTrustedRendererUrl(url?: string): boolean {
 	}
 }
 
-function isTrustedDisplayCaptureUrl(url?: string): boolean {
+export function isTrustedAppRendererUrl(url?: string): boolean {
 	if (!url) return false;
 	const devOrigin = rendererDevOrigin();
 	try {
