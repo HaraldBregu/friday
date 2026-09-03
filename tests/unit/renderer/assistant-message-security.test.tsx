@@ -15,6 +15,12 @@ jest.mock('@/components/prompt-kit/markdown', () => ({
 		return image ? components.img({ alt: image[1], src: image[2] }) : <div>{children}</div>;
 	},
 }));
+jest.mock('@/components/audio-player', () => ({
+	AudioPlayer: ({ src }: { src: string }) => <div data-testid="generated-audio" data-src={src} />,
+}));
+jest.mock('@/components/video-player', () => ({
+	VideoPlayer: ({ src }: { src: string }) => <div data-testid="generated-video" data-src={src} />,
+}));
 jest.mock('@/pages/home/hooks', () => ({
 	useReadMessageAloud: () => ({
 		speak: jest.fn(),
