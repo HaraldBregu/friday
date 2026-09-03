@@ -36,7 +36,7 @@ import { registerIpcHandlers } from './ipc/core/register_ipc_handlers';
 import { setupEventLogging, setupProcessSafetyNet } from './shared/error_reporter';
 import { setupMemoryMonitor } from './shared/metrics';
 import { bootstrapServices, cleanup } from './bootstrap';
-import { startStorageSync, stopStorageSync } from './storage';
+import { bindStorageSyncToAccount } from './storage';
 import { startRagSchedule, stopRagSchedule } from './agent/knowledge/rag';
 import { CHANNEL_PROVIDER_IDS } from '../shared';
 import { AppChannels } from '../shared/ipc_channels_definitions';
@@ -76,7 +76,6 @@ try {
 const services = bootstrapServices();
 const { eventBus, appState, windowFactory, logger, windowContextManager, agentService } = services;
 agentService.start(logger);
-startStorageSync(logger, services.storageOperations);
 startRagSchedule(logger);
 // Re-bind safety net with the real logger now that it exists.
 setupProcessSafetyNet(logger);
@@ -89,6 +88,11 @@ setupAppLifecycle(appState, logger);
 setupEventLogging(logger);
 
 const shortcutManager = new ShortcutManager();
+const unbindStorageSync = bindStorageSyncToAccount(
+	services.authService,
+	logger,
+	services.storageOperations
+);
 
 app.on('browser-window-created', (_event, win) => {
 	shortcutManager.attach(win);
@@ -236,7 +240,7 @@ app.on('before-quit', (event) => {
 	if (shutdownPromise) return;
 	shutdownPromise = Promise.resolve().then(async () => {
 		destroyAllExtensions();
-		stopStorageSync();
+		unbindStorageSync();
 		stopRagSchedule();
 		stopWiki();
 		await cleanup(services);
