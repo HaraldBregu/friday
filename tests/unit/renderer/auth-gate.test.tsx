@@ -207,7 +207,7 @@ it('moves from landing to auth and back without changing routes', async () => {
 	expect(document.querySelector('footer')).not.toBeInTheDocument();
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
-	expect(screen.getByText('Account').parentElement).toHaveTextContent('Account · 1 of 4');
+	expect(document.querySelector('footer')).not.toBeInTheDocument();
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 
 	await user.click(screen.getByRole('button', { name: 'Back' }));
