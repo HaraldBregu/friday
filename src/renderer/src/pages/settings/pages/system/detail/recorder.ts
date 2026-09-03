@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SystemMedia } from './media';
 
-export type RecorderState = 'idle' | 'recording' | 'recorded';
+export type RecorderState = 'idle' | 'starting' | 'recording' | 'recorded';
 
 export interface MediaRecorderTest {
 	readonly state: RecorderState;
@@ -18,19 +18,21 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const recorderRef = useRef<MediaRecorder | null>(null);
-	const chunksRef = useRef<Blob[]>([]);
 	const urlRef = useRef<string | null>(null);
 	const timerRef = useRef<number | null>(null);
+	const generationRef = useRef(0);
+	const startingRef = useRef(false);
 
 	const [state, setState] = useState<RecorderState>('idle');
 	const [error, setError] = useState('');
 	const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
 	const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-	const stopStream = useCallback(() => {
-		streamRef.current?.getTracks().forEach((track) => track.stop());
+	const stopStream = useCallback((stream: MediaStream | null = streamRef.current) => {
+		stream?.getTracks().forEach((track) => track.stop());
+		if (streamRef.current !== stream) return;
 		streamRef.current = null;
-		if (videoRef.current) videoRef.current.srcObject = null;
+		if (videoRef.current?.srcObject === stream) videoRef.current.srcObject = null;
 	}, []);
 
 	const clearTimer = useCallback(() => {
@@ -41,6 +43,11 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 	}, []);
 
 	const stop = useCallback(() => {
+		if (startingRef.current) {
+			startingRef.current = false;
+			generationRef.current += 1;
+			setState('idle');
+		}
 		clearTimer();
 		if (recorderRef.current && recorderRef.current.state !== 'inactive') {
 			recorderRef.current.stop();
@@ -49,6 +56,11 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 	}, [clearTimer, stopStream]);
 
 	const start = useCallback(async () => {
+		if (startingRef.current || recorderRef.current?.state === 'recording') return;
+		const generation = generationRef.current + 1;
+		generationRef.current = generation;
+		startingRef.current = true;
+		setState('starting');
 		setError('');
 		if (urlRef.current) {
 			URL.revokeObjectURL(urlRef.current);
@@ -57,27 +69,33 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 		setRecordedUrl(null);
 		setElapsedSeconds(0);
 
+		let stream: MediaStream | null = null;
 		try {
-			const stream =
+			stream =
 				media.source === 'display'
 					? await navigator.mediaDevices.getDisplayMedia(media.constraints)
 					: await navigator.mediaDevices.getUserMedia(media.constraints);
+			if (generationRef.current !== generation) {
+				stopStream(stream);
+				return;
+			}
 			streamRef.current = stream;
 
 			if (media.video && videoRef.current) {
 				videoRef.current.srcObject = stream;
 				await videoRef.current.play().catch(() => undefined);
 			}
-			// Stopping the share from the OS overlay ends the test too.
 			stream.getVideoTracks()[0]?.addEventListener('ended', () => stop());
 
-			chunksRef.current = [];
+			const chunks: Blob[] = [];
 			const recorder = new MediaRecorder(stream);
 			recorder.ondataavailable = (event) => {
-				if (event.data.size > 0) chunksRef.current.push(event.data);
+				if (event.data.size > 0) chunks.push(event.data);
 			};
 			recorder.onstop = () => {
-				const blob = new Blob(chunksRef.current, { type: recorder.mimeType || undefined });
+				if (generationRef.current !== generation || recorderRef.current !== recorder) return;
+				recorderRef.current = null;
+				const blob = new Blob(chunks, { type: recorder.mimeType || undefined });
 				const url = URL.createObjectURL(blob);
 				urlRef.current = url;
 				setRecordedUrl(url);
@@ -90,13 +108,27 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 				setElapsedSeconds((seconds) => seconds + 1);
 			}, 1000);
 		} catch (err) {
-			stopStream();
-			setState('idle');
-			setError(err instanceof Error ? err.message : String(err));
+			stopStream(stream);
+			if (generationRef.current === generation) {
+				recorderRef.current = null;
+				setState('idle');
+				setError(err instanceof Error ? err.message : String(err));
+			}
+		} finally {
+			if (generationRef.current === generation) startingRef.current = false;
 		}
 	}, [media, stop, stopStream]);
 
 	const reset = useCallback(() => {
+		generationRef.current += 1;
+		startingRef.current = false;
+		clearTimer();
+		if (recorderRef.current) {
+			recorderRef.current.onstop = null;
+			if (recorderRef.current.state !== 'inactive') recorderRef.current.stop();
+			recorderRef.current = null;
+		}
+		stopStream();
 		if (urlRef.current) {
 			URL.revokeObjectURL(urlRef.current);
 			urlRef.current = null;
@@ -105,19 +137,22 @@ export function useMediaRecorderTest(media: SystemMedia): MediaRecorderTest {
 		setElapsedSeconds(0);
 		setError('');
 		setState('idle');
-	}, []);
+	}, [clearTimer, stopStream]);
 
-	// Tear down any active capture when the media changes or the page unmounts.
 	useEffect(() => {
 		return () => {
+			generationRef.current += 1;
+			startingRef.current = false;
 			if (timerRef.current !== null) window.clearInterval(timerRef.current);
-			if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-				recorderRef.current.stop();
+			if (recorderRef.current) {
+				recorderRef.current.onstop = null;
+				if (recorderRef.current.state !== 'inactive') recorderRef.current.stop();
+				recorderRef.current = null;
 			}
-			streamRef.current?.getTracks().forEach((track) => track.stop());
+			stopStream();
 			if (urlRef.current) URL.revokeObjectURL(urlRef.current);
 		};
-	}, [media.id]);
+	}, [media.id, stopStream]);
 
 	return { state, error, recordedUrl, elapsedSeconds, videoRef, start, stop, reset };
 }

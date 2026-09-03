@@ -161,7 +161,11 @@ function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Elem
 
 						<div className="flex flex-wrap items-center gap-2">
 							{recorder.state !== 'recording' ? (
-								<Button size="xs" onClick={() => void recorder.start()}>
+								<Button
+									size="xs"
+									disabled={recorder.state === 'starting'}
+									onClick={() => void recorder.start()}
+								>
 									<Play className="size-3" />
 									{t('settings.system.media.test.start')}
 								</Button>
