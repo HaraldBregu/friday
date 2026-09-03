@@ -10,11 +10,10 @@ import googleIcon from '@resources/providers/google/images/fallback_lobehub/svg/
 type Mode = 'signIn' | 'signUp' | 'forgot';
 
 type AuthStepProps = {
-	readonly onBack?: () => void;
 	readonly onSkip?: () => void;
 };
 
-export function AuthStep({ onBack, onSkip }: AuthStepProps = {}): React.JSX.Element {
+export function AuthStep({ onSkip }: AuthStepProps = {}): React.JSX.Element {
 	const { state } = useAuth();
 	const [mode, setMode] = useState<Mode>('signIn');
 	const [email, setEmail] = useState('');
@@ -320,11 +319,8 @@ export function AuthStep({ onBack, onSkip }: AuthStepProps = {}): React.JSX.Elem
 						) : null}
 					</CardContent>
 				</Card>
-				{!recovery && onBack && onSkip ? (
-					<div className="mt-4 flex items-center justify-between gap-2">
-						<Button type="button" variant="ghost" size="sm" onClick={onBack}>
-							Back
-						</Button>
+				{!recovery && onSkip ? (
+					<div className="mt-4 flex justify-end">
 						<Button type="button" variant="ghost" size="sm" onClick={onSkip}>
 							Skip and continue
 							<ArrowRight className="size-3.5" aria-hidden="true" />

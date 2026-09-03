@@ -132,7 +132,7 @@ const StartPage: React.FC = () => {
 
 	const content =
 		phase === 'auth' ? (
-			<AuthStep onBack={restart} onSkip={skipSignIn} />
+			<AuthStep onSkip={skipSignIn} />
 		) : phase === 'setup' ? (
 			renderSetupStep()
 		) : (
