@@ -166,7 +166,7 @@
 				"configuration": "Configurazione"
 			},
 			"descriptions": {
-				"cloud": "Archiviazione e sincronizzazione cloud",
+				"cloud": "Backup cloud e sincronizzazione sicura delle chiavi",
 				"general": "Info e aspetto dell'app",
 				"account": "Identità cloud e sessione",
 				"modelServices": "Setup servizi modello",

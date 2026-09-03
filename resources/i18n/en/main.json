@@ -166,7 +166,7 @@
 				"configuration": "Configuration"
 			},
 			"descriptions": {
-				"cloud": "Cloud storage and sync",
+				"cloud": "Cloud backup and secure key sync",
 				"general": "App info and appearance",
 				"account": "Cloud identity and session",
 				"modelServices": "Model service setup",
