@@ -15,7 +15,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@kucedr/sdk": "file:../../packages/sdk",
+		"@kucedr/sdk": "file:../../../packages/sdk",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"react": "^19.1.1",
