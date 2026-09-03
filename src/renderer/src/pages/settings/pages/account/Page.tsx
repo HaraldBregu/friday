@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AlertCircle, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import type { AccountProfile } from '../../../../../../shared/auth_types';
 import {
 	SettingsNotice,
 	SettingsPageHeader,
@@ -17,79 +14,13 @@ import {
 
 const AccountPage: React.FC = () => {
 	const { state, localOnly, requireSignIn } = useAuth();
-	const [profile, setProfile] = useState<AccountProfile>({ firstName: '', lastName: '' });
-	const [storedProfile, setStoredProfile] = useState<AccountProfile>({
-		firstName: '',
-		lastName: '',
-	});
-	const [profileUserId, setProfileUserId] = useState('');
-	const [profileSaving, setProfileSaving] = useState(false);
-	const [profileSaved, setProfileSaved] = useState(false);
 	const [sessionBusy, setSessionBusy] = useState(false);
 	const [error, setError] = useState('');
 	const signedIn = state.status === 'signedIn' && !localOnly;
-	const userId = signedIn ? (state.user?.id ?? '') : '';
-	const profileLoaded = Boolean(userId) && profileUserId === userId;
-	const profileLoading = Boolean(userId) && !profileLoaded;
-
-	useEffect(() => {
-		if (!userId) return;
-		let mounted = true;
-		void window.auth
-			.getProfile()
-			.then((nextProfile) => {
-				if (!mounted) return;
-				setProfile(nextProfile);
-				setStoredProfile(nextProfile);
-				setProfileUserId(userId);
-				setProfileSaved(false);
-				setError('');
-			})
-			.catch((cause) => {
-				if (!mounted) return;
-				setProfileUserId('');
-				setError(cause instanceof Error ? cause.message : 'Could not load account details.');
-			});
-		return () => {
-			mounted = false;
-		};
-	}, [userId]);
-
-	const firstName = profile.firstName.trim();
-	const lastName = profile.lastName.trim();
-	const profileDirty =
-		profile.firstName !== storedProfile.firstName || profile.lastName !== storedProfile.lastName;
-
-	const saveProfile = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-		event.preventDefault();
-		setProfileSaving(true);
-		setProfileSaved(false);
-		setError('');
-		try {
-			const saved = await window.auth.updateProfile({ firstName, lastName });
-			setProfile(saved);
-			setStoredProfile(saved);
-			setProfileSaved(true);
-		} catch (cause) {
-			setError(cause instanceof Error ? cause.message : 'Could not save account details.');
-		} finally {
-			setProfileSaving(false);
-		}
-	};
 
 	return (
 		<SettingsPageShell>
-			<SettingsPageHeader
-				title="Account"
-				description="Manage your personal details and sign-in status."
-				action={
-					signedIn && (profileSaving || (profileLoaded && profileSaved)) ? (
-						<SettingsValue>
-							<span role="status">{profileSaving ? 'Saving…' : 'Saved'}</span>
-						</SettingsValue>
-					) : undefined
-				}
-			/>
+			<SettingsPageHeader title="Account" description="Manage your sign-in status." />
 			{error ? (
 				<div role="alert">
 					<SettingsNotice icon={AlertCircle} variant="destructive">
@@ -109,74 +40,6 @@ const AccountPage: React.FC = () => {
 					) : null}
 				</SettingsPanel>
 			</SettingsSection>
-			{signedIn ? (
-				<SettingsSection
-					title="Personal details"
-					description="These names are stored with your Friday account."
-				>
-					<SettingsPanel>
-						<form className="grid gap-3 p-3" onSubmit={saveProfile}>
-							<div className="grid gap-3 sm:grid-cols-2">
-								<div className="grid gap-1.5">
-									<Label htmlFor="account-first-name" className="text-xs">
-										First name
-									</Label>
-									<Input
-										id="account-first-name"
-										autoComplete="given-name"
-										maxLength={80}
-										required
-										value={profile.firstName}
-										disabled={profileLoading || profileSaving || !profileLoaded}
-										className="h-8 text-xs"
-										onChange={(event) => {
-											setProfile((current) => ({ ...current, firstName: event.target.value }));
-											setProfileSaved(false);
-										}}
-									/>
-								</div>
-								<div className="grid gap-1.5">
-									<Label htmlFor="account-last-name" className="text-xs">
-										Last name
-									</Label>
-									<Input
-										id="account-last-name"
-										autoComplete="family-name"
-										maxLength={80}
-										required
-										value={profile.lastName}
-										disabled={profileLoading || profileSaving || !profileLoaded}
-										className="h-8 text-xs"
-										onChange={(event) => {
-											setProfile((current) => ({ ...current, lastName: event.target.value }));
-											setProfileSaved(false);
-										}}
-									/>
-								</div>
-							</div>
-							<div className="flex justify-end">
-								<Button
-									type="submit"
-									size="xs"
-									disabled={
-										profileLoading ||
-										profileSaving ||
-										!profileLoaded ||
-										!profileDirty ||
-										!firstName ||
-										!lastName
-									}
-								>
-									{profileSaving ? (
-										<LoaderCircle className="animate-spin" aria-hidden="true" />
-									) : null}
-									Save changes
-								</Button>
-							</div>
-						</form>
-					</SettingsPanel>
-				</SettingsSection>
-			) : null}
 			<SettingsSection title="Session">
 				<SettingsPanel>
 					<SettingsRow
