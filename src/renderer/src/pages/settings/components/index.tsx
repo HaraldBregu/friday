@@ -167,7 +167,6 @@ export function SettingsRow({
 
 	return (
 		<div
-			role={variant === 'destructive' ? 'alert' : undefined}
 			className={cn(
 				'grid min-h-11 items-center gap-2 border-b border-border/60 px-3 py-2 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3',
 				className
@@ -242,6 +241,7 @@ export function SettingsNotice({
 }: SettingsNoticeProps): React.JSX.Element {
 	return (
 		<div
+			role={variant === 'destructive' ? 'alert' : undefined}
 			className={cn(
 				'flex items-start gap-2 rounded-lg border px-3 py-2 text-xs shadow-none',
 				variant === 'destructive'
