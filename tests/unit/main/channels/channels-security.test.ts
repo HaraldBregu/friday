@@ -40,9 +40,9 @@ describe('canReceive', () => {
 		expect(canReceive(message(), config({ apiKey: '  ' })).reason).toBe('channel_not_configured');
 	});
 	it('rejects empty text', () => {
-		expect(
-			canReceive(message({ content: { type: 'text', text: '   ' } }), config()).reason
-		).toBe('empty_text');
+		expect(canReceive(message({ content: { type: 'text', text: '   ' } }), config()).reason).toBe(
+			'empty_text'
+		);
 	});
 	it('allows valid voice metadata without loading audio', () => {
 		const load = jest.fn();
@@ -103,9 +103,9 @@ describe('canReceive', () => {
 			expect(canReceive(message(), config()).reason).toBe('route_not_allowed');
 		});
 		it('blocks chats not on the group allowlist', () => {
-			expect(
-				canReceive(message({ chatId: 'c9' }), config({ groupAllowFrom: ['c1'] })).reason
-			).toBe('route_not_allowed');
+			expect(canReceive(message({ chatId: 'c9' }), config({ groupAllowFrom: ['c1'] })).reason).toBe(
+				'route_not_allowed'
+			);
 		});
 		it('allows chats on the group allowlist', () => {
 			expect(canReceive(message({ chatId: 'c1' }), config({ groupAllowFrom: ['c1'] }))).toEqual({
