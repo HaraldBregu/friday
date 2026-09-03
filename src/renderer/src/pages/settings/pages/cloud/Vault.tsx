@@ -14,12 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProviderVaultStatus } from '@shared/provider_types';
-import {
-	SettingsLoadingRows,
-	SettingsNotice,
-	SettingsRow,
-	SettingsValue,
-} from '../../components';
+import { SettingsLoadingRows, SettingsNotice, SettingsRow, SettingsValue } from '../../components';
 
 const Vault: React.FC = () => {
 	const { t } = useTranslation();
@@ -143,9 +138,7 @@ const Vault: React.FC = () => {
 				<Card size="sm" className="gap-0! py-0!" aria-busy={busy}>
 					<CardHeader className="border-b border-border/60 py-3">
 						<CardTitle>
-							<h2 className="text-sm font-medium">
-								{t('settings.storage.credentials.title')}
-							</h2>
+							<h2 className="text-sm font-medium">{t('settings.storage.credentials.title')}</h2>
 						</CardTitle>
 						<CardDescription className="text-xs">
 							{t(
@@ -199,11 +192,7 @@ const Vault: React.FC = () => {
 							{t('settings.storage.credentials.passphraseHelp')}
 						</p>
 						{(error || mismatch) && (
-							<SettingsNotice
-								className="sm:col-span-2"
-								variant="destructive"
-								icon={AlertTriangle}
-							>
+							<SettingsNotice className="sm:col-span-2" variant="destructive" icon={AlertTriangle}>
 								{mismatch ? t('settings.storage.credentials.errors.mismatch') : error}
 							</SettingsNotice>
 						)}
@@ -245,9 +234,7 @@ const Vault: React.FC = () => {
 				<CardContent className="p-0!">
 					<SettingsRow
 						title={t('settings.storage.credentials.status')}
-						actions={
-							<SettingsValue>{t('settings.storage.credentials.ready')}</SettingsValue>
-						}
+						actions={<SettingsValue>{t('settings.storage.credentials.ready')}</SettingsValue>}
 					/>
 					<SettingsRow
 						title={t('settings.storage.credentials.pending')}
@@ -267,9 +254,7 @@ const Vault: React.FC = () => {
 				<CardFooter className="justify-end">
 					<Button type="button" size="sm" disabled={busy} onClick={() => void sync()}>
 						<RefreshCw className={busy ? 'size-3 animate-spin' : 'size-3'} />
-						{t(
-							busy ? 'settings.storage.credentials.syncing' : 'settings.storage.credentials.sync'
-						)}
+						{t(busy ? 'settings.storage.credentials.syncing' : 'settings.storage.credentials.sync')}
 					</Button>
 				</CardFooter>
 			</Card>

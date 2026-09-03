@@ -138,12 +138,12 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 		? t(operationStatusKey, {
 				count: operationStatus?.transferred,
 				failed: operationStatus?.failed,
-					error:
-						operationStatus?.operation === 'backup'
-							? t('settings.storage.errors.push')
-							: t('settings.storage.errors.pull'),
-				})
-			: undefined;
+				error:
+					operationStatus?.operation === 'backup'
+						? t('settings.storage.errors.push')
+						: t('settings.storage.errors.pull'),
+			})
+		: undefined;
 	const operationNeedsAttention =
 		operationStatus?.state === 'failed' || operationStatus?.state === 'partial';
 

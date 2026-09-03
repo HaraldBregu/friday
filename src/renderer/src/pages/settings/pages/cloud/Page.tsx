@@ -11,7 +11,7 @@ const CloudPage: React.FC = () => {
 		<SettingsPageShell>
 			<SettingsPageHeader
 				title={t('settings.tabs.cloud')}
-					description={t('settings.overview.descriptions.cloud')}
+				description={t('settings.overview.descriptions.cloud')}
 			/>
 			<Vault />
 			<StoragePage inline />
