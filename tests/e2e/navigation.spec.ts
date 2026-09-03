@@ -144,18 +144,16 @@ test('wiki settings renders the complete configuration workflow', async ({
 	await page.evaluate(() => {
 		window.location.hash = '#/settings/assistant/llm-wiki';
 	});
-	await expect(page.getByRole('heading', { name: 'Wiki', exact: true })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'LLM Wiki', exact: true })).toBeVisible();
 	await expect(page.getByRole('textbox', { name: 'Raw source folder', exact: true })).toBeVisible();
 	await expect(
 		page.getByRole('textbox', { name: 'Generated wiki folder', exact: true })
 	).toBeVisible();
-	await expect(page.getByRole('textbox', { name: 'Cron expression', exact: true })).toHaveValue(
-		'0 3 * * *'
-	);
+	await expect(page.getByRole('combobox', { name: 'Generation frequency' })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Run now' })).toBeVisible();
 	await page.screenshot({ path: testInfo.outputPath('wiki-settings.png'), fullPage: true });
 	await page.getByText('Settings file', { exact: true }).scrollIntoViewIfNeeded();
-	await expect(page.getByRole('switch', { name: 'Scheduled generation' })).toBeVisible();
+	await expect(page.getByRole('switch', { name: 'Enable wiki knowledge' })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Open folder' })).toBeVisible();
 	await page.screenshot({ path: testInfo.outputPath('wiki-settings-status.png'), fullPage: true });
 });
