@@ -19,5 +19,9 @@ export async function publicUrl(value: string): Promise<PublicUrl> {
 	if (!addresses.length || addresses.some(({ address }) => privateAddress(address))) {
 		throw new Error('Private URLs are not allowed.');
 	}
-	return { url, address: addresses[0].address, family: addresses[0].family };
+	return {
+		url,
+		address: addresses[0].address,
+		family: addresses[0].family === 6 ? 6 : 4,
+	};
 }
