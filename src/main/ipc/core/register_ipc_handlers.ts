@@ -97,7 +97,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('tasks', () => new TaskIpc().register(undefined, eventBus));
+	safeRegister('tasks', () =>
+		new TaskIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('mcp', () =>
 		new McpIpc().register(
 			{ windows: windowContextManager, extensions: extensionRegistry },
@@ -108,7 +113,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	safeRegister('realtime-voice', () =>
 		new RealtimeVoiceIpc().register({ conversation: conversationService }, eventBus)
 	);
-	safeRegister('skills', () => new SkillsIpc().register(undefined, eventBus));
+	safeRegister('skills', () =>
+		new SkillsIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('provider-store', () =>
 		new ProviderStoreIpc().register(
 			{
