@@ -23,7 +23,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-	  - run: npm run quality:check
+      - run: npm run quality:check
       - run: npm run build
       - run: npm run build:packages
       - run: npm pack --dry-run --workspace @friday/sdk
