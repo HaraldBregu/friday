@@ -106,6 +106,7 @@ describe('createSessionState', () => {
 		expect(s.runContext).toEqual({
 			loadedSkills: [],
 			fileAccess: { readDirectories: new Set(), createdFiles: new Set() },
+			fileHistory: { operations: [] },
 		});
 	});
 	it('returns a new object each call', () => {

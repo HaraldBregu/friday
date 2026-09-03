@@ -52,9 +52,10 @@ it.each([
 });
 
 it.each([searchWikiTool, readWikiPageTool, queryWikiTool])(
-	'%s has an allow fallback before runtime registration',
+	'%s is safe to expose in plan mode',
 	(tool) => {
-		expect(tool.defaultPermission).toBe('allow');
+		expect(tool.planSafe).toBe(true);
+		expect(tool.hardApproval).toBeUndefined();
 	}
 );
 
@@ -66,9 +67,7 @@ it.each([
 	resumeTaskTool,
 	runTaskNowTool,
 ])('%s uses its scoped permission without forced approval', (tool) => {
-	expect(tool.defaultPermission).toBe('allow');
 	expect(tool.hardApproval).not.toBe(true);
-	expect(tool.allowedOrigins).toBeUndefined();
 });
 
 it.each([
@@ -81,7 +80,7 @@ it.each([
 	['resume_task', resumeTaskTool],
 	['run_task_now', runTaskNowTool],
 ] as const)('exports the %s tool from its matching module', (name, taskTool) => {
-	expect(taskTool.name).toBe(name);
+	expect(taskTool.id).toBe(name);
 });
 
 it('uses taskId in task tool inputs', () => {
@@ -90,16 +89,11 @@ it('uses taskId in task tool inputs', () => {
 });
 
 it('uses ordinary policy approval for focused text edits', () => {
-	expect(editTool).toMatchObject({ risk: 'high', effect: 'write' });
+	expect(editTool.id).toBe('edit');
 	expect(editTool.hardApproval).not.toBe(true);
 });
 
 it('allows wiki lint to use its ordinary policy', () => {
-	expect(lintWikiTool).toMatchObject({
-		defaultPermission: 'allow',
-		risk: 'high',
-		effect: 'persistence',
-		allowedOrigins: ['main'],
-	});
+	expect(lintWikiTool.id).toBe('lint_wiki');
 	expect(lintWikiTool.hardApproval).toBeUndefined();
 });

@@ -7,7 +7,7 @@ jest.mock('../../../../src/main/shared/user_data_location', () => ({
 import { agentLocation } from '../../../../src/main/shared/agent_location';
 
 describe('agentLocation', () => {
-	it('appends the agent folder to the user data location', () => {
-		expect(agentLocation()).toBe(path.join('/user/data', 'agent'));
+	it('appends the workspace folder to the user data location', () => {
+		expect(agentLocation()).toBe(path.join('/user/data', 'workspace'));
 	});
 });

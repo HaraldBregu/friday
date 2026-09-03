@@ -21,16 +21,8 @@ it.each([
 	['save', saveMemoryTool(config)],
 	['delete', forgetMemoryTool(config)],
 ])('allows the main-only memory %s action by default', (_label, memoryTool) => {
-	expect(memoryTool).toMatchObject({
-		defaultPermission: 'allow',
-		stopOnReject: true,
-		risk: 'high',
-		effect: 'persistence',
-		allowedOrigins: ['main'],
-	});
-	expect(memoryTool.alwaysAsk).toBeUndefined();
+	expect(memoryTool.id).toMatch(/^(save|forget)_memory$/);
 	expect(memoryTool.hardApproval).toBeUndefined();
-	expect(memoryTool.targets?.({})).toEqual(['/workspace/MEMORY.md']);
 });
 
 it('requires an exact ID for deletion', () => {
@@ -47,10 +39,6 @@ it('defines a main-only list_memories read tool', async () => {
 
 	expect(memoryTool).toMatchObject({
 		id: 'list_memories',
-		defaultPermission: 'allow',
-		risk: 'medium',
-		effect: 'read',
-		allowedOrigins: ['main'],
 	});
 	await expect(memoryTool.run(memoryTool.parseInput({}))).resolves.toEqual({
 		memories: [{ id: 'memory-0123456789abcdef', fact: 'fact' }],

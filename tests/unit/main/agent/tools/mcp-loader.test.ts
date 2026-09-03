@@ -41,7 +41,7 @@ describe('loadMcpTools', () => {
 
 		const result = await loadMcpTools();
 		expect(result.tools).toHaveLength(MCP_MAX_TOOLS);
-		expect(result.tools.map((tool) => tool.name)).not.toEqual(
+		expect(result.tools.map((tool) => tool.id)).not.toEqual(
 			expect.arrayContaining(['mcp__safe__invalid', 'mcp__safe__oversized'])
 		);
 		expect(result.diagnostics).toMatchObject({
@@ -72,7 +72,7 @@ describe('loadMcpTools', () => {
 		});
 
 		const result = await loadMcpTools();
-		const names = result.tools.map((tool) => tool.name);
+		const names = result.tools.map((tool) => tool.id);
 		expect(new Set(names)).toHaveProperty('size', names.length);
 		expect(names[0]).toBe('mcp__safe__do_thing');
 		for (const name of names) {

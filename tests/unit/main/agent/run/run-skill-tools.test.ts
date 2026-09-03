@@ -3,11 +3,10 @@ import { selectSkillTools } from '../../../../../src/main/agent/runner/run_skill
 
 function fakeTool(name: string): Tool {
 	return {
+		id: name,
 		name,
 		description: name,
 		schema: { type: 'object' },
-		risk: 'low',
-		effect: 'read',
 		timeoutMs: 1_000,
 		maxOutputBytes: 1_000,
 		parseInput: () => ({}),

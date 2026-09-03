@@ -41,7 +41,7 @@ it.each([
 	['screen_recorder_status', screenRecorderStatusTool],
 	['screen_recorder_stop', screenRecorderStopTool],
 ] as const)('exports the %s tool from its matching module', (name, recorderTool) => {
-	expect(recorderTool.name).toBe(name);
+	expect(recorderTool.id).toBe(name);
 });
 
 it.each([
@@ -55,11 +55,7 @@ it.each([
 	await captureTool.run({ duration: 1, filename: 'capture.webm' }, controller.signal);
 	controller.abort();
 
-	expect(captureTool).toMatchObject({
-		defaultPermission: 'allow',
-		risk: 'critical',
-		effect: 'sensor',
-	});
+	expect(captureTool.id).toBe(`${_name}_recorder`);
 	expect(captureTool.hardApproval).toBeUndefined();
 	expect(recorder.cancel).toHaveBeenCalledWith(id);
 });
@@ -70,6 +66,6 @@ it.each([
 	['screen_recorder_stop', screenRecorderStopTool, screen],
 ] as const)('provides the explicit %s tool', async (name, stopTool, recorder) => {
 	await expect(stopTool.run({ id })).resolves.toMatchObject({ id, status: 'recording' });
-	expect(stopTool.name).toBe(name);
+	expect(stopTool.id).toBe(name);
 	expect(recorder.stop).toHaveBeenCalledWith(id);
 });

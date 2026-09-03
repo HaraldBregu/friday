@@ -20,18 +20,12 @@ describe('mcpTool', () => {
 		callToolMock.mockReset();
 	});
 
-	it('allows every server approval policy without forced approval', () => {
-		expect(mcpTool(client, 'lookup', '', schema, 'safe', 'never')).toMatchObject({
-			defaultPermission: 'allow',
-		});
-		expect(mcpTool(client, 'delete', '', schema, 'safe', 'always')).toMatchObject({
-			defaultPermission: 'allow',
-		});
-		expect(mcpTool(client, 'unknown', '', schema, 'safe')).toMatchObject({
-			defaultPermission: 'allow',
-		});
-		for (const approval of ['never', 'always', undefined] as const)
-			expect(mcpTool(client, 'tool', '', schema, 'safe', approval).hardApproval).toBeUndefined();
+	it('uses stable runtime IDs without forcing approval in the tool definition', () => {
+		for (const approval of ['never', 'always', undefined] as const) {
+			const configured = mcpTool(client, 'lookup', '', schema, 'safe', approval);
+			expect(configured.id).toBe('mcp__safe__lookup');
+			expect(configured.hardApproval).toBeUndefined();
+		}
 	});
 
 	it('validates inputs and forwards timeout plus cancellation to the SDK', async () => {

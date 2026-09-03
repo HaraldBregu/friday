@@ -6,7 +6,7 @@ import { buildSystemPrompt } from '../../../../../src/main/agent/system/system_b
 import type { Tool } from '../../../../../src/main/agent/types';
 
 function tool(name: string, description?: string): Tool {
-	return { name, description } as Tool;
+	return { id: name, name, description } as Tool;
 }
 
 describe('addBasePrompt', () => {
@@ -29,19 +29,19 @@ describe('addToolsPrompt', () => {
 	it('renders a markdown table of tools', () => {
 		const prompt = addToolsPrompt('base', [tool('read', 'Read a file'), tool('write')]);
 		expect(prompt).toContain('## Tools');
-		expect(prompt).toContain('| `read` | Read a file |');
-		expect(prompt).toContain('| `write` |  |');
+		expect(prompt).toContain('| `read` | read | Read a file |');
+		expect(prompt).toContain('| `write` | write |  |');
 	});
 	it('flattens newlines in descriptions', () => {
 		const prompt = addToolsPrompt('base', [tool('x', 'line1\nline2')]);
-		expect(prompt).toContain('| `x` | line1 line2 |');
+		expect(prompt).toContain('| `x` | x | line1 line2 |');
 	});
 	it('omits MCP tools while retaining built-in tools', () => {
 		const prompt = addToolsPrompt('base', [
 			tool('read', 'Read a file'),
 			tool('mcp__notion__notion-search', 'Search Notion'),
 		]);
-		expect(prompt).toContain('| `read` | Read a file |');
+		expect(prompt).toContain('| `read` | read | Read a file |');
 		expect(prompt).not.toContain('mcp__notion__notion-search');
 		expect(prompt).not.toContain('Search Notion');
 	});
@@ -61,8 +61,8 @@ describe('buildSystemPrompt', () => {
 			'minimal'
 		);
 
-		expect(prompt).toContain('| `read` | Read a file |');
-		expect(prompt).toContain('| `write` | Write a file |');
+		expect(prompt).toContain('| `read` | read | Read a file |');
+		expect(prompt).toContain('| `write` | write | Write a file |');
 	});
 });
 
