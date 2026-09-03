@@ -9,6 +9,7 @@ import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
 import { getStorageSettings } from './storage_store';
 import { storageTarget } from './storage_target';
+import { storageWrite } from './storage_write';
 
 export async function pullFiles(auth: AuthService): Promise<StoragePullResult> {
 	const storage = getStorageSettings();
@@ -28,7 +29,7 @@ export async function pullFiles(auth: AuthService): Promise<StoragePullResult> {
 				try {
 					const target = await storageTarget(entryPath, item.key, prefix);
 					await fs.mkdir(path.dirname(target), { recursive: true });
-					await fs.writeFile(target, await getObject(auth, item.key));
+					await storageWrite(target, await getObject(auth, item.key));
 					downloaded.push(item.key);
 				} catch (error) {
 					failed.push({ path: item.key, error: describeStorageError(error) });

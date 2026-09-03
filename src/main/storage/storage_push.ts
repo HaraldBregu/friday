@@ -27,7 +27,10 @@ export async function pushFiles(auth: AuthService): Promise<StoragePushResult> {
 
 	for (const entryPath of paths) {
 		try {
-			const stat = await fs.stat(entryPath);
+			const stat = await fs.lstat(entryPath);
+			if (stat.isSymbolicLink()) {
+				throw new Error(`Selected path is a symbolic link: ${entryPath}`);
+			}
 			const prefix = storagePrefix(entryPath);
 			if (stat.isDirectory()) {
 				for (const file of await walkFiles(entryPath)) {

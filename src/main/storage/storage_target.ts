@@ -17,7 +17,7 @@ export async function storageTarget(root: string, key: string, prefix: string): 
 		throw new Error(`Storage object escapes the selected folder: ${key}`);
 	}
 	let current = resolvedRoot;
-	for (const segment of segments.slice(0, -1)) {
+	for (const segment of segments) {
 		current = path.join(current, segment);
 		try {
 			if ((await fs.lstat(current)).isSymbolicLink()) {

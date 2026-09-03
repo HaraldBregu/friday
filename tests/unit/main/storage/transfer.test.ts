@@ -1,8 +1,8 @@
-const stat = jest.fn();
 const readFile = jest.fn();
 const mkdir = jest.fn();
 const lstat = jest.fn();
 const writeFile = jest.fn();
+const rename = jest.fn();
 const rm = jest.fn();
 const getStorageSettings = jest.fn();
 const walkFiles = jest.fn();
@@ -11,8 +11,9 @@ const listObjects = jest.fn();
 const getObject = jest.fn();
 
 jest.mock('node:fs', () => ({
-	promises: { stat, readFile, mkdir, lstat, writeFile, rm },
+	promises: { readFile, mkdir, lstat, writeFile, rename, rm },
 }));
+jest.mock('node:crypto', () => ({ randomUUID: () => 'restore' }));
 jest.mock('../../../../src/main/storage/storage_store', () => ({ getStorageSettings }));
 jest.mock('../../../../src/main/storage/storage_walk', () => ({ walkFiles }));
 jest.mock('../../../../src/main/storage/storage_put', () => ({ putObject }));
@@ -32,14 +33,27 @@ const storage = {
 };
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	getStorageSettings.mockReturnValue(storage);
-	stat.mockResolvedValue({ isDirectory: () => true });
+	lstat.mockResolvedValue({ isDirectory: () => true, isSymbolicLink: () => false });
 	readFile.mockResolvedValue(Buffer.from('hello'));
 	mkdir.mockResolvedValue(undefined);
-	lstat.mockResolvedValue({ isSymbolicLink: () => false });
 	writeFile.mockResolvedValue(undefined);
+	rename.mockResolvedValue(undefined);
+	rm.mockResolvedValue(undefined);
 	putObject.mockResolvedValue(undefined);
 	getObject.mockResolvedValue(Buffer.from('cloud'));
+});
+
+it('rejects a symbolic link selected as a backup root', async () => {
+	lstat.mockResolvedValueOnce({ isDirectory: () => false, isSymbolicLink: () => true });
+
+	await expect(pushFiles({} as never)).resolves.toMatchObject({
+		uploaded: [],
+		failed: [{ path: '/data/agent' }],
+	});
+	expect(walkFiles).not.toHaveBeenCalled();
+	expect(putObject).not.toHaveBeenCalled();
 });
 
 it('backs up selected files within the Friday-owned prefix', async () => {
@@ -68,7 +82,32 @@ it('restores cloud files without deleting unmatched local files', async () => {
 		skipped: [],
 		failed: [],
 	});
-	expect(writeFile).toHaveBeenCalledWith('/data/agent/notes/today.md', Buffer.from('cloud'));
+	expect(writeFile).toHaveBeenCalledWith(
+		'/data/agent/notes/today.md.friday-restore.tmp',
+		Buffer.from('cloud'),
+		{ flag: 'wx' }
+	);
+	expect(rename).toHaveBeenCalledWith(
+		'/data/agent/notes/today.md.friday-restore.tmp',
+		'/data/agent/notes/today.md'
+	);
 	expect(getObject).toHaveBeenCalledWith(auth, 'friday/v1/agent/notes/today.md');
 	expect(rm).not.toHaveBeenCalled();
+});
+
+it('rejects a restore target that is a symbolic link', async () => {
+	listObjects.mockResolvedValue([
+		{ key: 'friday/v1/agent/notes/today.md', size: 5, lastModified: undefined },
+	]);
+	lstat.mockImplementation(async (value: string) => ({
+		isDirectory: () => true,
+		isSymbolicLink: () => value.endsWith('today.md'),
+	}));
+
+	await expect(pullFiles({} as never)).resolves.toMatchObject({
+		downloaded: [],
+		failed: [{ path: 'friday/v1/agent/notes/today.md' }],
+	});
+	expect(getObject).not.toHaveBeenCalled();
+	expect(writeFile).not.toHaveBeenCalled();
 });
