@@ -61,8 +61,13 @@ class FakeCloud implements ProviderCloudPort {
 	vault?: ProviderVaultCloudRecord;
 	records = new Map<string, ProviderVaultRecord>();
 	fail = false;
+	getVaultCalls = 0;
+	syncCredentialCalls = 0;
+	beforeListCredentials?: () => void;
+	beforeSyncCredential?: (record: ProviderVaultRecord) => void;
 
 	async getVault(): Promise<ProviderVaultCloudRecord | undefined> {
+		this.getVaultCalls += 1;
 		this.check();
 		return this.vault ? structuredClone(this.vault) : undefined;
 	}
@@ -80,11 +85,14 @@ class FakeCloud implements ProviderCloudPort {
 
 	async listCredentials(): Promise<ProviderVaultRecord[]> {
 		this.check();
+		this.beforeListCredentials?.();
 		return structuredClone([...this.records.values()]);
 	}
 
 	async syncCredential(record: ProviderVaultRecord): Promise<ProviderVaultRecord> {
 		this.check();
+		this.syncCredentialCalls += 1;
+		this.beforeSyncCredential?.(structuredClone(record));
 		const key = `${record.kind}:${record.providerId}`;
 		const current = this.records.get(key);
 		const winner = !current || this.compare(record, current) > 0 ? record : current;
@@ -197,4 +205,116 @@ it('keeps signed-out writes local and synchronizes them after sign-in', async ()
 
 	expect(cloud.records.get('models:anthropic')).toBeDefined();
 	sync.destroy();
+});
+
+it('does not authorize credential sync during recovery and clears readiness on sign-out', async () => {
+	jest.useFakeTimers();
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	auth.state = { status: 'recovery', persistence: 'encrypted' };
+	sync.initialize();
+
+	await Promise.resolve();
+	expect(cloud.getVaultCalls).toBe(0);
+	await expect(sync.sync()).rejects.toThrow('Sign in to synchronize provider credentials');
+
+	auth.setState({
+		status: 'signedIn',
+		persistence: 'encrypted',
+		user: { id: '11111111-1111-4111-8111-111111111111', email: 'owner@example.test' },
+	});
+	cloud.fail = true;
+	auth.setState(auth.state);
+	for (let attempt = 0; attempt < 5; attempt += 1) await Promise.resolve();
+	expect(jest.getTimerCount()).toBe(1);
+
+	auth.setState({ status: 'signedOut', persistence: 'encrypted' });
+	expect(sync.status()).toMatchObject({ cloudConfigured: false, unlocked: false });
+	expect(jest.getTimerCount()).toBe(0);
+	sync.destroy();
+	jest.useRealTimers();
+});
+
+it('does not overwrite a local edit made while remote credentials are being listed', async () => {
+	jest.useFakeTimers().setSystemTime(new Date('2026-09-03T10:00:00.000Z'));
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	vault.save('models', {
+		id: 'openai',
+		name: 'OpenAI',
+		apiKey: 'initial-key',
+		baseUrl: 'https://api.openai.com/v1',
+	});
+	await sync.setup('correct horse battery staple');
+	const initial = vault.records()[0];
+
+	jest.setSystemTime(new Date('2026-09-03T10:00:01.000Z'));
+	vault.save('models', {
+		id: 'openai',
+		name: 'OpenAI',
+		apiKey: 'remote-key',
+		baseUrl: 'https://api.openai.com/v1',
+	});
+	await sync.sync();
+	vault.putRemote(initial);
+
+	jest.setSystemTime(new Date('2026-09-03T10:00:02.000Z'));
+	cloud.beforeListCredentials = () => {
+		cloud.beforeListCredentials = undefined;
+		vault.save('models', {
+			id: 'openai',
+			name: 'OpenAI',
+			apiKey: 'local-key',
+			baseUrl: 'https://api.openai.com/v1',
+		});
+	};
+	await sync.sync();
+
+	expect(vault.get('models', 'openai')?.apiKey).toBe('local-key');
+	expect(vault.records()[0].dirty).toBe(false);
+	jest.useRealTimers();
+});
+
+it('preserves edits made during upload and drains them in a follow-up pass', async () => {
+	jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00.000Z'));
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	vault.save('models', {
+		id: 'anthropic',
+		name: 'Anthropic',
+		apiKey: 'initial-key',
+		baseUrl: 'https://api.anthropic.com',
+	});
+	await sync.setup('correct horse battery staple');
+	const callsBeforeEdit = cloud.syncCredentialCalls;
+
+	jest.setSystemTime(new Date('2026-09-03T11:00:01.000Z'));
+	vault.save('models', {
+		id: 'anthropic',
+		name: 'Anthropic',
+		apiKey: 'first-edit',
+		baseUrl: 'https://api.anthropic.com',
+	});
+	cloud.beforeSyncCredential = () => {
+		cloud.beforeSyncCredential = undefined;
+		jest.setSystemTime(new Date('2026-09-03T11:00:02.000Z'));
+		vault.save('models', {
+			id: 'anthropic',
+			name: 'Anthropic',
+			apiKey: 'second-edit',
+			baseUrl: 'https://api.anthropic.com',
+		});
+	};
+	await sync.sync();
+
+	expect(cloud.syncCredentialCalls - callsBeforeEdit).toBe(2);
+	expect(vault.get('models', 'anthropic')?.apiKey).toBe('second-edit');
+	expect(vault.records()[0].dirty).toBe(false);
+	jest.useRealTimers();
 });
