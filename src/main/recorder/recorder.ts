@@ -69,8 +69,7 @@ export function createRecorder(channels: { command: string; event: string }): Re
 				throw new Error('Recording duration must be a positive number of milliseconds.');
 			}
 			const captureWindow = BrowserWindow.getAllWindows().find(
-				(window) =>
-					!window.isDestroyed() && isTrustedAppRendererUrl(window.webContents.getURL())
+				(window) => !window.isDestroyed() && isTrustedAppRendererUrl(window.webContents.getURL())
 			);
 			if (!captureWindow) {
 				throw new Error('No app window is open to capture the recording.');

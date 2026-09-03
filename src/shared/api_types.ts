@@ -55,11 +55,7 @@ import type {
 import type { EmbeddingRequest, EmbeddingResult } from './embedding_types';
 import type { ImageRequest, ImageResult } from './image_types';
 import type { SoundFile, SoundRequest, SoundResult } from './sound_types';
-import type {
-	Recording,
-	RecorderCaptureResult,
-	RecorderCommand,
-} from './recorder_types';
+import type { Recording, RecorderCaptureResult, RecorderCommand } from './recorder_types';
 import type { VideoRequest, VideoResult } from './video_types';
 import type { TextRequest } from './text_types';
 import type { SpeechSynthesisRequest, SpeechSynthesisResult } from './speech_types';
@@ -440,7 +436,6 @@ export interface ModelsApi {
 		setModelId: (modelId: string) => Promise<void>;
 	};
 }
-
 
 export interface AppApi extends ExtensionStorageApi {
 	models: () => Promise<CatalogModel[]>;

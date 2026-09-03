@@ -127,7 +127,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 		});
 
 		targetSession.setDisplayMediaRequestHandler((request, callback) => {
-		const trusted = allowDisplayCapture && isTrustedAppRendererUrl(request.frame?.url);
+			const trusted = allowDisplayCapture && isTrustedAppRendererUrl(request.frame?.url);
 			if (!trusted) {
 				callback({});
 				return;

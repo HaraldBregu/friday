@@ -19,9 +19,9 @@ describe('recorder IPC', () => {
 		const extensionFrame = {};
 		const extensionSender = { id: 22, mainFrame: extensionFrame };
 		const window = { id: 1, webContents: mainSender };
-		jest.mocked(BrowserWindow.fromWebContents).mockImplementation((sender) =>
-			sender === mainSender ? (window as never) : null
-		);
+		jest
+			.mocked(BrowserWindow.fromWebContents)
+			.mockImplementation((sender) => (sender === mainSender ? (window as never) : null));
 		const windows = { has: (id: number) => id === window.id };
 		const extensions = { has: (sender: unknown) => sender === extensionSender };
 		new RecorderIpc().register({ windows, extensions } as never, {} as never);
@@ -31,9 +31,12 @@ describe('recorder IPC', () => {
 			RecorderChannels.camera.complete,
 			RecorderChannels.screen.complete,
 		]);
-		const handler = jest.mocked(ipcMain.handle).mock.calls.find(
-			([channel]) => channel === RecorderChannels.screen.complete
-		)?.[1] as (event: unknown, result: unknown) => Promise<{ success: boolean }>;
+		const handler = jest
+			.mocked(ipcMain.handle)
+			.mock.calls.find(([channel]) => channel === RecorderChannels.screen.complete)?.[1] as (
+			event: unknown,
+			result: unknown
+		) => Promise<{ success: boolean }>;
 		const result = { id: 'recording-id', base64: 'cmVjb3JkZWQ=' };
 
 		await expect(

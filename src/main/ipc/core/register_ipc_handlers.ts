@@ -120,9 +120,7 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	);
 	safeRegister('wiki', () => new WikiIpc().register(undefined, eventBus));
 	safeRegister('data', () => new DataIpc().register({ agent: agentService }, eventBus));
-	safeRegister('window', () =>
-		new WindowIpc().register({ logger, extensionRegistry }, eventBus)
-	);
+	safeRegister('window', () => new WindowIpc().register({ logger, extensionRegistry }, eventBus));
 	safeRegister('terminal', () =>
 		new TerminalIpc().register(
 			{

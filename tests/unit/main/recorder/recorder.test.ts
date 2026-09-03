@@ -20,7 +20,8 @@ describe('recorder capture ownership', () => {
 	it('uses one trusted capture host and accepts completion only from that host', async () => {
 		const firstContents = {
 			id: 11,
-			getURL: () => pathToFileURL(path.join(app.getAppPath(), 'out/renderer/index.html')).toString(),
+			getURL: () =>
+				pathToFileURL(path.join(app.getAppPath(), 'out/renderer/index.html')).toString(),
 			isDestroyed: () => false,
 			send: jest.fn(),
 		};
