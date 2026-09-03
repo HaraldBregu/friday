@@ -76,7 +76,7 @@ export class ProviderStoreIpc implements IpcModule<ProviderStoreIpcDeps> {
 		});
 		registerQueryWithEvent(ProviderStoreChannels.vaultStatus, (event) => {
 			trusted.assert(event);
-			return sync.status();
+			return sync.refreshStatus();
 		});
 		registerCommandWithEvent(ProviderStoreChannels.setupVault, (event, passphrase) => {
 			trusted.assert(event);

@@ -23,6 +23,7 @@ export class ProviderSyncService {
 	private initialized = false;
 	private retryAttempt = 0;
 	private retryTimer?: ReturnType<typeof setTimeout>;
+	private refreshPromise?: Promise<void>;
 	private syncPromise?: Promise<void>;
 	private syncRequested = false;
 	private unsubscribeAuth?: () => void;
@@ -64,6 +65,11 @@ export class ProviderSyncService {
 					}
 				: {}),
 		};
+	}
+
+	async refreshStatus(): Promise<ProviderVaultStatus> {
+		if (this.isSignedIn()) await this.ensureRefresh();
+		return this.status();
 	}
 
 	listSummaries(kind?: ProviderCredentialKind): ProviderCredentialSummary[] {
@@ -172,7 +178,18 @@ export class ProviderSyncService {
 	}
 
 	private requestRefresh(): void {
-		void this.refresh().catch(() => this.scheduleRetry());
+		void this.ensureRefresh().catch(() => this.scheduleRetry());
+	}
+
+	private ensureRefresh(): Promise<void> {
+		if (this.refreshPromise) return this.refreshPromise;
+		const task = this.refresh();
+		this.refreshPromise = task;
+		void task.then(
+			() => this.finishRefresh(task),
+			() => this.finishRefresh(task)
+		);
+		return task;
 	}
 
 	private async refresh(): Promise<void> {
@@ -304,6 +321,10 @@ export class ProviderSyncService {
 		if (this.syncPromise !== task) return;
 		this.syncPromise = undefined;
 		if (this.syncRequested) this.requestSync();
+	}
+
+	private finishRefresh(task: Promise<void>): void {
+		if (this.refreshPromise === task) this.refreshPromise = undefined;
 	}
 
 	private resetReadiness(): void {

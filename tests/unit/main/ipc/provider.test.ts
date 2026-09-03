@@ -65,6 +65,7 @@ function register() {
 		getSummary: jest.fn(),
 		listSummaries: jest.fn(),
 		status: jest.fn(),
+		refreshStatus: jest.fn(),
 		setup: jest.fn(),
 		unlock: jest.fn(),
 		changePassphrase: jest.fn(),
@@ -78,6 +79,23 @@ function register() {
 }
 
 describe('provider credential IPC boundary', () => {
+	it('awaits refreshed vault readiness for the public status query', async () => {
+		const sync = register();
+		const status = {
+			persistence: 'encrypted',
+			cloudConfigured: true,
+			unlocked: false,
+			pending: 0,
+		};
+		sync.refreshStatus.mockResolvedValue(status);
+
+		await expect(
+			handler(registerQueryWithEvent, ProviderChannels.vaultStatus)({})
+		).resolves.toEqual(status);
+		expect(sync.refreshStatus).toHaveBeenCalledTimes(1);
+		expect(sync.status).not.toHaveBeenCalled();
+	});
+
 	it('returns summaries without API keys from get and list', async () => {
 		const sync = register();
 		const summary = {

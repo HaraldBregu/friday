@@ -128,6 +128,43 @@ function newVault(): ProviderVault {
 	return new ProviderVault(store, storage, 'darwin');
 }
 
+it('awaits and deduplicates the in-flight sign-in readiness refresh', async () => {
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const remote: ProviderVaultCloudRecord = {
+		vaultId: 'existing-vault',
+		wrappedDataKey: '',
+		wrappingNonce: '',
+		wrappingTag: '',
+		kdfSalt: '',
+		kdfN: 131072,
+		kdfR: 8,
+		kdfP: 1,
+		keyVersion: 1,
+	};
+	let resolveRefresh!: (value: ProviderVaultCloudRecord) => void;
+	cloud.getVault = jest.fn(
+		() =>
+			new Promise<ProviderVaultCloudRecord>((resolve) => {
+				resolveRefresh = resolve;
+			})
+	);
+	const sync = new ProviderSyncService(auth, vault, cloud);
+
+	sync.initialize();
+	const first = sync.refreshStatus();
+	const second = sync.refreshStatus();
+	expect(cloud.getVault).toHaveBeenCalledTimes(1);
+	expect(sync.status()).toMatchObject({ cloudConfigured: false, unlocked: false });
+
+	resolveRefresh(remote);
+	await expect(first).resolves.toMatchObject({ cloudConfigured: true, unlocked: false });
+	await expect(second).resolves.toMatchObject({ cloudConfigured: true, unlocked: false });
+	expect(cloud.getVault).toHaveBeenCalledTimes(1);
+	sync.destroy();
+});
+
 it('recovers on a second device, retains dirty data offline, and converges tombstones', async () => {
 	const cloud = new FakeCloud();
 	const firstAuth = new FakeAuth();
