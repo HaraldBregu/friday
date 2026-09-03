@@ -2,7 +2,7 @@ import { normalizeProviderId } from '../../../shared/provider_types';
 import { RealtimeVoiceChannels } from '../../../shared/ipc_channels_definitions';
 import type { Agent } from '../agent';
 import { builtinTools } from '../runner/run_builtin_tools';
-import { buildSystemPrompt } from '../system';
+import { buildSystemPrompt, buildWorkspaceContext } from '../system';
 import type { EventBus } from '../../event_bus';
 import { defaultProviderId, loadModels } from '../../models';
 import {
@@ -68,6 +68,7 @@ export function createRealtimeVoiceManager(
 						: (realtimeVoiceDefaultVoice(providerId) ?? '');
 			const tools = builtinTools(agent.config, agent.sandbox, windowFactory);
 			const instructions = await buildSystemPrompt(agent.config, tools);
+			const workspaceContext = await buildWorkspaceContext(agent.config);
 			return {
 				provider: {
 					id: providerId,
@@ -77,6 +78,7 @@ export function createRealtimeVoiceManager(
 				modelId: model.id,
 				voice,
 				instructions,
+				context: workspaceContext ? [{ role: 'user', text: workspaceContext }] : [],
 				tools,
 			};
 		},

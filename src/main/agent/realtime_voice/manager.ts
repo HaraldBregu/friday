@@ -15,6 +15,7 @@ import type {
 	RealtimeVoiceAdapterEvent,
 	RealtimeVoiceAdapterRequest,
 	RealtimeVoiceConnection,
+	RealtimeVoiceHistoryMessage,
 	RealtimeVoiceProviderSpec,
 } from '../../models/adapters/realtime_voice';
 import type { RealtimeVoiceConversation, RealtimeVoiceConversationFactory } from './conversation';
@@ -25,6 +26,7 @@ export interface ResolvedRealtimeVoiceConfiguration extends Omit<
 	'history'
 > {
 	provider: RealtimeVoiceProviderSpec;
+	context: readonly RealtimeVoiceHistoryMessage[];
 }
 
 export interface RealtimeVoiceManagerDependencies {
@@ -66,13 +68,14 @@ export class RealtimeVoiceManager {
 		if (previous) await this.close(previous, true);
 
 		const configuration = await this.dependencies.resolveConfiguration();
+		const { provider, context, ...adapterConfiguration } = configuration;
 		this.requireCurrentGeneration(windowId, generation);
 		const displaced = this.byWindow.get(windowId);
 		if (displaced) await this.close(displaced, true);
 		this.requireCurrentGeneration(windowId, generation);
 		const info: RealtimeVoiceSession = {
 			id: randomUUID(),
-			providerId: configuration.provider.id,
+			providerId: provider.id,
 			modelId: configuration.modelId,
 			input: {
 				format: 'pcm16',
@@ -120,9 +123,12 @@ export class RealtimeVoiceManager {
 
 		try {
 			const connection = await this.dependencies
-				.createAdapter(configuration.provider)
+				.createAdapter(provider)
 				.connect(
-					{ ...configuration, history: active.conversation.history },
+					{
+						...adapterConfiguration,
+						history: [...context, ...active.conversation.history],
+					},
 					(event) => this.handleAdapterEvent(active, event),
 					controller.signal
 				);

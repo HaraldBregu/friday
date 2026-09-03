@@ -49,6 +49,7 @@ const configuration: ResolvedRealtimeVoiceConfiguration = {
 	modelId: 'gpt-realtime-2.1',
 	voice: 'marin',
 	instructions: 'Help the user.',
+	context: [],
 	tools: [],
 };
 
@@ -290,10 +291,11 @@ describe('RealtimeVoiceManager', () => {
 		await expect(starting).rejects.toThrow('stopped');
 	});
 
-	it('replays persisted transcripts on restart without leaking another chat history', async () => {
+	it('prepends transient context while replaying only the active chat history', async () => {
 		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-voice-manager-'));
 		const requests: RealtimeVoiceAdapterRequest[] = [];
 		const adapterEmits: RealtimeVoiceAdapterEventHandler[] = [];
+		const context = [{ role: 'user' as const, text: 'Workspace profile and bootstrap.' }];
 		const manager = new RealtimeVoiceManager({
 			createAdapter: () => ({
 				connect: async (request, emit) => {
@@ -302,7 +304,7 @@ describe('RealtimeVoiceManager', () => {
 					return new FakeConnection();
 				},
 			}),
-			resolveConfiguration: async () => configuration,
+			resolveConfiguration: async () => ({ ...configuration, context }),
 			createConversation: realtimeVoiceConversationFactory({
 				location: path.join(temporaryRoot, 'agent'),
 			}),
@@ -313,7 +315,7 @@ describe('RealtimeVoiceManager', () => {
 		const secondChat = '22222222-2222-4222-8222-222222222222';
 		try {
 			const first = await manager.start(11, { chatSessionId: firstChat });
-			expect(requests[0].history).toEqual([]);
+			expect(requests[0].history).toEqual(context);
 			adapterEmits[0]({ type: 'input_speech_stopped', itemId: 'user-1' });
 			adapterEmits[0]({
 				type: 'user_transcript_final',
@@ -330,13 +332,14 @@ describe('RealtimeVoiceManager', () => {
 
 			const restarted = await manager.start(11, { chatSessionId: firstChat });
 			expect(requests[1].history).toEqual([
+				...context,
 				{ role: 'user', text: 'Remember this question.' },
 				{ role: 'assistant', text: 'I will remember this answer.' },
 			]);
 			await manager.stop(11, restarted.id);
 
 			const isolated = await manager.start(11, { chatSessionId: secondChat });
-			expect(requests[2].history).toEqual([]);
+			expect(requests[2].history).toEqual(context);
 			await manager.stop(11, isolated.id);
 		} finally {
 			await manager.stopAll();
