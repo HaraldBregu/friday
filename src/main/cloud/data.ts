@@ -13,6 +13,7 @@ import type { CloudRepository } from './repository';
 export class CloudService {
 	private readonly listeners = new Set<(change: CloudChange) => void>();
 	private unsubscribeSession?: () => void;
+	private repositorySessionUpdate = Promise.resolve();
 
 	constructor(
 		private readonly auth: AuthService,
@@ -22,11 +23,10 @@ export class CloudService {
 	initialize(): void {
 		if (this.unsubscribeSession) return;
 		this.unsubscribeSession = this.auth.onSessionChanged((session) => {
-			void this.repository?.setAccessToken(session?.accessToken ?? null).catch(() => undefined);
-			if (!session) void this.repository?.clearWatches().catch(() => undefined);
+			this.updateRepositorySession(session?.accessToken ?? null);
 		});
 		const token = this.auth.getAccessToken();
-		if (token) void this.repository?.setAccessToken(token).catch(() => undefined);
+		if (token) this.updateRepositorySession(token);
 	}
 
 	onSessionChanged(listener: (change: CloudChange) => void): () => void {
@@ -86,8 +86,18 @@ export class CloudService {
 	async destroy(): Promise<void> {
 		this.unsubscribeSession?.();
 		this.unsubscribeSession = undefined;
+		await this.repositorySessionUpdate;
 		await this.repository?.clearWatches();
 		this.listeners.clear();
+	}
+
+	private updateRepositorySession(accessToken: string | null): void {
+		const repository = this.repository;
+		if (!repository) return;
+		this.repositorySessionUpdate = this.repositorySessionUpdate.then(async () => {
+			await repository.setAccessToken(accessToken).catch(() => undefined);
+			if (!accessToken) await repository.clearWatches().catch(() => undefined);
+		});
 	}
 
 	private remote(): CloudRepository {
