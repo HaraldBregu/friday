@@ -83,7 +83,7 @@ it('explains when the required profile table is missing', () => {
 	expect(publicCloudError({ code: 'PGRST205' })).toMatchObject({
 		name: 'PGRST205',
 		message:
-			'The required cloud resources are not configured in the hosted Supabase project.',
+			'The required cloud database table is unavailable. Apply the latest Supabase migrations.',
 	});
 });
 

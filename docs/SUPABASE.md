@@ -43,21 +43,62 @@ and secret there. Keep `friday://auth/callback` in Supabase's redirect allow lis
 Supabase authorization URL in the system browser and exchanges the returned PKCE code in the main
 process.
 
-## Hosted API boundary
+For local Supabase development, Google must instead authorize
+`http://127.0.0.1:54321/auth/v1/callback`. Keep the client secret in
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET`, never in this repository, and add this configuration
+to `supabase/config.toml` while testing Google locally:
 
-Friday connects to a preconfigured hosted Supabase project only through
-`@supabase/supabase-js` and the public client settings above. This repository does not run a
-local Supabase stack, contain migrations or seed data, test database policies, or deploy schema
-changes. Configure the hosted project's authentication, tables, storage, Realtime, and access
-policies outside this codebase. Never provide the application with database credentials or a
-service-role key.
+```toml
+[auth.external.google]
+enabled = true
+client_id = "your-google-web-client-id"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+skip_nonce_check = false
+```
 
-Verify these hosted-project settings in the Supabase dashboard:
+## Run Supabase locally
+
+Docker must be running. Start the local stack and apply the committed migrations:
+
+```sh
+npm run supabase:start
+npm run supabase:status
+```
+
+Run the database policy tests:
+
+```sh
+npm run supabase:test
+```
+
+Reset the local database after changing migrations, or stop the stack when finished:
+
+```sh
+npm run supabase:reset
+npm run supabase:stop
+```
+
+The local email inbox is available at `http://127.0.0.1:54324`. Authentication redirects
+back to the desktop app through `friday://auth/callback`.
+
+## Deploy the schema
+
+The migration in `supabase/migrations` creates the application tables, row-level security
+policies, private `user-files` bucket, ownership constraints, and private Realtime policies.
+Deploy it with an authenticated Supabase CLI session:
+
+```sh
+npx supabase login
+npx supabase link --project-ref your-project-ref
+npx supabase db push
+```
+
+Then verify these hosted-project settings in the Supabase dashboard:
 
 1. Add `friday://auth/callback` to the Auth redirect allow list.
 2. Enable the Google provider with its Web OAuth client ID and secret.
 3. Keep email/password sign-up enabled and require email confirmation for production.
-4. Disable Realtime public-channel access so the hosted project's private-channel policies apply.
+4. Disable Realtime public-channel access so the migration's private-channel policies apply.
 5. Verify email/password and Google sign-in, callback handling, and sign-out in the application.
 
 ## Local data boundary
