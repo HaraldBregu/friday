@@ -1,6 +1,8 @@
 import type { IpcModule } from './core/module';
+import { TrustedRenderer } from './core/trusted';
 import type { EventBus } from '../event_bus';
-import { registerCommand, registerCommandWithEvent, registerQuery } from './core/gateway';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
 import {
 	EmbeddingChannels,
 	ImageChannels,
@@ -33,105 +35,111 @@ import {
 } from '../models/adapters/stt';
 import { getRealtimeVoiceSetup, setRealtimeVoiceSetup } from '../agent/realtime_voice/setup';
 
-export class ModelsIpc implements IpcModule {
+export interface ModelsIpcDependencies {
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
+}
+
+export class ModelsIpc implements IpcModule<ModelsIpcDependencies> {
 	readonly name = 'models';
 
-	register(_deps: void, _eventBus: EventBus): void {
-		registerCommand(EmbeddingChannels.createEmbedding, (request) =>
+	register({ windows, extensions }: ModelsIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, extensions);
+		trusted.command(EmbeddingChannels.createEmbedding, (request) =>
 			embedding.createEmbedding(request)
 		);
-		registerQuery(EmbeddingChannels.getProviderId, () => getProviderId('embedding'));
-		registerCommand(EmbeddingChannels.setProviderId, (providerId) =>
+		trusted.query(EmbeddingChannels.getProviderId, () => getProviderId('embedding'));
+		trusted.command(EmbeddingChannels.setProviderId, (providerId) =>
 			setProviderId('embedding', providerId)
 		);
-		registerQuery(EmbeddingChannels.getModelId, () => getModelId('embedding'));
-		registerCommand(EmbeddingChannels.setModelId, (modelId) => setModelId('embedding', modelId));
+		trusted.query(EmbeddingChannels.getModelId, () => getModelId('embedding'));
+		trusted.command(EmbeddingChannels.setModelId, (modelId) => setModelId('embedding', modelId));
 
-		registerCommand(ImageChannels.createImage, (request) => image.createImage(request));
-		registerQuery(ImageChannels.getProviderId, () => getProviderId('image'));
-		registerCommand(ImageChannels.setProviderId, (providerId) =>
+		trusted.command(ImageChannels.createImage, (request) => image.createImage(request));
+		trusted.query(ImageChannels.getProviderId, () => getProviderId('image'));
+		trusted.command(ImageChannels.setProviderId, (providerId) =>
 			setProviderId('image', providerId)
 		);
-		registerQuery(ImageChannels.getModelId, () => getModelId('image'));
-		registerCommand(ImageChannels.setModelId, (modelId) => setModelId('image', modelId));
-		registerQuery(ImageChannels.getOptions, () => getOptions('image'));
-		registerCommand(ImageChannels.setOptions, (options) => {
+		trusted.query(ImageChannels.getModelId, () => getModelId('image'));
+		trusted.command(ImageChannels.setModelId, (modelId) => setModelId('image', modelId));
+		trusted.query(ImageChannels.getOptions, () => getOptions('image'));
+		trusted.command(ImageChannels.setOptions, (options) => {
 			setOptions('image', options);
 			return getOptions('image');
 		});
 
-		registerCommand(SoundChannels.createSound, async (request) => {
+		trusted.command(SoundChannels.createSound, async (request) => {
 			const result = await sound.createSound(request);
 			await sound.saveSoundFile(result);
 			return result;
 		});
-		registerQuery(SoundChannels.listSounds, () => sound.listSounds());
-		registerQuery(SoundChannels.getProviderId, () => getProviderId('sound'));
-		registerCommand(SoundChannels.setProviderId, (providerId) =>
+		trusted.query(SoundChannels.listSounds, () => sound.listSounds());
+		trusted.query(SoundChannels.getProviderId, () => getProviderId('sound'));
+		trusted.command(SoundChannels.setProviderId, (providerId) =>
 			setProviderId('sound', providerId)
 		);
-		registerQuery(SoundChannels.getModelId, () => getModelId('sound'));
-		registerCommand(SoundChannels.setModelId, (modelId) => setModelId('sound', modelId));
-		registerQuery(SoundChannels.getOptions, () => getOptions('sound'));
-		registerCommand(SoundChannels.setOptions, (options) => {
+		trusted.query(SoundChannels.getModelId, () => getModelId('sound'));
+		trusted.command(SoundChannels.setModelId, (modelId) => setModelId('sound', modelId));
+		trusted.query(SoundChannels.getOptions, () => getOptions('sound'));
+		trusted.command(SoundChannels.setOptions, (options) => {
 			setOptions('sound', options);
 			return getOptions('sound');
 		});
 
-		registerCommand(TextChannels.generateText, (request) => text.generateText(request));
-		registerQuery(TextChannels.getProviderId, () => getProviderId('text'));
-		registerCommand(TextChannels.setProviderId, (providerId) => setProviderId('text', providerId));
-		registerQuery(TextChannels.getModelId, () => getModelId('text'));
-		registerCommand(TextChannels.setModelId, (modelId) => setModelId('text', modelId));
+		trusted.command(TextChannels.generateText, (request) => text.generateText(request));
+		trusted.query(TextChannels.getProviderId, () => getProviderId('text'));
+		trusted.command(TextChannels.setProviderId, (providerId) => setProviderId('text', providerId));
+		trusted.query(TextChannels.getModelId, () => getModelId('text'));
+		trusted.command(TextChannels.setModelId, (modelId) => setModelId('text', modelId));
 
-		registerCommand(VideoChannels.createVideo, async (request) => {
+		trusted.command(VideoChannels.createVideo, async (request) => {
 			const result = await video.createVideo(request);
 			const path = await video.saveVideoFile(result);
 			return { ...result, path };
 		});
-		registerQuery(VideoChannels.getProviderId, () => getProviderId('video'));
-		registerCommand(VideoChannels.setProviderId, (providerId) =>
+		trusted.query(VideoChannels.getProviderId, () => getProviderId('video'));
+		trusted.command(VideoChannels.setProviderId, (providerId) =>
 			setProviderId('video', providerId)
 		);
-		registerQuery(VideoChannels.getModelId, () => getModelId('video'));
-		registerCommand(VideoChannels.setModelId, (modelId) => setModelId('video', modelId));
-		registerQuery(VideoChannels.getOptions, () => getOptions('video'));
-		registerCommand(VideoChannels.setOptions, (options) => {
+		trusted.query(VideoChannels.getModelId, () => getModelId('video'));
+		trusted.command(VideoChannels.setModelId, (modelId) => setModelId('video', modelId));
+		trusted.query(VideoChannels.getOptions, () => getOptions('video'));
+		trusted.command(VideoChannels.setOptions, (options) => {
 			setOptions('video', options);
 			return getOptions('video');
 		});
 
-		registerCommand(SpeechChannels.synthesize, (request) => voice.synthesize(request));
-		registerQuery(SpeechChannels.getProviderId, () => getProviderId('voice'));
-		registerQuery(SpeechChannels.getOptions, () => getOptions('voice'));
-		registerCommand(SpeechChannels.setOptions, (options) => {
+		trusted.command(SpeechChannels.synthesize, (request) => voice.synthesize(request));
+		trusted.query(SpeechChannels.getProviderId, () => getProviderId('voice'));
+		trusted.query(SpeechChannels.getOptions, () => getOptions('voice'));
+		trusted.command(SpeechChannels.setOptions, (options) => {
 			setOptions('voice', options);
 			return getOptions('voice');
 		});
-		registerCommand(SpeechChannels.setProviderId, (providerId) =>
+		trusted.command(SpeechChannels.setProviderId, (providerId) =>
 			setProviderId('voice', providerId)
 		);
-		registerQuery(SpeechChannels.getModelId, () => getModelId('voice'));
-		registerCommand(SpeechChannels.setModelId, (modelId) => setModelId('voice', modelId));
+		trusted.query(SpeechChannels.getModelId, () => getModelId('voice'));
+		trusted.command(SpeechChannels.setModelId, (modelId) => setModelId('voice', modelId));
 
-		registerQuery(RealtimeVoiceChannels.getProviderId, () => getProviderId('realtimeVoice'));
-		registerQuery(RealtimeVoiceChannels.getSetup, () => getRealtimeVoiceSetup());
-		registerCommand(RealtimeVoiceChannels.setSetup, (request) => setRealtimeVoiceSetup(request));
-		registerCommand(RealtimeVoiceChannels.setProviderId, (providerId) => {
+		trusted.query(RealtimeVoiceChannels.getProviderId, () => getProviderId('realtimeVoice'));
+		trusted.query(RealtimeVoiceChannels.getSetup, () => getRealtimeVoiceSetup());
+		trusted.command(RealtimeVoiceChannels.setSetup, (request) => setRealtimeVoiceSetup(request));
+		trusted.command(RealtimeVoiceChannels.setProviderId, (providerId) => {
 			if (typeof providerId !== 'string' || !providerId.trim()) {
 				throw new Error('Invalid realtime voice provider id.');
 			}
 			setProviderId('realtimeVoice', providerId.trim());
 		});
-		registerQuery(RealtimeVoiceChannels.getModelId, () => getModelId('realtimeVoice'));
-		registerCommand(RealtimeVoiceChannels.setModelId, (modelId) => {
+		trusted.query(RealtimeVoiceChannels.getModelId, () => getModelId('realtimeVoice'));
+		trusted.command(RealtimeVoiceChannels.setModelId, (modelId) => {
 			if (typeof modelId !== 'string' || !modelId.trim()) {
 				throw new Error('Invalid realtime voice model id.');
 			}
 			setModelId('realtimeVoice', modelId.trim());
 		});
-		registerQuery(RealtimeVoiceChannels.getOptions, () => getOptions('realtimeVoice'));
-		registerCommand(RealtimeVoiceChannels.setOptions, (options) => {
+		trusted.query(RealtimeVoiceChannels.getOptions, () => getOptions('realtimeVoice'));
+		trusted.command(RealtimeVoiceChannels.setOptions, (options) => {
 			if (!options || typeof options !== 'object' || Array.isArray(options)) {
 				throw new Error('Invalid realtime voice options.');
 			}
@@ -139,28 +147,28 @@ export class ModelsIpc implements IpcModule {
 			return getOptions('realtimeVoice');
 		});
 
-		registerQuery(SttChannels.getSelection, (mode) => getSelection(mode));
-		registerQuery(SttChannels.listProviders, () => listProviders());
-		registerQuery(SttChannels.listModels, (providerId) => listModels(providerId));
-		registerCommand(SttChannels.saveSelection, (providerId, modelId, mode) =>
+		trusted.query(SttChannels.getSelection, (mode) => getSelection(mode));
+		trusted.query(SttChannels.listProviders, () => listProviders());
+		trusted.query(SttChannels.listModels, (providerId) => listModels(providerId));
+		trusted.command(SttChannels.saveSelection, (providerId, modelId, mode) =>
 			saveSelection(providerId, modelId, mode)
 		);
-		registerQuery(SttChannels.getProviderId, () => getProviderId('transcribe'));
-		registerCommand(SttChannels.setProviderId, (providerId) =>
+		trusted.query(SttChannels.getProviderId, () => getProviderId('transcribe'));
+		trusted.command(SttChannels.setProviderId, (providerId) =>
 			setProviderId('transcribe', providerId)
 		);
-		registerQuery(SttChannels.getModelId, () => getModelId('transcribe'));
-		registerCommand(SttChannels.setModelId, (modelId) => setModelId('transcribe', modelId));
-		registerCommand(SttChannels.transcribe, (request) => sttTranscribe(request));
-		registerCommandWithEvent(SttChannels.startRealtime, (event, request) =>
+		trusted.query(SttChannels.getModelId, () => getModelId('transcribe'));
+		trusted.command(SttChannels.setModelId, (modelId) => setModelId('transcribe', modelId));
+		trusted.command(SttChannels.transcribe, (request) => sttTranscribe(request));
+		trusted.commandWithEvent(SttChannels.startRealtime, (event, request) =>
 			startRealtime(request, (sttEvent) => {
 				event.sender.send(SttChannels.realtimeEvent, sttEvent);
 			})
 		);
-		registerCommand(SttChannels.appendRealtimeAudio, (sessionId, audio) =>
+		trusted.command(SttChannels.appendRealtimeAudio, (sessionId, audio) =>
 			appendRealtimeAudio(sessionId, audio)
 		);
-		registerCommand(SttChannels.finishRealtime, (sessionId) => finishRealtime(sessionId));
-		registerCommand(SttChannels.cancelRealtime, (sessionId) => cancelRealtime(sessionId));
+		trusted.command(SttChannels.finishRealtime, (sessionId) => finishRealtime(sessionId));
+		trusted.command(SttChannels.cancelRealtime, (sessionId) => cancelRealtime(sessionId));
 	}
 }
