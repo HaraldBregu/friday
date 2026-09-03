@@ -204,10 +204,10 @@ it('moves from landing to auth and back without changing routes', async () => {
 	window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 	renderFlow('/start');
 
-	expect(screen.queryByRole('status')).not.toBeInTheDocument();
+	expect(document.querySelector('footer')).not.toBeInTheDocument();
 	await user.click(await screen.findByRole('button', { name: 'Get started' }));
 	expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
-	expect(screen.getByRole('status')).toHaveTextContent('Account · 1 of 4');
+	expect(screen.getByText('Account').parentElement).toHaveTextContent('Account · 1 of 4');
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 
 	await user.click(screen.getByRole('button', { name: 'Back' }));
