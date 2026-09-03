@@ -1,6 +1,5 @@
 import { app, BrowserWindow, crashReporter, nativeTheme, shell } from 'electron';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { mkdirSync } from 'node:fs';
 import { Main } from './create_window';
 import { Tray } from './tray';
 import { setTrayEnabled } from './set_tray_enabled';
@@ -43,6 +42,7 @@ import { CHANNEL_PROVIDER_IDS } from '../shared';
 import { AppChannels } from '../shared/ipc_channels_definitions';
 import { startWiki, stopWiki } from './agent/knowledge/wiki';
 import { authLinks } from './cloud/links';
+import { loadLocalEnvironment } from './cloud/environment';
 
 // // DIAG: bump V8 old-space heap to confirm whether crashes (Chromium OOM,
 // // exception 0xE0000008) come from the V8/JS heap or from native/C++
@@ -53,28 +53,7 @@ import { authLinks } from './cloud/links';
 // 	app.commandLine.appendSwitch('enable-transparent-visuals');
 // }
 
-function loadLocalEnv(): void {
-	const paths = Array.from(
-		new Set([resolve(process.cwd(), '.env'), resolve(app.getAppPath(), '.env')])
-	);
-
-	for (const envPath of paths) {
-		if (!existsSync(envPath)) continue;
-		const lines = readFileSync(envPath, 'utf8').split(/\r?\n/);
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (!trimmed || trimmed.startsWith('#')) continue;
-			const separatorIndex = trimmed.indexOf('=');
-			if (separatorIndex <= 0) continue;
-			const key = trimmed.slice(0, separatorIndex).trim();
-			const rawValue = trimmed.slice(separatorIndex + 1).trim();
-			if (!key || process.env[key]?.trim()) continue;
-			process.env[key] = rawValue.replace(/^(['"])(.*)\1$/, '$2');
-		}
-	}
-}
-
-loadLocalEnv();
+loadLocalEnvironment(app.getAppPath(), app.isPackaged);
 registerLocalResourceProtocolScheme();
 
 // Install process-level safety net BEFORE anything else so we can see silent exits.
