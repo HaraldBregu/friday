@@ -40,27 +40,39 @@ function statusClassName(status: MicrophoneSystemPermissionStatus): string {
 
 function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Element {
 	const { t } = useTranslation();
-	const recorder = useMediaRecorderTest(media);
+	const {
+		state: recorderState,
+		error: recorderError,
+		recordedUrl,
+		elapsedSeconds,
+		videoRef,
+		start,
+		stop,
+		reset,
+	} = useMediaRecorderTest(media);
 	const [status, setStatus] = useState<MicrophoneSystemPermissionStatus>('unknown');
 	const [permissionError, setPermissionError] = useState('');
 
-	const loadPermission = useCallback(async (): Promise<void> => {
-		if (!media.permission) return;
-		setPermissionError('');
-		try {
-			const result =
-				media.permission === 'camera'
-					? await window.app.getCameraPermission()
-					: await window.app.getMicrophonePermission();
-			setStatus(result.systemStatus);
-		} catch (error) {
-			setPermissionError(errorMessage(error, t(`settings.${media.permission}.errors.load`)));
-		}
-	}, [media.permission, t]);
-
 	useEffect(() => {
-		void loadPermission();
-	}, [loadPermission]);
+		if (!media.permission) return;
+		let active = true;
+		const request =
+			media.permission === 'camera'
+				? window.app.getCameraPermission()
+				: window.app.getMicrophonePermission();
+		void request
+			.then((result) => {
+				if (active) setStatus(result.systemStatus);
+			})
+			.catch((error) => {
+				if (active) {
+					setPermissionError(errorMessage(error, t(`settings.${media.permission}.errors.load`)));
+				}
+			});
+		return () => {
+			active = false;
+		};
+	}, [media.permission, t]);
 
 	const handleRequest = useCallback(async (): Promise<void> => {
 		if (!media.permission) return;
@@ -136,13 +148,13 @@ function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Elem
 			>
 				<SettingsPanel>
 					<div className="flex flex-col gap-3 p-3">
-						{recorder.error && (
-							<SettingsNotice variant="destructive">{recorder.error}</SettingsNotice>
+						{recorderError && (
+							<SettingsNotice variant="destructive">{recorderError}</SettingsNotice>
 						)}
 
-						{media.video && recorder.state !== 'recorded' && (
+						{media.video && recorderState !== 'recorded' && (
 							<video
-								ref={recorder.videoRef}
+								ref={videoRef}
 								muted
 								playsInline
 								className="aspect-video w-full rounded-md bg-black/80"
@@ -151,53 +163,53 @@ function MediaDetail({ media }: { readonly media: SystemMedia }): React.JSX.Elem
 
 						{!media.video && (
 							<div className="flex h-24 items-center justify-center rounded-md border border-border/60 bg-muted/30 text-xs text-muted-foreground">
-								{recorder.state === 'recording'
+								{recorderState === 'recording'
 									? t('settings.system.media.test.recording', {
-											time: formatElapsed(recorder.elapsedSeconds),
+											time: formatElapsed(elapsedSeconds),
 										})
 									: t('settings.system.media.test.audioIdle')}
 							</div>
 						)}
 
 						<div className="flex flex-wrap items-center gap-2">
-							{recorder.state !== 'recording' ? (
+							{recorderState !== 'recording' ? (
 								<Button
 									size="xs"
-									disabled={recorder.state === 'starting'}
-									onClick={() => void recorder.start()}
+									disabled={recorderState === 'starting'}
+									onClick={() => void start()}
 								>
 									<Play className="size-3" />
 									{t('settings.system.media.test.start')}
 								</Button>
 							) : (
-								<Button size="xs" variant="destructive" onClick={recorder.stop}>
+								<Button size="xs" variant="destructive" onClick={stop}>
 									<Square className="size-3" />
 									{t('settings.system.media.test.stop')}
-									{media.video ? ` · ${formatElapsed(recorder.elapsedSeconds)}` : ''}
+									{media.video ? ` · ${formatElapsed(elapsedSeconds)}` : ''}
 								</Button>
 							)}
-							{recorder.state === 'recorded' && (
-								<Button size="xs" variant="outline" onClick={recorder.reset}>
+							{recorderState === 'recorded' && (
+								<Button size="xs" variant="outline" onClick={reset}>
 									<RotateCcw className="size-3" />
 									{t('settings.system.media.test.retry')}
 								</Button>
 							)}
 						</div>
 
-						{recorder.state === 'recorded' && recorder.recordedUrl && (
+						{recorderState === 'recorded' && recordedUrl && (
 							<div className="flex flex-col gap-1.5">
 								<p className="text-[11px] font-medium text-muted-foreground">
 									{t('settings.system.media.test.result')}
 								</p>
 								{media.video ? (
 									<video
-										src={recorder.recordedUrl}
+										src={recordedUrl}
 										controls
 										playsInline
 										className="aspect-video w-full rounded-md bg-black/80"
 									/>
 								) : (
-									<audio src={recorder.recordedUrl} controls className="w-full" />
+									<audio src={recordedUrl} controls className="w-full" />
 								)}
 							</div>
 						)}
