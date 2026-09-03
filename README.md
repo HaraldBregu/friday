@@ -44,7 +44,7 @@ Friday runs on Windows, macOS, and Linux, with English and Italian interfaces an
 
 ## Getting Started
 
-Requirements: Node.js 22.14+ and npm 11.5.1+.
+Requirements: Node.js 22.19+ and npm 11.5.1+.
 
 ```bash
 npm ci

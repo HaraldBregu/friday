@@ -85,7 +85,7 @@
 		"build:coder": "npm ci --prefix extensions/coder && npm run build --prefix extensions/coder",
 		"build:architect": "npm ci --prefix extensions/architect && npm run build --prefix extensions/architect",
 		"build:demo": "npm run build --prefix extensions/demo",
-		"build:workspace": "npm run build --prefix extensions/workspace",
+		"build:workspace": "npm ci --prefix extensions/workspace && npm run build --prefix extensions/workspace",
 		"build:packages": "npm run build --workspaces --if-present",
 		"build:all": "npm run build && npm run build:packages && npm run build:workspace",
 		"build:dev": "cross-env NODE_ENV=development npm run typecheck && electron-vite build --mode development",

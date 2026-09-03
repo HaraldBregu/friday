@@ -23,14 +23,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run typecheck
+	  - run: npm run quality:check
       - run: npm run build
-      - run: npm run test:packages
       - run: npm run build:packages
       - run: npm pack --dry-run --workspace @friday/sdk
       - run: npm pack --dry-run --workspace @friday/cli
       - run: npm install --prefix extensions/demo
       - run: npm run build:demo
       - run: npm run build:coder
-      - run: npm ci --prefix extensions/workspace
       - run: npm run build:workspace

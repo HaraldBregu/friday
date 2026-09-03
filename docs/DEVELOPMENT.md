@@ -20,7 +20,7 @@ intentionally keeps its own lockfile.
 Install:
 
 - Git
-- Node.js 22.14 or newer
+- Node.js 22.19 or newer
 - npm 11.5.1 or newer
 
 Confirm the active versions from the repository root:
@@ -198,12 +198,7 @@ Also verify formatting without rewriting files:
 npm run format:check
 ```
 
-At the time this guide was written, `quality:check` is not green on `main`: existing ESLint
-errors and stale main/renderer Jest expectations still need to be reconciled with recent
-application changes. The deployable CI gate is the exact command sequence in
-[Match the automated CI gate](#match-the-automated-ci-gate). Run the individual checks
-relevant to your change, and record any unrelated baseline failures in the pull request.
-Do not claim that `quality:check` passed when it did not.
+CI and release builds run this same gate. Run it locally before submitting changes.
 
 ### Production build
 

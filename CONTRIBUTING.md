@@ -6,7 +6,7 @@ Thanks for your interest in contributing! This document describes how to set up 
 
 Requirements:
 
-- Node.js 22.14+
+- Node.js 22.19+
 - npm 11.5.1+
 
 ```bash
@@ -50,8 +50,7 @@ npm run format           # prettier --write .
 npm run format:check     # prettier --check .
 ```
 
-The full `quality:check` currently exposes known baseline lint and stale Jest failures.
-Run the checks relevant to your change and report unrelated failures accurately.
+Run the full `quality:check` before submitting changes.
 
 The complete workflow, including targeted workspace tests and end-to-end setup, is in
 [Development, Testing, and Deployment](docs/DEVELOPMENT.md).
