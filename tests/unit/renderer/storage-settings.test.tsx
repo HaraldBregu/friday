@@ -273,7 +273,7 @@ it.each([
 	render(<StoragePage />);
 
 	expect(await screen.findByText(message)).toBeInTheDocument();
-	expect(screen.getByRole('button', { name: 'Back up now' })).toBeDisabled();
+	expect(await screen.findByRole('button', { name: 'Back up now' })).toBeDisabled();
 	expect(screen.getByRole('button', { name: 'Restore from cloud' })).toBeDisabled();
 	expect(screen.getByRole('button', { name: 'Add folders' })).toBeDisabled();
 });
@@ -357,6 +357,7 @@ it('announces partial backups as warnings', async () => {
 		});
 	});
 
-	expect(await screen.findByRole('alert')).toHaveTextContent('Backed up files; some failed');
-	expect(screen.getByRole('alert')).toHaveClass('text-amber-700');
+	const warning = await screen.findByRole('alert');
+	expect(warning).toHaveTextContent('Backed up files; some failed');
+	expect(warning.firstElementChild).toHaveClass('text-amber-700');
 });
