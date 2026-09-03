@@ -87,13 +87,16 @@ export function AuthStep(): React.JSX.Element {
 
 	if (state.status === 'unconfigured') {
 		return (
-			<div className="flex min-h-full items-center justify-center px-6 py-8">
-				<Card className="w-full max-w-sm">
-					<CardHeader>
-						<h1 className="text-base font-medium leading-snug">Supabase is not configured</h1>
-						<CardDescription>
-							Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then restart Kucedr.
-						</CardDescription>
+				<div className="flex min-h-full items-center justify-center px-6 py-8">
+					<Card className="w-full max-w-sm">
+						<CardHeader>
+							<h1 className="text-base font-medium leading-snug">
+								Kucedr account services are unavailable
+							</h1>
+							<CardDescription>
+								Sign-in and cloud sync are not available right now. You can continue using Kucedr
+								on this device.
+							</CardDescription>
 					</CardHeader>
 				</Card>
 			</div>
@@ -235,7 +238,7 @@ export function AuthStep(): React.JSX.Element {
 												autoComplete={
 													mode === 'signIn' && !recovery ? 'current-password' : 'new-password'
 												}
-												minLength={8}
+												minLength={mode === 'signIn' && !recovery ? undefined : 8}
 												required
 												value={password}
 												disabled={disabled}

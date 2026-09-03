@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { AuthApi, AuthState } from '../../../src/shared/auth_types';
 import { AuthProvider } from '../../../src/renderer/src/contexts/AuthContext';
@@ -54,6 +54,49 @@ it('submits email and password to sign in', async () => {
 	);
 });
 
+it('accepts a non-empty current password shorter than the new-password minimum', async () => {
+	const user = userEvent.setup();
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+	await user.type(screen.getByLabelText('Email'), 'user@example.test');
+	await user.type(screen.getByLabelText('Password'), 'short');
+	await user.click(screen.getByRole('button', { name: 'Sign in' }));
+
+	await waitFor(() =>
+		expect(window.auth.signIn).toHaveBeenCalledWith({
+			email: 'user@example.test',
+			password: 'short',
+		})
+	);
+});
+
+it('keeps the eight-character minimum for new passwords', async () => {
+	const user = userEvent.setup();
+	const view = render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+	await user.click(screen.getByRole('button', { name: 'New to Kucedr? Create an account' }));
+
+	expect(screen.getByLabelText('Password')).toHaveAttribute('minlength', '8');
+	expect(screen.getByLabelText('Confirm password')).toHaveAttribute('minlength', '8');
+
+	view.unmount();
+	window.auth = authApi({ status: 'recovery', persistence: 'encrypted' });
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+
+	expect(await screen.findByLabelText('New password')).toHaveAttribute('minlength', '8');
+	expect(screen.getByLabelText('Confirm password')).toHaveAttribute('minlength', '8');
+});
+
 it('starts Google sign-in', async () => {
 	const user = userEvent.setup();
 	render(
@@ -98,4 +141,93 @@ it('keeps local-only continuation out of the account content', async () => {
 	expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Skip for now' })).not.toBeInTheDocument();
 	expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+});
+
+it('describes unavailable account services without exposing infrastructure configuration', async () => {
+	window.auth = authApi({ status: 'unconfigured', persistence: 'memory' });
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+
+	expect(
+		await screen.findByRole('heading', { name: 'Kucedr account services are unavailable' })
+	).toBeInTheDocument();
+	expect(screen.getByText(/continue using Kucedr on this device/i)).toBeInTheDocument();
+	expect(screen.queryByText(/supabase|publishable_key|supabase_url/i)).not.toBeInTheDocument();
+});
+
+it('does not let a stale initial snapshot overwrite a newer auth event', async () => {
+	let resolveState: ((state: AuthState) => void) | undefined;
+	let listener: ((state: AuthState) => void) | undefined;
+	window.auth = {
+		...authApi({ status: 'signedOut', persistence: 'encrypted' }),
+		getState: jest.fn(
+			() =>
+				new Promise<AuthState>((resolve) => {
+					resolveState = resolve;
+				})
+		),
+		onStateChanged: jest.fn((callback) => {
+			listener = callback;
+			return jest.fn();
+		}),
+	};
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+
+	act(() => {
+		listener?.({
+			status: 'confirmationRequired',
+			email: 'user@example.test',
+			persistence: 'encrypted',
+		});
+	});
+	expect(await screen.findByRole('heading', { name: 'Check your email' })).toBeInTheDocument();
+
+	await act(async () => {
+		resolveState?.({ status: 'signedOut', persistence: 'encrypted' });
+	});
+	expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument();
+});
+
+it('does not let a stale initial failure overwrite a newer auth event', async () => {
+	let rejectState: ((cause: Error) => void) | undefined;
+	let listener: ((state: AuthState) => void) | undefined;
+	window.auth = {
+		...authApi({ status: 'signedOut', persistence: 'encrypted' }),
+		getState: jest.fn(
+			() =>
+				new Promise<AuthState>((_resolve, reject) => {
+					rejectState = reject;
+				})
+		),
+		onStateChanged: jest.fn((callback) => {
+			listener = callback;
+			return jest.fn();
+		}),
+	};
+	render(
+		<AuthProvider>
+			<AuthStep />
+		</AuthProvider>
+	);
+
+	act(() => {
+		listener?.({
+			status: 'confirmationRequired',
+			email: 'user@example.test',
+			persistence: 'encrypted',
+		});
+	});
+	expect(await screen.findByRole('heading', { name: 'Check your email' })).toBeInTheDocument();
+
+	await act(async () => {
+		rejectState?.(new Error('Initial state failed'));
+	});
+	expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument();
 });

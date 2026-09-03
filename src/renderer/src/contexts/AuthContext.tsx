@@ -51,16 +51,20 @@ export function AuthProvider({ children }: { readonly children: ReactNode }): Re
 
 	useEffect(() => {
 		let mounted = true;
+		let receivedStateChange = false;
 		const unsubscribe = window.auth.onStateChanged((next) => {
+			receivedStateChange = true;
 			if (mounted) applyState(next);
 		});
 		void window.auth
 			.getState()
 			.then((next) => {
-				if (mounted) applyState(next);
+				if (mounted && !receivedStateChange) applyState(next);
 			})
 			.catch(() => {
-				if (mounted) setState({ status: 'unconfigured', persistence: 'memory' });
+				if (mounted && !receivedStateChange) {
+					setState({ status: 'unconfigured', persistence: 'memory' });
+				}
 			});
 		return () => {
 			mounted = false;
