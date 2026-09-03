@@ -89,7 +89,12 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		)
 	);
 	safeRegister('tasks', () => new TaskIpc().register(undefined, eventBus));
-	safeRegister('mcp', () => new McpIpc().register(undefined, eventBus));
+	safeRegister('mcp', () =>
+		new McpIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('models', () => new ModelsIpc().register(undefined, eventBus));
 	safeRegister('realtime-voice', () =>
 		new RealtimeVoiceIpc().register({ conversation: conversationService }, eventBus)

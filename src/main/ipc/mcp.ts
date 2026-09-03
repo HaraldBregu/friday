@@ -21,8 +21,11 @@ import {
 	type McpOAuthStorage,
 } from '../mcp';
 import type { McpData, McpOAuthStart, McpSettings } from '../../shared/mcp_types';
-import { registerCommand, registerCommandWithEvent, registerQuery } from './core/gateway';
+import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
+import { TrustedRenderer } from './core/trusted';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -128,25 +131,38 @@ function getHttpMcpServer(id: string): {
 	};
 }
 
-export class McpIpc implements IpcModule {
+export interface McpIpcDeps {
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
+}
+
+export class McpIpc implements IpcModule<McpIpcDeps> {
 	readonly name = 'mcp';
 
-	register(_deps: void, _eventBus: EventBus): void {
-		registerQuery(McpChannels.list, () => listMcp());
+	register({ windows, extensions }: McpIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, extensions);
 
-		registerQuery(McpChannels.get, (id: string) => {
+		registerQueryWithEvent(McpChannels.list, (event) => {
+			trusted.assert(event);
+			return listMcp();
+		});
+
+		registerQueryWithEvent(McpChannels.get, (event, id: string) => {
+			trusted.assert(event);
 			const connectorId = resolveMcpId(id);
 			const connector = listMcp()[connectorId];
 			return connector ? { [connectorId]: connector } : {};
 		});
 
-		registerCommand(McpChannels.save, (input: McpSettings) => {
+		registerCommandWithEvent(McpChannels.save, (event, input: McpSettings) => {
+			trusted.assert(event);
 			const next = normalizeMcpSettings(input);
 			setMcpServers(next);
 			return listMcp();
 		});
 
-		registerCommand(McpChannels.upsert, (id: string, input: McpData) => {
+		registerCommandWithEvent(McpChannels.upsert, (event, id: string, input: McpData) => {
+			trusted.assert(event);
 			const connectorId = resolveMcpId(id);
 			const entry = normalizeMcpSettings({ [connectorId]: input })[connectorId];
 			if (!entry) throw new Error('Invalid MCP server configuration.');
@@ -154,15 +170,19 @@ export class McpIpc implements IpcModule {
 			return listMcp();
 		});
 
-		registerCommand(McpChannels.delete, (id: string) => {
+		registerCommandWithEvent(McpChannels.delete, (event, id: string) => {
+			trusted.assert(event);
 			const connectorId = resolveMcpId(id);
 			deleteMcpServer(connectorId);
 		});
 
-		registerQuery(McpChannels.registry, () => listMcpRegistry());
+		registerQueryWithEvent(McpChannels.registry, (event) => {
+			trusted.assert(event);
+			return listMcpRegistry();
+		});
 
 		registerCommandWithEvent(McpChannels.importLocal, async (event) => {
-			const window = BrowserWindow.fromWebContents(event.sender);
+			const window = trusted.assert(event);
 			const options: Electron.OpenDialogOptions = {
 				title: 'Select local MCP server folder(s)',
 				properties: ['openDirectory', 'multiSelections'],
@@ -174,22 +194,33 @@ export class McpIpc implements IpcModule {
 			return importLocalMcpServers(result.filePaths);
 		});
 
-		registerCommand(McpChannels.configureLocal, (id, input) =>
-			configureLocalMcpServer(resolveMcpId(id), input)
-		);
+		registerCommandWithEvent(McpChannels.configureLocal, (event, id, input) => {
+			trusted.assert(event);
+			return configureLocalMcpServer(resolveMcpId(id), input);
+		});
 
-		registerQuery(McpChannels.getRoot, () => mcpLocalRoot());
+		registerQueryWithEvent(McpChannels.getRoot, (event) => {
+			trusted.assert(event);
+			return mcpLocalRoot();
+		});
 
-		registerCommand(McpChannels.openRoot, async () => {
+		registerCommandWithEvent(McpChannels.openRoot, async (event) => {
+			trusted.assert(event);
 			const root = mcpLocalRoot();
 			mkdirSync(root, { recursive: true });
 			const error = await shell.openPath(root);
 			if (error) throw new Error(error);
 		});
 
-		registerCommand(McpChannels.test, (id: string) => testMcpServer(resolveMcpId(id)));
+		registerCommandWithEvent(McpChannels.test, (event, id: string) => {
+			trusted.assert(event);
+			return testMcpServer(resolveMcpId(id));
+		});
 
-		registerCommand(McpChannels.oauthStart, async (id: string): Promise<McpOAuthStart> => {
+		registerCommandWithEvent(
+			McpChannels.oauthStart,
+			async (event, id: string): Promise<McpOAuthStart> => {
+				trusted.assert(event);
 			const server = getHttpMcpServer(id);
 			let redirectUrl: string | undefined;
 			const provider = () =>
@@ -218,22 +249,27 @@ export class McpIpc implements IpcModule {
 				const finish = await auth(provider(), { serverUrl: server.url, authorizationCode: code });
 				if (finish !== 'AUTHORIZED') throw new Error(`OAuth authorization failed for "${id}".`);
 				return { status: 'authorized' };
-			} finally {
-				callback.close();
+				} finally {
+					callback.close();
+				}
 			}
-		});
+		);
 
-		registerCommand(McpChannels.oauthFinish, async (id: string, code: string): Promise<void> => {
-			const server = getHttpMcpServer(id);
-			const result = await auth(
-				createOAuthProvider({
-					storage: oauthStorage(server.id),
-					clientId: server.clientId,
-					clientSecret: server.clientSecret,
-				}),
-				{ serverUrl: server.url, authorizationCode: code }
-			);
-			if (result !== 'AUTHORIZED') throw new Error(`OAuth authorization failed for "${id}".`);
-		});
+		registerCommandWithEvent(
+			McpChannels.oauthFinish,
+			async (event, id: string, code: string): Promise<void> => {
+				trusted.assert(event);
+				const server = getHttpMcpServer(id);
+				const result = await auth(
+					createOAuthProvider({
+						storage: oauthStorage(server.id),
+						clientId: server.clientId,
+						clientSecret: server.clientSecret,
+					}),
+					{ serverUrl: server.url, authorizationCode: code }
+				);
+				if (result !== 'AUTHORIZED') throw new Error(`OAuth authorization failed for "${id}".`);
+			}
+		);
 	}
 }
