@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { app, BrowserWindow } from 'electron';
-import { createRecorder } from '../../../../../src/main/recorder/recorder';
+import { createRecorder } from '../../../../src/main/recorder/recorder';
 
 describe('recorder capture ownership', () => {
 	let directory: string;
