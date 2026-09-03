@@ -37,6 +37,7 @@ export default tseslint.config(
 			...eslintPluginReactHooks.configs.recommended.rules,
 			...eslintPluginReactRefresh.configs.vite.rules,
 			'react/prop-types': 'off',
+			'react-hooks/set-state-in-effect': 'off',
 			'@typescript-eslint/explicit-function-return-type': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'error',

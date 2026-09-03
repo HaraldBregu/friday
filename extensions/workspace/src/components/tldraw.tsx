@@ -18,7 +18,10 @@ export default function TldrawEditor({ content, isDark, onChange }: TldrawEditor
 	const onChangeRef = useRef(onChange);
 	const timerRef = useRef<number | undefined>(undefined);
 	const unsubscribeRef = useRef<(() => void) | undefined>(undefined);
-	onChangeRef.current = onChange;
+
+	useEffect(() => {
+		onChangeRef.current = onChange;
+	}, [onChange]);
 
 	useEffect(() => {
 		activeRef.current = true;

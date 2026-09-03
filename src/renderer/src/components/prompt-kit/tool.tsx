@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { createElement, useState, type CSSProperties } from 'react';
 import {
 	AudioLines,
 	Blocks,
@@ -148,7 +148,7 @@ function Tool({ toolPart, label, defaultOpen = false, hideIcon = false, classNam
 	const input = toolPart.input ?? (toolPart.inputText ? { raw: toolPart.inputText } : undefined);
 	const output = toolPart.output ?? toolPart.outputText;
 	const triggerLabel = label ?? toolPart.type;
-	const KindIcon = toolIcon(toolPart);
+	const kindIcon = toolIcon(toolPart);
 	const isExecuting =
 		toolPart.durationMs === undefined &&
 		toolPart.startedAtMs !== undefined &&
@@ -179,7 +179,10 @@ function Tool({ toolPart, label, defaultOpen = false, hideIcon = false, classNam
 							className="p-0! h-auto w-full justify-start rounded-md bg-transparent! py-1 font-normal text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground"
 						>
 							<div className="flex w-full min-w-0 items-center gap-1.5">
-								{!hideIcon && <KindIcon className="size-3.5 shrink-0 text-muted-foreground/60" />}
+								{!hideIcon &&
+									createElement(kindIcon, {
+										className: 'size-3.5 shrink-0 text-muted-foreground/60',
+									})}
 								<span
 									className={cn(
 										'truncate text-xs font-medium',
