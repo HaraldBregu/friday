@@ -988,6 +988,34 @@
 				"confirmationRequired": "Conferma il tuo indirizzo email prima di usare il backup cloud.",
 				"signedOut": "Accedi per eseguire il backup e il ripristino delle cartelle."
 			},
+			"credentials": {
+				"title": "Sincronizzazione sicura delle chiavi",
+				"setupDescription": "Crea una passphrase separata per cifrare e sincronizzare le chiavi API salvate tra i dispositivi su cui hai effettuato l'accesso.",
+				"unlockDescription": "Inserisci la passphrase di sincronizzazione sicura per usare le chiavi API salvate su questo dispositivo.",
+				"readyDescription": "Le chiavi API salvate sono cifrate e pronte per la sincronizzazione tra i dispositivi su cui hai effettuato l'accesso.",
+				"passphrase": "Passphrase di sincronizzazione",
+				"confirmPassphrase": "Conferma passphrase",
+				"passphraseHelp": "Usa almeno 12 caratteri e conserva la passphrase in modo sicuro. Non può essere recuperata.",
+				"setup": "Attiva sincronizzazione sicura",
+				"settingUp": "Attivazione…",
+				"unlock": "Sblocca sincronizzazione sicura",
+				"unlocking": "Sblocco…",
+				"status": "Sincronizzazione sicura delle chiavi",
+				"ready": "Pronta",
+				"pending": "Modifiche in sospeso",
+				"lastSync": "Ultima sincronizzazione",
+				"never": "Non ancora sincronizzate",
+				"sync": "Sincronizza ora",
+				"syncing": "Sincronizzazione…",
+				"memoryWarning": "L'archiviazione sicura del dispositivo non è disponibile. Le chiavi API vengono conservate solo in memoria e cancellate alla chiusura dell'app.",
+				"errors": {
+					"load": "Impossibile verificare la sincronizzazione sicura delle chiavi.",
+					"setup": "Impossibile attivare la sincronizzazione sicura delle chiavi.",
+					"unlock": "Impossibile sbloccare la sincronizzazione sicura delle chiavi. Verifica la passphrase e riprova.",
+					"sync": "Impossibile sincronizzare le chiavi API salvate.",
+					"mismatch": "Le passphrase non corrispondono."
+				}
+			},
 			"sync": {
 				"title": "Backup cloud",
 				"description": "Scegli le cartelle locali ed eseguine il backup in modo sicuro secondo una pianificazione.",
