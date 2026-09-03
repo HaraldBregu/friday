@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { AuthService } from '../../../../src/main/cloud/service';
 import { publicCloudError } from '../../../../src/main/cloud/cloud_error';
+import { publicAuthError } from '../../../../src/main/cloud/error';
 import type { AuthStorage } from '../../../../src/main/cloud/session';
 import { SupabaseAccountProvider } from '../../../../src/main/cloud/supabase/auth';
 import { createSupabaseClient } from '../../../../src/main/cloud/supabase/client';
@@ -89,8 +90,15 @@ it('reads and updates the signed-in account profile', async () => {
 
 it('explains when the required profile table is missing', () => {
 	expect(publicCloudError({ code: 'PGRST205' })).toMatchObject({
-		name: 'PGRST205',
+		name: 'CloudError',
 		message: 'The cloud service is temporarily unavailable. Please try again later.',
+	});
+});
+
+it('keeps provider error identifiers out of public authentication errors', () => {
+	expect(publicAuthError({ code: 'invalid_credentials' })).toMatchObject({
+		name: 'AuthError',
+		message: 'The email or password is incorrect.',
 	});
 });
 

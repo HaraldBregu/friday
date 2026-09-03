@@ -9,6 +9,6 @@ export function publicCloudError(error: unknown): Error {
 		PGRST116: 'The requested cloud item was not found.',
 	};
 	const result = new Error(messages[code] ?? 'The cloud request failed. Please try again.');
-	result.name = code || 'CloudError';
+	result.name = 'CloudError';
 	return result;
 }

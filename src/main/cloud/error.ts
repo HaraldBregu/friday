@@ -12,6 +12,6 @@ export function publicAuthError(error: unknown): Error {
 	};
 	const mapped = messages[code] ?? 'Authentication failed. Please try again.';
 	const result = new Error(mapped);
-	result.name = code || 'AuthError';
+	result.name = 'AuthError';
 	return result;
 }
