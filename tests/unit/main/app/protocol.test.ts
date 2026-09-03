@@ -20,8 +20,7 @@ describe('protocol security', () => {
 		const mainHandler = jest.mocked(protocol.handle).mock.calls[0][1] as (
 			request: Request
 		) => Promise<Response>;
-		const extension = jest.mocked(session.fromPartition).mock.results[0]
-			.value as Electron.Session;
+		const extension = jest.mocked(session.fromPartition).mock.results[0].value as Electron.Session;
 		const extensionHandler = jest.mocked(extension.protocol.handle).mock.calls[0][1] as (
 			request: Request
 		) => Promise<Response>;
@@ -43,9 +42,11 @@ describe('protocol security', () => {
 		const extensionContents = { id: 7, once: jest.fn() };
 		extensionRegistry.register(extensionContents, 'workspace');
 		const mainContents = { id: 8 };
-		jest.mocked(BrowserWindow.fromWebContents).mockImplementation((contents) =>
-			contents === mainContents ? ({} as Electron.BrowserWindow) : null
-		);
+		jest
+			.mocked(BrowserWindow.fromWebContents)
+			.mockImplementation((contents) =>
+				contents === mainContents ? ({} as Electron.BrowserWindow) : null
+			);
 		setupMediaPermissionHandlers(extensionRegistry);
 
 		const defaultSession = session.defaultSession;
@@ -60,13 +61,20 @@ describe('protocol security', () => {
 			securityOrigin: 'file://',
 		} as Electron.PermissionCheckHandlerHandlerDetails;
 
-		expect(check(extensionContents as Electron.WebContents, 'clipboard-read', 'file://', details)).toBe(
+		expect(
+			check(extensionContents as Electron.WebContents, 'clipboard-read', 'file://', details)
+		).toBe(false);
+		expect(
+			check(
+				extensionContents as Electron.WebContents,
+				'clipboard-sanitized-write',
+				'file://',
+				details
+			)
+		).toBe(true);
+		expect(check(extensionContents as Electron.WebContents, 'media', 'file://', details)).toBe(
 			false
 		);
-		expect(
-			check(extensionContents as Electron.WebContents, 'clipboard-sanitized-write', 'file://', details)
-		).toBe(true);
-		expect(check(extensionContents as Electron.WebContents, 'media', 'file://', details)).toBe(false);
 		expect(check(mainContents as Electron.WebContents, 'media', 'file://', details)).toBe(true);
 
 		const display = jest.mocked(defaultSession.setDisplayMediaRequestHandler).mock.calls[0][0];

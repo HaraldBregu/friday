@@ -75,7 +75,10 @@ export class WindowFactory {
 				const target = externalUrl(url);
 				if (target) {
 					void shell.openExternal(target).catch((error) => {
-						this.logger?.warn('WindowFactory', 'Failed to open external URL', { url: target, error });
+						this.logger?.warn('WindowFactory', 'Failed to open external URL', {
+							url: target,
+							error,
+						});
 					});
 				}
 			}

@@ -25,33 +25,30 @@ export function registerLocalResourceProtocolScheme(): void {
 	]);
 }
 
-export function registerLocalResourceProtocolHandler(
-	logger: Pick<LoggerService, 'error'>
-): void {
-	const handler = (allowAbsolutePaths: boolean) => async (request: Request): Promise<Response> => {
-		try {
-			const url = new URL(request.url);
-			if (
-				url.host !== 'agent' &&
-				(url.host !== 'file' || !allowAbsolutePaths)
-			) {
-				return new Response(null, { status: 403 });
+export function registerLocalResourceProtocolHandler(logger: Pick<LoggerService, 'error'>): void {
+	const handler =
+		(allowAbsolutePaths: boolean) =>
+		async (request: Request): Promise<Response> => {
+			try {
+				const url = new URL(request.url);
+				if (url.host !== 'agent' && (url.host !== 'file' || !allowAbsolutePaths)) {
+					return new Response(null, { status: 403 });
+				}
+				let pathname = decodeURIComponent(url.pathname);
+				if (url.host === 'agent') {
+					pathname = await resolveWorkspaceFile(agentLocation(), pathname.replace(/^\/+/, ''));
+				} else if (process.platform === 'win32' && /^\/[A-Za-z]:/.test(pathname)) {
+					pathname = pathname.slice(1);
+				}
+				// Forward headers so media Range requests get 206 responses for seeking.
+				return await net.fetch(pathToFileURL(pathname).toString(), {
+					headers: request.headers,
+				});
+			} catch (err) {
+				logger.error('App', `${LOCAL_RESOURCE_SCHEME} fetch failed for ${request.url}`, err);
+				return new Response(null, { status: 500 });
 			}
-			let pathname = decodeURIComponent(url.pathname);
-			if (url.host === 'agent') {
-				pathname = await resolveWorkspaceFile(agentLocation(), pathname.replace(/^\/+/, ''));
-			} else if (process.platform === 'win32' && /^\/[A-Za-z]:/.test(pathname)) {
-				pathname = pathname.slice(1);
-			}
-			// Forward headers so media Range requests get 206 responses for seeking.
-			return await net.fetch(pathToFileURL(pathname).toString(), {
-				headers: request.headers,
-			});
-		} catch (err) {
-			logger.error('App', `${LOCAL_RESOURCE_SCHEME} fetch failed for ${request.url}`, err);
-			return new Response(null, { status: 500 });
-		}
-	};
+		};
 
 	protocol.handle(LOCAL_RESOURCE_SCHEME, handler(true));
 	session
@@ -62,36 +59,36 @@ export function registerLocalResourceProtocolHandler(
 export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistry): void {
 	const configure = (targetSession: Electron.Session, allowDisplayCapture: boolean): void => {
 		targetSession.setPermissionCheckHandler(
-		(webContents, permission, requestingOrigin, details) => {
-			const isAppContents = isAppWindowWebContents(webContents, extensionRegistry);
-			if (permission === 'fullscreen') return Boolean(webContents && extensionRegistry.has(webContents));
-			if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
-				return Boolean(
-					details.isMainFrame &&
-					(permission === 'clipboard-sanitized-write'
-						? isAppContents
-						: webContents && BrowserWindow.fromWebContents(webContents)) &&
-					isTrustedMediaRequestSource(
-						requestingOrigin,
-						details.requestingUrl,
-						details.securityOrigin
-					)
+			(webContents, permission, requestingOrigin, details) => {
+				const isAppContents = isAppWindowWebContents(webContents, extensionRegistry);
+				if (permission === 'fullscreen')
+					return Boolean(webContents && extensionRegistry.has(webContents));
+				if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
+					return Boolean(
+						details.isMainFrame &&
+						(permission === 'clipboard-sanitized-write'
+							? isAppContents
+							: webContents && BrowserWindow.fromWebContents(webContents)) &&
+						isTrustedMediaRequestSource(
+							requestingOrigin,
+							details.requestingUrl,
+							details.securityOrigin
+						)
+					);
+				}
+				if (permission !== 'media') return false;
+				if (details.mediaType !== 'audio' && details.mediaType !== 'video') return false;
+				if (!details.isMainFrame) return false;
+				if (!webContents || !BrowserWindow.fromWebContents(webContents)) return false;
+				return isTrustedMediaRequestSource(
+					requestingOrigin,
+					details.requestingUrl,
+					details.securityOrigin
 				);
 			}
-			if (permission !== 'media') return false;
-			if (details.mediaType !== 'audio' && details.mediaType !== 'video') return false;
-			if (!details.isMainFrame) return false;
-			if (!webContents || !BrowserWindow.fromWebContents(webContents)) return false;
-			return isTrustedMediaRequestSource(
-				requestingOrigin,
-				details.requestingUrl,
-				details.securityOrigin
-			);
-		}
 		);
 
-		targetSession.setPermissionRequestHandler(
-		(webContents, permission, callback, details) => {
+		targetSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
 			if (permission === 'fullscreen') {
 				callback(Boolean(webContents && extensionRegistry.has(webContents)));
 				return;
@@ -103,11 +100,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 						(permission === 'clipboard-sanitized-write'
 							? isAppWindowWebContents(webContents, extensionRegistry)
 							: webContents && BrowserWindow.fromWebContents(webContents)) &&
-						isTrustedMediaRequestSource(
-							undefined,
-							details.requestingUrl,
-							undefined
-						)
+						isTrustedMediaRequestSource(undefined, details.requestingUrl, undefined)
 					)
 				);
 				return;
@@ -131,22 +124,21 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				);
 
 			callback(allowed);
-		}
-		);
+		});
 
 		targetSession.setDisplayMediaRequestHandler((request, callback) => {
-		const trusted = allowDisplayCapture && isTrustedDisplayCaptureUrl(request.frame?.url);
-		if (!trusted) {
-			callback({});
-			return;
-		}
-		desktopCapturer
-			.getSources({ types: ['screen', 'window'] })
-			.then((sources) => {
-				const source = sources[0];
-				callback(source ? { video: source } : {});
-			})
-			.catch(() => callback({}));
+			const trusted = allowDisplayCapture && isTrustedDisplayCaptureUrl(request.frame?.url);
+			if (!trusted) {
+				callback({});
+				return;
+			}
+			desktopCapturer
+				.getSources({ types: ['screen', 'window'] })
+				.then((sources) => {
+					const source = sources[0];
+					callback(source ? { video: source } : {});
+				})
+				.catch(() => callback({}));
 		});
 	};
 
@@ -205,7 +197,7 @@ function isAppWindowWebContents(
 ): boolean {
 	return Boolean(
 		webContents &&
-			(BrowserWindow.fromWebContents(webContents) || extensionRegistry.has(webContents))
+		(BrowserWindow.fromWebContents(webContents) || extensionRegistry.has(webContents))
 	);
 }
 
