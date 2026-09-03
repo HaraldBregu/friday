@@ -1,13 +1,15 @@
 import path from 'node:path';
 import { userDataLocation } from '../shared/user_data_location';
+import { realPath } from '../shared/real_path';
 
 export function isProtectedStoragePath(value: string): boolean {
-	const resolved = path.resolve(value);
-	const root = path.resolve(userDataLocation());
+	const resolved = realPath(value);
+	const root = realPath(userDataLocation());
+	const settings = path.join(root, 'settings');
 	const providerCatalog = path.join(root, 'providers');
 	return (
-		resolved === path.join(root, 'settings', 'providers.json') ||
-		resolved === path.join(root, 'settings', 'provider-vault.json') ||
+		resolved === settings ||
+		resolved.startsWith(`${settings}${path.sep}`) ||
 		resolved === providerCatalog ||
 		resolved.startsWith(`${providerCatalog}${path.sep}`)
 	);
