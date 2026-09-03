@@ -1,10 +1,11 @@
 import { act, render, screen } from '@testing-library/react';
-import { CodeBlockCode } from '../../../src/renderer/src/components/ui/code-block';
 
 const codeToHtml = jest.fn();
 
 jest.mock('shiki', () => ({ codeToHtml }));
 jest.mock('../../../src/renderer/src/hooks/use-is-dark', () => ({ useIsDark: () => false }));
+
+import { CodeBlockCode } from '../../../src/renderer/src/components/ui/code-block';
 
 it('ignores stale highlighting and keeps current code when highlighting fails', async () => {
 	let resolveOld: (html: string) => void = () => undefined;
