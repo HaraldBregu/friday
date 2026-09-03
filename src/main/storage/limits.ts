@@ -1,0 +1,1 @@
+export const STORAGE_MAX_OBJECT_BYTES = 50 * 1024 * 1024;

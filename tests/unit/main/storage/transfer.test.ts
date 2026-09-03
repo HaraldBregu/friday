@@ -27,6 +27,7 @@ jest.mock('../../../../src/main/storage/storage_prefix', () => ({
 
 import { pullFiles } from '../../../../src/main/storage/storage_pull';
 import { pushFiles } from '../../../../src/main/storage/storage_push';
+import { STORAGE_MAX_OBJECT_BYTES } from '../../../../src/main/storage/limits';
 
 const storage = {
 	paths: ['/data/agent'],
@@ -37,7 +38,7 @@ const storage = {
 beforeEach(() => {
 	jest.clearAllMocks();
 	getStorageSettings.mockReturnValue(storage);
-	lstat.mockResolvedValue({ isDirectory: () => true, isSymbolicLink: () => false });
+	lstat.mockResolvedValue({ size: 5, isDirectory: () => true, isSymbolicLink: () => false });
 	readFile.mockResolvedValue(Buffer.from('hello'));
 	mkdir.mockResolvedValue(undefined);
 	writeFile.mockResolvedValue(undefined);
@@ -71,6 +72,28 @@ it('backs up selected files within the Kucedr-owned prefix', async () => {
 		'kucedr/v1/agent/notes/today.md',
 		Buffer.from('hello')
 	);
+});
+
+it('rejects oversized local files before reading or uploading them', async () => {
+	walkFiles.mockResolvedValue(['/data/agent/archive.bin']);
+	lstat
+		.mockResolvedValueOnce({
+			size: 0,
+			isDirectory: () => true,
+			isSymbolicLink: () => false,
+		})
+		.mockResolvedValueOnce({
+			size: STORAGE_MAX_OBJECT_BYTES + 1,
+			isDirectory: () => false,
+			isSymbolicLink: () => false,
+		});
+
+	await expect(pushFiles({} as never)).resolves.toMatchObject({
+		uploaded: [],
+		failed: [{ path: '/data/agent/archive.bin', error: expect.stringContaining('50 MiB') }],
+	});
+	expect(readFile).not.toHaveBeenCalled();
+	expect(putObject).not.toHaveBeenCalled();
 });
 
 it('restores cloud files without deleting unmatched local files', async () => {
@@ -109,6 +132,25 @@ it('rejects a restore target that is a symbolic link', async () => {
 	await expect(pullFiles({} as never)).resolves.toMatchObject({
 		downloaded: [],
 		failed: [{ path: 'kucedr/v1/agent/notes/today.md' }],
+	});
+	expect(getObject).not.toHaveBeenCalled();
+	expect(writeFile).not.toHaveBeenCalled();
+});
+
+it('rejects oversized remote files before downloading them', async () => {
+	listObjects.mockResolvedValue([
+		{
+			key: 'kucedr/v1/agent/archive.bin',
+			size: STORAGE_MAX_OBJECT_BYTES + 1,
+			lastModified: undefined,
+		},
+	]);
+
+	await expect(pullFiles({} as never)).resolves.toMatchObject({
+		downloaded: [],
+		failed: [
+			{ path: 'kucedr/v1/agent/archive.bin', error: expect.stringContaining('50 MiB') },
+		],
 	});
 	expect(getObject).not.toHaveBeenCalled();
 	expect(writeFile).not.toHaveBeenCalled();

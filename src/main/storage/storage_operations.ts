@@ -71,13 +71,21 @@ export class StorageOperations {
 		this.publish(status);
 		const task = this.execute(status);
 		this.tasks.set(status.operationId, task);
-		void task.finally(() => this.tasks.delete(status.operationId));
+		void task.then(
+			() => {
+				this.tasks.delete(status.operationId);
+			},
+			() => {
+				this.tasks.delete(status.operationId);
+			}
+		);
 		return status;
 	}
 
 	private async execute(running: StorageOperationStatus): Promise<StorageOperationStatus> {
-		const allowSuspension = this.dependencies.preventSuspension();
+		let allowSuspension: (() => void) | undefined;
 		try {
+			allowSuspension = this.dependencies.preventSuspension();
 			const result: StorageTransferResult =
 				running.operation === 'backup'
 					? await this.dependencies.lock(this.dependencies.backup)
@@ -90,10 +98,12 @@ export class StorageOperations {
 				state: 'failed',
 				finishedAt: new Date().toISOString(),
 				error: describeStorageError(error),
-				revision: ++this.revision,
-			});
+					revision: ++this.revision,
+				});
 		} finally {
-			allowSuspension();
+			try {
+				allowSuspension?.();
+			} catch {}
 		}
 	}
 

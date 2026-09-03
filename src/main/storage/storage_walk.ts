@@ -3,15 +3,17 @@ import path from 'node:path';
 import { isProtectedStoragePath } from './storage_protected';
 
 export async function walkFiles(dir: string): Promise<string[]> {
-	const entries = await fs.readdir(dir, { withFileTypes: true });
-	const nested = await Promise.all(
-		entries.map((entry) => {
-			const full = path.join(dir, entry.name);
-			if (isProtectedStoragePath(full)) return Promise.resolve([]);
-			if (entry.isSymbolicLink()) return Promise.resolve([]);
-			if (entry.isDirectory()) return walkFiles(full);
-			return Promise.resolve(entry.isFile() ? [full] : []);
-		})
-	);
-	return nested.flat();
+	const files: string[] = [];
+	const pending = [dir];
+	while (pending.length > 0) {
+		const current = pending.pop();
+		if (!current) continue;
+		for (const entry of await fs.readdir(current, { withFileTypes: true })) {
+			const full = path.join(current, entry.name);
+			if (isProtectedStoragePath(full) || entry.isSymbolicLink()) continue;
+			if (entry.isDirectory()) pending.push(full);
+			else if (entry.isFile()) files.push(full);
+		}
+	}
+	return files;
 }

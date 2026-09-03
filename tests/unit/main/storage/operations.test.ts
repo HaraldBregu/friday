@@ -85,4 +85,43 @@ describe('storage operations', () => {
 		expect(operations.backup('manual')).toEqual(running);
 		expect(() => operations.restore()).toThrow('already running');
 	});
+
+	it('publishes a failed terminal state when suspension prevention throws', async () => {
+		const backup = jest.fn();
+		const dependencies: StorageOperationDependencies = {
+			backup,
+			restore: jest.fn(),
+			lock: (operation) => operation(),
+			preventSuspension: () => {
+				throw new Error('power blocker unavailable');
+			},
+		};
+		const Operations = await loadOperations();
+		const operations = new Operations(jest.fn(), dependencies);
+
+		const running = operations.backup('manual');
+		await expect(operations.wait(running.operationId)).resolves.toEqual(
+			expect.objectContaining({ state: 'failed', error: 'power blocker unavailable' })
+		);
+		expect(operations.isRunning()).toBe(false);
+		expect(backup).not.toHaveBeenCalled();
+	});
+
+	it('does not reject a completed operation when suspension cleanup throws', async () => {
+		const dependencies: StorageOperationDependencies = {
+			backup: jest.fn().mockResolvedValue({ uploaded: ['one'], failed: [] }),
+			restore: jest.fn(),
+			lock: (operation) => operation(),
+			preventSuspension: () => () => {
+				throw new Error('power blocker cleanup failed');
+			},
+		};
+		const Operations = await loadOperations();
+		const operations = new Operations(jest.fn(), dependencies);
+
+		const running = operations.backup('manual');
+		await expect(operations.wait(running.operationId)).resolves.toEqual(
+			expect.objectContaining({ state: 'succeeded', transferred: 1 })
+		);
+	});
 });

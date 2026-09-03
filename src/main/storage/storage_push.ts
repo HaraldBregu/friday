@@ -6,6 +6,7 @@ import { putObject } from './storage_put';
 import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
 import type { StorageObjectStore } from './remote';
+import { STORAGE_MAX_OBJECT_BYTES } from './limits';
 import { getStorageSettings } from './storage_store';
 import { walkFiles } from './storage_walk';
 
@@ -17,7 +18,14 @@ export async function pushFiles(store: StorageObjectStore): Promise<StoragePushR
 
 	const uploadFile = async (filePath: string, key: string): Promise<void> => {
 		try {
+			const stat = await fs.lstat(filePath);
+			if (stat.size > STORAGE_MAX_OBJECT_BYTES) {
+				throw new Error('Cloud backup files must be no larger than 50 MiB.');
+			}
 			const data = await fs.readFile(filePath);
+			if (data.byteLength > STORAGE_MAX_OBJECT_BYTES) {
+				throw new Error('Cloud backup files must be no larger than 50 MiB.');
+			}
 			await putObject(store, key, data);
 			uploaded.push(filePath);
 		} catch (error) {

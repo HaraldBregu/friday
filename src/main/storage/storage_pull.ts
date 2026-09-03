@@ -7,6 +7,7 @@ import { listObjects } from './storage_list';
 import { normalizeStoragePaths } from './storage_paths';
 import { storagePrefix } from './storage_prefix';
 import type { StorageObjectStore } from './remote';
+import { STORAGE_MAX_OBJECT_BYTES } from './limits';
 import { getStorageSettings } from './storage_store';
 import { storageTarget } from './storage_target';
 import { storageWrite } from './storage_write';
@@ -27,9 +28,16 @@ export async function pullFiles(store: StorageObjectStore): Promise<StoragePullR
 			const remote = (await listObjects(store, prefix)).filter((item) => !item.key.endsWith('/'));
 			for (const item of remote) {
 				try {
+					if (item.size > STORAGE_MAX_OBJECT_BYTES) {
+						throw new Error('Cloud restore files must be no larger than 50 MiB.');
+					}
 					const target = await storageTarget(entryPath, item.key, prefix);
 					await fs.mkdir(path.dirname(target), { recursive: true });
-					await storageWrite(target, await getObject(store, item.key));
+					const data = await getObject(store, item.key);
+					if (data.byteLength > STORAGE_MAX_OBJECT_BYTES) {
+						throw new Error('Cloud restore files must be no larger than 50 MiB.');
+					}
+					await storageWrite(target, data);
 					downloaded.push(item.key);
 				} catch (error) {
 					failed.push({ path: item.key, error: describeStorageError(error) });
