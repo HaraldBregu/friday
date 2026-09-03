@@ -191,6 +191,11 @@ const Vault: React.FC = () => {
 						<p className="text-xs text-muted-foreground sm:col-span-2">
 							{t('settings.storage.credentials.passphraseHelp')}
 						</p>
+						{status.persistence === 'memory' && (
+							<SettingsNotice className="sm:col-span-2" icon={AlertTriangle}>
+								{t('settings.storage.credentials.memoryWarning')}
+							</SettingsNotice>
+						)}
 						{(error || mismatch) && (
 							<SettingsNotice className="sm:col-span-2" variant="destructive" icon={AlertTriangle}>
 								{mismatch ? t('settings.storage.credentials.errors.mismatch') : error}
@@ -201,7 +206,12 @@ const Vault: React.FC = () => {
 						<Button
 							type="submit"
 							size="sm"
-							disabled={busy || passphrase.length < 12 || (settingUp && mismatch)}
+							disabled={
+								busy ||
+								status.persistence === 'memory' ||
+								passphrase.length < 12 ||
+								(settingUp && (confirmation.length < 12 || mismatch))
+							}
 						>
 							<KeyRound className="size-3" />
 							{t(
