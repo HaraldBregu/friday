@@ -980,22 +980,29 @@
 			}
 		},
 		"storage": {
-			"configurationTitle": "Folder Sync",
+			"configurationTitle": "Cloud Backup",
 			"description": "Choose local folders to back up securely.",
+			"access": {
+				"loading": "Checking account access…",
+				"unavailable": "Cloud backup is unavailable right now.",
+				"recovery": "Finish updating your password before using cloud backup.",
+				"confirmationRequired": "Confirm your email address before using cloud backup.",
+				"signedOut": "Sign in to back up and restore your folders."
+			},
 			"sync": {
-				"title": "Folder Sync",
+				"title": "Cloud Backup",
 				"description": "Choose local folders and back them up securely on a schedule.",
 				"addFolders": "Add folders",
 				"folder": "Selected folder",
 				"removeFolder": "Remove folder",
 				"save": "Save schedule"
 			},
-			"syncSaved": "Folder sync schedule saved.",
+			"syncSaved": "Cloud backup schedule saved.",
 			"autoSync": {
 				"description": "Back up the selected folders automatically on a schedule.",
 				"cronExpression": "Cron expression",
 				"cronDescription": "Five-field cron schedule in local time. For example, 0 3 * * * runs daily at 03:00.",
-				"interval": "Sync interval",
+				"interval": "Backup interval",
 				"off": "Off",
 				"every15m": "Every 15 minutes",
 				"every30m": "Every 30 minutes",
@@ -1012,7 +1019,7 @@
 			"errors": {
 				"load": "Could not load storage settings.",
 				"pickFolders": "Could not select folders.",
-				"saveSync": "Could not save the folder sync schedule.",
+				"saveSync": "Could not save the cloud backup schedule.",
 				"push": "Could not back up files.",
 				"pull": "Could not restore files."
 			},
@@ -1045,8 +1052,8 @@
 					"failed": "Restore failed. {{error}}"
 				}
 			},
-			"pushing": "Pushing…",
-			"pulling": "Pulling…",
+			"pushing": "Backing up…",
+			"pulling": "Restoring…",
 			"cancel": "Cancel"
 		},
 		"embedding": {

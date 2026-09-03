@@ -979,22 +979,29 @@
 			}
 		},
 		"storage": {
-			"configurationTitle": "Sincronizzazione cartelle",
+			"configurationTitle": "Backup cloud",
 			"description": "Scegli le cartelle locali di cui eseguire il backup in modo sicuro.",
+			"access": {
+				"loading": "Verifica dell'accesso all'account…",
+				"unavailable": "Il backup cloud non è disponibile al momento.",
+				"recovery": "Completa l'aggiornamento della password prima di usare il backup cloud.",
+				"confirmationRequired": "Conferma il tuo indirizzo email prima di usare il backup cloud.",
+				"signedOut": "Accedi per eseguire il backup e il ripristino delle cartelle."
+			},
 			"sync": {
-				"title": "Sincronizzazione cartelle",
+				"title": "Backup cloud",
 				"description": "Scegli le cartelle locali ed eseguine il backup in modo sicuro secondo una pianificazione.",
 				"addFolders": "Aggiungi cartelle",
 				"folder": "Cartella selezionata",
 				"removeFolder": "Rimuovi cartella",
 				"save": "Salva pianificazione"
 			},
-			"syncSaved": "Pianificazione della sincronizzazione salvata.",
+			"syncSaved": "Pianificazione del backup cloud salvata.",
 			"autoSync": {
 				"description": "Esegui automaticamente il backup delle cartelle selezionate secondo una pianificazione.",
 				"cronExpression": "Espressione cron",
 				"cronDescription": "Pianificazione cron a cinque campi nell'ora locale. Ad esempio, 0 3 * * * viene eseguita ogni giorno alle 03:00.",
-				"interval": "Intervallo di sincronizzazione",
+				"interval": "Intervallo di backup",
 				"off": "Disattivata",
 				"every15m": "Ogni 15 minuti",
 				"every30m": "Ogni 30 minuti",
@@ -1011,7 +1018,7 @@
 			"errors": {
 				"load": "Impossibile caricare le impostazioni di archiviazione.",
 				"pickFolders": "Impossibile selezionare le cartelle.",
-				"saveSync": "Impossibile salvare la pianificazione della sincronizzazione.",
+				"saveSync": "Impossibile salvare la pianificazione del backup cloud.",
 				"push": "Impossibile eseguire il backup dei file.",
 				"pull": "Impossibile ripristinare i file."
 			},
@@ -1044,8 +1051,8 @@
 					"failed": "Ripristino non riuscito. {{error}}"
 				}
 			},
-			"pushing": "Caricamento…",
-			"pulling": "Scaricamento…",
+			"pushing": "Backup in corso…",
+			"pulling": "Ripristino in corso…",
 			"cancel": "Annulla"
 		},
 		"embedding": {

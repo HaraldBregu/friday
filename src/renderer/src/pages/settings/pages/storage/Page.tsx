@@ -120,14 +120,14 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 	const controlsDisabled = busy || !cloudEnabled;
 	const cloudAccessMessage =
 		authState.status === 'loading'
-			? 'Checking account access…'
+			? t('settings.storage.access.loading')
 			: authState.status === 'unconfigured'
-				? 'Cloud sync is unavailable right now.'
+				? t('settings.storage.access.unavailable')
 				: authState.status === 'recovery'
-					? 'Finish updating your password before using cloud sync.'
+					? t('settings.storage.access.recovery')
 					: authState.status === 'confirmationRequired'
-						? 'Confirm your email address before using cloud sync.'
-						: 'Sign in to back up and restore your folders.';
+						? t('settings.storage.access.confirmationRequired')
+						: t('settings.storage.access.signedOut');
 	const canRequestSignIn = authState.status === 'signedOut';
 	const operationStatusKey = operationStatus
 		? operationStatus.state === 'running' && operationStatus.trigger === 'scheduled'
