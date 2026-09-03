@@ -1,5 +1,5 @@
-import { workspaceMoveError } from '../../../../extensions/workspace/src/lib/drop';
-import { rebaseWorkspacePath } from '../../../../extensions/workspace/src/lib/rebase';
+import { workspaceMoveError } from '../../../../resources/extensions/workspace/src/lib/drop';
+import { rebaseWorkspacePath } from '../../../../resources/extensions/workspace/src/lib/rebase';
 
 describe('workspace tree drag and drop', () => {
 	const file = { name: 'note.md', path: 'source/note.md', type: 'file' } as const;

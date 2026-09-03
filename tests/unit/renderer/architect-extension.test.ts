@@ -1,8 +1,8 @@
 import type { CatalogModel } from '../../../src/shared/model_types';
-import { buildBriefPrompt } from '../../../extensions/architect/src/brief';
-import { createGenerationOptions } from '../../../extensions/architect/src/options';
-import { buildRevisionPrompt } from '../../../extensions/architect/src/revision';
-import { selectEditModel } from '../../../extensions/architect/src/model';
+import { buildBriefPrompt } from '../../../resources/extensions/architect/src/brief';
+import { createGenerationOptions } from '../../../resources/extensions/architect/src/options';
+import { buildRevisionPrompt } from '../../../resources/extensions/architect/src/revision';
+import { selectEditModel } from '../../../resources/extensions/architect/src/model';
 
 const provider = { id: 'black-forest-labs', name: 'BFL' } as CatalogModel['provider'];
 const catalog = [

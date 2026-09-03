@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { FileInformation } from '../../../extensions/workspace/src/components/information';
+import { FileInformation } from '../../../resources/extensions/workspace/src/components/information';
 
 it('renders workspace file size and creation and update dates', () => {
 	render(
