@@ -6,6 +6,7 @@ import {
 	WebContentsView,
 	type WebContents,
 } from 'electron';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { is } from '@electron-toolkit/utils';
@@ -50,13 +51,10 @@ export class WindowFactory {
 			? path.resolve(app.getAppPath(), 'resources/icons/icon.png')
 			: path.resolve(process.resourcesPath, 'resources/icons/icon.png');
 		this.logger?.info('WindowFactory', `Preload path: ${this.preloadPath}`);
-		// Verify preload file exists
 		try {
-			const { existsSync } = require('fs');
 			const exists = existsSync(this.preloadPath);
 			this.logger?.info('WindowFactory', `Preload file exists: ${exists}`);
 		} catch {
-			// Silent fail
 		}
 	}
 
