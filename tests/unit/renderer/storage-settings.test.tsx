@@ -18,8 +18,7 @@ jest.mock('react-i18next', () => {
 		'settings.storage.description': 'Choose folders to back up securely.',
 		'settings.storage.access.loading': 'Checking account access…',
 		'settings.storage.access.unavailable': 'Cloud backup is unavailable right now.',
-		'settings.storage.access.recovery':
-			'Finish updating your password before using cloud backup.',
+		'settings.storage.access.recovery': 'Finish updating your password before using cloud backup.',
 		'settings.storage.access.confirmationRequired':
 			'Confirm your email address before using cloud backup.',
 		'settings.storage.access.signedOut': 'Sign in to back up and restore your folders.',

@@ -164,9 +164,7 @@ it('sets up secure key sync with a confirmed passphrase', async () => {
 	await user.type(screen.getByLabelText('Confirm passphrase'), 'a secure passphrase');
 	await user.click(screen.getByRole('button', { name: 'Enable secure sync' }));
 
-	await waitFor(() =>
-		expect(providerApi.setupVault).toHaveBeenCalledWith('a secure passphrase')
-	);
+	await waitFor(() => expect(providerApi.setupVault).toHaveBeenCalledWith('a secure passphrase'));
 	expect(await screen.findByRole('button', { name: 'Sync now' })).toBeEnabled();
 });
 
@@ -185,9 +183,7 @@ it('unlocks an existing secure key sync', async () => {
 	await user.type(await screen.findByLabelText('Sync passphrase'), 'a secure passphrase');
 	await user.click(screen.getByRole('button', { name: 'Unlock secure sync' }));
 
-	await waitFor(() =>
-		expect(providerApi.unlockVault).toHaveBeenCalledWith('a secure passphrase')
-	);
+	await waitFor(() => expect(providerApi.unlockVault).toHaveBeenCalledWith('a secure passphrase'));
 });
 
 it('runs secure key sync from the ready state', async () => {
