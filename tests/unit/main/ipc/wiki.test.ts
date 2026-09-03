@@ -28,22 +28,16 @@ import type { EventBus } from '../../../../src/main/event_bus';
 import { WikiIpc } from '../../../../src/main/ipc/wiki';
 import { WikiChannels } from '../../../../src/shared/ipc_channels_definitions';
 
-	describe('WikiIpc', () => {
+describe('WikiIpc', () => {
 	it('registers a separate typed wiki API', async () => {
-		new WikiIpc().register(
-			{ windows: {} as never, extensions: {} as never },
-			{} as EventBus
-		);
+		new WikiIpc().register({ windows: {} as never, extensions: {} as never }, {} as EventBus);
 
 		expect(query).toHaveBeenCalledWith(WikiChannels.getSettings, expect.any(Function));
 		expect(query).toHaveBeenCalledWith(WikiChannels.getStatus, expect.any(Function));
 		expect(command).toHaveBeenCalledWith(WikiChannels.saveSettings, expect.any(Function));
 		expect(command).toHaveBeenCalledWith(WikiChannels.run, expect.any(Function));
 		expect(command).toHaveBeenCalledWith(WikiChannels.cancel, expect.any(Function));
-		expect(commandWithEvent).toHaveBeenCalledWith(
-			WikiChannels.pickDirectory,
-			expect.any(Function)
-		);
+		expect(commandWithEvent).toHaveBeenCalledWith(WikiChannels.pickDirectory, expect.any(Function));
 		expect(command).toHaveBeenCalledWith(WikiChannels.openDirectory, expect.any(Function));
 
 		const settingsHandler = query.mock.calls.find(
@@ -52,9 +46,7 @@ import { WikiChannels } from '../../../../src/shared/ipc_channels_definitions';
 		settingsHandler();
 		expect(getWikiSettings).toHaveBeenCalled();
 
-		const runHandler = command.mock.calls.find(
-			([channel]) => channel === WikiChannels.run
-		)?.[1];
+		const runHandler = command.mock.calls.find(([channel]) => channel === WikiChannels.run)?.[1];
 		await runHandler();
 		expect(runWiki).toHaveBeenCalled();
 

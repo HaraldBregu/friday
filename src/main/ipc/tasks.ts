@@ -42,15 +42,22 @@ export class TaskIpc implements IpcModule<TaskIpcDependencies> {
 			trusted.assert(event);
 			return getRuntime();
 		});
-		registerCommandWithEvent(TaskChannels.setRuntime, (event, providerId: string, modelId: string) => {
-			trusted.assert(event);
-			return setRuntime(providerId, modelId);
-		});
+		registerCommandWithEvent(
+			TaskChannels.setRuntime,
+			(event, providerId: string, modelId: string) => {
+				trusted.assert(event);
+				return setRuntime(providerId, modelId);
+			}
+		);
 		registerCommandWithEvent(
 			TaskChannels.configureCapabilities,
 			(event, scheduleId: string, enabled: boolean, toolsAllow: string[]) => {
 				trusted.assert(event);
-				if (typeof scheduleId !== 'string' || typeof enabled !== 'boolean' || !Array.isArray(toolsAllow))
+				if (
+					typeof scheduleId !== 'string' ||
+					typeof enabled !== 'boolean' ||
+					!Array.isArray(toolsAllow)
+				)
 					throw new Error('Invalid schedule capability configuration.');
 				return configureScheduleCapabilities(scheduleId, enabled, toolsAllow);
 			}

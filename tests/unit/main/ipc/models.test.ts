@@ -53,12 +53,16 @@ let event: Record<string, unknown>;
 const extensionHas = jest.fn(() => false);
 
 function command(channel: string): (...args: unknown[]) => unknown {
-	const handler = registerCommandWithEvent.mock.calls.find(([registered]) => registered === channel)?.[1];
+	const handler = registerCommandWithEvent.mock.calls.find(
+		([registered]) => registered === channel
+	)?.[1];
 	return (...args: unknown[]) => handler(event, ...args);
 }
 
 function query(channel: string): (...args: unknown[]) => unknown {
-	const handler = registerQueryWithEvent.mock.calls.find(([registered]) => registered === channel)?.[1];
+	const handler = registerQueryWithEvent.mock.calls.find(
+		([registered]) => registered === channel
+	)?.[1];
 	return (...args: unknown[]) => handler(event, ...args);
 }
 
@@ -68,7 +72,9 @@ beforeEach(() => {
 	const mainFrame = {};
 	const sender = { mainFrame };
 	event = { sender, senderFrame: mainFrame };
-	jest.mocked(BrowserWindow.fromWebContents).mockReturnValue({ id: 1, webContents: sender } as never);
+	jest
+		.mocked(BrowserWindow.fromWebContents)
+		.mockReturnValue({ id: 1, webContents: sender } as never);
 	new ModelsIpc().register(
 		{ windows: { has: () => true } as never, extensions: { has: extensionHas } as never },
 		{} as never
