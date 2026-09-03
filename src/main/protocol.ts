@@ -1,13 +1,17 @@
 import { app, BrowserWindow, desktopCapturer, net, protocol, session } from 'electron';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import { resolveWorkspaceFile } from './ipc/workspace';
 import { agentLocation } from './shared/agent_location';
 import type { LoggerService } from './shared';
 import type { ExtensionRegistry } from './extensions/extension_registry';
+import { extensionsRoot } from './extensions/extension_root';
+import { isExtensionId } from './extensions/extension_id';
 
 const LOCAL_RESOURCE_SCHEME = 'local-resource';
+export const EXTENSION_RESOURCE_SCHEME = 'friday-extension';
 export const EXTENSION_SESSION_PARTITION = 'persist:friday-extensions';
 
 export function registerLocalResourceProtocolScheme(): void {
@@ -22,7 +26,30 @@ export function registerLocalResourceProtocolScheme(): void {
 				stream: true,
 			},
 		},
+		{
+			scheme: EXTENSION_RESOURCE_SCHEME,
+			privileges: {
+				standard: true,
+				secure: true,
+				corsEnabled: true,
+				supportFetchAPI: true,
+				stream: true,
+			},
+		},
 	]);
+}
+
+export function extensionResourceUrl(file: string, extensionId: string): string {
+	if (!isExtensionId(extensionId)) throw new Error('Invalid extension ID.');
+	const root = path.resolve(extensionsRoot(), extensionId);
+	const target = path.resolve(file);
+	const relative = path.relative(root, target);
+	if (!relative || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+		throw new Error('Extension entry resolves outside its folder.');
+	}
+	const url = new URL(`${EXTENSION_RESOURCE_SCHEME}://${extensionId}`);
+	url.pathname = `/${relative.split(path.sep).join('/')}`;
+	return url.toString();
 }
 
 export function registerLocalResourceProtocolHandler(logger: Pick<LoggerService, 'error'>): void {
@@ -51,9 +78,37 @@ export function registerLocalResourceProtocolHandler(logger: Pick<LoggerService,
 		};
 
 	protocol.handle(LOCAL_RESOURCE_SCHEME, handler(true));
-	session
-		.fromPartition(EXTENSION_SESSION_PARTITION)
-		.protocol.handle(LOCAL_RESOURCE_SCHEME, handler(false));
+	const extensionSession = session.fromPartition(EXTENSION_SESSION_PARTITION);
+	extensionSession.protocol.handle(LOCAL_RESOURCE_SCHEME, handler(false));
+	extensionSession.protocol.handle(EXTENSION_RESOURCE_SCHEME, async (request) => {
+		try {
+			const url = new URL(request.url);
+			if (!isExtensionId(url.host)) return new Response(null, { status: 403 });
+			const root = path.resolve(extensionsRoot(), url.host);
+			const pathname = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+			const target = path.resolve(root, pathname);
+			const lexicalRelative = path.relative(root, target);
+			if (
+				!pathname ||
+				lexicalRelative.startsWith(`..${path.sep}`) ||
+				path.isAbsolute(lexicalRelative)
+			) {
+				return new Response(null, { status: 403 });
+			}
+			const resolvedRoot = await fs.realpath(root);
+			const resolvedTarget = await fs.realpath(target);
+			const relative = path.relative(resolvedRoot, resolvedTarget);
+			if (relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+				return new Response(null, { status: 403 });
+			}
+			return await net.fetch(pathToFileURL(resolvedTarget).toString(), {
+				headers: request.headers,
+			});
+		} catch (err) {
+			logger.error('Extensions', `Extension resource fetch failed for ${request.url}`, err);
+			return new Response(null, { status: 404 });
+		}
+	});
 }
 
 export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistry): void {
@@ -66,9 +121,11 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
 					return Boolean(
 						details.isMainFrame &&
-						(permission === 'clipboard-sanitized-write'
-							? isAppContents
-							: webContents && BrowserWindow.fromWebContents(webContents)) &&
+							(permission === 'clipboard-sanitized-write'
+								? isAppContents
+								: webContents &&
+									!extensionRegistry.has(webContents) &&
+									BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(
 							requestingOrigin,
 							details.requestingUrl,
@@ -79,6 +136,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				if (permission !== 'media') return false;
 				if (details.mediaType !== 'audio' && details.mediaType !== 'video') return false;
 				if (!details.isMainFrame) return false;
+				if (webContents && extensionRegistry.has(webContents)) return false;
 				if (!webContents || !BrowserWindow.fromWebContents(webContents)) return false;
 				return isTrustedMediaRequestSource(
 					requestingOrigin,
@@ -97,9 +155,11 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				callback(
 					Boolean(
 						details.isMainFrame &&
-						(permission === 'clipboard-sanitized-write'
-							? isAppWindowWebContents(webContents, extensionRegistry)
-							: webContents && BrowserWindow.fromWebContents(webContents)) &&
+							(permission === 'clipboard-sanitized-write'
+								? isAppWindowWebContents(webContents, extensionRegistry)
+								: webContents &&
+									!extensionRegistry.has(webContents) &&
+									BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(undefined, details.requestingUrl, undefined)
 					)
 				);
@@ -116,6 +176,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 			const allowed =
 				(requestsAudio || requestsVideo) &&
 				mediaDetails.isMainFrame &&
+				!extensionRegistry.has(webContents) &&
 				Boolean(webContents && BrowserWindow.fromWebContents(webContents)) &&
 				isTrustedMediaRequestSource(
 					undefined,
@@ -160,6 +221,11 @@ function rendererDevOrigin(): string | null {
 function isTrustedRendererOrigin(origin?: string): boolean {
 	if (!origin) return false;
 	if (origin === 'file://') return true;
+	try {
+		if (new URL(origin).protocol === `${EXTENSION_RESOURCE_SCHEME}:`) return true;
+	} catch {
+		return false;
+	}
 	const devOrigin = rendererDevOrigin();
 	return Boolean(devOrigin && origin === devOrigin);
 }
@@ -169,7 +235,11 @@ function isTrustedRendererUrl(url?: string): boolean {
 	if (url.startsWith('file://')) return true;
 
 	try {
-		return isTrustedRendererOrigin(new URL(url).origin);
+		const parsed = new URL(url);
+		return (
+			parsed.protocol === `${EXTENSION_RESOURCE_SCHEME}:` ||
+			isTrustedRendererOrigin(parsed.origin)
+		);
 	} catch {
 		return false;
 	}

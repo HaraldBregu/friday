@@ -13,7 +13,11 @@ import type { LoggerService } from './shared';
 import { setupPdfContextMenu } from './pdf';
 import type { ExtensionRegistry } from './extensions/extension_registry';
 import { externalUrl } from './external';
-import { EXTENSION_SESSION_PARTITION } from './protocol';
+import {
+	EXTENSION_RESOURCE_SCHEME,
+	EXTENSION_SESSION_PARTITION,
+	extensionResourceUrl,
+} from './protocol';
 
 export interface WindowPreset {
 	name: string;
@@ -69,9 +73,13 @@ export class WindowFactory {
 		};
 	}
 
-	private secureNavigation(webContents: WebContents, fileRoot?: string): void {
+	private secureNavigation(
+		webContents: WebContents,
+		fileRoot?: string,
+		extensionId?: string
+	): void {
 		webContents.setWindowOpenHandler(({ url }) => {
-			if (fileRoot) {
+			if (fileRoot || extensionId) {
 				const target = externalUrl(url);
 				if (target) {
 					void shell.openExternal(target).catch((error) => {
@@ -86,6 +94,13 @@ export class WindowFactory {
 		});
 		webContents.on('will-navigate', (event, url) => {
 			const target = new URL(url);
+			if (
+				extensionId &&
+				target.protocol === `${EXTENSION_RESOURCE_SCHEME}:` &&
+				target.host === extensionId
+			) {
+				return;
+			}
 			if (target.protocol === 'file:') {
 				if (!fileRoot) {
 					event.preventDefault();
@@ -98,7 +113,7 @@ export class WindowFactory {
 			const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
 			if (is.dev && rendererUrl && target.origin === new URL(rendererUrl).origin) return;
 			event.preventDefault();
-			const externalTarget = fileRoot ? externalUrl(url) : null;
+			const externalTarget = fileRoot || extensionId ? externalUrl(url) : null;
 			if (externalTarget) {
 				void shell.openExternal(externalTarget).catch((error) => {
 					this.logger?.warn('WindowFactory', 'Failed to open external URL', {
@@ -153,8 +168,9 @@ export class WindowFactory {
 			},
 		});
 		const viewContents = view.webContents;
+		const resourceUrl = extensionResourceUrl(file, extensionId);
 		this.extensionRegistry.register(viewContents, extensionId);
-		this.secureNavigation(viewContents, path.dirname(file));
+		this.secureNavigation(viewContents, undefined, extensionId);
 		viewContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
 			this.logger?.error('Extensions', `Extension view failed to load: ${validatedURL}`, {
 				errorCode,
@@ -169,7 +185,7 @@ export class WindowFactory {
 		});
 		const load = async (): Promise<void> => {
 			try {
-				await viewContents.loadFile(file);
+				await viewContents.loadURL(resourceUrl);
 			} catch (error) {
 				this.logger?.error('Extensions', `Unable to open extension entry: ${file}`, {
 					error: error instanceof Error ? error.message : String(error),

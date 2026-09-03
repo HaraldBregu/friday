@@ -58,6 +58,7 @@ export const nativeImage = {
 
 export const protocol = {
 	handle: jest.fn(),
+	registerSchemesAsPrivileged: jest.fn(),
 };
 
 const extensionSession = {
