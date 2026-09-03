@@ -1,15 +1,17 @@
 import { expect, test, type ElectronApplication, type Page } from '@playwright/test';
+import { closeApp } from './close';
 import { launchApp } from './helpers';
 
 let app: ElectronApplication;
 let page: Page;
+let userDataDir: string;
 
 test.beforeAll(async () => {
-	({ app, page } = await launchApp());
+	({ app, page, userDataDir } = await launchApp());
 });
 
 test.afterAll(async () => {
-	await app?.close();
+	await closeApp(app, userDataDir);
 });
 
 /**
