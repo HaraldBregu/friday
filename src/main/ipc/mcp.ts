@@ -221,34 +221,35 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 			McpChannels.oauthStart,
 			async (event, id: string): Promise<McpOAuthStart> => {
 				trusted.assert(event);
-			const server = getHttpMcpServer(id);
-			let redirectUrl: string | undefined;
-			const provider = () =>
-				createOAuthProvider({
-					storage: oauthStorage(server.id),
-					clientId: server.clientId,
-					clientSecret: server.clientSecret,
-					onRedirect: (url) => {
-						redirectUrl = url.toString();
-					},
-				});
-			const result = await auth(provider(), { serverUrl: server.url });
-			if (result === 'AUTHORIZED') return { status: 'authorized' };
-			if (!redirectUrl) throw new Error(`MCP server "${id}" did not return an authorization URL.`);
+				const server = getHttpMcpServer(id);
+				let redirectUrl: string | undefined;
+				const provider = () =>
+					createOAuthProvider({
+						storage: oauthStorage(server.id),
+						clientId: server.clientId,
+						clientSecret: server.clientSecret,
+						onRedirect: (url) => {
+							redirectUrl = url.toString();
+						},
+					});
+				const result = await auth(provider(), { serverUrl: server.url });
+				if (result === 'AUTHORIZED') return { status: 'authorized' };
+				if (!redirectUrl)
+					throw new Error(`MCP server "${id}" did not return an authorization URL.`);
 
-			let callback: Awaited<ReturnType<typeof startOauthCallbackServer>>;
-			try {
-				callback = await startOauthCallbackServer();
-			} catch {
-				// ponytail: callback port busy → fall back to the manual paste flow
-				return { status: 'redirect', url: redirectUrl };
-			}
-			try {
-				await shell.openExternal(redirectUrl);
-				const code = await callback.code;
-				const finish = await auth(provider(), { serverUrl: server.url, authorizationCode: code });
-				if (finish !== 'AUTHORIZED') throw new Error(`OAuth authorization failed for "${id}".`);
-				return { status: 'authorized' };
+				let callback: Awaited<ReturnType<typeof startOauthCallbackServer>>;
+				try {
+					callback = await startOauthCallbackServer();
+				} catch {
+					// ponytail: callback port busy → fall back to the manual paste flow
+					return { status: 'redirect', url: redirectUrl };
+				}
+				try {
+					await shell.openExternal(redirectUrl);
+					const code = await callback.code;
+					const finish = await auth(provider(), { serverUrl: server.url, authorizationCode: code });
+					if (finish !== 'AUTHORIZED') throw new Error(`OAuth authorization failed for "${id}".`);
+					return { status: 'authorized' };
 				} finally {
 					callback.close();
 				}
