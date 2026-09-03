@@ -62,7 +62,7 @@ it('rejects cloud access without a fully signed-in account', async () => {
 	};
 	const service = new CloudService(auth as never, remote);
 
-	await expect(service.listSessions()).rejects.toThrow('Sign in to use cloud synchronization.');
+	expect(() => service.listSessions()).toThrow('Sign in to use cloud synchronization.');
 	expect(remote.listSessions).not.toHaveBeenCalled();
 });
 
