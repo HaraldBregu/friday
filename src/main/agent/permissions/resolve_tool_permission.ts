@@ -1,10 +1,7 @@
 import { contextAllowsTool, type FileAccessContext } from '../context';
 import { AGENT_DIRECTORY, getPermissions } from '../agent_store';
 import { registry } from '../tools/core/process';
-import {
-	directoryPermissionTargets,
-	isWritePermissionTool,
-} from './directory_permission_targets';
+import { directoryPermissionTargets, isWritePermissionTool } from './directory_permission_targets';
 import { permissionFor } from './permission_for';
 import { toolPermissionTargets } from './tool_permission_targets';
 import type { PermissionKind, PermissionMode, PermissionsSchema } from './permissions_types';
@@ -25,14 +22,16 @@ export function resolveToolPermissionDetails(
 	if (toolName === 'read') kind = 'read';
 	else if (isWritePermissionTool(toolName, args)) kind = 'write';
 	else if (toolName === 'bash' || toolName === 'process') kind = 'exec';
-	if (!kind)
-		return { mode: 'allow', targets: [], approvalTargets: [], persistable: false };
+	if (!kind) return { mode: 'allow', targets: [], approvalTargets: [], persistable: false };
 
 	if (toolName === 'process') {
 		const session = typeof args.sessionId === 'string' ? registry.get(args.sessionId) : undefined;
 		if (session?.executionMode === 'sandbox')
 			return { mode: 'allow', kind, targets: [], approvalTargets: [], persistable: false };
-		if (!session || ['list', 'poll', 'log', 'kill', 'clear', 'remove'].includes(String(args.action)))
+		if (
+			!session ||
+			['list', 'poll', 'log', 'kill', 'clear', 'remove'].includes(String(args.action))
+		)
 			return { mode: 'allow', kind, targets: [], approvalTargets: [], persistable: false };
 		return {
 			mode: fallback,
@@ -45,9 +44,10 @@ export function resolveToolPermissionDetails(
 	}
 
 	const permissions = configuredPermissions ?? getPermissions();
-	const targets = kind === 'write' || kind === 'exec'
-		? directoryPermissionTargets(toolName, args, AGENT_DIRECTORY, history)
-		: toolPermissionTargets(toolName, args, AGENT_DIRECTORY);
+	const targets =
+		kind === 'write' || kind === 'exec'
+			? directoryPermissionTargets(toolName, args, AGENT_DIRECTORY, history)
+			: toolPermissionTargets(toolName, args, AGENT_DIRECTORY);
 	const decisions = targets.map((target) =>
 		permissionFor(permissions[kind], target, kind, args.elevated === true)
 	);

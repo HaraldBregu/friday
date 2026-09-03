@@ -27,14 +27,7 @@ describe('resolveToolPermission', () => {
 		};
 
 		expect(
-			resolveToolPermission(
-				'read',
-				{ path: '/outside/a.txt' },
-				undefined,
-				true,
-				'ask',
-				injected
-			)
+			resolveToolPermission('read', { path: '/outside/a.txt' }, undefined, true, 'ask', injected)
 		).toBe('deny');
 		expect(getPermissions).not.toHaveBeenCalled();
 	});
@@ -55,9 +48,7 @@ describe('resolveToolPermission', () => {
 		fileAccess.readDirectories.add('/repo/private');
 
 		expect(resolveToolPermission('read', { path: '/repo/public/a.txt' })).toBe('allow');
-		expect(
-			resolveToolPermission('read', { path: '/repo/private/a.txt' }, fileAccess)
-		).toBe('deny');
+		expect(resolveToolPermission('read', { path: '/repo/private/a.txt' }, fileAccess)).toBe('deny');
 	});
 
 	it('allows every shell form inside the workspace and asks outside', () => {
@@ -118,9 +109,7 @@ describe('resolveToolPermission', () => {
 			write: { allow: [], deny: ['*'] },
 		};
 
-		expect(
-			resolveToolPermission(toolName, args, undefined, true, 'ask', denyWrites)
-		).toBe('deny');
+		expect(resolveToolPermission(toolName, args, undefined, true, 'ask', denyWrites)).toBe('deny');
 	});
 
 	it('distinguishes read-only operations from conditional writes', () => {
@@ -129,9 +118,7 @@ describe('resolveToolPermission', () => {
 			write: { allow: [], deny: ['*'] },
 		};
 
-		expect(resolveToolPermission('get_task', {}, undefined, true, 'ask', denyWrites)).toBe(
-			'allow'
-		);
+		expect(resolveToolPermission('get_task', {}, undefined, true, 'ask', denyWrites)).toBe('allow');
 		expect(resolveToolPermission('list_tasks', {}, undefined, true, 'ask', denyWrites)).toBe(
 			'allow'
 		);

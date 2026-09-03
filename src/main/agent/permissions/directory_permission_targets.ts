@@ -41,10 +41,7 @@ const WIKI_TOOLS = new Set([
 	'rebuild_wiki_index',
 ]);
 
-export function isWritePermissionTool(
-	toolName: string,
-	args: Record<string, unknown>
-): boolean {
+export function isWritePermissionTool(toolName: string, args: Record<string, unknown>): boolean {
 	return (
 		toolName === 'write' ||
 		toolName === 'edit' ||
