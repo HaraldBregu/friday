@@ -4,17 +4,8 @@ import {
 	type SupabaseClient,
 	type User,
 } from '@supabase/supabase-js';
-import type {
-	AccountProfile,
-	AuthCredentials,
-	SignUpInput,
-} from '../../../shared/auth_types';
-import type {
-	AccountProvider,
-	AccountSession,
-	AccountSessionEvent,
-	AccountUser,
-} from '../account';
+import type { AccountProfile, AuthCredentials, SignUpInput } from '../../../shared/auth_types';
+import type { AccountProvider, AccountSession, AccountSessionEvent, AccountUser } from '../account';
 import type { CloudConfig } from '../config';
 import { publicCloudError } from '../cloud_error';
 import { publicAuthError } from '../error';

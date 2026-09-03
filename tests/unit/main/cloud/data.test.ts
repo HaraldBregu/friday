@@ -70,13 +70,12 @@ it('serializes token revocation after an in-flight sign-in update', async () => 
 	let sessionListener: ((session: AccountSession | null) => void) | undefined;
 	let finishSignIn!: () => void;
 	const remote = repository();
-	remote.setAccessToken.mockImplementation(
-		(token) =>
-			token
-				? new Promise<void>((resolve) => {
-						finishSignIn = resolve;
-					})
-				: Promise.resolve()
+	remote.setAccessToken.mockImplementation((token) =>
+		token
+			? new Promise<void>((resolve) => {
+					finishSignIn = resolve;
+				})
+			: Promise.resolve()
 	);
 	const auth = {
 		getAccessToken: () => 'private-token',

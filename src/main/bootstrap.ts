@@ -78,7 +78,8 @@ export function bootstrapServices(): BootstrapResult {
 	const conversationService = new Conversation(agentService, realtimeVoiceManager);
 	const cloudConfig = loadCloudConfig();
 	const authStorage = cloudConfig ? new AuthSessionStorage() : undefined;
-	const cloudClient = cloudConfig && authStorage ? createSupabaseClient(cloudConfig, authStorage) : undefined;
+	const cloudClient =
+		cloudConfig && authStorage ? createSupabaseClient(cloudConfig, authStorage) : undefined;
 	const accountProvider =
 		cloudClient && cloudConfig && authStorage
 			? new SupabaseAccountProvider(cloudClient, cloudConfig, authStorage)
