@@ -21,7 +21,7 @@
 	},
 	"dependencies": {
 		"@friday/sdk": "file:../../packages/sdk",
-		"@remotion/media": "4.0.513",
+		"@remotion/media": "4.0.519",
 		"@remotion/player": "4.0.513",
 		"@remotion/web-renderer": "4.0.513",
 		"lucide-react": "^1.31.0",
