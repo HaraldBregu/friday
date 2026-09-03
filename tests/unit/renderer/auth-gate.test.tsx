@@ -265,6 +265,7 @@ it('takes a restored unconfigured signed-in user directly to setup', async () =>
 	renderFlow('/start');
 
 	expect(await screen.findByRole('heading', { name: 'Model API keys' })).toBeInTheDocument();
+	expect(screen.getByText('Model').parentElement).toHaveTextContent('Model · 1 of 3');
 	expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 });
 
