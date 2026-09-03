@@ -2,6 +2,7 @@ export { ensureExtensions } from './extension_ensure';
 export { closeExtension } from './extension_close';
 export { deleteExtension } from './extension_delete';
 export { destroyExtension } from './extension_destroy';
+export { destroyAllExtensions } from './extension_destroy_all';
 export { listExtensions } from './extension_list';
 export { loadExtension } from './extension_load';
 export { readExtensionManifest } from './extension_read';

@@ -14,7 +14,10 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 	safetyNetInstalled = true;
 	let terminationRequested = false;
 	const requestTermination = (): void => {
-		if (terminationRequested) return;
+		if (terminationRequested) {
+			app.exit(1);
+			return;
+		}
 		terminationRequested = true;
 		process.exitCode = 1;
 		if (app.isReady()) app.quit();

@@ -20,6 +20,7 @@ import { Menu } from './menu';
 import { setKeepAwake } from './keep_awake';
 import { userDataLocation } from './shared/user_data_location';
 import {
+	destroyAllExtensions,
 	ensureExtensions,
 	listExtensions,
 	loadExtension,
@@ -255,6 +256,7 @@ app.on('before-quit', (event) => {
 	event.preventDefault();
 	if (shutdownPromise) return;
 	shutdownPromise = Promise.resolve().then(async () => {
+		destroyAllExtensions();
 		stopStorageSync();
 		stopRagSchedule();
 		stopWiki();

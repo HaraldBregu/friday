@@ -28,5 +28,8 @@ describe('process safety net', () => {
 		);
 		expect(process.exitCode).toBe(1);
 		expect(app.quit).toHaveBeenCalledTimes(1);
+
+		listeners.get('SIGTERM')?.();
+		expect(app.exit).toHaveBeenCalledWith(1);
 	});
 });

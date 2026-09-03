@@ -6,6 +6,7 @@ export const app = {
 	isReady: jest.fn(() => true),
 	once: jest.fn(),
 	quit: jest.fn(),
+	exit: jest.fn(),
 };
 
 export const ipcMain = {
