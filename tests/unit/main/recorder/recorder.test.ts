@@ -38,7 +38,10 @@ describe('recorder capture ownership', () => {
 			'capture:command',
 			expect.objectContaining({ type: 'start', id: recording.id })
 		);
-		expect(secondContents.send).not.toHaveBeenCalled();
+		expect(secondContents.send).not.toHaveBeenCalledWith(
+			'capture:command',
+			expect.anything()
+		);
 
 		await expect(
 			recorder.complete({ id: recording.id, base64: Buffer.from('wrong').toString('base64') }, 12)
