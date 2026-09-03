@@ -2,6 +2,7 @@ jest.mock('../../../../src/main/shared/user_data_location', () => ({
 	userDataLocation: () => '/tmp/friday-user-data',
 }));
 
+import { safeStorage } from 'electron';
 import {
 	channelsStorePath,
 	getChannelProvider,
@@ -11,6 +12,17 @@ import {
 import type { StoredBotProvider } from '../../../../src/shared';
 
 describe('channels store', () => {
+	beforeEach(() => {
+		(safeStorage.isEncryptionAvailable as jest.Mock).mockReturnValue(true);
+		(safeStorage.getSelectedStorageBackend as jest.Mock).mockReturnValue('gnome_libsecret');
+		(safeStorage.encryptString as jest.Mock).mockImplementation((value: string) =>
+			Buffer.from(value, 'utf8')
+		);
+		(safeStorage.decryptString as jest.Mock).mockImplementation((value: Buffer) =>
+			value.toString('utf8')
+		);
+	});
+
 	it('persists channel providers under settings/channels.json', () => {
 		const provider: StoredBotProvider = {
 			id: 'telegram',
@@ -25,6 +37,9 @@ describe('channels store', () => {
 		setChannelProvider(provider);
 
 		expect(getChannelProvider('telegram')).toEqual(provider);
+		expect(safeStorage.encryptString).toHaveBeenCalledWith(
+			JSON.stringify({ id: 'telegram', apiKey: 'token' })
+		);
 
 		expect(getChannelProvider('telegram')).toEqual(provider);
 	});

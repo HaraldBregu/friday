@@ -3,6 +3,11 @@ import Store from 'electron-store';
 import type { ChannelModelKind, ChannelModelSelection, StoredBotProvider } from '../../shared';
 import { userDataLocation } from '../shared/user_data_location';
 import { getModelId, getProviderId } from '../models/selection';
+import { safeStorage } from 'electron';
+import { isSafeStorageAvailable } from '../shared/safe_storage';
+import { restrictSettingsFile } from '../shared/restrict_settings_file';
+
+type PersistedBotProvider = Omit<StoredBotProvider, 'apiKey'> & { readonly apiKey?: string };
 
 type ChannelModelKeys = {
 	providerId: keyof ChannelsStoreState;
@@ -25,7 +30,8 @@ const CHANNEL_MODEL_KEYS: Record<ChannelModelKind, ChannelModelKeys> = {
 } as const;
 
 export interface ChannelsStoreState {
-	readonly providers: StoredBotProvider[];
+	readonly providers: PersistedBotProvider[];
+	readonly encryptedApiKeys: Record<string, string>;
 	readonly llmProviderId?: string;
 	readonly llmModelId?: string;
 	readonly sttProviderId?: string;
@@ -46,10 +52,13 @@ const store = new Store<ChannelsStoreState>({
 	accessPropertiesByDotNotation: false,
 	defaults: {
 		providers: [],
+		encryptedApiKeys: {},
 	},
 });
 
 export const channelsStorePath = store.path;
+restrictSettingsFile(channelsStorePath);
+const volatileApiKeys = new Map<string, string>();
 
 function trimValue(value: unknown): string | undefined {
 	if (typeof value !== 'string') return undefined;
@@ -58,7 +67,42 @@ function trimValue(value: unknown): string | undefined {
 }
 
 export function listChannelProviders(): StoredBotProvider[] {
-	return store.get('providers');
+	const encryptedApiKeys = { ...(store.get('encryptedApiKeys') ?? {}) };
+	let migrated = false;
+	const providers = store.get('providers').map((provider) => {
+		const { apiKey: plaintextApiKey, ...metadata } = provider;
+		let apiKey = volatileApiKeys.get(provider.id) ?? '';
+		if (plaintextApiKey) {
+			apiKey = plaintextApiKey;
+			migrated = true;
+			if (isSafeStorageAvailable()) {
+				encryptedApiKeys[provider.id] = safeStorage
+					.encryptString(JSON.stringify({ id: provider.id, apiKey }))
+					.toString('base64');
+			} else {
+				volatileApiKeys.set(provider.id, apiKey);
+			}
+		} else if (encryptedApiKeys[provider.id] && isSafeStorageAvailable()) {
+			try {
+				const opened = JSON.parse(
+					safeStorage.decryptString(Buffer.from(encryptedApiKeys[provider.id], 'base64'))
+				) as { id?: unknown; apiKey?: unknown };
+				if (opened.id === provider.id && typeof opened.apiKey === 'string') apiKey = opened.apiKey;
+			} catch {
+				apiKey = '';
+			}
+		}
+		return { ...metadata, apiKey };
+	});
+	if (migrated) {
+		store.set(
+			'providers',
+			providers.map(({ apiKey: _apiKey, ...provider }) => provider)
+		);
+		store.set('encryptedApiKeys', encryptedApiKeys);
+		restrictSettingsFile(channelsStorePath);
+	}
+	return providers;
 }
 
 export function getChannelProvider(id: string): StoredBotProvider | undefined {
@@ -70,7 +114,27 @@ export function setChannelProvider(provider: StoredBotProvider): StoredBotProvid
 	const index = providers.findIndex((entry) => entry.id === provider.id);
 	if (index === -1) providers.push(provider);
 	else providers[index] = provider;
-	store.set('providers', providers);
+	store.set(
+		'providers',
+		providers.map(({ apiKey: _apiKey, ...entry }) => entry)
+	);
+	const encryptedApiKeys = { ...(store.get('encryptedApiKeys') ?? {}) };
+	if (provider.apiKey) {
+		if (isSafeStorageAvailable()) {
+			encryptedApiKeys[provider.id] = safeStorage
+				.encryptString(JSON.stringify({ id: provider.id, apiKey: provider.apiKey }))
+				.toString('base64');
+			volatileApiKeys.delete(provider.id);
+		} else {
+			delete encryptedApiKeys[provider.id];
+			volatileApiKeys.set(provider.id, provider.apiKey);
+		}
+	} else {
+		delete encryptedApiKeys[provider.id];
+		volatileApiKeys.delete(provider.id);
+	}
+	store.set('encryptedApiKeys', encryptedApiKeys);
+	restrictSettingsFile(channelsStorePath);
 	return provider;
 }
 

@@ -5,6 +5,7 @@ import { openMcpRecord } from './mcp_record_open';
 import { sealMcpRecord } from './mcp_record_seal';
 import type { McpSecrets } from './mcp_secret_keys';
 import type { McpRecord, McpStoreSchema } from './mcp_types';
+import { restrictSettingsFile } from '../shared/restrict_settings_file';
 
 type LegacyProvidersState = {
 	mcp_servers?: unknown;
@@ -51,6 +52,7 @@ function migrateLegacyMcpServers(): void {
 }
 
 export const mcpStorePath = store.path;
+restrictSettingsFile(mcpStorePath);
 
 export function getMcpServersState(): McpRecord[] {
 	let hasPlaintextSecrets = false;
@@ -72,6 +74,7 @@ export function setMcpServersState(value: McpRecord[]): void {
 	});
 	volatileSecrets = nextVolatileSecrets;
 	store.set('servers', servers);
+	restrictSettingsFile(mcpStorePath);
 }
 
 export function migrateMcpStoreFromProviders(): void {
