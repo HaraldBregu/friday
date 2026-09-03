@@ -317,3 +317,58 @@ it('preserves edits made during upload and drains them in a follow-up pass', asy
 	expect(vault.records()[0].dirty).toBe(false);
 	jest.useRealTimers();
 });
+
+it('stops when the cloud returns a stale canonical record without accepting progress', async () => {
+	jest.useFakeTimers().setSystemTime(new Date('2026-09-03T12:00:00.000Z'));
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	vault.save('models', {
+		id: 'openai',
+		name: 'OpenAI',
+		apiKey: 'initial-key',
+		baseUrl: 'https://api.openai.com/v1',
+	});
+	await sync.setup('correct horse battery staple');
+	const stale = structuredClone(cloud.records.get('models:openai'));
+	if (!stale) throw new Error('Expected the initial cloud credential.');
+
+	jest.setSystemTime(new Date('2026-09-03T12:00:01.000Z'));
+	vault.save('models', {
+		id: 'openai',
+		name: 'OpenAI',
+		apiKey: 'newer-local-key',
+		baseUrl: 'https://api.openai.com/v1',
+	});
+	cloud.syncCredential = jest.fn(async () => structuredClone(stale));
+
+	await expect(sync.sync()).rejects.toThrow(
+		'Credential synchronization could not make progress.'
+	);
+	expect(cloud.syncCredential).toHaveBeenCalledTimes(1);
+	expect(vault.records()[0].dirty).toBe(true);
+	jest.useRealTimers();
+});
+
+it('rejects invalid cloud modification timestamps', async () => {
+	const cloud = new FakeCloud();
+	const auth = new FakeAuth();
+	const vault = newVault();
+	const sync = new ProviderSyncService(auth, vault, cloud);
+	vault.save('models', {
+		id: 'anthropic',
+		name: 'Anthropic',
+		apiKey: 'initial-key',
+		baseUrl: 'https://api.anthropic.com',
+	});
+	await sync.setup('correct horse battery staple');
+	const invalid = structuredClone(cloud.records.get('models:anthropic'));
+	if (!invalid) throw new Error('Expected the initial cloud credential.');
+	invalid.clientModifiedAt = 'not-a-timestamp';
+	cloud.records.set('models:anthropic', invalid);
+
+	await expect(sync.sync()).rejects.toThrow(
+		'Credential synchronization returned invalid metadata.'
+	);
+});

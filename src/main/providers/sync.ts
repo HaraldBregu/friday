@@ -187,8 +187,28 @@ export class ProviderSyncService {
 
 	private async drainSync(): Promise<void> {
 		do {
+			const pendingBefore = new Map(
+				this.vault
+					.records()
+					.filter((record) => record.dirty)
+					.map((record) => [this.recordKey(record), record])
+			);
 			this.syncRequested = false;
 			await this.performSync();
+			const pending = this.vault.records().filter((record) => record.dirty);
+			const madeProgress =
+				pending.length < pendingBefore.size ||
+				pending.some((record) => {
+					const previous = pendingBefore.get(this.recordKey(record));
+					return (
+						!previous ||
+						previous.clientModifiedAt !== record.clientModifiedAt ||
+						previous.writerDeviceId !== record.writerDeviceId
+					);
+				});
+			if (pending.length > 0 && !madeProgress && !this.syncRequested) {
+				throw new Error('Credential synchronization could not make progress.');
+			}
 		} while (this.syncRequested || this.vault.records().some((record) => record.dirty));
 	}
 
@@ -260,7 +280,12 @@ export class ProviderSyncService {
 	}
 
 	private compare(left: ProviderVaultRecord, right: ProviderVaultRecord): number {
-		const time = Date.parse(left.clientModifiedAt) - Date.parse(right.clientModifiedAt);
+		const leftTime = Date.parse(left.clientModifiedAt);
+		const rightTime = Date.parse(right.clientModifiedAt);
+		if (!Number.isFinite(leftTime) || !Number.isFinite(rightTime)) {
+			throw new Error('Credential synchronization returned invalid metadata.');
+		}
+		const time = leftTime - rightTime;
 		if (time !== 0) return time;
 		return left.writerDeviceId.localeCompare(right.writerDeviceId);
 	}
