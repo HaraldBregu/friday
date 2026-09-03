@@ -6,37 +6,42 @@ import type { Agent } from '../agent/agent';
 import { DataController } from '../data/data_controller';
 import { normalizeDataScope } from '../data/data_scope';
 import type { EventBus } from '../event_bus';
-import { registerCommand, registerQuery } from './core/gateway';
 import type { IpcModule } from './core/module';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
+import { TrustedRenderer } from './core/trusted';
 
 export interface DataIpcDeps {
 	agent: Agent;
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
 }
 
 export class DataIpc implements IpcModule<DataIpcDeps> {
 	readonly name = 'data';
 
-	register({ agent }: DataIpcDeps, _eventBus: EventBus): void {
+	register({ agent, windows, extensions }: DataIpcDeps, _eventBus: EventBus): void {
 		const controller = new DataController(agent);
-		registerQuery(DataChannels.listScopes, () => controller.listScopes());
-		registerCommand(DataChannels.export, async (input) => {
+		const trusted = new TrustedRenderer(windows, extensions);
+		trusted.query(DataChannels.listScopes, () => controller.listScopes());
+		trusted.commandWithEvent(DataChannels.export, async (event, input) => {
 			const scope = normalizeDataScope(input);
 			const options = {
 				title: 'Export Friday data',
 				defaultPath: `${this.fileName(scope)}.json`,
 				filters: [{ name: 'Friday data export', extensions: ['json'] }],
 			};
-			const window = BrowserWindow.getFocusedWindow();
+			const window = BrowserWindow.fromWebContents(event.sender);
 			const result = await (window
 				? dialog.showSaveDialog(window, options)
 				: dialog.showSaveDialog(options));
 			if (result.canceled || !result.filePath) return undefined;
 			return controller.export(scope, path.resolve(result.filePath));
 		});
-		registerQuery(DataChannels.previewPurge, (input) => {
+		trusted.query(DataChannels.previewPurge, (input) => {
 			return controller.previewPurge(normalizeDataScope(input));
 		});
-		registerCommand(DataChannels.purge, async (input, confirmationId) => {
+		trusted.commandWithEvent(DataChannels.purge, async (event, input, confirmationId) => {
 			const scope = normalizeDataScope(input);
 			const remoteNamespace =
 				scope.kind === 'rag' &&
@@ -61,7 +66,7 @@ export class DataIpc implements IpcModule<DataIpcDeps> {
 						: 'Remote provider data will not be deleted.'
 				}`,
 			};
-			const window = BrowserWindow.getFocusedWindow();
+			const window = BrowserWindow.fromWebContents(event.sender);
 			const result = await (window
 				? dialog.showMessageBox(window, options)
 				: dialog.showMessageBox(options));

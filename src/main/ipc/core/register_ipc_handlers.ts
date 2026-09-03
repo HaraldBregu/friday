@@ -153,15 +153,34 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			eventBus
 		)
 	);
-	safeRegister('database', () => new DatabaseIpc().register(undefined, eventBus));
+	safeRegister('database', () =>
+		new DatabaseIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
 	safeRegister('extensions', () =>
 		new ExtensionsIpc().register(
 			{ windowFactory, extensionRegistry, windows: windowContextManager },
 			eventBus
 		)
 	);
-	safeRegister('wiki', () => new WikiIpc().register(undefined, eventBus));
-	safeRegister('data', () => new DataIpc().register({ agent: agentService }, eventBus));
+	safeRegister('wiki', () =>
+		new WikiIpc().register(
+			{ windows: windowContextManager, extensions: extensionRegistry },
+			eventBus
+		)
+	);
+	safeRegister('data', () =>
+		new DataIpc().register(
+			{
+				agent: agentService,
+				windows: windowContextManager,
+				extensions: extensionRegistry,
+			},
+			eventBus
+		)
+	);
 	safeRegister('window', () => new WindowIpc().register({ logger, extensionRegistry }, eventBus));
 	safeRegister('terminal', () =>
 		new TerminalIpc().register(
