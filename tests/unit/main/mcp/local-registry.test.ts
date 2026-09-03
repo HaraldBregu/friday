@@ -220,6 +220,28 @@ describe('local MCP registry', () => {
 		}
 	});
 
+	it('does not release a stored environment to a changed command', () => {
+		const root = path.join(temp, 'servers');
+		const directory = path.join(root, 'bound-environment');
+		fs.mkdirSync(directory, { recursive: true });
+		fs.writeFileSync(
+			path.join(directory, 'mcp.json'),
+			JSON.stringify({ id: 'bound-environment', command: 'trusted-command' })
+		);
+		configureLocalMcpServer(
+			'bound-environment',
+			{ type: 'stdio', command: 'trusted-command', env: { SECRET: 'value' } },
+			root
+		);
+
+		fs.writeFileSync(
+			path.join(directory, 'mcp.json'),
+			JSON.stringify({ id: 'bound-environment', command: 'other-command' })
+		);
+
+		expect(readLocalMcpServer(directory).data.env).toBeUndefined();
+	});
+
 	it('returns diagnostics for malformed and duplicate manifests', () => {
 		const root = path.join(temp, 'servers');
 		for (const folder of ['one', 'two']) {
@@ -254,6 +276,7 @@ describe('local MCP registry', () => {
 				id: 'uploaded',
 				command: 'node',
 				args: ['server.js'],
+				env: { SECRET: 'value' },
 				require_approval: 'never',
 				enabled: true,
 			})
@@ -262,15 +285,18 @@ describe('local MCP registry', () => {
 		const first = importLocalMcpServers([source], root);
 		expect(first.imported.map((server) => server.id)).toEqual(['uploaded']);
 		expect(first.imported[0]?.data).toMatchObject({
+			env: { SECRET: 'value' },
 			require_approval: 'always',
 			enabled: false,
 		});
-		expect(
-			JSON.parse(fs.readFileSync(path.join(root, 'uploaded', 'mcp.json'), 'utf8'))
-		).toMatchObject({
+		const installedManifest = JSON.parse(
+			fs.readFileSync(path.join(root, 'uploaded', 'mcp.json'), 'utf8')
+		);
+		expect(installedManifest).toMatchObject({
 			require_approval: 'always',
 			enabled: false,
 		});
+		expect(installedManifest).not.toHaveProperty('env');
 		expect(first.skipped).toEqual([]);
 		const second = importLocalMcpServers([source], root);
 		expect(second.imported).toEqual([]);
