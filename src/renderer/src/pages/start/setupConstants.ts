@@ -169,7 +169,7 @@ export const MODEL_SERVICE_DEFINITIONS: readonly ModelServiceDefinition[] = [
 
 export const SETUP_STEPS: readonly SetupStep[] = ['modelProvider', 'search', 'models'];
 
-export const ONBOARDING_STEPS: readonly OnboardingStep[] = ['auth', ...SETUP_STEPS];
+export const ONBOARDING_STEPS: readonly OnboardingStep[] = SETUP_STEPS;
 
 export const ONBOARDING_STEP_TITLES: Record<OnboardingStep, string> = {
 	landing: 'Welcome',
