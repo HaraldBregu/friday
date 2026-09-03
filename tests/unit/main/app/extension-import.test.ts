@@ -34,6 +34,21 @@ describe('extension import', () => {
 		expect(fs.readFileSync(path.join(installed, 'index.html'), 'utf8')).toBe('installed');
 	});
 
+	it('rejects the privileged Coder extension identifier', () => {
+		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-source-'));
+		const source = path.join(sourceRoot, 'coder');
+		fs.mkdirSync(source, { recursive: true });
+
+		try {
+			expect(importExtensions([source], appLocation)).toMatchObject({
+				imported: [],
+				skipped: [{ sourcePath: source, reason: 'Reserved extension folder name.' }],
+			});
+		} finally {
+			fs.rmSync(sourceRoot, { recursive: true, force: true });
+		}
+	});
+
 	it('replaces an installed extension through a staged copy', () => {
 		const installed = path.join(appLocation, 'extensions', 'project');
 		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-extension-source-'));
