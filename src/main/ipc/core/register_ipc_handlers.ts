@@ -121,7 +121,10 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	);
 	safeRegister('database', () => new DatabaseIpc().register(undefined, eventBus));
 	safeRegister('extensions', () =>
-		new ExtensionsIpc().register({ windowFactory, extensionRegistry }, eventBus)
+		new ExtensionsIpc().register(
+			{ windowFactory, extensionRegistry, windows: windowContextManager },
+			eventBus
+		)
 	);
 	safeRegister('wiki', () => new WikiIpc().register(undefined, eventBus));
 	safeRegister('data', () => new DataIpc().register({ agent: agentService }, eventBus));

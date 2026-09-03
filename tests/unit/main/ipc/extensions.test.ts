@@ -3,7 +3,7 @@ const loadExtension = jest.fn();
 const importExtensions = jest.fn();
 const openRoot = jest.fn();
 const deleteExtension = jest.fn();
-const closeExtension = jest.fn();
+const destroyExtension = jest.fn();
 const extension = {
 	id: 'demo-extension',
 	title: 'Demo Extension',
@@ -17,51 +17,62 @@ jest.mock('../../../../src/main/extensions/extension_index', () => ({
 	importExtensions,
 	openRoot,
 	deleteExtension,
-	closeExtension,
+	destroyExtension,
 }));
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
-	registerQuery: jest.fn(),
-	registerCommand: jest.fn(),
+	registerQueryWithEvent: jest.fn(),
 	registerCommandWithEvent: jest.fn(),
 }));
 
 import type { EventBus } from '../../../../src/main/event_bus';
 import { ExtensionsIpc } from '../../../../src/main/ipc/extensions';
-import { registerCommand, registerCommandWithEvent } from '../../../../src/main/ipc/core/gateway';
+import { registerCommandWithEvent } from '../../../../src/main/ipc/core/gateway';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 import { ExtensionChannels } from '../../../../src/shared/ipc_channels_definitions';
 import { BrowserWindow, dialog } from 'electron';
 
 beforeEach(() => {
+	jest.clearAllMocks();
 	listExtensions.mockReturnValue([extension]);
-	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(null);
 	(dialog.showMessageBox as jest.Mock).mockResolvedValue({ response: 0, checkboxChecked: false });
 });
 
-const extensionRegistry = { revoke: jest.fn() };
+const extensionRegistry = { has: jest.fn(() => false), revoke: jest.fn() };
+const windows = { has: jest.fn(() => true) };
+const mainFrame = {};
+const sender = { mainFrame };
+const event = { sender, senderFrame: mainFrame };
+const owner = { id: 1, webContents: sender };
 
 it('opens the extensions directory in the system file explorer', () => {
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
 	new ExtensionsIpc().register(
-		{ windowFactory: {} as WindowFactory, extensionRegistry: extensionRegistry as never },
+		{
+			windowFactory: {} as WindowFactory,
+			extensionRegistry: extensionRegistry as never,
+			windows: windows as never,
+		},
 		{} as EventBus
 	);
 
-	const handler = (registerCommand as jest.Mock).mock.calls.find(
+	const handler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
 		([channel]) => channel === ExtensionChannels.openRoot
 	)?.[1];
-	handler();
+	handler(event);
 
 	expect(openRoot).toHaveBeenCalledTimes(1);
 });
 
 it('uses a native confirmation before deleting an extension', async () => {
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
 	new ExtensionsIpc().register(
-		{ windowFactory: {} as WindowFactory, extensionRegistry: extensionRegistry as never },
+		{
+			windowFactory: {} as WindowFactory,
+			extensionRegistry: extensionRegistry as never,
+			windows: windows as never,
+		},
 		{} as EventBus
 	);
-	const owner = {};
-	const event = { sender: {} };
-	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
 
 	const deleteHandler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
 		([channel]) => channel === ExtensionChannels.delete
@@ -88,7 +99,7 @@ it('uses a native confirmation before deleting an extension', async () => {
 	expect(deleteExtension).toHaveBeenCalledTimes(1);
 	expect(deleteExtension).toHaveBeenCalledWith(extension.id);
 	expect(extensionRegistry.revoke).toHaveBeenCalledWith(extension.id);
-	expect(closeExtension).toHaveBeenCalledWith(extension.id);
+	expect(destroyExtension).toHaveBeenCalledWith(extension.id);
 
 	await expect(deleteHandler(event, 'missing-extension')).rejects.toThrow(
 		'Extension not found: missing-extension'
