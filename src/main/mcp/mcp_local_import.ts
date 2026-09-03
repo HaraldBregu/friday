@@ -27,6 +27,7 @@ export function importLocalMcpServers(
 		let destination: string | undefined;
 		try {
 			const server = readLocalMcpServer(source);
+			if (server.data.type !== 'stdio') throw new Error('Expected a local MCP server.');
 			const target = path.join(root, server.id);
 			if (existsSync(target)) {
 				throw new Error(`A local MCP server with ID "${server.id}" already exists.`);
