@@ -292,7 +292,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 										<Switch
 											checked={storage.paths.includes(folder.path)}
 											aria-label={t(`settings.storage.folders.${folder.key}`)}
-											disabled={busy}
+											disabled={controlsDisabled}
 											onCheckedChange={(checked) =>
 												updateDraft({
 													...storage,
@@ -318,7 +318,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 											variant="ghost"
 											size="icon-sm"
 											aria-label={t('settings.storage.sync.removeFolder')}
-											disabled={busy}
+										disabled={controlsDisabled}
 											onClick={() =>
 												updateDraft({
 													...storage,
@@ -337,7 +337,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 									variant="outline"
 									size="sm"
 									onClick={() => void pickFolders()}
-									disabled={busy}
+									disabled={controlsDisabled}
 								>
 									<FolderPlus className="size-3" />
 									{t('settings.storage.sync.addFolders')}
@@ -348,7 +348,11 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								title={t('settings.storage.autoSync.interval')}
 								description={t('settings.storage.autoSync.description')}
 								actions={
-									<Select value={intervalValue} onValueChange={selectInterval} disabled={busy}>
+									<Select
+										value={intervalValue}
+										onValueChange={selectInterval}
+										disabled={controlsDisabled}
+									>
 										<SelectTrigger
 											size="sm"
 											className="w-56 max-w-full text-xs"
@@ -381,7 +385,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 										value={storage.syncCronExpression}
 										aria-label={t('settings.storage.autoSync.cronExpression')}
 										className="w-56 max-w-full font-mono text-xs"
-										disabled={!storage.syncEnabled || busy}
+										disabled={!storage.syncEnabled || controlsDisabled}
 										onChange={(event) =>
 											updateDraft({ ...storage, syncCronExpression: event.target.value })
 										}
@@ -395,7 +399,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="outline"
 								size="sm"
 								onClick={() => setRestoreOpen(true)}
-								disabled={busy || storage.paths.length === 0}
+									disabled={controlsDisabled || storage.paths.length === 0}
 							>
 								<Download className="size-3" />
 								{runningOperation?.operation === 'restore'
@@ -406,7 +410,7 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="outline"
 								size="sm"
 								onClick={() => void runBackup()}
-								disabled={busy || storage.paths.length === 0}
+									disabled={controlsDisabled || storage.paths.length === 0}
 							>
 								<Upload className="size-3" />
 								{runningOperation?.operation === 'backup'
@@ -417,11 +421,15 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 								variant="ghost"
 								size="sm"
 								onClick={() => setDraft(null)}
-								disabled={!draft || busy}
+									disabled={!draft || controlsDisabled}
 							>
 								{t('settings.storage.cancel')}
 							</Button>
-							<Button size="sm" onClick={() => void saveSync()} disabled={!draft || busy}>
+							<Button
+								size="sm"
+								onClick={() => void saveSync()}
+								disabled={!draft || controlsDisabled}
+							>
 								<Save className="size-3" />
 								{savingSync ? t('settings.storage.saving') : t('settings.storage.sync.save')}
 							</Button>
@@ -431,13 +439,18 @@ const StoragePage: React.FC<StoragePageProps> = ({ inline = false }) => {
 					{syncStatus && <SettingsNotice icon={FolderSync}>{syncStatus}</SettingsNotice>}
 					{operationStatusText && (
 						<div
-							role={operationStatus?.state === 'failed' ? 'alert' : 'status'}
-							aria-live={operationStatus?.state === 'failed' ? 'assertive' : 'polite'}
+							role={operationStatus?.state === 'partial' ? 'alert' : undefined}
+							aria-live={operationNeedsAttention ? 'assertive' : 'polite'}
 							aria-atomic="true"
 						>
 							<SettingsNotice
-								icon={operationStatus?.state === 'failed' ? AlertTriangle : FolderSync}
+								icon={operationNeedsAttention ? AlertTriangle : FolderSync}
 								variant={operationStatus?.state === 'failed' ? 'destructive' : 'default'}
+								className={
+									operationStatus?.state === 'partial'
+										? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+										: undefined
+								}
 							>
 								{operationStatusText}
 							</SettingsNotice>
