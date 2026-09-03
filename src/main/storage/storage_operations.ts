@@ -47,6 +47,10 @@ export class StorageOperations {
 		return this.tasks.get(operationId) ?? Promise.resolve(undefined);
 	}
 
+	async settle(): Promise<void> {
+		await Promise.allSettled([...this.tasks.values()]);
+	}
+
 	private start(
 		operation: StorageOperation,
 		trigger: StorageOperationTrigger
@@ -125,7 +129,9 @@ export class StorageOperations {
 
 	private publish(status: StorageOperationStatus): StorageOperationStatus {
 		this.status = status;
-		this.onStatusChanged(status);
+		try {
+			this.onStatusChanged(status);
+		} catch {}
 		return status;
 	}
 }

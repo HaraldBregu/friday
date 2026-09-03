@@ -124,4 +124,53 @@ describe('storage operations', () => {
 			expect.objectContaining({ state: 'succeeded', transferred: 1 })
 		);
 	});
+
+	it('settles only after in-flight storage work finishes', async () => {
+		let finishBackup: ((value: { uploaded: string[]; failed: [] }) => void) | undefined;
+		const dependencies: StorageOperationDependencies = {
+			backup: jest.fn(
+				() =>
+					new Promise<{ uploaded: string[]; failed: [] }>((resolve) => {
+						finishBackup = resolve;
+					})
+			),
+			restore: jest.fn(),
+			lock: (operation) => operation(),
+			preventSuspension: () => jest.fn(),
+		};
+		const Operations = await loadOperations();
+		const operations = new Operations(jest.fn(), dependencies);
+		operations.backup('manual');
+		const settled = jest.fn();
+		const settling = operations.settle().then(settled);
+
+		await Promise.resolve();
+		expect(settled).not.toHaveBeenCalled();
+		finishBackup?.({ uploaded: ['one'], failed: [] });
+		await settling;
+
+		expect(settled).toHaveBeenCalledTimes(1);
+	});
+
+	it('contains observer failures and still completes the operation', async () => {
+		const dependencies: StorageOperationDependencies = {
+			backup: jest.fn().mockResolvedValue({ uploaded: ['one'], failed: [] }),
+			restore: jest.fn(),
+			lock: (operation) => operation(),
+			preventSuspension: () => jest.fn(),
+		};
+		const Operations = await loadOperations();
+		const observer = jest.fn(() => {
+			throw new Error('renderer unavailable');
+		});
+		const operations = new Operations(observer, dependencies);
+
+		const running = operations.backup('manual');
+		await expect(operations.wait(running.operationId)).resolves.toEqual(
+			expect.objectContaining({ state: 'succeeded', transferred: 1 })
+		);
+
+		expect(observer).toHaveBeenCalledTimes(2);
+		expect(operations.getStatus()).toEqual(expect.objectContaining({ state: 'succeeded' }));
+	});
 });

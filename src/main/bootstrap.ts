@@ -157,6 +157,7 @@ export async function cleanup(services: MainServices): Promise<void> {
 		authService,
 		agentService,
 		coderService,
+		storageOperations,
 	} = services;
 	logger.info('Bootstrap', 'Starting cleanup');
 	terminalManager.shutdown();
@@ -164,6 +165,7 @@ export async function cleanup(services: MainServices): Promise<void> {
 	coderService.destroy();
 	await conversationService.execute({ type: 'voice', action: 'stop-all' });
 	await windowContextManager.destroyAll();
+	await storageOperations.settle();
 	await cloudService.destroy();
 	providerSyncService.destroy();
 	authService.destroy();
