@@ -250,11 +250,25 @@ app.on('will-quit', () => {
 	services.terminalManager.shutdown();
 });
 
-app.on('quit', () => {
-	stopStorageSync();
-	stopRagSchedule();
-	stopWiki();
-	agentService.destroy();
-	services.coderService.destroy();
-	cleanup(services);
+let shutdownPromise: Promise<void> | undefined;
+let shutdownComplete = false;
+app.on('before-quit', (event) => {
+	if (shutdownComplete) return;
+	event.preventDefault();
+	if (shutdownPromise) return;
+	shutdownPromise = Promise.resolve().then(async () => {
+		stopStorageSync();
+		stopRagSchedule();
+		stopWiki();
+		await cleanup(services);
+	});
+	void shutdownPromise
+		.catch((error) => {
+			// eslint-disable-next-line no-console
+			console.error('[Shutdown] Cleanup failed', error);
+		})
+		.finally(() => {
+			shutdownComplete = true;
+			app.quit();
+		});
 });

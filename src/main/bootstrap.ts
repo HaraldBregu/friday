@@ -129,15 +129,19 @@ export async function cleanup(services: MainServices): Promise<void> {
 		cloudService,
 		providerSyncService,
 		authService,
+		agentService,
+		coderService,
 	} = services;
 	logger.info('Bootstrap', 'Starting cleanup');
 	terminalManager.shutdown();
+	agentService.destroy();
+	coderService.destroy();
 	await conversationService.execute({ type: 'voice', action: 'stop-all' });
 	await windowContextManager.destroyAll();
 	await cloudService.destroy();
 	providerSyncService.destroy();
 	authService.destroy();
 	channelRegistry.destroy();
-	logger.destroy();
 	logger.info('Bootstrap', 'Cleanup complete');
+	logger.destroy();
 }

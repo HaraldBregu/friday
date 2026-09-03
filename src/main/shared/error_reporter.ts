@@ -12,12 +12,21 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 		return;
 	}
 	safetyNetInstalled = true;
+	let terminationRequested = false;
+	const requestTermination = (): void => {
+		if (terminationRequested) return;
+		terminationRequested = true;
+		process.exitCode = 1;
+		if (app.isReady()) app.quit();
+		else app.once('ready', () => app.quit());
+	};
 
 	process.on('uncaughtException', (error, origin) => {
 		const message = error instanceof Error ? error.stack || error.message : String(error);
 		safetyNetLogger?.error('Process', `uncaughtException (${origin})`, { error: message });
 		// eslint-disable-next-line no-console
 		console.error(`[uncaughtException:${origin}]`, message);
+		requestTermination();
 	});
 
 	process.on('unhandledRejection', (reason) => {
@@ -25,6 +34,7 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 		safetyNetLogger?.error('Process', 'unhandledRejection', { reason: message });
 		// eslint-disable-next-line no-console
 		console.error('[unhandledRejection]', message);
+		requestTermination();
 	});
 
 	process.on('exit', (code) => {
@@ -39,6 +49,7 @@ export function setupProcessSafetyNet(logger?: LoggerService): void {
 			safetyNetLogger?.warn('Process', `Received ${signal}`);
 			// eslint-disable-next-line no-console
 			console.error(`[signal] ${signal}`);
+			requestTermination();
 		});
 	}
 }
