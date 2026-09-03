@@ -334,6 +334,7 @@ describe('run stream system prompt', () => {
 	it('loads a pending bootstrap for a minimal main-agent turn', async () => {
 		const root = await fs.mkdtemp(path.join(os.tmpdir(), 'kucedr-run-bootstrap-'));
 		try {
+			await fs.writeFile(path.join(root, 'BOOTSTRAP.md'), '# First-run conversation');
 			const session = createSessionState();
 			session.messages = [{ role: 'user', content: 'Hello' }];
 
@@ -357,7 +358,7 @@ describe('run stream system prompt', () => {
 
 			const systemPrompt = runModelTurnMock.mock.calls[0][3] as string;
 			const contextMessages = runModelTurnMock.mock.calls[0][10] as Message[];
-			expect(systemPrompt).toContain('## Workspace');
+			expect(systemPrompt).toContain('\n\n## Workspace\n');
 			expect(contextMessages[0]).toMatchObject({
 				role: 'user',
 				content: expect.stringContaining('### BOOTSTRAP.md'),
@@ -383,7 +384,7 @@ describe('run stream system prompt', () => {
 			))
 				void event;
 
-			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('## Workspace');
+			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('\n\n## Workspace\n');
 			expect(runModelTurnMock.mock.calls[0][10]).toEqual([]);
 		} finally {
 			await fs.rm(root, { recursive: true, force: true });
@@ -415,7 +416,7 @@ describe('run stream system prompt', () => {
 			))
 				void event;
 
-			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('## Workspace');
+			expect(runModelTurnMock.mock.calls[0][3]).not.toContain('\n\n## Workspace\n');
 			expect(runModelTurnMock.mock.calls[0][10]).toEqual([]);
 		} finally {
 			await fs.rm(root, { recursive: true, force: true });

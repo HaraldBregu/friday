@@ -2,7 +2,6 @@ import type { AgentContextMode, AgentInteractionMode } from '../../../shared/age
 import type { SessionCategory } from '../session';
 import type { Config } from '../types';
 import { readBootstrap } from './system_read_bootstrap';
-import { workspacePath } from './system_workspace_path';
 
 export async function resolveContextMode(
 	config: Config,
@@ -20,6 +19,6 @@ export async function resolveContextMode(
 		return requestedMode;
 	}
 
-	const bootstrap = await readBootstrap(workspacePath(config));
+	const bootstrap = await readBootstrap(config.location);
 	return bootstrap.trim() ? 'workspace' : requestedMode;
 }

@@ -62,6 +62,7 @@ import {
 } from './state';
 import { getModelId, getProviderId } from './agent_store';
 import { preflightPromptAttachments, resolvePromptInputCapabilities } from './attachments';
+import { workspacePath } from './system';
 
 const RUN_PRIORITIES: Record<SessionCategory, AgentRunPriority> = {
 	main: 'high',
@@ -115,6 +116,7 @@ export class Agent {
 		readonly sandbox: ExecSandbox
 	) {
 		this.config = { location: path.resolve(agentLocation()) };
+		workspacePath(this.config);
 		initTask();
 	}
 
