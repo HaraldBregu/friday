@@ -256,12 +256,12 @@ it('does not authorize credential sync during recovery and clears readiness on s
 	expect(cloud.getVaultCalls).toBe(0);
 	await expect(sync.sync()).rejects.toThrow('Sign in to synchronize provider credentials');
 
+	cloud.fail = true;
 	auth.setState({
 		status: 'signedIn',
 		persistence: 'encrypted',
 		user: { id: '11111111-1111-4111-8111-111111111111', email: 'owner@example.test' },
 	});
-	cloud.fail = true;
 	auth.setState(auth.state);
 	for (let attempt = 0; attempt < 5; attempt += 1) await Promise.resolve();
 	expect(jest.getTimerCount()).toBe(1);

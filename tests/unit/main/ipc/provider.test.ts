@@ -78,6 +78,11 @@ function register() {
 	return sync;
 }
 
+beforeEach(() => {
+	registerQueryWithEvent.mockClear();
+	registerCommandWithEvent.mockClear();
+});
+
 describe('provider credential IPC boundary', () => {
 	it('awaits refreshed vault readiness for the public status query', async () => {
 		const sync = register();
