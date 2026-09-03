@@ -1,7 +1,13 @@
 import { lookup } from 'node:dns/promises';
 import { privateAddress } from './private';
 
-export async function publicUrl(value: string): Promise<URL> {
+export interface PublicUrl {
+	url: URL;
+	address: string;
+	family: 4 | 6;
+}
+
+export async function publicUrl(value: string): Promise<PublicUrl> {
 	const url = new URL(value);
 	if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error('Unsupported URL.');
 	if (url.username || url.password) throw new Error('URL credentials are not allowed.');
@@ -13,5 +19,5 @@ export async function publicUrl(value: string): Promise<URL> {
 	if (!addresses.length || addresses.some(({ address }) => privateAddress(address))) {
 		throw new Error('Private URLs are not allowed.');
 	}
-	return url;
+	return { url, address: addresses[0].address, family: addresses[0].family };
 }

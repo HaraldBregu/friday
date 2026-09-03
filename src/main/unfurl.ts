@@ -1,20 +1,20 @@
-import { net } from 'electron';
 import type { UrlMetadata } from '../shared/app_types';
 import { responseText } from './body';
 import { metadata } from './metadata';
-import { publicUrl } from './public';
+import { publicRequest } from './request';
 
 export async function unfurlUrl(value: string): Promise<UrlMetadata> {
-	let url = await publicUrl(value);
+	let url = new URL(value);
 	for (let redirects = 0; redirects <= 5; redirects += 1) {
-		const response = await net.fetch(url.toString(), {
+		const result = await publicRequest(url.toString(), {
 			headers: { Accept: 'text/html,application/xhtml+xml' },
-			redirect: 'manual',
 		});
+		const { response } = result;
+		url = result.url;
 		if (response.status >= 300 && response.status < 400) {
 			const location = response.headers.get('location');
 			if (!location || redirects === 5) throw new Error('Too many redirects.');
-			url = await publicUrl(new URL(location, url).toString());
+			url = new URL(location, url);
 			continue;
 		}
 		if (!response.ok) throw new Error(`URL returned ${response.status}.`);

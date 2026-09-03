@@ -1,39 +1,12 @@
-import dns from 'node:dns/promises';
-import net from 'node:net';
 import { z } from 'zod';
+import { responseText } from '../../../body';
+import { publicRequest } from '../../../request';
 import { tool } from '../tool';
 
 const MAX_CHARS_DEFAULT = 20_000;
 const TIMEOUT_MS = 30_000;
 const MAX_REDIRECTS = 3;
-
-const BLOCKED = new net.BlockList();
-BLOCKED.addSubnet('0.0.0.0', 8);
-BLOCKED.addSubnet('10.0.0.0', 8);
-BLOCKED.addSubnet('100.64.0.0', 10);
-BLOCKED.addSubnet('127.0.0.0', 8);
-BLOCKED.addSubnet('169.254.0.0', 16);
-BLOCKED.addSubnet('172.16.0.0', 12);
-BLOCKED.addSubnet('192.168.0.0', 16);
-BLOCKED.addAddress('::1', 'ipv6');
-BLOCKED.addSubnet('fc00::', 7, 'ipv6');
-BLOCKED.addSubnet('fe80::', 10, 'ipv6');
-
-// ponytail: validates then fetches by hostname (DNS rebinding TOCTOU remains);
-// pin the resolved IP via a custom agent if that matters
-async function assertPublicHost(hostname: string, signal?: AbortSignal): Promise<void> {
-	signal?.throwIfAborted();
-	const host = hostname.toLowerCase().replace(/\.$/, '');
-	if (host === 'localhost' || host.endsWith('.localhost'))
-		throw new Error(`fetch_web_page blocked: ${hostname} is not a public host`);
-	const addresses = await dns.lookup(host, { all: true });
-	signal?.throwIfAborted();
-	for (const { address } of addresses) {
-		const v4 = address.replace(/^::ffff:/i, '');
-		const blocked = net.isIPv4(v4) ? BLOCKED.check(v4, 'ipv4') : BLOCKED.check(address, 'ipv6');
-		if (blocked) throw new Error(`fetch_web_page blocked: ${hostname} resolves to a private address`);
-	}
-}
+const MAX_RESPONSE_BYTES = 1_000_000;
 
 // ponytail: regex-based HTML-to-text; add a readability lib if extraction quality matters
 function htmlToText(html: string): string {
@@ -77,16 +50,16 @@ export const fetchWebPageTool = tool({
 		for (let hop = 0; ; hop++) {
 			if (current.protocol !== 'http:' && current.protocol !== 'https:')
 				throw new Error('Invalid URL: must be http or https');
-			await assertPublicHost(current.hostname, signal);
 			const timeoutSignal = AbortSignal.timeout(TIMEOUT_MS);
-			res = await fetch(current, {
-				redirect: 'manual',
+			const result = await publicRequest(current.toString(), {
 				signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal,
 				headers: {
 					Accept: 'text/html, application/json;q=0.9, */*;q=0.1',
 					'Accept-Language': 'en-US,en;q=0.9',
 				},
 			});
+			res = result.response;
+			current = result.url;
 			if (res.status >= 300 && res.status < 400) {
 				const location = res.headers.get('location');
 				if (!location)
@@ -100,7 +73,7 @@ export const fetchWebPageTool = tool({
 		if (!res.ok) throw new Error(`fetch_web_page failed (${res.status}): ${res.statusText}`);
 
 		const contentType = res.headers.get('content-type') ?? '';
-		const body = await res.text();
+		const body = await responseText(res, MAX_RESPONSE_BYTES);
 
 		let text = body;
 		if (contentType.includes('text/html')) {
