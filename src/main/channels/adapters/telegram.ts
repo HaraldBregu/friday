@@ -196,8 +196,7 @@ function registerMessageHandlers(
 			accountId,
 			senderId: String(ctx.from?.id ?? ''),
 			senderName:
-				[ctx.from?.first_name, ctx.from?.last_name].filter(Boolean).join(' ') ||
-				ctx.from?.username,
+				[ctx.from?.first_name, ctx.from?.last_name].filter(Boolean).join(' ') || ctx.from?.username,
 			chatId,
 			chatType: getChatType(ctx.chat.type, threadId),
 			messageId,
@@ -222,8 +221,7 @@ function registerMessageHandlers(
 			accountId,
 			senderId: String(ctx.from?.id ?? ''),
 			senderName:
-				[ctx.from?.first_name, ctx.from?.last_name].filter(Boolean).join(' ') ||
-				ctx.from?.username,
+				[ctx.from?.first_name, ctx.from?.last_name].filter(Boolean).join(' ') || ctx.from?.username,
 			chatId,
 			chatType: getChatType(ctx.chat.type, threadId),
 			messageId,
