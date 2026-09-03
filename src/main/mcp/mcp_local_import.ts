@@ -27,10 +27,11 @@ export function importLocalMcpServers(
 		let destination: string | undefined;
 		try {
 			const server = readLocalMcpServer(source);
-			destination = path.join(root, server.id);
-			if (existsSync(destination)) {
+			const target = path.join(root, server.id);
+			if (existsSync(target)) {
 				throw new Error(`A local MCP server with ID "${server.id}" already exists.`);
 			}
+			destination = target;
 			temporary = mkdtempSync(path.join(root, '.import-'));
 			cpSync(source, temporary, { recursive: true, force: false, errorOnExist: true });
 			const manifestPath = path.join(temporary, 'mcp.json');
