@@ -47,7 +47,7 @@ export const TitleBar = React.memo(function TitleBar({
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { isFullScreen } = useWindowState();
+	const { isFullScreen, isMaximized } = useWindowState();
 
 	const isHome = location.pathname === '/home';
 	const isOnboarding = ['/start', '/auth', '/setup', '/config'].includes(location.pathname);
@@ -77,7 +77,7 @@ export const TitleBar = React.memo(function TitleBar({
 			title={homeButtonLabel}
 			aria-label={homeButtonLabel}
 		>
-			<GradientSphere size={18} className="pointer-events-none" />
+			<GradientSphere size={18} mode="css" className="pointer-events-none" />
 			Friday
 		</Button>
 	) : !isOnboarding ? (
@@ -188,8 +188,8 @@ export const TitleBar = React.memo(function TitleBar({
 					</div>
 				)}
 
-				{/* ── Windows only: minimize / close ── */}
-				{!isMac && <WindowControls />}
+					{/* ── Windows/Linux window controls ── */}
+					{!isMac && <WindowControls isMaximized={isMaximized} />}
 			</TitleBarContainer>
 		</TitleBarProvider>
 	);

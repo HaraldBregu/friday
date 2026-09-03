@@ -21,9 +21,10 @@ export function SettingsPageShell({
 	children,
 	className,
 }: SettingsPageShellProps): React.JSX.Element {
-	return (
-		<div
-			className={cn(
+		return (
+			<div
+				role={variant === 'destructive' ? 'alert' : undefined}
+				className={cn(
 				'mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-8 sm:px-10 sm:py-10',
 				className
 			)}

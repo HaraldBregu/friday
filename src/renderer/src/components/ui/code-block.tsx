@@ -39,20 +39,23 @@ function CodeBlockCode({
 }: CodeBlockCodeProps) {
   const isDark = useIsDark()
   const activeTheme = theme ?? (isDark ? "github-dark" : "github-light")
-  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null)
+  const highlightKey = `${activeTheme}\u0000${language}\u0000${code}`
+  const [highlighted, setHighlighted] = useState<{ key: string; html: string } | null>(null)
 
   useEffect(() => {
-    async function highlight() {
-      if (!code) {
-        setHighlightedHtml("<pre><code></code></pre>")
-        return
-      }
-
-      const html = await codeToHtml(code, { lang: language, theme: activeTheme })
-      setHighlightedHtml(html)
+    if (!code) return
+    let cancelled = false
+    void codeToHtml(code, { lang: language, theme: activeTheme })
+      .then((html) => {
+        if (!cancelled) setHighlighted({ key: highlightKey, html })
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
     }
-    highlight()
-  }, [activeTheme, code, language])
+  }, [activeTheme, code, highlightKey, language])
+
+  const highlightedHtml = highlighted?.key === highlightKey ? highlighted.html : null
 
   const classNames = cn(
     "w-full overflow-x-auto bg-code text-[13px] text-code-foreground [&>pre]:min-w-full [&>pre]:w-max [&>pre]:!bg-transparent [&>pre]:px-4 [&>pre]:py-4",

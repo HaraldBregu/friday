@@ -327,37 +327,46 @@ export function AssistantMessage({
 			)}
 			{hasContent && (
 				<>
-					{parsedPlan.kind === 'complete' ? (
-						<Card className="w-full gap-4 border-info/30 py-4">
-							<CardHeader className="px-4">
-								<CardTitle className="text-sm">Proposed plan</CardTitle>
-							</CardHeader>
-							<CardContent className="px-4">
-								<Markdown
-									className="min-w-0 max-w-full break-words [overflow-wrap:anywhere]"
-									components={messageMarkdownComponents}
-									urlTransform={transformImageUrl}
-								>
-									{normalizeImageLinks(displayContent)}
-								</Markdown>
-							</CardContent>
-							{canImplement && onImplement ? (
-								<CardFooter className="justify-end px-4">
-									<Button type="button" size="sm" onClick={onImplement}>
-										Implement
-									</Button>
-								</CardFooter>
-							) : null}
-						</Card>
-					) : displayContent ? (
-						<Markdown
-							className="min-w-0 max-w-full break-words [overflow-wrap:anywhere]"
-							components={messageMarkdownComponents}
-							urlTransform={transformImageUrl}
-						>
-							{normalizeImageLinks(displayContent)}
-						</Markdown>
-					) : null}
+					<div
+						id={`assistant-message-${message.id}-content`}
+						data-slot="assistant-message-content"
+						className={cn(
+							'relative min-w-0 max-w-full',
+							canToggleContent && !isContentExpanded && 'max-h-40 overflow-hidden'
+						)}
+					>
+						{parsedPlan.kind === 'complete' ? (
+							<Card className="w-full gap-4 border-info/30 py-4">
+								<CardHeader className="px-4">
+									<CardTitle className="text-sm">Proposed plan</CardTitle>
+								</CardHeader>
+								<CardContent className="px-4">
+									<Markdown
+										className="min-w-0 max-w-full break-words [overflow-wrap:anywhere]"
+										components={messageMarkdownComponents}
+										urlTransform={transformImageUrl}
+									>
+										{normalizeImageLinks(displayContent)}
+									</Markdown>
+								</CardContent>
+								{canImplement && onImplement ? (
+									<CardFooter className="justify-end px-4">
+										<Button type="button" size="sm" onClick={onImplement}>
+											Implement
+										</Button>
+									</CardFooter>
+								) : null}
+							</Card>
+						) : displayContent ? (
+							<Markdown
+								className="min-w-0 max-w-full break-words [overflow-wrap:anywhere]"
+								components={messageMarkdownComponents}
+								urlTransform={transformImageUrl}
+							>
+								{normalizeImageLinks(displayContent)}
+							</Markdown>
+						) : null}
+					</div>
 					{canToggleContent ? (
 						<Button
 							type="button"
@@ -365,6 +374,7 @@ export function AssistantMessage({
 							size="xs"
 							className="self-start text-muted-foreground hover:text-foreground"
 							aria-expanded={isContentExpanded}
+							aria-controls={`assistant-message-${message.id}-content`}
 							onClick={() => setIsContentExpanded((expanded) => !expanded)}
 						>
 							{isContentExpanded ? 'Less' : 'More'}

@@ -23,6 +23,7 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 	const [sessions, setSessions] = useState<AgentSessionSummary[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
+	const [actionError, setActionError] = useState('');
 	const [editingSessionId, setEditingSessionId] = useState<string>();
 	const [editingTitle, setEditingTitle] = useState('');
 
@@ -95,6 +96,11 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 				<div className="px-2 pb-2 text-xs font-medium text-sidebar-foreground/70">
 					{t('settings.chatHistory.title')}
 				</div>
+				{actionError ? (
+					<p className="px-2 pb-2 text-xs text-destructive" role="alert">
+						{actionError}
+					</p>
+				) : null}
 				{loading ? (
 					<div className="grid gap-2 px-2 py-1" aria-label={t('settings.chatHistory.loading')}>
 						{[0, 1, 2, 3].map((row) => (
@@ -172,14 +178,24 @@ export function HomeSidebar({ refreshKey }: HomeSidebarProps): ReactElement {
 																setEditingTitle(title);
 																setEditingSessionId(session.id);
 															}
-															if (action === 'delete') {
-																void window.agent.deleteSession(session.id).then(() => {
-																	setSessions((current) =>
-																		current.filter((item) => item.id !== session.id)
-																	);
-																	if (isActive) setSessionId(crypto.randomUUID());
-																});
-															}
+													if (action === 'delete') {
+														if (
+															!window.confirm(
+																t('settings.chatHistory.confirmDeleteSession', { title })
+															)
+														)
+															return;
+														setActionError('');
+														void window.agent
+															.deleteSession(session.id)
+															.then(() => {
+																setSessions((current) =>
+																	current.filter((item) => item.id !== session.id)
+																);
+																if (isActive) setSessionId(crypto.randomUUID());
+															})
+															.catch(() => setActionError(t('settings.chatHistory.errors.delete')));
+													}
 														});
 												}}
 											>
