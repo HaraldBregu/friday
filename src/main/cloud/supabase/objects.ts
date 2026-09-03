@@ -5,7 +5,7 @@ import { publicCloudError } from '../cloud_error';
 
 export class SupabaseObjectStore implements StorageObjectStore {
 	constructor(
-		private readonly client: () => SupabaseClient,
+		private readonly client: SupabaseClient,
 		private readonly ownerId: () => string | undefined
 	) {}
 
@@ -60,7 +60,7 @@ export class SupabaseObjectStore implements StorageObjectStore {
 	}
 
 	private bucket(): ReturnType<SupabaseClient['storage']['from']> {
-		return this.client().storage.from('user-files');
+		return this.client.storage.from('user-files');
 	}
 
 	private objectPath(key: string): string {

@@ -7,8 +7,14 @@ import type {
 	CloudFile,
 	CloudFileUpload,
 } from '../../shared/cloud_types';
-import type { AuthService } from './service';
+import type { AccountSession } from './account';
 import type { CloudRepository } from './repository';
+
+interface CloudAuthPort {
+	getAccessToken(): string | null;
+	getSignedInUserId(): string | undefined;
+	onSessionChanged(listener: (session: AccountSession | null) => void): () => void;
+}
 
 export class CloudService {
 	private readonly listeners = new Set<(change: CloudChange) => void>();
@@ -16,7 +22,7 @@ export class CloudService {
 	private repositorySessionUpdate = Promise.resolve();
 
 	constructor(
-		private readonly auth: AuthService,
+		private readonly auth: CloudAuthPort,
 		private readonly repository?: CloudRepository
 	) {}
 

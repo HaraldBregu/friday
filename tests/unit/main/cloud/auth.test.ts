@@ -3,6 +3,7 @@ import { AuthService } from '../../../../src/main/cloud/service';
 import { publicCloudError } from '../../../../src/main/cloud/cloud_error';
 import type { AuthStorage } from '../../../../src/main/cloud/session';
 import { SupabaseAccountProvider } from '../../../../src/main/cloud/supabase/auth';
+import { createSupabaseClient } from '../../../../src/main/cloud/supabase/client';
 
 jest.mock('@supabase/supabase-js', () => ({
 	createClient: jest.fn(),
@@ -22,6 +23,10 @@ const config = {
 	redirectUrl: 'kucedr://auth/callback',
 };
 const binding = { accept: jest.fn(() => true) };
+
+function accountProvider(storage: AuthStorage): SupabaseAccountProvider {
+	return new SupabaseAccountProvider(createSupabaseClient(config, storage), config, storage);
+}
 
 beforeEach(() => {
 	createClientMock.mockReturnValue({
@@ -62,7 +67,7 @@ it('reads and updates the signed-in account profile', async () => {
 	const select = jest.fn(() => ({ eq: getEq }));
 	from.mockReturnValue({ select, update });
 	const service = new AuthService(
-		new SupabaseAccountProvider(config, {
+		accountProvider({
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
@@ -96,7 +101,7 @@ it('configures Supabase to restore sessions from encrypted main-process storage'
 		setItem: jest.fn(),
 		removeItem: jest.fn(),
 	};
-	const service = new AuthService(new SupabaseAccountProvider(config, storage), binding);
+	const service = new AuthService(accountProvider(storage), binding);
 
 	await service.initialize();
 
@@ -129,7 +134,7 @@ it('restores a persisted session without exposing its tokens in public auth stat
 		error: null,
 	});
 	const service = new AuthService(
-		new SupabaseAccountProvider(config, {
+		accountProvider({
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
@@ -152,7 +157,7 @@ it('starts Google sign-in with a PKCE deep-link callback', async () => {
 	const url = 'https://project.supabase.co/auth/v1/authorize?provider=google';
 	signInWithOAuth.mockResolvedValueOnce({ data: { url }, error: null });
 	const service = new AuthService(
-		new SupabaseAccountProvider(config, {
+		accountProvider({
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),
@@ -193,7 +198,7 @@ it('exchanges a Google callback code for a token-free signed-in state', async ()
 	};
 	exchangeCodeForSession.mockResolvedValueOnce({ data: { session }, error: null });
 	const service = new AuthService(
-		new SupabaseAccountProvider(config, {
+		accountProvider({
 			persistence: 'encrypted',
 			getItem: jest.fn(() => null),
 			setItem: jest.fn(),

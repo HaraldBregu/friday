@@ -9,7 +9,7 @@ const list = jest.fn();
 const from = jest.fn(() => ({ upload, download, list }));
 const client = { storage: { from } } as never;
 const ownerId = jest.fn(() => '11111111-1111-4111-8111-111111111111');
-const store = new SupabaseObjectStore(() => client, ownerId);
+const store = new SupabaseObjectStore(client, ownerId);
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -79,7 +79,7 @@ it('recursively lists Supabase folders without exposing the user prefix', async 
 });
 
 it('requires a signed-in user before accessing storage', async () => {
-	const signedOut = new SupabaseObjectStore(() => client, () => undefined);
+	const signedOut = new SupabaseObjectStore(client, () => undefined);
 
 	await expect(putObject(signedOut, 'kucedr/v1/file', new Uint8Array())).rejects.toThrow(
 		'Sign in to use cloud backup'

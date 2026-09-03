@@ -36,7 +36,7 @@ it('passes the signed-in owner to writes and forwards neutral change events', as
 		getSignedInUserId: () => 'owner-1',
 		onSessionChanged: () => jest.fn(),
 	};
-	const service = new CloudService(auth as never, remote);
+	const service = new CloudService(auth, remote);
 	const changed = jest.fn();
 	service.onSessionChanged(changed);
 
@@ -60,7 +60,7 @@ it('rejects cloud access without a fully signed-in account', async () => {
 		getSignedInUserId: () => undefined,
 		onSessionChanged: () => jest.fn(),
 	};
-	const service = new CloudService(auth as never, remote);
+	const service = new CloudService(auth, remote);
 
 	expect(() => service.listSessions()).toThrow('Sign in to use cloud synchronization.');
 	expect(remote.listSessions).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ it('serializes token revocation after an in-flight sign-in update', async () => 
 			return jest.fn();
 		},
 	};
-	const service = new CloudService(auth as never, remote);
+	const service = new CloudService(auth, remote);
 
 	service.initialize();
 	await Promise.resolve();

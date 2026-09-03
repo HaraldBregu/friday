@@ -1,5 +1,4 @@
 import {
-	createClient,
 	type AuthChangeEvent,
 	type Session,
 	type SupabaseClient,
@@ -19,7 +18,7 @@ import type {
 import type { CloudConfig } from '../config';
 import { publicCloudError } from '../cloud_error';
 import { publicAuthError } from '../error';
-import { AuthSessionStorage, type AuthStorage } from '../session';
+import type { AuthStorage } from '../session';
 
 interface ProfileRow {
 	first_name: string;
@@ -27,22 +26,11 @@ interface ProfileRow {
 }
 
 export class SupabaseAccountProvider implements AccountProvider {
-	readonly client: SupabaseClient;
-
 	constructor(
+		private readonly client: SupabaseClient,
 		private readonly config: CloudConfig,
-		private readonly storage: AuthStorage = new AuthSessionStorage()
-	) {
-		this.client = createClient(config.url, config.publishableKey, {
-			auth: {
-				autoRefreshToken: true,
-				persistSession: true,
-				storage,
-				detectSessionInUrl: false,
-				flowType: 'pkce',
-			},
-		});
-	}
+		private readonly storage: AuthStorage
+	) {}
 
 	get persistence(): 'encrypted' | 'memory' {
 		return this.storage.persistence;
