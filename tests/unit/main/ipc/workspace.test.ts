@@ -210,7 +210,9 @@ describe('workspace files', () => {
 		await expect(deleteWorkspaceFile(root, 'file-link.md')).rejects.toThrow('symlinks');
 		await expect(deleteWorkspaceDirectory(root, 'directory-link')).rejects.toThrow('symlinks');
 		await expect(fs.readFile(targetFile, 'utf8')).resolves.toBe('# Keep');
-		await expect(fs.readFile(path.join(targetDirectory, 'keep.md'), 'utf8')).resolves.toBe('# Keep');
+		await expect(fs.readFile(path.join(targetDirectory, 'keep.md'), 'utf8')).resolves.toBe(
+			'# Keep'
+		);
 
 		await fs.rm(root, { recursive: true });
 	});
