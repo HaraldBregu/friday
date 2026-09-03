@@ -37,9 +37,6 @@ it.each([
 	['/settings/coder', 'settings.coder.title'],
 	['/settings/assistant/permissions', 'settings.tabs.permissions'],
 	['/settings/assistant/data', 'settings.dataControls.title'],
-	['/settings/tasks/permissions', 'settings.permissions.scopes.tasksTitle'],
-	['/settings/channels/permissions', 'settings.permissions.scopes.channelsTitle'],
-	['/settings/assistant/health/permissions', 'settings.permissions.scopes.healthTitle'],
 ])('uses the canonical %s route and breadcrumb', (path, labelKey) => {
 	if (path === '/settings/assistant/data' || path === '/settings/general/persona') {
 		expect(SETTINGS_DETAIL_ITEMS).toContainEqual(expect.objectContaining({ path, labelKey }));
@@ -47,7 +44,7 @@ it.each([
 		expect(SETTINGS_MODEL_SERVICE_ITEMS).toContainEqual(
 			expect.objectContaining({ path, labelKey })
 		);
-	} else if (!path.endsWith('/permissions') || path === '/settings/assistant/permissions') {
+	} else {
 		expect(SETTINGS_NAVIGATION).toContainEqual(expect.objectContaining({ path, labelKey }));
 	}
 
