@@ -63,10 +63,10 @@ An account is optional. Outside password recovery, the footer should provide:
 - **Back**, which returns to Welcome;
 - **Skip and continue**, which uses Kucedr in local-only mode for the current session.
 
-If Supabase is not configured, the page should explain which environment variables must be
-configured while leaving Back and local-only continuation available. Password recovery should
-take priority over the normal flow and hide the footer Back and Skip actions until recovery is
-complete.
+If Kucedr account services are unavailable, the page should explain that cloud features are
+unavailable while leaving Back and local-only continuation available. It must not expose
+infrastructure configuration or provider names. Password recovery should take priority over the
+normal flow and hide the footer Back and Skip actions until recovery is complete.
 
 After a successful sign-in or local-only continuation, Kucedr should check the stored assistant
 configuration. A stored assistant provider and model ID count as complete and lead directly to

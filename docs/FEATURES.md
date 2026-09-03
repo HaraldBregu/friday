@@ -35,7 +35,7 @@ Kucedr provides:
 - Image and PDF attachments for multimodal requests, and live or recorded speech-to-text input with text-to-speech playback.
 - Independent provider and model selection for chat, transcription, speech, image, video, audio, scheduled work, and health checks.
 - Local skills, remote HTTP MCP servers, local stdio MCP servers, and standalone extension windows.
-- Persistent schedules, periodic `HEALTH.md` checks, and Supabase-backed cloud storage sync for local folders.
+- Persistent schedules, periodic `HEALTH.md` checks, and account-backed cloud backup for local folders.
 - Telegram and Discord bot connections with sender policies.
 - Local configuration, conversation history, memory, generated-media storage, and operational logs.
 - Windows, macOS, and Linux packaging; partial English and Italian localization; light, dark, and system themes.
@@ -513,7 +513,8 @@ See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and
   **Integrations**. Dedicated model-service and API-key pages are also available through
   Assistant, route search, or direct links.
 - The **Cloud** page configures folders, schedules, backup, and restore for the signed-in account's
-  private Supabase storage. It has no storage-provider selection or storage credentials.
+  private storage. It also configures end-to-end encrypted API-key sync. It has no infrastructure
+  provider selection, endpoint, bucket, or storage credentials.
 - Deep pages use breadcrumbs.
 - `Cmd/Ctrl+F` opens a route and setting search palette.
 - Unknown routes show a 404 recovery view; route failures show retry, restart, or Home actions.
@@ -536,9 +537,11 @@ no enable/disable control.
 
 ### Cloud storage sync
 
-- **Cloud** selects local paths and a sync interval so chosen folders back up to the signed-in
-  account's private Supabase storage on a schedule. Backup objects use the account-scoped
-  `user-files/<user-id>/backups/` path.
+- **Cloud** selects local paths and a backup interval so chosen folders back up to the signed-in
+  account's private storage on a schedule. Restore replaces matching local files after explicit
+  confirmation and keeps other local files.
+- **Secure key sync** encrypts saved model, database, and search API keys with a separate
+  user-held passphrase and reconciles them across signed-in devices.
 - Assistant RAG uses Pinecone as its environment-configured remote vector mirror and does not
   expose a vector-database provider or database picker.
 
@@ -588,9 +591,14 @@ Kucedr stores configuration and working data below Electron's application-data d
 | Diagnostics | Local rotating logs and crash dumps. Crash dumps are not uploaded by the current configuration.                                             |
 | Wiki        | Source inbox, immutable evidence snapshots, generated Markdown, source/page/operation registries, review queue, failures, and audit log.    |
 
-Secrets are masked in the renderer after saving, but provider keys, bot tokens, and MCP secrets are stored in ordinary local electron-store files rather than an encrypted credential vault. Anyone with access to the user's application-data files may be able to read them.
+Model, database, and search provider keys are encrypted in a local credential vault when secure
+operating-system storage is available. Without it, new keys remain memory-only. Bot tokens and MCP
+secrets use their respective local stores and should still be protected as sensitive app data.
 
-Prompts, attachments, tool inputs, and generated content may be sent to configured model providers, MCP servers, websites, browser targets, Telegram, Discord, or Supabase as required by the requested operation. Only folders selected in Cloud are included in folder backups.
+Prompts, attachments, tool inputs, and generated content may be sent to configured model providers,
+MCP servers, websites, browser targets, messaging channels, or Kucedr account cloud services as
+required by the requested operation. Only folders selected in Cloud are included in folder
+backups.
 
 ### Electron hardening
 
@@ -626,6 +634,7 @@ The main implementation areas behind this reference are:
 - [LLM Wiki](../src/main/agent/knowledge/wiki/)
 - [Extensions](../src/main/extensions/)
 - [Cloud storage sync](../src/renderer/src/pages/settings/pages/storage/)
+- [Account and cloud architecture](CLOUD.md)
 - [Provider catalog declarations](../resources/providers/)
 - [Provider catalog loader](../src/main/models.ts)
 - [Speech-to-text adapters](../src/main/models/adapters/stt/)

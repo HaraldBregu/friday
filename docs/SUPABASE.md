@@ -1,8 +1,9 @@
-# Supabase
+# Supabase Adapter
 
-Kucedr uses Supabase for email/password and Google authentication, cloud chat metadata, private file
-storage, and per-chat Realtime events. The Supabase client runs only in Electron's main
-process. The renderer receives token-free data through validated IPC handlers.
+This is the current infrastructure adapter for Kucedr accounts, cloud chat metadata, private file
+storage, encrypted credential records, and per-chat Realtime events. Read [Account and Cloud
+Architecture](CLOUD.md) first. The client runs only in Electron's main process; shared contracts,
+IPC, and renderer code remain provider-neutral.
 
 ## Configure development
 
@@ -56,22 +57,21 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
 skip_nonce_check = false
 ```
 
-## Run Supabase locally
+## Local infrastructure
 
-Docker must be running. Start the local stack and apply the committed migrations:
+This repository currently does not version a `supabase/config.toml`, database migrations, or policy
+tests. The `supabase:*` npm scripts require a separately supplied local project configuration.
+Do not treat client-side owner IDs or object prefixes as authorization controls; deployed row-level
+security and private storage policies are mandatory.
+
+With an authorized local project configuration and Docker running, the available helpers are:
 
 ```sh
 npm run supabase:start
 npm run supabase:status
 ```
 
-Run the database policy tests:
-
-```sh
-npm run supabase:test
-```
-
-Reset the local database after changing migrations, or stop the stack when finished:
+Reset that local project or stop the stack when finished:
 
 ```sh
 npm run supabase:reset
@@ -81,30 +81,26 @@ npm run supabase:stop
 The local email inbox is available at `http://127.0.0.1:54324`. Authentication redirects
 back to the desktop app through `kucedr://auth/callback`.
 
-## Deploy the schema
+## Required backend invariants
 
-The migration in `supabase/migrations` creates the application tables, row-level security
-policies, private `user-files` bucket, ownership constraints, and private Realtime policies.
-Deploy it with an authenticated Supabase CLI session:
-
-```sh
-npx supabase login
-npx supabase link --project-ref your-project-ref
-npx supabase db push
-```
-
-Then verify these hosted-project settings in the Supabase dashboard:
+The separately managed backend schema must provide application tables, row-level security,
+ownership constraints, a private file bucket, private Realtime policies, provider-vault tables,
+and the atomic credential reconciliation RPC expected by the adapters. Verify these hosted-project
+settings before releasing a build:
 
 1. Add `kucedr://auth/callback` to the Auth redirect allow list.
 2. Enable the Google provider with its Web OAuth client ID and secret.
 3. Keep email/password sign-up enabled and require email confirmation for production.
-4. Disable Realtime public-channel access so the migration's private-channel policies apply.
-5. Verify email/password and Google sign-in, callback handling, and sign-out in the application.
+4. Disable Realtime public-channel access so private-channel policies apply.
+5. Verify that two distinct test accounts cannot read, write, list, subscribe to, or delete each
+   other's records or objects.
+6. Verify email/password and Google sign-in, callback handling, recovery isolation, and sign-out in
+   the application.
 
 ## Local data boundary
 
-Existing local chats and provider configuration stay on the device. The first signed-in
-Supabase account becomes the owner of that local Kucedr profile; signing into another account
+Existing local chats and provider configuration stay on the device. The first signed-in account
+becomes the owner of that local Kucedr profile; signing into another account
 is rejected to prevent accidental cross-account data exposure. Cloud folder backups use the
 private `user-files` bucket below `<user-id>/backups/`; no storage-provider selection or separate
 storage credentials are required. Legacy local storage-provider configuration is left untouched

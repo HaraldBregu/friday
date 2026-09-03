@@ -193,11 +193,12 @@ options that belonged to the previous model rather than carrying incompatible va
 
 ## Cloud storage
 
-Cloud should use the signed-in Kucedr account's private Supabase storage directly. It should not
-show a storage provider, profile selector, endpoint, bucket, or storage credentials.
+Cloud should use the signed-in Kucedr account's private storage directly. It should not show an
+infrastructure provider, profile selector, endpoint, bucket, or storage credentials.
 
 Cloud should allow the user to:
 
+- create or unlock a passphrase-protected vault and synchronize saved API keys;
 - include known Kucedr folders and additional folders selected from the system picker;
 - select an automatic sync interval or edit the cron expression;
 - save or cancel sync changes;
@@ -205,8 +206,9 @@ Cloud should allow the user to:
 - confirm and run a restore;
 - inspect save, backup, restore, and failure status inline.
 
-Backup and restore require a signed-in account. Remote files are isolated below the account's
-private backup path; folder selections and schedules remain local application settings.
+Secure key sync, backup, and restore require a fully signed-in account. Recovery sessions cannot
+use them. Remote files are isolated below the account's private backup path; folder selections and
+schedules remain local application settings.
 
 ## Knowledge and data
 

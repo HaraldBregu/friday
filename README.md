@@ -10,7 +10,10 @@
 
 Kucedr is a cross-platform desktop AI assistant that turns conversations into actions. Type or speak a request, attach images or PDFs, and let the agent work with files, run commands, research the web, create media, or automate a recurring task.
 
-You choose the providers and models behind each AI capability. Kucedr keeps its settings, provider keys, conversations, and workspace data on your machine, while requests are sent only to the AI providers and connected services you configure.
+You choose the providers and models behind each AI capability. Kucedr keeps its settings,
+conversations, and workspace data on your machine. Provider keys are encrypted locally when secure
+device storage is available, and signed-in users can optionally enable end-to-end encrypted key
+sync. Requests are sent only to the AI providers and connected services you configure.
 
 ## What Kucedr Can Do
 
@@ -29,7 +32,8 @@ Kucedr runs on Windows, macOS, and Linux, with English and Italian interfaces an
 
 ## Control and Privacy
 
-- Provider API keys and Kucedr's application data are stored locally.
+- Provider API keys are encrypted locally when secure device storage is available. Optional key
+  sync encrypts them with a separate passphrase before upload.
 - Prompts, attachments, and tool data may be sent to the providers, MCP servers, websites, or messaging channels you configure.
 - File writes, edits, patches, and command execution are governed by the agent permission policy.
 - Tool activity is streamed into the conversation so you can follow what the agent is doing.
@@ -57,7 +61,8 @@ workspaces and one lockfile.
 On first launch, follow the [Start Page Flow](docs/ui/START.md) to sign in or continue local-only,
 save a model-provider API key, and select the provider and model for the assistant. Search,
 database, speech, and media configuration are optional and can be completed later in Settings.
-Signed-in users can select folders for Supabase-backed cloud backup from **Settings → Cloud**.
+Signed-in users can enable secure key sync and select folders for account-backed cloud backup from
+**Settings → Cloud**.
 See [Home UI](docs/ui/HOME.md) for the chat workspace's states and interactions.
 See [Settings UI](docs/ui/SETTINGS.md) for configuration navigation and behavior.
 
@@ -144,6 +149,8 @@ chat and other supported features from running.
 - `src/main/models` contains provider-specific model integrations. See
   [Provider Reference](docs/PROVIDERS.md) for the built-in catalog and runtime support matrix.
 - `src/main/agent/knowledge/wiki` contains immutable-source registration, transactional wiki compilation, retrieval, lint, review, and agent tools. See [LLM Wiki](docs/WIKI.md).
+- `src/main/cloud` and `src/main/storage` keep account and cloud behavior behind replaceable ports.
+  See [Account and Cloud Architecture](docs/CLOUD.md).
 
 ## Security
 
