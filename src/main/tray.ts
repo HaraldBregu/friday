@@ -1,9 +1,9 @@
 import { Tray as ElectronTray, Menu, nativeImage } from 'electron';
 import path from 'node:path';
-import { is } from '@electron-toolkit/utils';
 
 import { loadTranslations } from './i18n';
 import type { Extension } from './extensions/extension_index';
+import { resourceRoot } from './shared/resource_root';
 
 interface TrayManagerCallbacks {
 	onToggleApp: () => void;
@@ -25,9 +25,7 @@ export class Tray {
 
 	create(): void {
 		const icon = nativeImage.createFromPath(
-			is.dev
-				? path.join(process.cwd(), 'resources/icons/icon.png')
-				: path.join(process.resourcesPath, 'resources/icons/icon.png')
+			path.join(resourceRoot(), 'resources/icons/icon.png')
 		);
 
 		this.tray = new ElectronTray(icon.resize({ width: 16, height: 16 }));

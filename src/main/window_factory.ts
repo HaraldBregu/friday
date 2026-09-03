@@ -11,6 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { is } from '@electron-toolkit/utils';
 import type { LoggerService } from './shared';
+import { resourceRoot } from './shared/resource_root';
 import { setupPdfContextMenu } from './pdf';
 import type { ExtensionRegistry } from './extensions/extension_registry';
 import { externalUrl } from './external';
@@ -47,9 +48,7 @@ export class WindowFactory {
 		// Use path.resolve to ensure absolute path for preload
 		// Output as .js (CommonJS) for Electron preload compatibility
 		this.preloadPath = path.resolve(app.getAppPath(), 'out/preload/index.js');
-		this.iconPath = is.dev
-			? path.resolve(app.getAppPath(), 'resources/icons/icon.png')
-			: path.resolve(process.resourcesPath, 'resources/icons/icon.png');
+		this.iconPath = path.resolve(resourceRoot(), 'resources/icons/icon.png');
 		this.logger?.info('WindowFactory', `Preload path: ${this.preloadPath}`);
 		this.logger?.info('WindowFactory', `Preload file exists: ${existsSync(this.preloadPath)}`);
 	}

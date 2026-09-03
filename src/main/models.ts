@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { existsSync, readdirSync, readFileSync, watch } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { is } from '@electron-toolkit/utils';
 import {
 	normalizeProviderId,
 	type CatalogEntryModel,
@@ -19,6 +18,7 @@ import type {
 } from '../shared/model_types';
 import { userDataLocation } from './shared/user_data_location';
 import { parseProviderManifest } from '../shared/providers/validation';
+import { resourceRoot } from './shared/resource_root';
 
 interface Catalog {
 	readonly models: readonly CatalogModel[];
@@ -220,9 +220,7 @@ export function providersDir(): string {
 }
 
 function bundledProvidersDir(): string {
-	return is.dev
-		? path.join(process.cwd(), 'resources/providers')
-		: path.join(process.resourcesPath, 'resources/providers');
+	return path.join(resourceRoot(), 'resources/providers');
 }
 
 function readCatalog(): Catalog {

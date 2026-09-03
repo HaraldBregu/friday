@@ -1,18 +1,16 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { is } from '@electron-toolkit/utils';
 import {
 	normalizeProviderId,
 	type CatalogService,
 	type PublicProvider,
 } from '../../shared/provider_types';
 import { parseProviderManifest } from '../../shared/providers/validation';
+import { resourceRoot } from '../shared/resource_root';
 
 export function loadChannels(): readonly CatalogService[] {
-	const directory = is.dev
-		? path.join(process.cwd(), 'resources/channels')
-		: path.join(process.resourcesPath, 'resources/channels');
+	const directory = path.join(resourceRoot(), 'resources/channels');
 	if (!existsSync(directory)) return [];
 
 	const channels: CatalogService[] = [];
