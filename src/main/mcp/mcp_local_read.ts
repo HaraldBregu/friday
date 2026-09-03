@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { McpServerInfo } from '../../shared/mcp_types';
+import { getLocalMcpEnvironment } from './mcp_store_state';
 
 export function readLocalMcpServer(directory: string): McpServerInfo {
 	const manifestPath = path.join(directory, 'mcp.json');
@@ -71,6 +72,7 @@ export function readLocalMcpServer(directory: string): McpServerInfo {
 		typeof manifest.cwd === 'string' && manifest.cwd.trim()
 			? path.resolve(directory, manifest.cwd.trim())
 			: directory;
+	const environment = getLocalMcpEnvironment(id);
 	return {
 		id,
 		source: 'local',
@@ -79,7 +81,7 @@ export function readLocalMcpServer(directory: string): McpServerInfo {
 			type: 'stdio',
 			command: manifest.command.trim(),
 			args: manifest.args as string[] | undefined,
-			env: manifest.env as Record<string, string> | undefined,
+			env: environment ?? (manifest.env as Record<string, string> | undefined),
 			cwd,
 			name: typeof manifest.name === 'string' ? manifest.name.trim() || undefined : undefined,
 			require_approval: manifest.require_approval as 'always' | 'never' | undefined,

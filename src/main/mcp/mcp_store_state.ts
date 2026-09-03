@@ -6,6 +6,8 @@ import { sealMcpRecord } from './mcp_record_seal';
 import type { McpSecrets } from './mcp_secret_keys';
 import type { McpRecord, McpStoreSchema } from './mcp_types';
 import { restrictSettingsFile } from '../shared/restrict_settings_file';
+import { isSafeStorageAvailable } from '../shared/safe_storage';
+import { safeStorage } from 'electron';
 
 type LegacyProvidersState = {
 	mcp_servers?: unknown;
@@ -23,10 +25,11 @@ const store = new Store<McpStoreSchema>({
 	name: 'mcp',
 	cwd: settingsDirectory,
 	accessPropertiesByDotNotation: false,
-	defaults: { servers: [] },
+	defaults: { servers: [], localEnvironments: {} },
 });
 
 let volatileSecrets = new Map<string, McpSecrets>();
+const volatileLocalEnvironments = new Map<string, Readonly<Record<string, string>>>();
 
 function isMcpRecord(value: unknown): value is McpRecord {
 	if (typeof value !== 'object' || value === null) return false;
@@ -74,6 +77,54 @@ export function setMcpServersState(value: McpRecord[]): void {
 	});
 	volatileSecrets = nextVolatileSecrets;
 	store.set('servers', servers);
+	restrictSettingsFile(mcpStorePath);
+}
+
+export function getLocalMcpEnvironment(
+	id: string
+): Readonly<Record<string, string>> | undefined {
+	const volatile = volatileLocalEnvironments.get(id);
+	if (volatile) return volatile;
+	const encrypted = store.get('localEnvironments')[id];
+	if (!encrypted || !isSafeStorageAvailable()) return undefined;
+	try {
+		const opened = JSON.parse(safeStorage.decryptString(Buffer.from(encrypted, 'base64'))) as {
+			id?: unknown;
+			env?: unknown;
+		};
+		if (
+			opened.id !== id ||
+			!opened.env ||
+			typeof opened.env !== 'object' ||
+			Array.isArray(opened.env) ||
+			Object.values(opened.env).some((value) => typeof value !== 'string')
+		) {
+			return undefined;
+		}
+		return opened.env as Record<string, string>;
+	} catch {
+		return undefined;
+	}
+}
+
+export function setLocalMcpEnvironment(
+	id: string,
+	environment: Readonly<Record<string, string>> | undefined
+): void {
+	const localEnvironments = { ...store.get('localEnvironments') };
+	if (!environment || Object.keys(environment).length === 0) {
+		delete localEnvironments[id];
+		volatileLocalEnvironments.delete(id);
+	} else if (isSafeStorageAvailable()) {
+		localEnvironments[id] = safeStorage
+			.encryptString(JSON.stringify({ id, env: environment }))
+			.toString('base64');
+		volatileLocalEnvironments.delete(id);
+	} else {
+		delete localEnvironments[id];
+		volatileLocalEnvironments.set(id, { ...environment });
+	}
+	store.set('localEnvironments', localEnvironments);
 	restrictSettingsFile(mcpStorePath);
 }
 

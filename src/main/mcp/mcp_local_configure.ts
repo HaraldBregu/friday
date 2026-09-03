@@ -6,6 +6,7 @@ import { listLocalMcpServers } from './mcp_local_list';
 import { importLocalMcpServers } from './mcp_local_import';
 import { readLocalMcpServer } from './mcp_local_read';
 import { mcpLocalDiscoveryRoots, mcpLocalRoot } from './mcp_local_root';
+import { setLocalMcpEnvironment } from './mcp_store_state';
 
 export function configureLocalMcpServer(
 	id: string,
@@ -80,13 +81,14 @@ export function configureLocalMcpServer(
 		name: input.name?.trim() || undefined,
 		command: input.command.trim(),
 		args: input.args ? [...input.args] : undefined,
-		env: input.env ? { ...input.env } : undefined,
+		env: undefined,
 		cwd: input.cwd === serverData.cwd ? manifest.cwd : input.cwd?.trim() || undefined,
 		require_approval: input.require_approval ?? serverData.require_approval,
 		defer_loading: input.defer_loading,
 		enabled: input.enabled ?? serverData.enabled,
 	};
 
+	setLocalMcpEnvironment(server.id, input.env);
 	try {
 		writeFileSync(temporaryPath, `${JSON.stringify(next, null, '\t')}\n`, 'utf8');
 		renameSync(temporaryPath, manifestPath);

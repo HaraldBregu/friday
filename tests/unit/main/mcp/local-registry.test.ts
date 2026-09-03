@@ -160,6 +160,9 @@ describe('local MCP registry', () => {
 			cwd: 'runtime',
 			package_value: 'preserved',
 		});
+		expect(JSON.parse(fs.readFileSync(path.join(directory, 'mcp.json'), 'utf8'))).not.toHaveProperty(
+			'env'
+		);
 		expect(fs.readdirSync(directory).filter((entry) => entry.startsWith('.mcp-'))).toEqual([]);
 	});
 
@@ -193,11 +196,14 @@ describe('local MCP registry', () => {
 
 			const installed = path.join(localRoot, 'gmail-smtp');
 			expect(result.path).toBe(installed);
-			expect(JSON.parse(fs.readFileSync(path.join(installed, 'mcp.json'), 'utf8'))).toMatchObject({
+			const installedManifest = JSON.parse(
+				fs.readFileSync(path.join(installed, 'mcp.json'), 'utf8')
+			);
+			expect(installedManifest).toMatchObject({
 				id: 'gmail-smtp',
 				args: ['--experimental-strip-types', 'src/index.ts'],
-				env: { GMAIL_SMTP_HOST: 'smtp.gmail.com' },
 			});
+			expect(installedManifest).not.toHaveProperty('env');
 			expect(fs.existsSync(installed)).toBe(true);
 		} finally {
 			process.chdir(originalCwd);

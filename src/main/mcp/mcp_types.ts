@@ -30,7 +30,10 @@ export type McpStoredRecord = {
 	readonly [key: string]: unknown;
 };
 
-export type McpStoreSchema = { readonly servers: McpStoredRecord[] };
+export type McpStoreSchema = {
+	readonly servers: McpStoredRecord[];
+	readonly localEnvironments: Record<string, string>;
+};
 
 export type McpOAuthStorage = {
 	load: () => McpOAuthState;
