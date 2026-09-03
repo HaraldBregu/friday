@@ -1,11 +1,11 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { watch } from 'chokidar';
 import { realPath } from '../shared/real_path';
 import type { IpcModule } from './core/module';
 import type { EventBus } from '../event_bus';
-import { wrapIpcHandler, wrapSimpleHandler } from './core/error_handler';
+import { wrapIpcHandler } from './core/error_handler';
 import { AgentChannels } from '../../shared/ipc_channels_definitions';
 import type { Agent } from '../agent/agent';
 import type { Conversation } from '../agent/conversation';
@@ -71,11 +71,17 @@ import { renameWorkspaceEntry } from './rename';
 import { readWorkspaceTree } from './tree';
 import { resolveWorkspaceFile } from './workspace';
 import { respondUserInput } from '../agent/user_input/user_input_pending';
+import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { WindowContextManager } from '../window_context';
+import type { IpcResult } from '../../shared/ipc_types';
+import { AgentRenderer } from './core/agent_renderer';
 
 export interface AgentIpcDeps {
 	logger: LoggerService;
 	agent: Agent;
 	conversation: Conversation;
+	windows: WindowContextManager;
+	extensions: ExtensionRegistry;
 }
 
 const TOOL_PERMISSION_DECISIONS: readonly AgentToolPermissionDecision[] = [
@@ -190,6 +196,17 @@ function normalizeHealthSettingsPatch(value: Partial<HealthSettings>): Partial<H
 	return { ...value };
 }
 
+function wrapAgentHandler<TArgs extends unknown[], TResult>(
+	access: (event: IpcMainInvokeEvent) => unknown,
+	handler: (...args: TArgs) => Promise<TResult> | TResult,
+	handlerName: string
+): (event: IpcMainInvokeEvent, ...args: TArgs) => Promise<IpcResult<TResult>> {
+	return wrapIpcHandler((event, ...args) => {
+		access(event);
+		return handler(...args);
+	}, handlerName);
+}
+
 export function normalizeAgentSendRuntimeOptions(options: unknown): AgentRunOptions {
 	if (options === undefined || options === null) return { interactionMode: 'default' };
 	if (!isRecord(options)) throw new Error('Invalid assistant runtime options.');
@@ -236,7 +253,13 @@ export function normalizeAgentSendRuntimeOptions(options: unknown): AgentRunOpti
 export class AgentIpc implements IpcModule<AgentIpcDeps> {
 	readonly name = 'agent';
 
-	register({ logger, agent, conversation }: AgentIpcDeps, eventBus: EventBus): void {
+	register(
+		{ logger, agent, conversation, windows, extensions }: AgentIpcDeps,
+		eventBus: EventBus
+	): void {
+		const renderer = new AgentRenderer(windows, extensions);
+		const mainAccess = renderer.assert.bind(renderer);
+		const workspaceAccess = renderer.assertWorkspace.bind(renderer);
 		let watcherStarted = false;
 		const startWorkspaceWatcher = (root: string): void => {
 			if (watcherStarted) return;
@@ -259,8 +282,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		ipcMain.handle(
 			AgentChannels.send,
 			wrapIpcHandler(async (event, message: string, options?: unknown): Promise<string> => {
-				const window = BrowserWindow.fromWebContents(event.sender);
-				if (!window) throw new Error('Assistant request requires an originating window.');
+				const window = renderer.assert(event);
 				return conversation.execute({
 					type: 'text',
 					message,
@@ -279,15 +301,15 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		ipcMain.handle(
 			AgentChannels.respondUserInput,
 			wrapIpcHandler((event, value: unknown, answers: unknown): boolean => {
-				const window = BrowserWindow.fromWebContents(event.sender);
-				if (!window) return false;
+				const window = renderer.assert(event);
 				return respondUserInput(toUserInputScope(value), toUserInputAnswers(answers), window.id);
 			}, AgentChannels.respondUserInput)
 		);
 
 		ipcMain.handle(
 			AgentChannels.getPromptInputCapabilities,
-			wrapSimpleHandler(
+			wrapAgentHandler(
+				mainAccess,
 				() => agent.getPromptInputCapabilities(),
 				AgentChannels.getPromptInputCapabilities
 			)
@@ -296,8 +318,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		ipcMain.handle(
 			AgentChannels.cancel,
 			wrapIpcHandler((event, value: unknown): boolean => {
-				const window = BrowserWindow.fromWebContents(event.sender);
-				if (!window) return false;
+				const window = renderer.assert(event);
 				const runId = optionalTrimmedString(value);
 				if (!runId) throw new Error('Invalid assistant run id.');
 				return agent.cancel(runId, window.id);
@@ -307,8 +328,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 		ipcMain.handle(
 			AgentChannels.respondToolPermission,
 			wrapIpcHandler((event, value: unknown, decision: unknown): boolean => {
-				const window = BrowserWindow.fromWebContents(event.sender);
-				if (!window) return false;
+				const window = renderer.assert(event);
 				const scope = toToolPermissionScope(value);
 				if (!isToolPermissionDecision(decision)) throw new Error('Invalid permission decision.');
 				return respondToolPermission(scope, decision, window.id);
@@ -317,12 +337,12 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.listSessions,
-			wrapSimpleHandler(() => agent.listSessions(), AgentChannels.listSessions)
+			wrapAgentHandler(mainAccess, () => agent.listSessions(), AgentChannels.listSessions)
 		);
 
 		ipcMain.handle(
 			AgentChannels.renameSession,
-			wrapSimpleHandler((sessionId: unknown, title: unknown): Promise<void> => {
+			wrapAgentHandler(mainAccess, (sessionId: unknown, title: unknown): Promise<void> => {
 				const normalizedTitle = optionalTrimmedString(title);
 				if (!normalizedTitle || normalizedTitle.length > 120)
 					throw new Error('Chat title must be between 1 and 120 characters.');
@@ -332,21 +352,22 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.lastMessages,
-			wrapSimpleHandler((sessionId: unknown) => {
+			wrapAgentHandler(mainAccess, (sessionId: unknown) => {
 				return agent.getLastMessages(requireUuidSessionId(sessionId));
 			}, AgentChannels.lastMessages)
 		);
 
 		ipcMain.handle(
 			AgentChannels.sessionSnapshot,
-			wrapSimpleHandler((sessionId: unknown) => {
+			wrapAgentHandler(mainAccess, (sessionId: unknown) => {
 				return agent.getSessionSnapshot(requireUuidSessionId(sessionId));
 			}, AgentChannels.sessionSnapshot)
 		);
 
 		ipcMain.handle(
 			AgentChannels.editUserMessage,
-			wrapSimpleHandler(
+			wrapAgentHandler(
+				mainAccess,
 				(sessionId: unknown, userOffsetFromEnd: unknown, content: unknown): Promise<boolean> => {
 					if (!Number.isSafeInteger(userOffsetFromEnd) || Number(userOffsetFromEnd) < 0)
 						throw new Error('Invalid user message offset.');
@@ -364,21 +385,21 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.clearMessages,
-			wrapSimpleHandler((sessionId: unknown): Promise<void> => {
+			wrapAgentHandler(mainAccess, (sessionId: unknown): Promise<void> => {
 				return agent.clearMessages(requireUuidSessionId(sessionId));
 			}, AgentChannels.clearMessages)
 		);
 
 		ipcMain.handle(
 			AgentChannels.deleteSession,
-			wrapSimpleHandler((sessionId: unknown): Promise<void> => {
+			wrapAgentHandler(mainAccess, (sessionId: unknown): Promise<void> => {
 				return agent.deleteSession(requireUuidSessionId(sessionId));
 			}, AgentChannels.deleteSession)
 		);
 
 		ipcMain.handle(
 			AgentChannels.getWorkspaceLocation,
-			wrapSimpleHandler((): string => {
+			wrapAgentHandler(workspaceAccess, (): string => {
 				const root = workspacePath(agent.config);
 				startWorkspaceWatcher(root);
 				return root;
@@ -387,7 +408,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.listWorkspaceFiles,
-			wrapSimpleHandler((): Promise<WorkspaceTreeEntry[]> => {
+			wrapAgentHandler(workspaceAccess, (): Promise<WorkspaceTreeEntry[]> => {
 				const root = workspacePath(agent.config);
 				startWorkspaceWatcher(root);
 				return readWorkspaceTree(root);
@@ -396,7 +417,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.readWorkspaceFile,
-			wrapSimpleHandler(async (filePath: unknown): Promise<string> => {
+			wrapAgentHandler(workspaceAccess, async (filePath: unknown): Promise<string> => {
 				const normalizedFilePath = optionalTrimmedString(filePath);
 				if (!normalizedFilePath) throw new Error('Invalid workspace file path.');
 				const root = workspacePath(agent.config);
@@ -409,7 +430,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.readWorkspaceAsset,
-			wrapSimpleHandler(async (filePath: unknown): Promise<WorkspaceAsset> => {
+			wrapAgentHandler(workspaceAccess, async (filePath: unknown): Promise<WorkspaceAsset> => {
 				const normalizedFilePath = optionalTrimmedString(filePath);
 				if (!normalizedFilePath) throw new Error('Invalid workspace file path.');
 				return readWorkspaceAsset(workspacePath(agent.config), normalizedFilePath);
@@ -418,57 +439,74 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.writeWorkspaceFile,
-			wrapSimpleHandler(async (filePath: unknown, content: unknown): Promise<void> => {
+			wrapAgentHandler(
+				workspaceAccess,
+				async (filePath: unknown, content: unknown): Promise<void> => {
 				const normalizedFilePath = optionalTrimmedString(filePath);
 				if (!normalizedFilePath) throw new Error('Invalid workspace file path.');
 				if (typeof content !== 'string') throw new Error('Invalid workspace file content.');
-				await writeWorkspaceFile(workspacePath(agent.config), normalizedFilePath, content);
-			}, AgentChannels.writeWorkspaceFile)
+					await writeWorkspaceFile(workspacePath(agent.config), normalizedFilePath, content);
+				},
+				AgentChannels.writeWorkspaceFile
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.writeWorkspaceMarkdown,
-			wrapSimpleHandler(async (filePath: unknown, content: unknown): Promise<void> => {
+			wrapAgentHandler(
+				workspaceAccess,
+				async (filePath: unknown, content: unknown): Promise<void> => {
 				const normalizedFilePath = optionalTrimmedString(filePath);
 				if (!normalizedFilePath) throw new Error('Invalid workspace file path.');
 				if (typeof content !== 'string') throw new Error('Invalid workspace file content.');
-				await writeWorkspaceMarkdown(workspacePath(agent.config), normalizedFilePath, content);
-			}, AgentChannels.writeWorkspaceMarkdown)
+					await writeWorkspaceMarkdown(workspacePath(agent.config), normalizedFilePath, content);
+				},
+				AgentChannels.writeWorkspaceMarkdown
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.createWorkspaceFile,
-			wrapSimpleHandler(async (parentPath: unknown, name: unknown): Promise<string> => {
+			wrapAgentHandler(
+				workspaceAccess,
+				async (parentPath: unknown, name: unknown): Promise<string> => {
 				if (typeof parentPath !== 'string') throw new Error('Invalid workspace parent path.');
 				const normalizedName = optionalTrimmedString(name);
 				if (!normalizedName) throw new Error('Invalid workspace file name.');
-				return createWorkspaceEntry(
+					return createWorkspaceEntry(
 					workspacePath(agent.config),
 					parentPath.trim(),
 					normalizedName,
 					'file'
-				);
-			}, AgentChannels.createWorkspaceFile)
+					);
+				},
+				AgentChannels.createWorkspaceFile
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.createWorkspaceDirectory,
-			wrapSimpleHandler(async (parentPath: unknown, name: unknown): Promise<string> => {
+			wrapAgentHandler(
+				workspaceAccess,
+				async (parentPath: unknown, name: unknown): Promise<string> => {
 				if (typeof parentPath !== 'string') throw new Error('Invalid workspace parent path.');
 				const normalizedName = optionalTrimmedString(name);
 				if (!normalizedName) throw new Error('Invalid workspace folder name.');
-				return createWorkspaceEntry(
+					return createWorkspaceEntry(
 					workspacePath(agent.config),
 					parentPath.trim(),
 					normalizedName,
 					'directory'
-				);
-			}, AgentChannels.createWorkspaceDirectory)
+					);
+				},
+				AgentChannels.createWorkspaceDirectory
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.moveWorkspaceEntry,
-			wrapSimpleHandler(
+			wrapAgentHandler(
+				workspaceAccess,
 				async (sourcePath: unknown, destinationDirectoryPath: unknown): Promise<string> => {
 					const normalizedSourcePath = optionalTrimmedString(sourcePath);
 					if (!normalizedSourcePath) throw new Error('Invalid workspace source path.');
@@ -487,7 +525,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.deleteWorkspaceFile,
-			wrapSimpleHandler(async (filePath: unknown): Promise<void> => {
+			wrapAgentHandler(workspaceAccess, async (filePath: unknown): Promise<void> => {
 				const normalizedFilePath = optionalTrimmedString(filePath);
 				if (!normalizedFilePath) throw new Error('Invalid workspace file path.');
 				await deleteWorkspaceFile(workspacePath(agent.config), normalizedFilePath);
@@ -496,22 +534,26 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.renameWorkspaceEntry,
-			wrapSimpleHandler(async (sourcePath: unknown, name: unknown): Promise<string> => {
+			wrapAgentHandler(
+				workspaceAccess,
+				async (sourcePath: unknown, name: unknown): Promise<string> => {
 				const normalizedSourcePath = optionalTrimmedString(sourcePath);
 				if (!normalizedSourcePath) throw new Error('Invalid workspace source path.');
 				const normalizedName = optionalTrimmedString(name);
 				if (!normalizedName) throw new Error('Invalid workspace entry name.');
-				return renameWorkspaceEntry(
+					return renameWorkspaceEntry(
 					workspacePath(agent.config),
 					normalizedSourcePath,
 					normalizedName
-				);
-			}, AgentChannels.renameWorkspaceEntry)
+					);
+				},
+				AgentChannels.renameWorkspaceEntry
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.deleteWorkspaceDirectory,
-			wrapSimpleHandler(async (directoryPath: unknown): Promise<void> => {
+			wrapAgentHandler(workspaceAccess, async (directoryPath: unknown): Promise<void> => {
 				const normalizedDirectoryPath = optionalTrimmedString(directoryPath);
 				if (!normalizedDirectoryPath) throw new Error('Invalid workspace folder path.');
 				await deleteWorkspaceDirectory(workspacePath(agent.config), normalizedDirectoryPath);
@@ -520,7 +562,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.getProvider,
-			wrapSimpleHandler((): PublicProvider | undefined => {
+			wrapAgentHandler(mainAccess, (): PublicProvider | undefined => {
 				const providerId = getProviderId();
 				return providerId ? toPublicProvider(providerId) : undefined;
 			}, AgentChannels.getProvider)
@@ -528,7 +570,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.setProvider,
-			wrapSimpleHandler((provider: PublicProvider): boolean => {
+			wrapAgentHandler(mainAccess, (provider: PublicProvider): boolean => {
 				if (!provider.id) return false;
 				setProviderId(provider.id);
 				return true;
@@ -537,14 +579,14 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.getModelId,
-			wrapSimpleHandler((): string | undefined => {
+			wrapAgentHandler(mainAccess, (): string | undefined => {
 				return getModelId();
 			}, AgentChannels.getModelId)
 		);
 
 		ipcMain.handle(
 			AgentChannels.setModelId,
-			wrapSimpleHandler((modelId: string): boolean => {
+			wrapAgentHandler(mainAccess, (modelId: string): boolean => {
 				const trimmed = modelId.trim();
 				if (!trimmed) return false;
 				setModelId(trimmed);
@@ -554,11 +596,11 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.getModelOptions,
-			wrapSimpleHandler(() => getModelOptions(), AgentChannels.getModelOptions)
+			wrapAgentHandler(mainAccess, () => getModelOptions(), AgentChannels.getModelOptions)
 		);
 		ipcMain.handle(
 			AgentChannels.setModelOptions,
-			wrapSimpleHandler((options: unknown) => {
+			wrapAgentHandler(mainAccess, (options: unknown) => {
 				if (!isRecord(options)) throw new Error('Invalid model options.');
 				setModelOptions(options);
 				return getModelOptions();
@@ -567,12 +609,16 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.policyGet,
-			wrapSimpleHandler((): PermissionsSchema => getPermissions(), AgentChannels.policyGet)
+			wrapAgentHandler(
+				mainAccess,
+				(): PermissionsSchema => getPermissions(),
+				AgentChannels.policyGet
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.policySet,
-			wrapSimpleHandler(async (value: unknown): Promise<PermissionsSchema> => {
+			wrapAgentHandler(mainAccess, async (value: unknown): Promise<PermissionsSchema> => {
 				const permissions = setPermissions(toPermissions(value));
 				if (process.platform === 'win32') await agent.sandbox.invalidate();
 				return permissions;
@@ -581,7 +627,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.policyReset,
-			wrapSimpleHandler(async (): Promise<PermissionsSchema> => {
+			wrapAgentHandler(mainAccess, async (): Promise<PermissionsSchema> => {
 				const permissions = resetPermissions();
 				if (process.platform === 'win32') await agent.sandbox.invalidate();
 				return permissions;
@@ -590,7 +636,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.policyPickDirectory,
-			wrapSimpleHandler(async (): Promise<string | undefined> => {
+			wrapAgentHandler(mainAccess, async (): Promise<string | undefined> => {
 				const window = BrowserWindow.getFocusedWindow();
 				const options = {
 					defaultPath: workspacePath(agent.config),
@@ -605,7 +651,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.policyNormalizeDirectory,
-			wrapSimpleHandler((value: unknown): string => {
+			wrapAgentHandler(mainAccess, (value: unknown): string => {
 				const target = optionalTrimmedString(value);
 				if (!target || !path.isAbsolute(target) || /[*?[\]]/.test(target)) {
 					throw new Error('Choose an absolute folder path without wildcard characters.');
@@ -616,12 +662,12 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.healthSettings,
-			wrapSimpleHandler(() => getHealthSettings(), AgentChannels.healthSettings)
+			wrapAgentHandler(mainAccess, () => getHealthSettings(), AgentChannels.healthSettings)
 		);
 
 		ipcMain.handle(
 			AgentChannels.healthSaveSettings,
-			wrapSimpleHandler((request: Partial<HealthSettings>) => {
+			wrapAgentHandler(mainAccess, (request: Partial<HealthSettings>) => {
 				const next = updateHealthSettings(normalizeHealthSettingsPatch(request));
 				rescheduleHealth();
 				return next;
@@ -630,7 +676,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.healthResetSettings,
-			wrapSimpleHandler(() => {
+			wrapAgentHandler(mainAccess, () => {
 				const next = resetHealthSettings();
 				rescheduleHealth();
 				return next;
@@ -639,12 +685,12 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.healthData,
-			wrapSimpleHandler(() => getHealthData(agent.config), AgentChannels.healthData)
+			wrapAgentHandler(mainAccess, () => getHealthData(agent.config), AgentChannels.healthData)
 		);
 
 		ipcMain.handle(
 			AgentChannels.healthSaveData,
-			wrapSimpleHandler((content: unknown) => {
+			wrapAgentHandler(mainAccess, (content: unknown) => {
 				if (typeof content !== 'string') throw new Error('Invalid health data content.');
 				return saveHealthData(agent.config, content);
 			}, AgentChannels.healthSaveData)
@@ -652,7 +698,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.ragIndex,
-			wrapSimpleHandler((): Promise<RagIndexResult> => {
+			wrapAgentHandler(mainAccess, (): Promise<RagIndexResult> => {
 				const configuration = getRagConfiguration();
 				if (configuration.enabled !== true) throw new Error('Knowledge Base is disabled.');
 				return indexRag(configuration.folders, configuration.indexName);
@@ -661,7 +707,8 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.ragGetConfiguration,
-			wrapSimpleHandler(
+			wrapAgentHandler(
+				mainAccess,
 				(): RagConfiguration => getRagConfiguration(),
 				AgentChannels.ragGetConfiguration
 			)
@@ -669,7 +716,9 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.ragSaveConfiguration,
-			wrapSimpleHandler((configuration: RagConfiguration): RagConfiguration => {
+			wrapAgentHandler(
+				mainAccess,
+				(configuration: RagConfiguration): RagConfiguration => {
 				const current = getRagConfiguration();
 				const saved = saveRagConfiguration({
 					...configuration,
@@ -679,13 +728,15 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 					embeddingModelId: current.embeddingModelId,
 				});
 				rescheduleRagIndexing();
-				return saved;
-			}, AgentChannels.ragSaveConfiguration)
+					return saved;
+				},
+				AgentChannels.ragSaveConfiguration
+			)
 		);
 
 		ipcMain.handle(
 			AgentChannels.ragSearch,
-			wrapSimpleHandler((query: unknown, topK: unknown): Promise<RagMatch[]> => {
+			wrapAgentHandler(mainAccess, (query: unknown, topK: unknown): Promise<RagMatch[]> => {
 				const text = optionalTrimmedString(query);
 				if (!text) throw new Error('Invalid search query.');
 				const configuration = getRagConfiguration();
@@ -700,7 +751,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 
 		ipcMain.handle(
 			AgentChannels.ragPickFolder,
-			wrapSimpleHandler(async (): Promise<string | undefined> => {
+			wrapAgentHandler(mainAccess, async (): Promise<string | undefined> => {
 				const window = BrowserWindow.getFocusedWindow();
 				const options = {
 					defaultPath: workspacePath(agent.config),

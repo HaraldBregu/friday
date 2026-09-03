@@ -43,7 +43,7 @@ export function importExtensions(sources: string[], appLocation?: string): Exten
 			skipped.push(createSkipped(source, 'Invalid extension folder name.'));
 			continue;
 		}
-		if (id === 'coder') {
+		if (id === 'coder' || id === 'workspace') {
 			skipped.push(createSkipped(source, 'Reserved extension folder name.'));
 			continue;
 		}

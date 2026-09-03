@@ -75,7 +75,13 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 	);
 	safeRegister('agent', () =>
 		new AgentIpc().register(
-			{ logger, agent: agentService, conversation: conversationService },
+			{
+				logger,
+				agent: agentService,
+				conversation: conversationService,
+				windows: windowContextManager,
+				extensions: extensionRegistry,
+			},
 			eventBus
 		)
 	);
