@@ -7,7 +7,7 @@ export class AgentRenderer {
 	private readonly trusted: TrustedRenderer;
 
 	constructor(
-		private readonly windows: WindowContextManager,
+		windows: WindowContextManager,
 		private readonly extensions: ExtensionRegistry
 	) {
 		this.trusted = new TrustedRenderer(windows, extensions);
