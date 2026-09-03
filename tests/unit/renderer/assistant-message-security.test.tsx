@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { AssistantMessage } from '../../../src/renderer/src/pages/home/components/AssistantMessage';
 import type { AgentMessage } from '../../../src/renderer/src/pages/home/context';
 
@@ -65,4 +65,16 @@ it('encodes reserved pathname characters in generated media URLs', () => {
 		'src',
 		'local-resource://file/tmp/generated%23draft%3F.png'
 	);
+});
+
+it('expands and collapses long assistant content', () => {
+	const { container } = render(
+		<AssistantMessage message={message('x'.repeat(700))} collapseLongContent />
+	);
+	const content = container.querySelector('[data-slot="assistant-message-content"]');
+
+	expect(content).toHaveClass('max-h-40', 'overflow-hidden');
+	fireEvent.click(screen.getByRole('button', { name: 'More' }));
+	expect(content).not.toHaveClass('max-h-40', 'overflow-hidden');
+	expect(screen.getByRole('button', { name: 'Less' })).toHaveAttribute('aria-expanded', 'true');
 });

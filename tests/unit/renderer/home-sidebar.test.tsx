@@ -186,6 +186,33 @@ it('renames a chat from its context menu without item action buttons', async () 
 	await waitFor(() => expect(renameSession).toHaveBeenCalledWith('session-latest', 'Named chat'));
 });
 
+it('requires confirmation before permanently deleting a chat', async () => {
+	listSessions.mockResolvedValue([{ id: 'session-latest', title: 'Latest chat', createdAtMs: 2 }]);
+	showContextMenu.mockResolvedValue('delete');
+	deleteSession.mockResolvedValue(undefined);
+	const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+	render(
+		<MemoryRouter>
+			<ChatSessionContext.Provider value={{ sessionId: 'session-latest', setSessionId: jest.fn() }}>
+				<PageContainer>
+					<HomeSidebar refreshKey="initial" />
+				</PageContainer>
+			</ChatSessionContext.Provider>
+		</MemoryRouter>
+	);
+
+	const chat = await screen.findByRole('button', { name: 'Latest chat' });
+	fireEvent.contextMenu(chat);
+	await waitFor(() => expect(confirm).toHaveBeenCalled());
+	expect(deleteSession).not.toHaveBeenCalled();
+
+	confirm.mockReturnValue(true);
+	fireEvent.contextMenu(chat);
+	await waitFor(() => expect(deleteSession).toHaveBeenCalledWith('session-latest'));
+	await waitFor(() => expect(screen.queryByRole('button', { name: 'Latest chat' })).toBeNull());
+});
+
 it('starts a new chat from the sidebar', async () => {
 	const user = userEvent.setup();
 	const setSessionId = jest.fn();
