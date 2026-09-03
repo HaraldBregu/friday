@@ -71,12 +71,16 @@ function localResourceUrl(path: string): string {
 	// Chromium would swallow the first path segment as the URL host.
 	const posixPath = path.replace(/\\/g, '/');
 	if (!isLocalImagePath(path)) {
-		return `local-resource://agent/${encodeURI(posixPath.replace(/^\/+/, ''))}`;
+		const url = new URL('local-resource://agent/');
+		url.pathname = `/${posixPath.replace(/^\/+/, '')}`;
+		return url.toString();
 	}
 	// Windows paths start with a drive letter (C:\...) rather than a slash, so add
 	// a leading slash to produce a valid slash-separated pathname.
 	const absolutePath = posixPath.startsWith('/') ? posixPath : `/${posixPath}`;
-	return `local-resource://file${encodeURI(absolutePath)}`;
+	const url = new URL('local-resource://file/');
+	url.pathname = absolutePath;
+	return url.toString();
 }
 
 // react-markdown drops URLs whose scheme is not in its safe list, and a Windows
@@ -105,7 +109,7 @@ function resolveLocalImagePath(
 		return posix === decodedPosix || posix.endsWith(`/${decodedPosix}`);
 	});
 	if (matched) return matched;
-	return isLocalImagePath(decodedPosix) ? decoded : undefined;
+	return undefined;
 }
 
 function isSkillTool(tool: AgentToolPart): boolean {
@@ -192,6 +196,7 @@ export function AssistantMessage({
 		...markdownComponents,
 		img: ({ src, alt }: { src?: string; alt?: string }) => {
 			const localPath = resolveLocalImagePath(src, mediaPaths);
+			const safeSource = src && !isLocalImagePath(src) ? src : undefined;
 			if (localPath && isAudioPath(localPath)) {
 				return (
 					<AudioPlayer
@@ -214,7 +219,7 @@ export function AssistantMessage({
 			}
 			return (
 				<img
-					src={localPath ? localResourceUrl(localPath) : src}
+					src={localPath ? localResourceUrl(localPath) : safeSource}
 					alt={alt ?? ''}
 					className="my-2 h-auto max-w-full rounded-lg border border-border/50"
 					onContextMenu={
