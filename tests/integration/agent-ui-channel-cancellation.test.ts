@@ -176,10 +176,7 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		emit: jest.fn(),
 		broadcast: jest.fn(),
 	} as unknown as EventBus;
-	const agent = new Agent(
-		{} as WindowFactory,
-		{ reset: jest.fn() } as unknown as ExecSandbox
-	);
+	const agent = new Agent({} as WindowFactory, { reset: jest.fn() } as unknown as ExecSandbox);
 	const conversation = {
 		execute: ({ message, options }: { message: string; options: unknown }) =>
 			agent.send(message, 'main', options as never),
@@ -202,8 +199,8 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		{ sender: uiSender, senderFrame: uiSender.mainFrame },
 		'ui request',
 		{
-		runId: 'ui-run',
-		sessionId: 'ui-session',
+			runId: 'ui-run',
+			sessionId: 'ui-session',
 		}
 	);
 	mockInboundHandler?.({
@@ -227,10 +224,7 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 		)
 	).resolves.toEqual({ success: true, data: false });
 	await expect(
-		handler(AgentChannels.cancel)(
-			{ sender: uiSender, senderFrame: uiSender.mainFrame },
-			'ui-run'
-		)
+		handler(AgentChannels.cancel)({ sender: uiSender, senderFrame: uiSender.mainFrame }, 'ui-run')
 	).resolves.toEqual({ success: true, data: true });
 	botRelease.resolve();
 	await replySent.promise;

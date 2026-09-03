@@ -38,9 +38,10 @@ describe('AgentIpc run ownership', () => {
 		const handler = (channel: string) =>
 			(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
-		await expect(
-			handler(AgentChannels.send)(event, 'hello', { runId: 'run-1' })
-		).resolves.toEqual({ success: true, data: 'reply' });
+		await expect(handler(AgentChannels.send)(event, 'hello', { runId: 'run-1' })).resolves.toEqual({
+			success: true,
+			data: 'reply',
+		});
 		expect(execute).toHaveBeenCalledWith({
 			type: 'text',
 			message: 'hello',
