@@ -64,7 +64,7 @@ cross-platform artifacts cannot be fully validated from one host OS.
 
 ## Current scope
 
-The main Friday renderer currently has no terminal UI. Extension views cannot consume
-this layer only through `@friday/sdk`. Tabs, split panes, display serialization, and SSH backends are
-not part of the current scope. PTYs live in the Electron main process and end when their owner
-reloads, closes, crashes, or the application quits.
+The main Friday renderer currently has no terminal UI. Extension views cannot consume this layer.
+Tabs, split panes, display serialization, and SSH backends are not part of the current scope. PTYs
+live in the Electron main process and end when their owner reloads, closes, crashes, or the
+application quits.

@@ -4,8 +4,11 @@ import { CoderChannels } from '../../../../src/shared/ipc_channels_definitions';
 import type { Coder } from '../../../../src/main/coder';
 import type { EventBus } from '../../../../src/main/event_bus';
 
+const windows = { has: jest.fn() };
+
 beforeEach(() => {
 	jest.clearAllMocks();
+	windows.has.mockReturnValue(true);
 });
 
 it('streams Coder extension runs back to the originating view and scopes cancellation', async () => {
@@ -29,7 +32,10 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		once: jest.fn(),
 		removeListener: jest.fn(),
 	};
-	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	new CoderIpc().register(
+		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{} as EventBus
+	);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
@@ -95,7 +101,10 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		canceled: false,
 		filePaths: ['/project'],
 	});
-	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	new CoderIpc().register(
+		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{} as EventBus
+	);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
@@ -147,7 +156,10 @@ it('restricts project instruction files to the Coder extension and validates upd
 		resolve: jest.fn().mockReturnValue('coder'),
 	};
 	const sender = { id: 23 };
-	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	new CoderIpc().register(
+		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{} as EventBus
+	);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
@@ -179,7 +191,10 @@ it('rejects Coder access from other extensions', async () => {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('demo'),
 	};
-	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	new CoderIpc().register(
+		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{} as EventBus
+	);
 	const getSettings = (ipcMain.handle as jest.Mock).mock.calls.find(
 		([channel]) => channel === CoderChannels.getSettings
 	)?.[1];
@@ -221,12 +236,24 @@ it('allows configuration and authentication from the host and Coder extension on
 		disconnectCodex: jest.fn().mockResolvedValue(undefined),
 	} as unknown as Coder;
 	const extensionRegistry = { has: jest.fn().mockReturnValue(false) };
-	const sender = { id: 8, send: jest.fn(), once: jest.fn(), removeListener: jest.fn() };
-	new CoderIpc().register({ coder, extensionRegistry: extensionRegistry as never }, {} as EventBus);
+	const mainFrame = {};
+	const sender = {
+		id: 8,
+		mainFrame,
+		send: jest.fn(),
+		once: jest.fn(),
+		removeListener: jest.fn(),
+	};
+	const event = { sender, senderFrame: mainFrame };
+	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 1, webContents: sender });
+	new CoderIpc().register(
+		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{} as EventBus
+	);
 	const handler = (channel: string) =>
 		(ipcMain.handle as jest.Mock).mock.calls.find(([registered]) => registered === channel)?.[1];
 
-	await expect(handler(CoderChannels.connectCodex)({ sender })).resolves.toEqual({
+	await expect(handler(CoderChannels.connectCodex)(event)).resolves.toEqual({
 		success: true,
 		data: { configured: true, type: 'oauth' },
 	});
@@ -240,14 +267,14 @@ it('allows configuration and authentication from the host and Coder extension on
 
 	extensionRegistry.has.mockReturnValue(true);
 	(extensionRegistry as { resolve?: jest.Mock }).resolve = jest.fn().mockReturnValue('coder');
-	await expect(handler(CoderChannels.listModels)({ sender })).resolves.toEqual({
+	await expect(handler(CoderChannels.listModels)(event)).resolves.toEqual({
 		success: true,
 		data: { providers: [] },
 	});
 	expect(coder.listModels).toHaveBeenCalled();
 
 	(extensionRegistry.resolve as jest.Mock).mockReturnValue('demo');
-	await expect(handler(CoderChannels.listModels)({ sender })).resolves.toEqual(
+	await expect(handler(CoderChannels.listModels)(event)).resolves.toEqual(
 		expect.objectContaining({ success: false })
 	);
 });
