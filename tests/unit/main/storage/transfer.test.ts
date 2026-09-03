@@ -148,9 +148,7 @@ it('rejects oversized remote files before downloading them', async () => {
 
 	await expect(pullFiles({} as never)).resolves.toMatchObject({
 		downloaded: [],
-		failed: [
-			{ path: 'kucedr/v1/agent/archive.bin', error: expect.stringContaining('50 MiB') },
-		],
+		failed: [{ path: 'kucedr/v1/agent/archive.bin', error: expect.stringContaining('50 MiB') }],
 	});
 	expect(getObject).not.toHaveBeenCalled();
 	expect(writeFile).not.toHaveBeenCalled();

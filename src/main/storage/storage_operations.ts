@@ -98,8 +98,8 @@ export class StorageOperations {
 				state: 'failed',
 				finishedAt: new Date().toISOString(),
 				error: describeStorageError(error),
-					revision: ++this.revision,
-				});
+				revision: ++this.revision,
+			});
 		} finally {
 			try {
 				allowSuspension?.();
