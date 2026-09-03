@@ -39,7 +39,11 @@ describe('sessionPath', () => {
 		const root = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-sessions-'));
 		const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'friday-outside-'));
 		try {
-			fs.symlinkSync(outside, path.join(root, SESSION_ID), process.platform === 'win32' ? 'junction' : 'dir');
+			fs.symlinkSync(
+				outside,
+				path.join(root, SESSION_ID),
+				process.platform === 'win32' ? 'junction' : 'dir'
+			);
 			expect(() => sessionPath(root, SESSION_ID)).toThrow(
 				'Session path escapes the sessions directory.'
 			);
@@ -89,9 +93,7 @@ describe('legacyFilePath', () => {
 
 describe('messagesFile', () => {
 	it('builds the messages.json path for a UUID session id', () => {
-		expect(messagesFile('/root', SESSION_ID)).toBe(
-			path.join('/root', SESSION_ID, 'messages.json')
-		);
+		expect(messagesFile('/root', SESSION_ID)).toBe(path.join('/root', SESSION_ID, 'messages.json'));
 	});
 });
 
