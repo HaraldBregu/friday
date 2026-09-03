@@ -1,4 +1,5 @@
 jest.mock('../../../src/main/channels', () => ({ createChannelRegistry: jest.fn() }));
+jest.mock('../../../src/main/agent/sandbox', () => ({ ExecSandbox: jest.fn() }));
 
 import { cleanup, type MainServices } from '../../../src/main/bootstrap';
 

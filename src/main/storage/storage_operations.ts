@@ -107,7 +107,9 @@ export class StorageOperations {
 		} finally {
 			try {
 				allowSuspension?.();
-			} catch {}
+			} catch (error) {
+				void error;
+			}
 		}
 	}
 
@@ -131,7 +133,9 @@ export class StorageOperations {
 		this.status = status;
 		try {
 			this.onStatusChanged(status);
-		} catch {}
+		} catch (error) {
+			void error;
+		}
 		return status;
 	}
 }
