@@ -21,15 +21,15 @@ The installed application directory is not used because packaged application fil
 or replaced by an update. Plugin IDs and contribution IDs use lowercase kebab-case. The plugin folder
 name must match the manifest `id`.
 
-A plugin keeps each contribution kind in its own folder. The `extensions/`, `skills/`, and
-`providers/` folders are the standardized layout: extension entries must live under `extensions/`,
+A plugin keeps each contribution kind in its own folder. The `apps/`, `skills/`, and
+`providers/` folders are the standardized layout: app entries must live under `apps/`,
 skill paths under `skills/`, and each provider is a folder under `providers/` shaped like the
 built-in `resources/providers/<id>/` catalog:
 
 ```text
 <plugin-id>/
   manifest.json
-  extensions/<extension-id>/index.html
+  apps/<app-id>/index.html
   skills/<skill-id>/SKILL.md
   providers/<provider-id>/
     manifest.json
@@ -59,13 +59,13 @@ built-in `resources/providers/<id>/` catalog:
 				"url": "https://mcp.acme.test"
 			}
 		],
-		"extensions": [
+		"apps": [
 			{
 				"id": "dashboard",
 				"title": "Acme Dashboard",
 				"description": "Account usage and status.",
 				"category": "integration",
-				"entry": "extensions/dashboard/index.html"
+				"entry": "apps/dashboard/index.html"
 			}
 		],
 		"languages": [{ "id": "fr", "name": "Français", "entry": "languages/fr.json" }],
@@ -98,8 +98,8 @@ Provider credentials do not belong in the manifest. They remain in Kucedr's prov
 Only declarative OpenAI-compatible chat providers are supported; custom executable provider adapters
 are not loaded into the Electron main process.
 
-Extension entries must be relative HTML paths inside the plugin folder. Kucedr verifies that each entry is
-a regular file and remains inside its plugin before exposing it. Plugin extensions run without Kucedr's
+App entries must be relative HTML paths inside the plugin folder. Kucedr verifies that each entry is
+a regular file and remains inside its plugin before exposing it. Plugin apps run without Kucedr's
 preload API.
 
 Skills must contain `SKILL.md`. Language and theme contributions are JSON assets. MCP server
@@ -108,7 +108,7 @@ contained JavaScript modules but are not executed by this foundation; channel ac
 an explicit trust decision and lifecycle integration with Kucedr's channel registry.
 
 The main-process `PluginRepository` is the filesystem source of truth. It validates manifests, returns
-structured scan issues, rejects provider ID collisions, and catalogs providers, skills, extensions, MCP
-servers, languages, themes, and chatbot communication channels. Provider and extension contributions are
+structured scan issues, rejects provider ID collisions, and catalogs providers, skills, apps, MCP
+servers, languages, themes, and chatbot communication channels. Provider and app contributions are
 already supplied to their existing IPC and menu flows; the other catalogs are ready for their
 respective runtime registries.

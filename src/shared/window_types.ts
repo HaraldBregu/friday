@@ -24,7 +24,7 @@ export type ContextMenuDescriptor =
 			enabled?: boolean;
 	  };
 
-export const EXTENSION_TITLEBAR_BUTTON_ICONS = [
+export const APP_TITLEBAR_BUTTON_ICONS = [
 	'panel-left',
 	'panel-right',
 	'plus',
@@ -34,22 +34,22 @@ export const EXTENSION_TITLEBAR_BUTTON_ICONS = [
 	'more-horizontal',
 ] as const;
 
-export type ExtensionTitlebarButtonIcon =
-	(typeof EXTENSION_TITLEBAR_BUTTON_ICONS)[number];
+export type AppTitlebarButtonIcon =
+	(typeof APP_TITLEBAR_BUTTON_ICONS)[number];
 
-export interface ExtensionTitlebarButton {
+export interface AppTitlebarButton {
 	id: string;
 	label: string;
-	icon: ExtensionTitlebarButtonIcon;
+	icon: AppTitlebarButtonIcon;
 	disabled?: boolean;
 	expanded?: boolean;
 	pressed?: boolean;
 }
 
-export interface ExtensionTitlebarOptions {
+export interface AppTitlebarOptions {
 	title?: string;
-	leftButtons?: ExtensionTitlebarButton[];
-	rightButtons?: ExtensionTitlebarButton[];
+	leftButtons?: AppTitlebarButton[];
+	rightButtons?: AppTitlebarButton[];
 	sidebarOpen?: boolean;
 	sidebarTransitionStartedAt?: number;
 	sidebarWidth?: number | null;

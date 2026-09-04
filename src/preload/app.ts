@@ -5,28 +5,28 @@ import type { AppApi } from './index.d';
 import type { AppThemeData } from '../shared/app_types';
 import type { ChannelModelKind, ChannelStatusEvent, ChannelType } from '../shared';
 import { optionalTrimmedString } from './normalize';
-import type { ExtensionStoreValue } from '../shared/extension_store_types';
+import type { AppStoreValue } from '../shared/app_store_types';
 
 export const app: AppApi = {
-	getExtensionStoreValue: <T extends ExtensionStoreValue = ExtensionStoreValue>(
+	getAppStoreValue: <T extends AppStoreValue = AppStoreValue>(
 		key: string
 	): Promise<T | undefined> => {
-		return typedInvokeUnwrap(AppChannels.getExtensionStoreValue, key) as Promise<T | undefined>;
+		return typedInvokeUnwrap(AppChannels.getAppStoreValue, key) as Promise<T | undefined>;
 	},
-	setExtensionStoreValue: (key, value) => {
-		return typedInvokeUnwrap(AppChannels.setExtensionStoreValue, key, value);
+	setAppStoreValue: (key, value) => {
+		return typedInvokeUnwrap(AppChannels.setAppStoreValue, key, value);
 	},
-	deleteExtensionStoreValue: (key) => {
-		return typedInvokeUnwrap(AppChannels.deleteExtensionStoreValue, key);
+	deleteAppStoreValue: (key) => {
+		return typedInvokeUnwrap(AppChannels.deleteAppStoreValue, key);
 	},
-	readExtensionStoreFile: (path) => {
-		return typedInvokeUnwrap(AppChannels.readExtensionStoreFile, path);
+	readAppStoreFile: (path) => {
+		return typedInvokeUnwrap(AppChannels.readAppStoreFile, path);
 	},
-	writeExtensionStoreFile: (path, data) => {
-		return typedInvokeUnwrap(AppChannels.writeExtensionStoreFile, path, data);
+	writeAppStoreFile: (path, data) => {
+		return typedInvokeUnwrap(AppChannels.writeAppStoreFile, path, data);
 	},
-	deleteExtensionStoreFile: (path) => {
-		return typedInvokeUnwrap(AppChannels.deleteExtensionStoreFile, path);
+	deleteAppStoreFile: (path) => {
+		return typedInvokeUnwrap(AppChannels.deleteAppStoreFile, path);
 	},
 	models: () => {
 		return typedInvokeUnwrap(AppChannels.models);

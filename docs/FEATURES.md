@@ -34,7 +34,7 @@ Kucedr provides:
 - An agent loop that can use files, patches, commands, long-running processes, the web, a browser, memory, skills, MCP tools, media generation, automation tools, and one-level subagents.
 - Image and PDF attachments for multimodal requests, and live or recorded speech-to-text input with text-to-speech playback.
 - Independent provider and model selection for chat, transcription, speech, image, video, audio, scheduled work, and health checks.
-- Local skills, remote HTTP MCP servers, local stdio MCP servers, and standalone extension windows.
+- Local skills, remote HTTP MCP servers, local stdio MCP servers, and standalone app windows.
 - Persistent schedules, periodic `HEALTH.md` checks, and account-backed cloud backup for local folders.
 - Telegram and Discord bot connections with sender policies.
 - Local configuration, conversation history, memory, generated-media storage, and operational logs.
@@ -522,17 +522,17 @@ See [Settings UI](ui/SETTINGS.md) for the canonical navigation, persistence, and
 - **Providers → Search** stores Brave or Tavily credentials, while Assistant selects the active
   configured engine used by the agent's web search tool. It is not a separate local-search feature.
 
-### Extensions
+### Apps
 
-Extensions are standalone mini-app windows:
+Apps are standalone mini-app windows:
 
-- Each extension lives in its own folder under the app's local data directory with a `manifest.json` declaring a title, description, and entry point.
-- The application menu and a `window.extensions` API can list installed extensions and open each one in its own `BrowserWindow`.
-- The main process watches extension folders and supports hot-reload.
-- The Extensions settings page opens the extensions folder, refreshes discovery, imports extension
-  packages, shows list/detail metadata, opens an extension, and deletes it from the list.
+- Each app lives in its own folder under the app's local data directory with a `manifest.json` declaring a title, description, and entry point.
+- The application menu and a `window.apps` API can list installed apps and open each one in its own `BrowserWindow`.
+- The main process watches app folders and supports hot-reload.
+- The Apps settings page opens the apps folder, refreshes discovery, imports app
+  packages, shows list/detail metadata, opens an app, and deletes it from the list.
 
-**Partial:** the extension-loading backend and import/removal UI are implemented, but Settings has
+**Partial:** the app-loading backend and import/removal UI are implemented, but Settings has
 no enable/disable control.
 
 ### Cloud storage sync
@@ -605,7 +605,7 @@ backups.
 - Renderer windows use Electron sandboxing, context isolation, disabled Node integration, web security, and insecure-content blocking.
 - Production navigation is restricted to local `file://` content.
 - Renderer capabilities are exposed through typed preload APIs rather than direct Node access.
-- Extension views use an isolated Electron session; their local-resource protocol is limited to the agent workspace, clipboard reads are denied, and media/display capture is reserved for app windows.
+- App views use an isolated Electron session; their local-resource protocol is limited to the agent workspace, clipboard reads are denied, and media/display capture is reserved for app windows.
 - Renderer agent requests are always mapped to the `default` run type; renderers cannot request privileged background execution.
 - Media permission requests are limited to trusted app windows and renderer origins.
 - Native media context menus validate that files are inside the agent or media data roots.
@@ -632,7 +632,7 @@ The main implementation areas behind this reference are:
 - [Settings pages](../src/renderer/src/pages/settings/)
 - [Agent runtime and tools](../src/main/agent/)
 - [LLM Wiki](../src/main/agent/knowledge/wiki/)
-- [Extensions](../src/main/extensions/)
+- [Apps](../src/main/apps/)
 - [Cloud storage sync](../src/renderer/src/pages/settings/pages/storage/)
 - [Account and cloud architecture](CLOUD.md)
 - [Provider catalog declarations](../resources/providers/)

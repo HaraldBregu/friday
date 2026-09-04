@@ -10,20 +10,20 @@ import {
 	saveWikiSettings,
 } from '../agent/knowledge/wiki';
 import type { IpcModule } from './core/module';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 
 export interface WikiIpcDependencies {
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class WikiIpc implements IpcModule<WikiIpcDependencies> {
 	readonly name = 'wiki';
 
-	register({ windows, extensions }: WikiIpcDependencies, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ windows, apps }: WikiIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		trusted.query(WikiChannels.getSettings, () => getWikiSettings());
 		trusted.query(WikiChannels.getStatus, () => getWikiStatus());
 		trusted.command(WikiChannels.saveSettings, (settings) => saveWikiSettings(settings));

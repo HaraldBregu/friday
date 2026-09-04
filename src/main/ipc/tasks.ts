@@ -1,5 +1,5 @@
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TaskChannels } from '../../shared/ipc_channels_definitions';
 import {
@@ -16,14 +16,14 @@ import { TrustedRenderer } from './core/trusted';
 
 export interface TaskIpcDependencies {
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class TaskIpc implements IpcModule<TaskIpcDependencies> {
 	readonly name = 'tasks';
 
-	register({ windows, extensions }: TaskIpcDependencies, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ windows, apps }: TaskIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		registerQueryWithEvent(TaskChannels.list, (event) => {
 			trusted.assert(event);
 			return listSchedules();

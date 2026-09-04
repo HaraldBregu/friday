@@ -7,7 +7,7 @@ import type {
 	TerminalWriteRequest,
 } from '../../shared/terminal';
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { LoggerService } from '../shared';
 import type { PtyManager } from '../terminal/manager';
 import type { WindowContextManager } from '../window_context';
@@ -23,17 +23,17 @@ export interface TerminalIpcDeps {
 	readonly logger: LoggerService;
 	readonly manager: PtyManager;
 	readonly windows: WindowContextManager;
-	readonly extensions: ExtensionRegistry;
+	readonly apps: AppRegistry;
 }
 
 export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 	readonly name = 'terminal';
 
-	register({ logger, manager, windows, extensions }: TerminalIpcDeps, _eventBus: EventBus): void {
+	register({ logger, manager, windows, apps }: TerminalIpcDeps, _eventBus: EventBus): void {
 		ipcMain.handle(
 			TerminalChannels.create,
 			wrapIpcHandler(async (event, value: unknown) => {
-				this.assertTrustedSender(event, windows, extensions);
+				this.assertTrustedSender(event, windows, apps);
 				const request = this.createRequest(value);
 				return manager.create(event.sender, request);
 			}, TerminalChannels.create)
@@ -42,7 +42,7 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 		ipcMain.handle(
 			TerminalChannels.kill,
 			wrapIpcHandler((event, value: unknown) => {
-				this.assertTrustedSender(event, windows, extensions);
+				this.assertTrustedSender(event, windows, apps);
 				const request = this.killRequest(value);
 				return manager.kill(event.sender.id, request.id);
 			}, TerminalChannels.kill)
@@ -50,7 +50,7 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 
 		ipcMain.on(TerminalChannels.write, (event, value: unknown) => {
 			try {
-				this.assertTrustedSender(event, windows, extensions);
+				this.assertTrustedSender(event, windows, apps);
 				const request = this.writeRequest(value);
 				manager.write(event.sender.id, request.id, request.data);
 			} catch (error) {
@@ -60,7 +60,7 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 
 		ipcMain.on(TerminalChannels.resize, (event, value: unknown) => {
 			try {
-				this.assertTrustedSender(event, windows, extensions);
+				this.assertTrustedSender(event, windows, apps);
 				const request = this.resizeRequest(value);
 				manager.resize(event.sender.id, request.id, request.cols, request.rows);
 			} catch (error) {
@@ -74,13 +74,13 @@ export class TerminalIpc implements IpcModule<TerminalIpcDeps> {
 	private assertTrustedSender(
 		event: IpcMainEvent | IpcMainInvokeEvent,
 		windows: WindowContextManager,
-		extensions: ExtensionRegistry
+		apps: AppRegistry
 	): void {
 		if (!event.senderFrame || event.senderFrame !== event.sender.mainFrame) {
 			throw new Error('Terminal IPC is restricted to the main frame.');
 		}
-		if (extensions.has(event.sender)) {
-			throw new Error('Terminal IPC is unavailable to extension views.');
+		if (apps.has(event.sender)) {
+			throw new Error('Terminal IPC is unavailable to app views.');
 		}
 		const window = BrowserWindow.fromWebContents(event.sender);
 		if (!window || window.webContents !== event.sender || !windows.has(window.id)) {

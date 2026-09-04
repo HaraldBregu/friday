@@ -2,7 +2,7 @@ import { shell } from 'electron';
 import type { AccountProfile, AuthCredentials, SignUpInput } from '../../shared/auth_types';
 import { AuthChannels } from '../../shared/ipc_channels_definitions';
 import type { AuthService } from '../cloud/service';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { EventBus } from '../event_bus';
 import type { WindowContextManager } from '../window_context';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
@@ -12,14 +12,14 @@ import { TrustedRenderer } from './core/trusted';
 export interface AuthIpcDeps {
 	auth: AuthService;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class AuthIpc implements IpcModule<AuthIpcDeps> {
 	readonly name = 'auth';
 
-	register({ auth, windows, extensions }: AuthIpcDeps, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ auth, windows, apps }: AuthIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		auth.onStateChanged((state) => trusted.broadcast(AuthChannels.stateChanged, state));
 		registerQueryWithEvent(AuthChannels.getState, (event) => {
 			trusted.assert(event);

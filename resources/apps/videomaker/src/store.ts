@@ -5,7 +5,7 @@ import { openDatabase } from './database';
 export async function storeMedia(id: string, file: File): Promise<string> {
 	const assetPath = `media/${id}`;
 	if (isKucedr()) {
-		await app.writeExtensionStoreFile(assetPath, new Uint8Array(await file.arrayBuffer()));
+		await app.writeAppStoreFile(assetPath, new Uint8Array(await file.arrayBuffer()));
 		return assetPath;
 	}
 	const database = await openDatabase();

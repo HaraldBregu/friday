@@ -4,7 +4,7 @@ import { Menu } from '../../../../src/main/menu';
 jest.mock('@electron-toolkit/utils', () => ({ is: { dev: true } }));
 jest.mock('../../../../src/main/i18n', () => ({
 	loadTranslations: () => ({
-		extensions: 'Extensions',
+		apps: 'Apps',
 	}),
 }));
 
@@ -15,7 +15,7 @@ type MenuEntry = {
 	click?: () => void;
 };
 
-describe('application menu extensions', () => {
+describe('application menu apps', () => {
 	it('keeps the platform new-session shortcut available', () => {
 		const onNewWindow = jest.fn();
 		const buildFromTemplate = ElectronMenu.buildFromTemplate as jest.Mock;
@@ -23,8 +23,8 @@ describe('application menu extensions', () => {
 		const menu = new Menu({
 			onLanguageChange: jest.fn(),
 			onNewWindow,
-			getExtensions: () => [],
-			onOpenExtension: jest.fn(),
+			getApps: () => [],
+			onOpenApp: jest.fn(),
 		});
 
 		menu.create();
@@ -36,8 +36,8 @@ describe('application menu extensions', () => {
 		expect(onNewWindow).toHaveBeenCalledTimes(1);
 	});
 
-	it('opens manifest-defined extensions from the Extensions menu', () => {
-		const extensionConfigurations = [
+	it('opens manifest-defined apps from the Apps menu', () => {
+		const appConfigurations = [
 			{
 				id: 'weather',
 				title: 'Weather',
@@ -51,30 +51,30 @@ describe('application menu extensions', () => {
 				metadata: { version: '2.0.0', category: 'utility', entry: 'index.html' },
 			},
 		];
-		const onOpenExtension = jest.fn();
+		const onOpenApp = jest.fn();
 		const buildFromTemplate = ElectronMenu.buildFromTemplate as jest.Mock;
 		buildFromTemplate.mockClear();
 		buildFromTemplate.mockImplementation((template: MenuEntry[]) => template);
 		const menu = new Menu({
 			onLanguageChange: jest.fn(),
 			onNewWindow: jest.fn(),
-			getExtensions: () => extensionConfigurations,
-			onOpenExtension,
+			getApps: () => appConfigurations,
+			onOpenApp,
 		});
 
 		menu.create();
 
 		const template = buildFromTemplate.mock.calls[0][0] as MenuEntry[];
-		const extensionsMenu = template.find((entry) => entry.label === 'Extensions');
-		extensionsMenu?.submenu?.find((entry) => entry.label === 'Weather')?.click?.();
-		extensionsMenu?.submenu?.find((entry) => entry.label === 'World Clock')?.click?.();
+		const appsMenu = template.find((entry) => entry.label === 'Apps');
+		appsMenu?.submenu?.find((entry) => entry.label === 'Weather')?.click?.();
+		appsMenu?.submenu?.find((entry) => entry.label === 'World Clock')?.click?.();
 
-		expect(onOpenExtension).toHaveBeenNthCalledWith(1, extensionConfigurations[0]);
-		expect(onOpenExtension).toHaveBeenNthCalledWith(2, extensionConfigurations[1]);
+		expect(onOpenApp).toHaveBeenNthCalledWith(1, appConfigurations[0]);
+		expect(onOpenApp).toHaveBeenNthCalledWith(2, appConfigurations[1]);
 	});
 
-	it('rebuilds the Extensions submenu from the current extension list', () => {
-		let extensions = [
+	it('rebuilds the Apps submenu from the current app list', () => {
+		let apps = [
 			{
 				id: 'weather',
 				title: 'Weather',
@@ -88,11 +88,11 @@ describe('application menu extensions', () => {
 		const menu = new Menu({
 			onLanguageChange: jest.fn(),
 			onNewWindow: jest.fn(),
-			getExtensions: () => extensions,
-			onOpenExtension: jest.fn(),
+			getApps: () => apps,
+			onOpenApp: jest.fn(),
 		});
 		menu.create();
-		extensions = [
+		apps = [
 			{
 				id: 'clock',
 				title: 'World Clock',
@@ -104,7 +104,7 @@ describe('application menu extensions', () => {
 		menu.create();
 
 		const template = buildFromTemplate.mock.calls[1][0] as MenuEntry[];
-		const extensionsMenu = template.find((entry) => entry.label === 'Extensions');
-		expect(extensionsMenu?.submenu?.map((entry) => entry.label)).toEqual(['World Clock']);
+		const appsMenu = template.find((entry) => entry.label === 'Apps');
+		expect(appsMenu?.submenu?.map((entry) => entry.label)).toEqual(['World Clock']);
 	});
 });

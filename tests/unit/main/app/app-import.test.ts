@@ -1,57 +1,57 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { importExtensions } from '../../../../src/main/extensions/extension_import';
+import { importApps } from '../../../../src/main/apps/app_import';
 
-describe('extension import', () => {
+describe('app import', () => {
 	let appLocation: string;
 
 	beforeEach(() => {
-		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-import-'));
+		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-app-import-'));
 	});
 
 	afterEach(() => {
 		fs.rmSync(appLocation, { recursive: true, force: true });
 	});
 
-	it('does not delete an extension imported from its installed directory', () => {
-		const installed = path.join(appLocation, 'extensions', 'project');
+	it('does not delete an app imported from its installed directory', () => {
+		const installed = path.join(appLocation, 'apps', 'project');
 		fs.mkdirSync(installed, { recursive: true });
 		fs.writeFileSync(path.join(installed, 'index.html'), 'installed');
 		fs.writeFileSync(
 			path.join(installed, 'manifest.json'),
 			JSON.stringify({
 				title: 'Project',
-				description: 'Project extension',
+				description: 'Project app',
 				metadata: { version: '1.0.0', category: 'utility', entry: 'index.html' },
 			})
 		);
 
-		expect(importExtensions([installed], appLocation)).toMatchObject({
+		expect(importApps([installed], appLocation)).toMatchObject({
 			imported: [],
 			skipped: [{ sourcePath: installed, reason: 'Source folder is already installed.' }],
 		});
 		expect(fs.readFileSync(path.join(installed, 'index.html'), 'utf8')).toBe('installed');
 	});
 
-	it.each(['coder', 'workspace'])('rejects the privileged %s extension identifier', (id) => {
-		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-source-'));
+	it.each(['coder', 'workspace'])('rejects the privileged %s app identifier', (id) => {
+		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-app-source-'));
 		const source = path.join(sourceRoot, id);
 		fs.mkdirSync(source, { recursive: true });
 
 		try {
-			expect(importExtensions([source], appLocation)).toMatchObject({
+			expect(importApps([source], appLocation)).toMatchObject({
 				imported: [],
-				skipped: [{ sourcePath: source, reason: 'Reserved extension folder name.' }],
+				skipped: [{ sourcePath: source, reason: 'Reserved app folder name.' }],
 			});
 		} finally {
 			fs.rmSync(sourceRoot, { recursive: true, force: true });
 		}
 	});
 
-	it('replaces an installed extension through a staged copy', () => {
-		const installed = path.join(appLocation, 'extensions', 'project');
-		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-source-'));
+	it('replaces an installed app through a staged copy', () => {
+		const installed = path.join(appLocation, 'apps', 'project');
+		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-app-source-'));
 		const source = path.join(sourceRoot, 'project');
 		fs.mkdirSync(installed, { recursive: true });
 		fs.mkdirSync(source, { recursive: true });
@@ -61,16 +61,16 @@ describe('extension import', () => {
 			path.join(source, 'manifest.json'),
 			JSON.stringify({
 				title: 'Project',
-				description: 'Project extension',
+				description: 'Project app',
 				metadata: { version: '2.0.0', category: 'utility', entry: 'index.html' },
 			})
 		);
 
 		try {
-			expect(importExtensions([source], appLocation).imported).toHaveLength(1);
+			expect(importApps([source], appLocation).imported).toHaveLength(1);
 			expect(fs.readFileSync(path.join(installed, 'index.html'), 'utf8')).toBe('replacement');
 			expect(fs.existsSync(path.join(installed, 'old.txt'))).toBe(false);
-			expect(fs.readdirSync(path.join(appLocation, 'extensions'))).toEqual(['project']);
+			expect(fs.readdirSync(path.join(appLocation, 'apps'))).toEqual(['project']);
 		} finally {
 			fs.rmSync(sourceRoot, { recursive: true, force: true });
 		}

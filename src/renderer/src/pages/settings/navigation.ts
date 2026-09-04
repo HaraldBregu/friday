@@ -230,12 +230,12 @@ export const SETTINGS_DETAIL_ITEMS: readonly SettingsDetailItem[] = [
 		descriptionKey: 'settings.searchEngine.tavilyDescription',
 		keywords: 'tavily web search api key',
 	},
-	// Extensions
+	// Apps
 	{
-		path: '/settings/extensions',
-		labelKey: 'settings.extensions.title',
-		descriptionKey: 'settings.extensions.description',
-		keywords: 'external extension apps window manifest api install folder entry',
+		path: '/settings/apps',
+		labelKey: 'settings.apps.title',
+		descriptionKey: 'settings.apps.description',
+		keywords: 'external app apps window manifest api install folder entry',
 	},
 	// Channels
 	{
@@ -422,9 +422,9 @@ export const SETTINGS_NAVIGATION: readonly SettingsNavigationItem[] = [
 		icon: BotMessageSquare,
 	},
 	{
-		path: '/settings/extensions',
-		labelKey: 'settings.tabs.extensions',
-		descriptionKey: 'settings.overview.descriptions.extensions',
+		path: '/settings/apps',
+		labelKey: 'settings.tabs.apps',
+		descriptionKey: 'settings.overview.descriptions.apps',
 		icon: Blocks,
 	},
 ] satisfies readonly SettingsNavigationItem[];

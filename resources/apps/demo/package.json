@@ -2,7 +2,7 @@
 	"name": "Demo",
 	"private": true,
 	"version": "1.0.0",
-	"description": "Minimal Kucedr app-data demo extension.",
+	"description": "Minimal Kucedr app-data demo app.",
 	"keywords": [
 		"utility"
 	],

@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { isExtensionId } from './extension_id';
-import { extensionsRoot } from './extension_root';
+import { isAppId } from './app_id';
+import { appsRoot } from './app_root';
 
-export function extensionManifestPath(id: string, appLocation?: string): string {
-	if (!isExtensionId(id)) throw new Error(`Invalid extension id: ${id}`);
-	return path.join(extensionsRoot(appLocation), id, 'manifest.json');
+export function appManifestPath(id: string, appLocation?: string): string {
+	if (!isAppId(id)) throw new Error(`Invalid app id: ${id}`);
+	return path.join(appsRoot(appLocation), id, 'manifest.json');
 }

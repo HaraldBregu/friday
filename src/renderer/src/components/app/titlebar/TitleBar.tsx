@@ -112,7 +112,7 @@ export const TitleBar = React.memo(function TitleBar({
 								label: t('settings.overview.groups.agent'),
 							},
 							{ id: '/settings/system', label: t('settings.tabs.system') },
-							{ id: '/settings/extensions', label: t('settings.tabs.extensions') },
+							{ id: '/settings/apps', label: t('settings.tabs.apps') },
 						])
 						.then((path) => {
 							if (path) navigate(path);

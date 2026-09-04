@@ -4,20 +4,20 @@ import { A2aChannels } from '../../shared/ipc_channels_definitions';
 import type { A2aAgentInput } from '../../shared/a2a_types';
 import { getA2aAgents, removeA2aAgent, saveA2aAgent, testA2aAgent } from '../agent/a2a';
 import { publicA2aAgent } from '../agent/a2a/public';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
 
 export interface A2aIpcDeps {
-	extensionRegistry: ExtensionRegistry;
+	appRegistry: AppRegistry;
 }
 
 export class A2aIpc implements IpcModule<A2aIpcDeps> {
 	readonly name = 'a2a';
-	register({ extensionRegistry }: A2aIpcDeps, _eventBus: EventBus): void {
+	register({ appRegistry }: A2aIpcDeps, _eventBus: EventBus): void {
 		const assertAppRenderer = (event: IpcMainInvokeEvent): void => {
-			if (extensionRegistry.has(event.sender) || !BrowserWindow.fromWebContents(event.sender)) {
-				throw new Error('A2A settings are unavailable to extension views.');
+			if (appRegistry.has(event.sender) || !BrowserWindow.fromWebContents(event.sender)) {
+				throw new Error('A2A settings are unavailable to app views.');
 			}
 		};
 		registerQueryWithEvent(A2aChannels.list, (event) => {

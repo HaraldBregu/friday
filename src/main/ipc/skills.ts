@@ -1,5 +1,5 @@
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { SkillsChannels } from '../../shared/ipc_channels_definitions';
 import * as skills from '../agent/skills';
@@ -9,14 +9,14 @@ import { TrustedRenderer } from './core/trusted';
 
 export interface SkillsIpcDependencies {
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class SkillsIpc implements IpcModule<SkillsIpcDependencies> {
 	readonly name = 'skills';
 
-	register({ windows, extensions }: SkillsIpcDependencies, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ windows, apps }: SkillsIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		registerQueryWithEvent(SkillsChannels.list, (event) => {
 			trusted.assert(event);
 			return skills.list();

@@ -1,37 +1,37 @@
 import type { IpcMainInvokeEvent } from 'electron';
 import { AppChannels } from '../../shared/ipc_channels_definitions';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
-import type { ExtensionStorage } from '../extensions/extension_store';
+import type { AppRegistry } from '../apps/app_registry';
+import type { AppStorage } from '../apps/app_store';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 
-export interface ExtensionStoreIpcDeps {
-	extensionRegistry: ExtensionRegistry;
-	extensionStorage: ExtensionStorage;
+export interface AppStoreIpcDeps {
+	appRegistry: AppRegistry;
+	appStorage: AppStorage;
 }
 
-export function registerExtensionStoreIpc({
-	extensionRegistry,
-	extensionStorage,
-}: ExtensionStoreIpcDeps): void {
-	const extensionId = (event: IpcMainInvokeEvent): string =>
-		extensionRegistry.resolve(event.sender);
+export function registerAppStoreIpc({
+	appRegistry,
+	appStorage,
+}: AppStoreIpcDeps): void {
+	const appId = (event: IpcMainInvokeEvent): string =>
+		appRegistry.resolve(event.sender);
 
-	registerQueryWithEvent(AppChannels.getExtensionStoreValue, (event, key) =>
-		extensionStorage.get(extensionId(event), key)
+	registerQueryWithEvent(AppChannels.getAppStoreValue, (event, key) =>
+		appStorage.get(appId(event), key)
 	);
-	registerCommandWithEvent(AppChannels.setExtensionStoreValue, (event, key, value) =>
-		extensionStorage.set(extensionId(event), key, value)
+	registerCommandWithEvent(AppChannels.setAppStoreValue, (event, key, value) =>
+		appStorage.set(appId(event), key, value)
 	);
-	registerCommandWithEvent(AppChannels.deleteExtensionStoreValue, (event, key) =>
-		extensionStorage.delete(extensionId(event), key)
+	registerCommandWithEvent(AppChannels.deleteAppStoreValue, (event, key) =>
+		appStorage.delete(appId(event), key)
 	);
-	registerQueryWithEvent(AppChannels.readExtensionStoreFile, (event, filePath) =>
-		extensionStorage.readFile(extensionId(event), filePath)
+	registerQueryWithEvent(AppChannels.readAppStoreFile, (event, filePath) =>
+		appStorage.readFile(appId(event), filePath)
 	);
-	registerCommandWithEvent(AppChannels.writeExtensionStoreFile, (event, filePath, data) =>
-		extensionStorage.writeFile(extensionId(event), filePath, data)
+	registerCommandWithEvent(AppChannels.writeAppStoreFile, (event, filePath, data) =>
+		appStorage.writeFile(appId(event), filePath, data)
 	);
-	registerCommandWithEvent(AppChannels.deleteExtensionStoreFile, (event, filePath) =>
-		extensionStorage.deleteFile(extensionId(event), filePath)
+	registerCommandWithEvent(AppChannels.deleteAppStoreFile, (event, filePath) =>
+		appStorage.deleteFile(appId(event), filePath)
 	);
 }

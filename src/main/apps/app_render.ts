@@ -3,26 +3,26 @@ import { setupPdfContextMenu } from '../pdf';
 import type { WindowFactory } from '../window_factory';
 import { attachWindowHandlers } from '../window_events';
 import { getPlatformTranslucencyOptions } from '../translucency';
-import type { ExtensionTitlebarOptions } from '../../shared/window_types';
+import type { AppTitlebarOptions } from '../../shared/window_types';
 
-export interface ExtensionWindow {
+export interface AppWindow {
 	window: BrowserWindow;
 	ready: boolean;
 	contents?: WebContents;
-	titlebarOptions: ExtensionTitlebarOptions | null;
+	titlebarOptions: AppTitlebarOptions | null;
 }
 
-const windows = new Map<string, ExtensionWindow>();
-export const openExtensionWindows: ReadonlyMap<string, ExtensionWindow> = windows;
+const windows = new Map<string, AppWindow>();
+export const openAppWindows: ReadonlyMap<string, AppWindow> = windows;
 const titleBarHeight = 48;
 
 export function render(
 	windowFactory: WindowFactory,
 	file: string,
 	title: string,
-	extensionId: string
+	appId: string
 ): BrowserWindow {
-	const existing = windows.get(extensionId);
+	const existing = windows.get(appId);
 	if (existing && !existing.window.isDestroyed()) {
 		if (existing.window.isMinimized()) existing.window.restore();
 		if (existing.ready && !existing.window.isVisible()) existing.window.show();
@@ -49,32 +49,32 @@ export function render(
 			autoHideMenuBar: true,
 			backgroundColor: '#00000000',
 		},
-		{ html: 'extension.html', hash: `extension/${encodeURIComponent(title)}` }
+		{ html: 'app.html', hash: `app/${encodeURIComponent(title)}` }
 	);
 
-	const extensionWindow: ExtensionWindow = {
+	const appWindow: AppWindow = {
 		window: win,
 		ready: false,
 		titlebarOptions: null,
 	};
-	windows.set(extensionId, extensionWindow);
+	windows.set(appId, appWindow);
 	win.setMenuBarVisibility(false);
 	let shellFailed = false;
-	let extensionView: WebContentsView | undefined;
-	let extensionContents: WebContents | undefined;
+	let appView: WebContentsView | undefined;
+	let appContents: WebContents | undefined;
 	let shellReady = false;
-	let extensionReady = false;
+	let appReady = false;
 	let childClosing = false;
 	let hostCloseAllowed = false;
 	const showWhenReady = (): void => {
-		if (!shellReady || !extensionReady || win.isDestroyed()) return;
-		extensionWindow.ready = true;
+		if (!shellReady || !appReady || win.isDestroyed()) return;
+		appWindow.ready = true;
 		win.show();
 	};
 	const resizeView = (): void => {
-		if (!extensionView || win.isDestroyed()) return;
+		if (!appView || win.isDestroyed()) return;
 		const { width, height } = win.getContentBounds();
-		extensionView.setBounds({
+		appView.setBounds({
 			x: 0,
 			y: titleBarHeight,
 			width,
@@ -84,7 +84,7 @@ export function render(
 	const discardFailedShell = (): void => {
 		if (shellFailed) return;
 		shellFailed = true;
-		if (windows.get(extensionId) === extensionWindow) windows.delete(extensionId);
+		if (windows.get(appId) === appWindow) windows.delete(appId);
 		if (!win.isDestroyed()) win.destroy();
 	};
 
@@ -94,11 +94,11 @@ export function render(
 	});
 	win.webContents.once('did-finish-load', () => {
 		if (win.isDestroyed()) return;
-		const { view, load } = windowFactory.createView(file, extensionId);
-		extensionView = view;
-		extensionContents = view.webContents;
-		extensionWindow.contents = extensionContents;
-		const viewContents = extensionContents;
+		const { view, load } = windowFactory.createView(file, appId);
+		appView = view;
+		appContents = view.webContents;
+		appWindow.contents = appContents;
+		const viewContents = appContents;
 
 		view.setVisible(false);
 		win.contentView.addChildView(view);
@@ -125,7 +125,7 @@ export function render(
 			.then(() => {
 				if (win.isDestroyed() || viewContents.isDestroyed()) return;
 				view.setVisible(true);
-				extensionReady = true;
+				appReady = true;
 				showWhenReady();
 			})
 			.catch(() => {
@@ -143,15 +143,15 @@ export function render(
 	win.setTitle(title);
 	win.on('resize', resizeView);
 	win.on('close', (event) => {
-		if (!extensionContents || hostCloseAllowed || extensionContents.isDestroyed()) return;
+		if (!appContents || hostCloseAllowed || appContents.isDestroyed()) return;
 		event.preventDefault();
 		if (childClosing) return;
 		childClosing = true;
-		extensionContents.close({ waitForBeforeUnload: true });
+		appContents.close({ waitForBeforeUnload: true });
 	});
 	win.on('closed', () => {
-		if (windows.get(extensionId) === extensionWindow) windows.delete(extensionId);
-		if (extensionContents && !extensionContents.isDestroyed()) extensionContents.close();
+		if (windows.get(appId) === appWindow) windows.delete(appId);
+		if (appContents && !appContents.isDestroyed()) appContents.close();
 	});
 	return win;
 }

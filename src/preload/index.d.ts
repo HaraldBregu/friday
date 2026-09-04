@@ -14,7 +14,7 @@ import type {
 	SkillsApi,
 	StorageApi,
 	DatabaseApi,
-	ExtensionsApi,
+	AppsApi,
 	WikiApi,
 	WindowApi,
 	DataApi,
@@ -39,7 +39,7 @@ declare global {
 		database: DatabaseApi;
 		provider: ProviderApi;
 		search: SearchApi;
-		extensions: ExtensionsApi;
+		apps: AppsApi;
 		wiki: WikiApi;
 		dataControls: DataApi;
 		terminalAPI: TerminalApi;

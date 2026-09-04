@@ -13,18 +13,18 @@ describe('recorder IPC', () => {
 		jest.clearAllMocks();
 	});
 
-	it('exposes only capture completion and rejects extension views', async () => {
+	it('exposes only capture completion and rejects app views', async () => {
 		const mainFrame = {};
 		const mainSender = { id: 21, mainFrame };
-		const extensionFrame = {};
-		const extensionSender = { id: 22, mainFrame: extensionFrame };
+		const appFrame = {};
+		const appSender = { id: 22, mainFrame: appFrame };
 		const window = { id: 1, webContents: mainSender };
 		jest
 			.mocked(BrowserWindow.fromWebContents)
 			.mockImplementation((sender) => (sender === mainSender ? (window as never) : null));
 		const windows = { has: (id: number) => id === window.id };
-		const extensions = { has: (sender: unknown) => sender === extensionSender };
-		new RecorderIpc().register({ windows, extensions } as never, {} as never);
+		const apps = { has: (sender: unknown) => sender === appSender };
+		new RecorderIpc().register({ windows, apps } as never, {} as never);
 
 		expect(jest.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel)).toEqual([
 			RecorderChannels.microphone.complete,
@@ -40,7 +40,7 @@ describe('recorder IPC', () => {
 		const result = { id: 'recording-id', base64: 'cmVjb3JkZWQ=' };
 
 		await expect(
-			handler({ sender: extensionSender, senderFrame: extensionFrame } as never, result)
+			handler({ sender: appSender, senderFrame: appFrame } as never, result)
 		).resolves.toMatchObject({ success: false });
 		expect(screen.complete).not.toHaveBeenCalled();
 

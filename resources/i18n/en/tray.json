@@ -1,8 +1,8 @@
 {
 	"showKucedr": "Show Kucedr",
 	"hideKucedr": "Hide Kucedr",
-	"extensions": "Extensions",
 	"apps": "Apps",
-	"noExtensions": "No extensions",
+	"apps": "Apps",
+	"noApps": "No apps",
 	"quit": "Quit"
 }

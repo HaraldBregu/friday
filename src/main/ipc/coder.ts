@@ -7,7 +7,7 @@ import {
 } from '../../shared/coder_types';
 import type { Coder } from '../coder';
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
@@ -15,28 +15,28 @@ import { TrustedRenderer } from './core/trusted';
 
 interface CoderIpcDependencies {
 	readonly coder: Coder;
-	readonly extensionRegistry: ExtensionRegistry;
+	readonly appRegistry: AppRegistry;
 	readonly windows: WindowContextManager;
 }
 
 export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 	readonly name = 'coder';
 
-	register({ coder, extensionRegistry, windows }: CoderIpcDependencies, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensionRegistry);
+	register({ coder, appRegistry, windows }: CoderIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, appRegistry);
 		const assertCoderCaller = (event: Electron.IpcMainInvokeEvent): void => {
-			if (extensionRegistry.has(event.sender)) {
-				if (extensionRegistry.resolve(event.sender) === 'coder') return;
-				throw new Error('Coder is only available to the Coder extension.');
+			if (appRegistry.has(event.sender)) {
+				if (appRegistry.resolve(event.sender) === 'coder') return;
+				throw new Error('Coder is only available to the Coder app.');
 			}
 			trusted.assert(event);
 		};
-		const assertCoderExtensionCaller = (event: Electron.IpcMainInvokeEvent): void => {
+		const assertCoderAppCaller = (event: Electron.IpcMainInvokeEvent): void => {
 			if (
-				!extensionRegistry.has(event.sender) ||
-				extensionRegistry.resolve(event.sender) !== 'coder'
+				!appRegistry.has(event.sender) ||
+				appRegistry.resolve(event.sender) !== 'coder'
 			) {
-				throw new Error('Project instructions are only available to the Coder extension.');
+				throw new Error('Project instructions are only available to the Coder app.');
 			}
 		};
 		registerQueryWithEvent(CoderChannels.getSettings, (event) => {
@@ -86,14 +86,14 @@ export class CoderIpc implements IpcModule<CoderIpcDependencies> {
 			return coder.removeProject(projectId.trim());
 		});
 		registerQueryWithEvent(CoderChannels.getProjectInstructions, (event, projectId) => {
-			assertCoderExtensionCaller(event);
+			assertCoderAppCaller(event);
 			if (typeof projectId !== 'string' || !projectId.trim()) {
 				throw new Error('Invalid coder project id.');
 			}
 			return coder.getProjectInstructions(projectId.trim());
 		});
 		registerCommandWithEvent(CoderChannels.saveProjectInstructions, (event, projectId, update) => {
-			assertCoderExtensionCaller(event);
+			assertCoderAppCaller(event);
 			if (typeof projectId !== 'string' || !projectId.trim()) {
 				throw new Error('Invalid coder project id.');
 			}

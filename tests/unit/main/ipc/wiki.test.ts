@@ -30,7 +30,7 @@ import { WikiChannels } from '../../../../src/shared/ipc_channels_definitions';
 
 describe('WikiIpc', () => {
 	it('registers a separate typed wiki API', async () => {
-		new WikiIpc().register({ windows: {} as never, extensions: {} as never }, {} as EventBus);
+		new WikiIpc().register({ windows: {} as never, apps: {} as never }, {} as EventBus);
 
 		expect(query).toHaveBeenCalledWith(WikiChannels.getSettings, expect.any(Function));
 		expect(query).toHaveBeenCalledWith(WikiChannels.getStatus, expect.any(Function));

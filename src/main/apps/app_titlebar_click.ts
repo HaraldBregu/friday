@@ -1,17 +1,17 @@
 import type { WebContents } from 'electron';
 import { WindowChannels } from '../../shared/ipc_channels_definitions';
-import { openExtensionWindows } from './extension_render';
+import { openAppWindows } from './app_render';
 
-export function dispatchExtensionTitlebarButton(sender: WebContents, buttonId: string): void {
-	for (const extensionWindow of openExtensionWindows.values()) {
-		if (extensionWindow.window.webContents !== sender) continue;
-		const options = extensionWindow.titlebarOptions;
+export function dispatchAppTitlebarButton(sender: WebContents, buttonId: string): void {
+	for (const appWindow of openAppWindows.values()) {
+		if (appWindow.window.webContents !== sender) continue;
+		const options = appWindow.titlebarOptions;
 		const button = [...(options?.leftButtons ?? []), ...(options?.rightButtons ?? [])].find(
 			(item) => item.id === buttonId
 		);
 		if (!button || button.disabled) return;
-		if (!extensionWindow.contents || extensionWindow.contents.isDestroyed()) return;
-		extensionWindow.contents.send(WindowChannels.titlebarButtonClicked, buttonId);
+		if (!appWindow.contents || appWindow.contents.isDestroyed()) return;
+		appWindow.contents.send(WindowChannels.titlebarButtonClicked, buttonId);
 		return;
 	}
 }

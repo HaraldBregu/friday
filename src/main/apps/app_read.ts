@@ -1,20 +1,20 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { extensionManifestPath } from './extension_manifest';
-import { extensionsRoot } from './extension_root';
-import { isExtensionManifest } from './extension_manifest_validate';
-import { isExtensionEntry } from './extension_entry_validate';
-import type { ExtensionManifest } from './extension_types';
+import { appManifestPath } from './app_manifest';
+import { appsRoot } from './app_root';
+import { isAppManifest } from './app_manifest_validate';
+import { isAppEntry } from './app_entry_validate';
+import type { AppManifest } from './app_types';
 
-function cleanExtensionEntry(value: string): string {
+function cleanAppEntry(value: string): string {
 	const trimmed = value.trim().replace(/\\+/g, '/').replace(/^\.?\//, '').replace(/\/+$/g, '');
 	return trimmed;
 }
 
 function extractEntryFromExports(value: unknown): string | null {
 	if (typeof value === 'string') {
-		const normalized = cleanExtensionEntry(value);
-		return isExtensionEntry(normalized) ? normalized : null;
+		const normalized = cleanAppEntry(value);
+		return isAppEntry(normalized) ? normalized : null;
 	}
 
 	if (!value || typeof value !== 'object') return null;
@@ -34,7 +34,7 @@ function extractEntryFromExports(value: unknown): string | null {
 	return null;
 }
 
-function readPackageManifestFromStandardFields(directory: string): ExtensionManifest | null {
+function readPackageManifestFromStandardFields(directory: string): AppManifest | null {
 	const file = path.join(directory, 'package.json');
 	if (!existsSync(file)) return null;
 
@@ -59,12 +59,12 @@ function readPackageManifestFromStandardFields(directory: string): ExtensionMani
 				: 'utility';
 
 		const main =
-			typeof packageJson.main === 'string' ? cleanExtensionEntry(packageJson.main) : null;
+			typeof packageJson.main === 'string' ? cleanAppEntry(packageJson.main) : null;
 		const fromExports = extractEntryFromExports(packageJson.exports);
-		const entry = main && isExtensionEntry(main) ? main : fromExports;
+		const entry = main && isAppEntry(main) ? main : fromExports;
 		if (!entry) return null;
 
-		const candidate: ExtensionManifest = {
+		const candidate: AppManifest = {
 			title,
 			description,
 			metadata: {
@@ -74,32 +74,32 @@ function readPackageManifestFromStandardFields(directory: string): ExtensionMani
 			},
 		};
 
-		return isExtensionManifest(candidate) ? candidate : null;
+		return isAppManifest(candidate) ? candidate : null;
 	} catch {
 		return null;
 	}
 }
 
-export function readExtensionManifest(id: string, appLocation?: string): ExtensionManifest | null {
-	const file = extensionManifestPath(id, appLocation);
+export function readAppManifest(id: string, appLocation?: string): AppManifest | null {
+	const file = appManifestPath(id, appLocation);
 	if (existsSync(file)) {
 		try {
 			const manifest = JSON.parse(readFileSync(file, 'utf8')) as unknown;
-			return isExtensionManifest(manifest) ? manifest : null;
+			return isAppManifest(manifest) ? manifest : null;
 		} catch {
 			return null;
 		}
 	}
 
-	return readPackageManifestFromStandardFields(path.join(extensionsRoot(appLocation), id));
+	return readPackageManifestFromStandardFields(path.join(appsRoot(appLocation), id));
 }
 
-export function readExtensionManifestFromDirectory(directory: string): ExtensionManifest | null {
+export function readAppManifestFromDirectory(directory: string): AppManifest | null {
 	const file = path.join(directory, 'manifest.json');
 	if (existsSync(file)) {
 		try {
 			const manifest = JSON.parse(readFileSync(file, 'utf8')) as unknown;
-			return isExtensionManifest(manifest) ? manifest : null;
+			return isAppManifest(manifest) ? manifest : null;
 		} catch {
 			return null;
 		}

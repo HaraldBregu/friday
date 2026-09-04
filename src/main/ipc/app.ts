@@ -62,9 +62,9 @@ import {
 	setChannelModelSelection,
 	type ChannelRegistry,
 } from '../channels';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
-import type { ExtensionStorage } from '../extensions/extension_store';
-import { registerExtensionStoreIpc } from './extension_store';
+import type { AppRegistry } from '../apps/app_registry';
+import type { AppStorage } from '../apps/app_store';
+import { registerAppStoreIpc } from './app_store';
 import { externalUrl } from '../external';
 import { unfurlUrl } from '../unfurl';
 import type { ExecSandbox } from '../agent/sandbox';
@@ -72,8 +72,8 @@ import type { ExecSandbox } from '../agent/sandbox';
 export interface AppIpcDeps {
 	logger: LoggerService;
 	channelRegistry: ChannelRegistry;
-	extensionRegistry: ExtensionRegistry;
-	extensionStorage: ExtensionStorage;
+	appRegistry: AppRegistry;
+	appStorage: AppStorage;
 	sandbox: ExecSandbox;
 }
 
@@ -390,10 +390,10 @@ export class AppIpc implements IpcModule {
 	readonly name = 'app';
 
 	register(
-		{ logger, channelRegistry, extensionRegistry, extensionStorage, sandbox }: AppIpcDeps,
+		{ logger, channelRegistry, appRegistry, appStorage, sandbox }: AppIpcDeps,
 		eventBus: EventBus
 	): void {
-		registerExtensionStoreIpc({ extensionRegistry, extensionStorage });
+		registerAppStoreIpc({ appRegistry, appStorage });
 		let currentThemeData: AppThemeData = getThemeData();
 		const emitThemeChangeEvent = (): void => {
 			const nextThemeData: AppThemeData = getThemeData();

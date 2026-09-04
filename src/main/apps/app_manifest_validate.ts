@@ -1,7 +1,7 @@
-import { isExtensionEntry } from './extension_entry_validate';
-import type { ExtensionManifest } from './extension_types';
+import { isAppEntry } from './app_entry_validate';
+import type { AppManifest } from './app_types';
 
-export function isExtensionManifest(value: unknown): value is ExtensionManifest {
+export function isAppManifest(value: unknown): value is AppManifest {
 	if (!value || typeof value !== 'object') return false;
 	const manifest = value as Record<string, unknown>;
 	const metadata = manifest.metadata as Record<string, unknown> | undefined;
@@ -17,6 +17,6 @@ export function isExtensionManifest(value: unknown): value is ExtensionManifest 
 		metadata.version.trim().length > 0 &&
 		typeof metadata.category === 'string' &&
 		metadata.category.trim().length > 0 &&
-		isExtensionEntry(metadata.entry)
+		isAppEntry(metadata.entry)
 	);
 }

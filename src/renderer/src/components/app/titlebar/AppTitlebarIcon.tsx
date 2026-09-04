@@ -7,12 +7,12 @@ import {
 	Search,
 	Settings,
 } from 'lucide-react';
-import type { ExtensionTitlebarButtonIcon } from '../../../../../shared/window_types';
+import type { AppTitlebarButtonIcon } from '../../../../../shared/window_types';
 
-export function ExtensionTitlebarIcon({
+export function AppTitlebarIcon({
 	icon,
 }: {
-	icon: ExtensionTitlebarButtonIcon;
+	icon: AppTitlebarButtonIcon;
 }): React.JSX.Element {
 	switch (icon) {
 		case 'panel-left':

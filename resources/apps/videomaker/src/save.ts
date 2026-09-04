@@ -1,4 +1,4 @@
-import { app, isKucedr, type ExtensionStoreValue } from '@kucedr/sdk';
+import { app, isKucedr, type AppStoreValue } from '@kucedr/sdk';
 
 import type { Project } from './types';
 
@@ -8,7 +8,7 @@ export async function saveProject(project: Project): Promise<void> {
 		clips: project.clips.map((clip) => ({ ...clip, src: '' })),
 	};
 	if (isKucedr()) {
-		await app.setExtensionStoreValue('project-v1', stored as unknown as ExtensionStoreValue);
+		await app.setAppStoreValue('project-v1', stored as unknown as AppStoreValue);
 		return;
 	}
 	localStorage.setItem('kucedr-videomaker-project-v1', JSON.stringify(stored));

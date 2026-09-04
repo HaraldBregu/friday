@@ -50,7 +50,7 @@ import {
 	SttChannels,
 	TextChannels,
 	VideoChannels,
-	ExtensionChannels,
+	AppChannels,
 	WikiChannels,
 	DataChannels,
 	WindowChannels,
@@ -528,27 +528,27 @@ export interface AppInvokeChannelMap {
 		args: [];
 		result: import('./channels_types').ChannelStatusEvent | undefined;
 	};
-	[AppChannels.getExtensionStoreValue]: {
+	[AppChannels.getAppStoreValue]: {
 		args: [key: string];
-		result: import('./extension_store_types').ExtensionStoreValue | undefined;
+		result: import('./app_store_types').AppStoreValue | undefined;
 	};
-	[AppChannels.setExtensionStoreValue]: {
-		args: [key: string, value: import('./extension_store_types').ExtensionStoreValue];
+	[AppChannels.setAppStoreValue]: {
+		args: [key: string, value: import('./app_store_types').AppStoreValue];
 		result: void;
 	};
-	[AppChannels.deleteExtensionStoreValue]: {
+	[AppChannels.deleteAppStoreValue]: {
 		args: [key: string];
 		result: void;
 	};
-	[AppChannels.readExtensionStoreFile]: {
+	[AppChannels.readAppStoreFile]: {
 		args: [path: string];
 		result: Uint8Array;
 	};
-	[AppChannels.writeExtensionStoreFile]: {
+	[AppChannels.writeAppStoreFile]: {
 		args: [path: string, data: Uint8Array];
 		result: void;
 	};
-	[AppChannels.deleteExtensionStoreFile]: {
+	[AppChannels.deleteAppStoreFile]: {
 		args: [path: string];
 		result: void;
 	};
@@ -974,14 +974,14 @@ export interface SttEventChannelMap {
 	[SttChannels.realtimeEvent]: { data: SttRealtimeEvent };
 }
 
-export interface ExtensionsInvokeChannelMap {
-	[ExtensionChannels.list]: { args: []; result: import('./extension_types').Extension[] };
-	[ExtensionChannels.open]: { args: [extensionId: string]; result: void };
-	[ExtensionChannels.openRoot]: { args: []; result: void };
-	[ExtensionChannels.delete]: { args: [extensionId: string]; result: boolean };
-	[ExtensionChannels.import]: {
+export interface AppsInvokeChannelMap {
+	[AppChannels.list]: { args: []; result: import('./app_types').App[] };
+	[AppChannels.open]: { args: [appId: string]; result: void };
+	[AppChannels.openRoot]: { args: []; result: void };
+	[AppChannels.delete]: { args: [appId: string]; result: boolean };
+	[AppChannels.import]: {
 		args: [];
-		result: import('./extension_types').ExtensionImportResult | undefined;
+		result: import('./app_types').AppImportResult | undefined;
 	};
 }
 
@@ -1000,7 +1000,7 @@ export interface WindowSendChannelMap {
 	[WindowChannels.close]: { args: [] };
 	[WindowChannels.popupMenu]: { args: [] };
 	[WindowChannels.titlebarOptionsSet]: {
-		args: [options: import('./window_types').ExtensionTitlebarOptions | null];
+		args: [options: import('./window_types').AppTitlebarOptions | null];
 	};
 	[WindowChannels.titlebarButtonClick]: { args: [buttonId: string] };
 	[WindowChannels.titlebarSidebarWidthSet]: { args: [width: number | null] };
@@ -1010,7 +1010,7 @@ export interface WindowEventChannelMap {
 	[WindowChannels.maximizeChange]: { data: boolean };
 	[WindowChannels.fullScreenChange]: { data: boolean };
 	[WindowChannels.titlebarOptionsChanged]: {
-		data: import('./window_types').ExtensionTitlebarOptions | null;
+		data: import('./window_types').AppTitlebarOptions | null;
 	};
 	[WindowChannels.titlebarButtonClicked]: { data: string };
 	[WindowChannels.titlebarSidebarWidthChanged]: { data: number | null };
@@ -1119,7 +1119,7 @@ export interface InvokeChannelMap
 		SttInvokeChannelMap,
 		TextInvokeChannelMap,
 		VideoInvokeChannelMap,
-		ExtensionsInvokeChannelMap,
+		AppsInvokeChannelMap,
 		TerminalInvokeChannelMap,
 		AuthInvokeChannelMap,
 		CloudInvokeChannelMap {}

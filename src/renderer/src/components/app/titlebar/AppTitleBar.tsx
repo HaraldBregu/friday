@@ -5,34 +5,34 @@ import { TitleBarCenterContainerTitle } from './TitleBarCenterContainerTitle';
 import { TitleBarContainer } from './TitleBarContainer';
 import { TitleBarLeftContainer } from './TitleBarLeftContainer';
 import { TitleBarRightContainer } from './TitleBarRightContainer';
-import { ExtensionWindowControls } from './ExtensionWindowControls';
-import { ExtensionTitlebarButton } from './ExtensionTitlebarButton';
-import { useExtensionWindowState } from './hooks/useExtensionWindowState';
+import { AppWindowControls } from './AppWindowControls';
+import { AppTitlebarButton } from './AppTitlebarButton';
+import { useAppWindowState } from './hooks/useAppWindowState';
 import { cn } from '@/lib/utils';
-import type { ExtensionTitlebarButton as ExtensionTitlebarButtonDescriptor } from '../../../../../shared/window_types';
+import type { AppTitlebarButton as AppTitlebarButtonDescriptor } from '../../../../../shared/window_types';
 
 const isMac =
 	typeof navigator !== 'undefined' &&
 	(navigator.platform === 'MacIntel' || navigator.platform.startsWith('Mac'));
 
-interface ExtensionTitleBarProps {
+interface AppTitleBarProps {
 	title: string;
-	leftButtons?: ExtensionTitlebarButtonDescriptor[];
-	rightButtons?: ExtensionTitlebarButtonDescriptor[];
+	leftButtons?: AppTitlebarButtonDescriptor[];
+	rightButtons?: AppTitlebarButtonDescriptor[];
 	sidebarOpen?: boolean;
 	sidebarTransitionDelay?: number;
 	sidebarWidth?: number | null;
 }
 
-export function ExtensionTitleBar({
+export function AppTitleBar({
 	title,
 	leftButtons = [],
 	rightButtons = [],
 	sidebarOpen,
 	sidebarTransitionDelay,
 	sidebarWidth = null,
-}: ExtensionTitleBarProps): React.JSX.Element {
-	const isMaximized = useExtensionWindowState();
+}: AppTitleBarProps): React.JSX.Element {
+	const isMaximized = useAppWindowState();
 	const sidebarOffset = sidebarOpen && sidebarWidth !== null ? sidebarWidth : 0;
 	const transitionDelay =
 		sidebarTransitionDelay === undefined ? undefined : `${sidebarTransitionDelay}ms`;
@@ -41,7 +41,7 @@ export function ExtensionTitleBar({
 		<TitleBarContainer className="relative">
 			{sidebarWidth !== null ? (
 				<div
-					data-slot="extension-titlebar-sidebar"
+					data-slot="app-titlebar-sidebar"
 					data-state={sidebarOpen === undefined ? undefined : sidebarOpen ? 'expanded' : 'collapsed'}
 					aria-hidden="true"
 					className={cn(
@@ -75,7 +75,7 @@ export function ExtensionTitleBar({
 					</Button>
 				) : null}
 				{leftButtons.map((button) => (
-					<ExtensionTitlebarButton key={button.id} button={button} />
+					<AppTitlebarButton key={button.id} button={button} />
 				))}
 			</TitleBarLeftContainer>
 			<TitleBarCenterContainer
@@ -94,11 +94,11 @@ export function ExtensionTitleBar({
 			{rightButtons.length > 0 ? (
 				<TitleBarRightContainer className={isMac ? 'mr-3' : undefined}>
 					{rightButtons.map((button) => (
-						<ExtensionTitlebarButton key={button.id} button={button} />
+						<AppTitlebarButton key={button.id} button={button} />
 					))}
 				</TitleBarRightContainer>
 			) : null}
-			{!isMac ? <ExtensionWindowControls isMaximized={isMaximized} /> : null}
+			{!isMac ? <AppWindowControls isMaximized={isMaximized} /> : null}
 		</TitleBarContainer>
 	);
 }

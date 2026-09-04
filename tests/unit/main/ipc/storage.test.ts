@@ -21,7 +21,7 @@ import { StorageIpc } from '../../../../src/main/ipc/storage';
 import { StorageChannels } from '../../../../src/shared/ipc_channels_definitions';
 import { BrowserWindow } from 'electron';
 
-const extensionRegistry = { has: jest.fn() };
+const appRegistry = { has: jest.fn() };
 const windows = { has: jest.fn() };
 const storageOperations = {
 	getStatus: jest.fn(),
@@ -35,14 +35,14 @@ const event = { sender, senderFrame: mainFrame };
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	extensionRegistry.has.mockReturnValue(false);
+	appRegistry.has.mockReturnValue(false);
 	windows.has.mockReturnValue(true);
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 1, webContents: sender });
 	storageOperations.getStatus.mockReturnValue(undefined);
 	storageOperations.isRunning.mockReturnValue(false);
 	new StorageIpc().register(
 		{
-			extensionRegistry: extensionRegistry as never,
+			appRegistry: appRegistry as never,
 			storageOperations: storageOperations as never,
 			windows: windows as never,
 		},
@@ -73,16 +73,16 @@ it('allows the app renderer to read storage sync settings', () => {
 	expect(handler(event)).toEqual({ paths: [] });
 });
 
-it('rejects cloud storage access from extension views', () => {
-	extensionRegistry.has.mockReturnValue(true);
+it('rejects cloud storage access from app views', () => {
+	appRegistry.has.mockReturnValue(true);
 	const query = registerQueryWithEvent.mock.calls.find(
 		([channel]) => channel === StorageChannels.getSettings
 	)?.[1];
 	const command = registerCommandWithEvent.mock.calls.find(
 		([channel]) => channel === StorageChannels.backup
 	)?.[1];
-	expect(() => query(event)).toThrow('unavailable to extension views');
-	expect(() => command(event)).toThrow('unavailable to extension views');
+	expect(() => query(event)).toThrow('unavailable to app views');
+	expect(() => command(event)).toThrow('unavailable to app views');
 });
 
 it('rejects untracked renderers', () => {

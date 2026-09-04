@@ -5,7 +5,7 @@
 	"files": [
 		"out/**",
 		"resources/**",
-		"!resources/extensions/**",
+		"!resources/apps/**",
 		"!resources/mcp/gmail-smtp/**",
 		"!resources/mcp/resend/**",
 		"!resources/skills/**",
@@ -94,7 +94,7 @@
 				"to": "resources",
 				"filter": [
 					"**/*",
-					"!extensions/**",
+					"!apps/**",
 					"!mcp/gmail-smtp/**",
 					"!mcp/resend/**",
 					"!skills/**",
@@ -148,7 +148,7 @@
 				"to": "resources",
 				"filter": [
 					"**/*",
-					"!extensions/**",
+					"!apps/**",
 					"!mcp/gmail-smtp/**",
 					"!mcp/resend/**",
 					"!skills/**",
@@ -206,7 +206,7 @@
 				"to": "resources",
 				"filter": [
 					"**/*",
-					"!extensions/**",
+					"!apps/**",
 					"!mcp/gmail-smtp/**",
 					"!mcp/resend/**",
 					"!skills/**",

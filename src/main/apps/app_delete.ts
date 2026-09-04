@@ -1,13 +1,13 @@
 import { rmSync } from 'node:fs';
 import path from 'node:path';
-import { isExtensionId } from './extension_id';
-import { extensionsRoot } from './extension_root';
+import { isAppId } from './app_id';
+import { appsRoot } from './app_root';
 
-export function deleteExtension(id: string, appLocation?: string): void {
-	const root = path.resolve(extensionsRoot(appLocation));
+export function deleteApp(id: string, appLocation?: string): void {
+	const root = path.resolve(appsRoot(appLocation));
 	const target = path.resolve(root, id);
-	if (!isExtensionId(id) || path.dirname(target) !== root) {
-		throw new Error('Invalid extension ID.');
+	if (!isAppId(id) || path.dirname(target) !== root) {
+		throw new Error('Invalid app ID.');
 	}
 	rmSync(target, { recursive: true, force: true });
 }

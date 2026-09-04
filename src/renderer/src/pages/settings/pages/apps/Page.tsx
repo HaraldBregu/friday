@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemTitle } from '@/components/ui/item';
-import type { Extension } from '../../../../../../shared/extension_types';
+import type { App } from '../../../../../../shared/installed_app_types';
 import Delete from './Delete';
 import {
 	SettingsEmptyState,
@@ -31,37 +31,37 @@ function getErrorMessage(error: unknown, fallback: string): string {
 	return fallback;
 }
 
-const ExtensionsPage: React.FC = () => {
+const AppsPage: React.FC = () => {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const [extensions, setExtensions] = useState<Extension[]>([]);
+	const [apps, setApps] = useState<App[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [importing, setImporting] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
 	const [successMessage, setSuccessMessage] = useState('');
 
-	const loadExtensions = useCallback(async (): Promise<void> => {
+	const loadApps = useCallback(async (): Promise<void> => {
 		setLoading(true);
 		setErrorMessage('');
 		try {
-			setExtensions(await window.extensions.list());
+			setApps(await window.apps.list());
 		} catch {
-			setErrorMessage(t('settings.extensions.loadError'));
+			setErrorMessage(t('settings.apps.loadError'));
 		} finally {
 			setLoading(false);
 		}
 	}, [t]);
 
 	useEffect(() => {
-		void loadExtensions();
-	}, [loadExtensions]);
+		void loadApps();
+	}, [loadApps]);
 
 	const handleOpenFolder = useCallback(async (): Promise<void> => {
 		setErrorMessage('');
 		try {
-			await window.extensions.openRoot();
+			await window.apps.openRoot();
 		} catch (error) {
-			setErrorMessage(getErrorMessage(error, t('settings.extensions.openFolderError')));
+			setErrorMessage(getErrorMessage(error, t('settings.apps.openFolderError')));
 		}
 	}, [t]);
 
@@ -70,33 +70,33 @@ const ExtensionsPage: React.FC = () => {
 		setErrorMessage('');
 		setSuccessMessage('');
 		try {
-			const result = await window.extensions.import();
+			const result = await window.apps.import();
 			if (result) {
 				setSuccessMessage(
-					t('settings.extensions.uploaded', {
+					t('settings.apps.uploaded', {
 						count: String(result.imported.length),
 						skipped: String(result.skipped.length),
 					})
 				);
-				await loadExtensions();
+				await loadApps();
 			}
 		} catch (error) {
-			setErrorMessage(getErrorMessage(error, t('settings.extensions.uploadError')));
+			setErrorMessage(getErrorMessage(error, t('settings.apps.uploadError')));
 		} finally {
 			setImporting(false);
 		}
-	}, [loadExtensions, t]);
+	}, [loadApps, t]);
 
-	const extensionPath = useCallback(
-		(extensionId: string): string => `/settings/extensions/${encodeURIComponent(extensionId)}`,
+	const appPath = useCallback(
+		(appId: string): string => `/settings/apps/${encodeURIComponent(appId)}`,
 		[]
 	);
 
 	return (
 		<SettingsPageShell>
 			<SettingsPageHeader
-				title={t('settings.tabs.extensions')}
-				description={t('settings.extensions.description')}
+				title={t('settings.tabs.apps')}
+				description={t('settings.apps.description')}
 				action={
 					<div className="flex flex-wrap items-center gap-2">
 						<Button
@@ -104,23 +104,23 @@ const ExtensionsPage: React.FC = () => {
 							size="icon-xs"
 							onClick={() => void handleOpenFolder()}
 							disabled={loading || importing}
-							aria-label={t('settings.extensions.openFolder')}
-							title={t('settings.extensions.openFolder')}
+							aria-label={t('settings.apps.openFolder')}
+							title={t('settings.apps.openFolder')}
 						>
 							<FolderOpen className="size-3" />
 						</Button>
 						<Button
 							variant="outline"
 							size="xs"
-							onClick={loadExtensions}
+							onClick={loadApps}
 							disabled={loading || importing}
 						>
 							<RefreshCw className="size-3" />
-							{t('settings.extensions.refresh')}
+							{t('settings.apps.refresh')}
 						</Button>
 						<Button size="xs" onClick={() => void handleImport()} disabled={loading || importing}>
 							<Upload className="size-3" />
-							{importing ? t('settings.extensions.uploading') : t('settings.extensions.upload')}
+							{importing ? t('settings.apps.uploading') : t('settings.apps.upload')}
 						</Button>
 					</div>
 				}
@@ -134,20 +134,20 @@ const ExtensionsPage: React.FC = () => {
 
 			{successMessage && <SettingsNotice>{successMessage}</SettingsNotice>}
 
-			<SettingsSection title={t('settings.extensions.title')}>
+			<SettingsSection title={t('settings.apps.title')}>
 				<SettingsPanel>
 					{loading ? (
 						<SettingsLoadingRows rows={2} />
-					) : extensions.length === 0 ? (
+					) : apps.length === 0 ? (
 						<SettingsEmptyState
 							icon={Blocks}
-							title={t('settings.extensions.empty')}
-							description={t('settings.extensions.emptyDescription')}
+							title={t('settings.apps.empty')}
+							description={t('settings.apps.emptyDescription')}
 						/>
 					) : (
-						extensions.map((extension) => (
+						apps.map((app) => (
 							<div
-								key={extension.id}
+								key={app.id}
 								className="flex items-center border-b border-border/60 hover:bg-muted/40 last:border-b-0"
 							>
 								<Item
@@ -156,27 +156,27 @@ const ExtensionsPage: React.FC = () => {
 									variant="outline"
 									size="md"
 									className="min-w-0 flex-1 cursor-pointer pr-2 text-left"
-									onClick={() => navigate(extensionPath(extension.id))}
+									onClick={() => navigate(appPath(app.id))}
 								>
 									<ItemContent className="min-w-0 flex-1 flex-col items-start gap-1">
-										<ItemTitle className="max-w-full truncate">{extension.title}</ItemTitle>
+										<ItemTitle className="max-w-full truncate">{app.title}</ItemTitle>
 										<p className="line-clamp-2 max-w-full text-[11px] leading-4 text-muted-foreground">
-											{extension.description}
+											{app.description}
 										</p>
 									</ItemContent>
 									<ItemActions className="ml-auto flex-none items-center justify-end gap-2">
 										<Badge variant="secondary" className="text-[10px] leading-none">
-											{extension.metadata.category}
+											{app.metadata.category}
 										</Badge>
 										<ChevronRight className="size-3.5 text-muted-foreground" strokeWidth={1.8} />
 									</ItemActions>
 								</Item>
 								<Delete
-									extension={extension}
+									app={app}
 									disabled={loading || importing}
-									onDeleted={(extensionId) => {
-										setExtensions((current) =>
-											current.filter(({ id }) => id !== extensionId)
+									onDeleted={(appId) => {
+										setApps((current) =>
+											current.filter(({ id }) => id !== appId)
 										);
 									}}
 									onError={setErrorMessage}
@@ -190,4 +190,4 @@ const ExtensionsPage: React.FC = () => {
 	);
 };
 
-export default ExtensionsPage;
+export default AppsPage;

@@ -3,7 +3,7 @@ import { AgentChannels, AppChannels } from '../../src/shared/ipc_channels_defini
 import type { AgentApi, AppApi } from '../../src/shared/api_types';
 import type { ChannelStatusEvent } from '../../src/shared/channels_types';
 import type { AppThemeData } from '../../src/shared/app_types';
-import type { ExtensionStorageApi } from '../../src/shared/extension_store_types';
+import type { AppStorageApi } from '../../src/shared/app_store_types';
 import type { WorkspaceChangeEvent } from '../../src/shared/agent_types';
 
 export type WorkspaceAgentApi = Pick<
@@ -23,21 +23,21 @@ export type WorkspaceAgentApi = Pick<
 	| 'deleteWorkspaceDirectory'
 >;
 
-const extensionStoreAppMethods = {
-	getExtensionStoreValue: true,
-	setExtensionStoreValue: true,
-	deleteExtensionStoreValue: true,
-	readExtensionStoreFile: true,
-	writeExtensionStoreFile: true,
-	deleteExtensionStoreFile: true,
-} satisfies Record<keyof ExtensionStorageApi, true>;
+const appStoreAppMethods = {
+	getAppStoreValue: true,
+	setAppStoreValue: true,
+	deleteAppStoreValue: true,
+	readAppStoreFile: true,
+	writeAppStoreFile: true,
+	deleteAppStoreFile: true,
+} satisfies Record<keyof AppStorageApi, true>;
 
-type ExtensionStoreAppMethod = keyof typeof extensionStoreAppMethods;
-export type RemoteAppApi = Omit<AppApi, ExtensionStoreAppMethod>;
+type AppStoreAppMethod = keyof typeof appStoreAppMethods;
+export type RemoteAppApi = Omit<AppApi, AppStoreAppMethod>;
 
 const RemoteAppChannels = Object.fromEntries(
-	Object.entries(AppChannels).filter(([method]) => !Object.hasOwn(extensionStoreAppMethods, method))
-) as Omit<typeof AppChannels, ExtensionStoreAppMethod>;
+	Object.entries(AppChannels).filter(([method]) => !Object.hasOwn(appStoreAppMethods, method))
+) as Omit<typeof AppChannels, AppStoreAppMethod>;
 
 export interface ConnectOptions {
 	/** Base URL of the Kucedr API. Defaults to `http://127.0.0.1:8765`. */

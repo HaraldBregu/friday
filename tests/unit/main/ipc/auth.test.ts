@@ -29,7 +29,7 @@ const auth = {
 	onStateChanged: jest.fn(() => jest.fn()),
 };
 const windows = { has: jest.fn(() => true) };
-const extensions = { has: jest.fn(() => false) };
+const apps = { has: jest.fn(() => false) };
 const sender = { id: 1, mainFrame: {} };
 const event = { sender, senderFrame: sender.mainFrame };
 
@@ -44,10 +44,10 @@ function command(channel: string): (...args: unknown[]) => unknown {
 beforeEach(() => {
 	jest.clearAllMocks();
 	windows.has.mockReturnValue(true);
-	extensions.has.mockReturnValue(false);
+	apps.has.mockReturnValue(false);
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 7, webContents: sender });
 	new AuthIpc().register(
-		{ auth: auth as never, windows: windows as never, extensions: extensions as never },
+		{ auth: auth as never, windows: windows as never, apps: apps as never },
 		{} as never
 	);
 });
@@ -139,10 +139,10 @@ it('rejects child-frame callers before invoking auth', () => {
 	expect(auth.getState).not.toHaveBeenCalled();
 });
 
-it('rejects unregistered and extension renderers', () => {
+it('rejects unregistered and app renderers', () => {
 	windows.has.mockReturnValue(false);
 	expect(() => query(AuthChannels.getState)(event)).toThrow('unavailable to this renderer');
-	extensions.has.mockReturnValue(true);
-	expect(() => query(AuthChannels.getState)(event)).toThrow('unavailable to extension views');
+	apps.has.mockReturnValue(true);
+	expect(() => query(AuthChannels.getState)(event)).toThrow('unavailable to app views');
 	expect(auth.getState).not.toHaveBeenCalled();
 });

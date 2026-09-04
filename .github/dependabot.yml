@@ -14,25 +14,25 @@ updates:
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /resources/extensions/architect
+    directory: /resources/apps/architect
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /resources/extensions/coder
+    directory: /resources/apps/coder
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /resources/extensions/videomaker
+    directory: /resources/apps/videomaker
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
-    directory: /resources/extensions/workspace
+    directory: /resources/apps/workspace
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

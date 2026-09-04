@@ -63,7 +63,7 @@ export const protocol = {
 	registerSchemesAsPrivileged: jest.fn(),
 };
 
-const extensionSession = {
+const appSession = {
 	protocol: { handle: jest.fn() },
 	setPermissionCheckHandler: jest.fn(),
 	setPermissionRequestHandler: jest.fn(),
@@ -76,7 +76,7 @@ export const session = {
 		setPermissionRequestHandler: jest.fn(),
 		setDisplayMediaRequestHandler: jest.fn(),
 	},
-	fromPartition: jest.fn(() => extensionSession),
+	fromPartition: jest.fn(() => appSession),
 };
 
 export const net = {

@@ -1,21 +1,21 @@
 import { typedInvokeUnwrap } from '../shared/ipc_types';
-import { ExtensionChannels } from '../shared/ipc_channels_definitions';
-import type { ExtensionsApi } from './index.d';
+import { AppChannels } from '../shared/ipc_channels_definitions';
+import type { AppsApi } from './index.d';
 
-export const extensions: ExtensionsApi = {
+export const apps: AppsApi = {
 	list: () => {
-		return typedInvokeUnwrap(ExtensionChannels.list);
+		return typedInvokeUnwrap(AppChannels.list);
 	},
-	open: (extensionId) => {
-		return typedInvokeUnwrap(ExtensionChannels.open, extensionId);
+	open: (appId) => {
+		return typedInvokeUnwrap(AppChannels.open, appId);
 	},
 	openRoot: () => {
-		return typedInvokeUnwrap(ExtensionChannels.openRoot);
+		return typedInvokeUnwrap(AppChannels.openRoot);
 	},
-	delete: (extensionId) => {
-		return typedInvokeUnwrap(ExtensionChannels.delete, extensionId);
+	delete: (appId) => {
+		return typedInvokeUnwrap(AppChannels.delete, appId);
 	},
 	import: () => {
-		return typedInvokeUnwrap(ExtensionChannels.import);
+		return typedInvokeUnwrap(AppChannels.import);
 	},
 };

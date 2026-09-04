@@ -1,82 +1,82 @@
 import { dialog } from 'electron';
 import type { EventBus } from '../event_bus';
 import type { WindowFactory } from '../window_factory';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import {
-	deleteExtension,
-	destroyExtension,
-	importExtensions,
-	listExtensions,
-	loadExtension,
+	deleteApp,
+	destroyApp,
+	importApps,
+	listApps,
+	loadApp,
 	openRoot,
-} from '../extensions/extension_index';
-import { ExtensionChannels } from '../../shared/ipc_channels_definitions';
-import type { ExtensionImportResult } from '../../shared/extension_types';
+} from '../apps/app_index';
+import { AppChannels } from '../../shared/ipc_channels_definitions';
+import type { AppImportResult } from '../../shared/installed_app_types';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 
-export interface ExtensionsIpcDeps {
+export interface AppsIpcDeps {
 	windowFactory: WindowFactory;
-	extensionRegistry: ExtensionRegistry;
+	appRegistry: AppRegistry;
 	windows: WindowContextManager;
 }
 
-export class ExtensionsIpc implements IpcModule<ExtensionsIpcDeps> {
-	readonly name = 'extensions';
+export class AppsIpc implements IpcModule<AppsIpcDeps> {
+	readonly name = 'apps';
 
 	register(
-		{ windowFactory, extensionRegistry, windows }: ExtensionsIpcDeps,
+		{ windowFactory, appRegistry, windows }: AppsIpcDeps,
 		_eventBus: EventBus
 	): void {
-		const trusted = new TrustedRenderer(windows, extensionRegistry);
-		registerQueryWithEvent(ExtensionChannels.list, (event) => {
+		const trusted = new TrustedRenderer(windows, appRegistry);
+		registerQueryWithEvent(AppChannels.list, (event) => {
 			trusted.assert(event);
-			return listExtensions();
+			return listApps();
 		});
-		registerCommandWithEvent(ExtensionChannels.open, (event, extensionId: string) => {
+		registerCommandWithEvent(AppChannels.open, (event, appId: string) => {
 			trusted.assert(event);
-			const extension = listExtensions().find((item) => item.id === extensionId);
-			if (!extension) throw new Error(`Extension not found: ${extensionId}`);
-			loadExtension(windowFactory, extension);
+			const app = listApps().find((item) => item.id === appId);
+			if (!app) throw new Error(`App not found: ${appId}`);
+			loadApp(windowFactory, app);
 		});
-		registerCommandWithEvent(ExtensionChannels.openRoot, (event) => {
+		registerCommandWithEvent(AppChannels.openRoot, (event) => {
 			trusted.assert(event);
 			return openRoot();
 		});
-		registerCommandWithEvent(ExtensionChannels.delete, async (event, extensionId) => {
+		registerCommandWithEvent(AppChannels.delete, async (event, appId) => {
 			const window = trusted.assert(event);
-			const extension = listExtensions().find((item) => item.id === extensionId);
-			if (!extension) throw new Error(`Extension not found: ${extensionId}`);
+			const app = listApps().find((item) => item.id === appId);
+			if (!app) throw new Error(`App not found: ${appId}`);
 			const options = {
 				type: 'warning' as const,
-				title: 'Delete Extension',
-				buttons: ['Cancel', 'Delete Extension'],
+				title: 'Delete App',
+				buttons: ['Cancel', 'Delete App'],
 				cancelId: 0,
 				defaultId: 0,
 				noLink: true,
-				message: `Delete “${extension.title}”?`,
-				detail: 'This permanently deletes the extension from Kucedr. This action cannot be undone.',
+				message: `Delete “${app.title}”?`,
+				detail: 'This permanently deletes the app from Kucedr. This action cannot be undone.',
 			};
 			const result = await dialog.showMessageBox(window, options);
 			if (result.response !== 1) return false;
-			destroyExtension(extensionId);
-			extensionRegistry.revoke(extensionId);
-			deleteExtension(extensionId);
+			destroyApp(appId);
+			appRegistry.revoke(appId);
+			deleteApp(appId);
 			return true;
 		});
 		registerCommandWithEvent(
-			ExtensionChannels.import,
-			async (event): Promise<ExtensionImportResult | undefined> => {
+			AppChannels.import,
+			async (event): Promise<AppImportResult | undefined> => {
 				const window = trusted.assert(event);
 				const result = await dialog.showOpenDialog(window, {
-					title: 'Select extension folder(s)',
+					title: 'Select app folder(s)',
 					properties: ['openDirectory', 'multiSelections'],
 				});
 
 				if (result.canceled || result.filePaths.length === 0) return undefined;
-				return importExtensions(result.filePaths);
+				return importApps(result.filePaths);
 			}
 		);
 	}

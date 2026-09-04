@@ -2,7 +2,7 @@
 
 Build a polished, responsive product landing page for **Kucedr**, a cross-platform desktop AI copilot that turns conversations into actions and turns useful work into reusable knowledge.
 
-This document is the source prompt for the page. Use the approved positioning and copy below. Keep every product claim consistent with the current implementation, especially the distinctions between Skills, the Knowledge Base, the LLM Wiki, and Extensions.
+This document is the source prompt for the page. Use the approved positioning and copy below. Keep every product claim consistent with the current implementation, especially the distinctions between Skills, the Knowledge Base, the LLM Wiki, and Apps.
 
 ## Page objective
 
@@ -10,7 +10,7 @@ The page should help a technically curious knowledge worker, developer, research
 
 1. Kucedr is a desktop agent that can act, not just chat.
 2. Kucedr can reuse workflows and ground answers in the user's own material.
-3. The user chooses the providers, knowledge sources, and extensions behind the experience.
+3. The user chooses the providers, knowledge sources, and apps behind the experience.
 
 The primary conversion is downloading Kucedr. The secondary conversion is viewing the project on GitHub. Documentation is the tertiary path.
 
@@ -37,7 +37,7 @@ Ask Kucedr to do the work
   -> activate the right reusable Skill
   -> retrieve evidence from the Knowledge Base
   -> build on durable knowledge in the LLM Wiki
-  -> use focused Extensions when the workflow needs a dedicated interface
+  -> use focused Apps when the workflow needs a dedicated interface
 ```
 
 Use the user-facing name **RAG** in application navigation. Marketing copy may introduce it as the semantic Knowledge Base for less technical readers. Keep **LLM Wiki** as the feature name.
@@ -49,7 +49,7 @@ Use the user-facing name **RAG** in application navigation. Marketing copy may i
 Use a compact sticky navigation bar.
 
 - Kucedr logo and wordmark on the left.
-- Anchor links: **Product**, **Skills**, **Knowledge**, **Extensions**, **Control**.
+- Anchor links: **Product**, **Skills**, **Knowledge**, **Apps**, **Control**.
 - Secondary action: **GitHub**.
 - Primary action: **Download**.
 
@@ -72,7 +72,7 @@ Turn conversations into action. Turn your work into lasting knowledge.
 **Supporting copy**
 
 ```text
-Kucedr works with your files, tools, and chosen AI providers—then makes the useful parts reusable through Skills, semantic document search, a source-aware LLM Wiki, and custom Extensions.
+Kucedr works with your files, tools, and chosen AI providers—then makes the useful parts reusable through Skills, semantic document search, a source-aware LLM Wiki, and custom Apps.
 ```
 
 **Actions**
@@ -91,7 +91,7 @@ Show four concise capability labels near the hero visual:
 - Reusable Skills
 - Semantic Knowledge Base
 - Source-aware LLM Wiki
-- Custom Extensions
+- Custom Apps
 
 The hero visual should look like the real Kucedr desktop application, not a generic browser chat mockup. Show one request moving through visible activity states such as loading a skill, searching knowledge, reading a wiki page, and updating a local file. Do not invent a marketplace, team workspace, or autonomous background task result.
 
@@ -114,7 +114,7 @@ Present a short four-step flow:
 1. **Ask** — Start with a natural-language request and the context that matters.
 2. **Act** — Kucedr selects tools, works through the task, and shows its activity.
 3. **Ground** — The assistant retrieves relevant source excerpts or compiled wiki knowledge.
-4. **Reuse** — Save the workflow as a Skill or give it a focused interface through an Extension.
+4. **Reuse** — Save the workflow as a Skill or give it a focused interface through an App.
 
 Use this section as context, not as a complete inventory of every Kucedr feature.
 
@@ -247,9 +247,9 @@ Preserve this distinction in both copy and visuals:
 | Result        | Ranked excerpts with paths and scores        | Interlinked pages with source-aware claims            |
 | Refresh model | Manual or scheduled full rebuild             | Incremental source-aware compilation                  |
 
-### 6. Extensions
+### 6. Apps
 
-Set the section anchor to `extensions`.
+Set the section anchor to `apps`.
 
 **Eyebrow**
 
@@ -266,25 +266,25 @@ Make Kucedr fit the workflow.
 **Body copy**
 
 ```text
-Extensions are local web mini-apps that open in their own Kucedr windows and can use the exposed app API. Build a focused interface for a dashboard, workspace utility, or repeatable workflow without turning the main conversation into a control panel.
+Apps are local web mini-apps that open in their own Kucedr windows and can use the exposed app API. Build a focused interface for a dashboard, workspace utility, or repeatable workflow without turning the main conversation into a control panel.
 ```
 
 **Feature points**
 
-- Import one or more extension folders from Settings.
+- Import one or more app folders from Settings.
 - Use a validated `manifest.json` or standard `package.json` with a local HTML entry.
 - Browse installed apps by title, description, and category.
-- Inspect metadata, open an extension in a dedicated resizable window, or delete it with confirmation.
-- Launch installed extensions from Settings, the native app menu, or the tray menu.
+- Inspect metadata, open an app in a dedicated resizable window, or delete it with confirmation.
+- Launch installed apps from Settings, the native app menu, or the tray menu.
 - Build typed in-app integrations with `@kucedr/sdk`.
 
 **Trust note**
 
 ```text
-Extensions run in Electron's sandboxed web runtime, but installed code can access broad Kucedr APIs. Install extensions only from sources you trust.
+Apps run in Electron's sandboxed web runtime, but installed code can access broad Kucedr APIs. Install apps only from sources you trust.
 ```
 
-For the visual, show the installed Extensions list opening a separate utility window. Do not claim an extension marketplace, signed extensions, per-extension permissions, enable/disable controls, or hot reload of an already-open extension window.
+For the visual, show the installed Apps list opening a separate utility window. Do not claim an app marketplace, signed apps, per-app permissions, enable/disable controls, or hot reload of an already-open app window.
 
 ### 7. Control and privacy
 
@@ -299,7 +299,7 @@ Your setup. Your providers. Your control.
 **Body copy**
 
 ```text
-Kucedr stores provider keys, settings, conversations, workspace data, Skills, Extensions, and generated wiki files on the user's machine. The user selects the providers and connected services behind chat, speech, media, search, embeddings, and knowledge generation.
+Kucedr stores provider keys, settings, conversations, workspace data, Skills, Apps, and generated wiki files on the user's machine. The user selects the providers and connected services behind chat, speech, media, search, embeddings, and knowledge generation.
 ```
 
 **Control points**
@@ -329,7 +329,7 @@ Build an assistant around the way you work.
 **Supporting copy**
 
 ```text
-Start with a conversation. Add the skills, knowledge, providers, and extensions that make Kucedr yours.
+Start with a conversation. Add the skills, knowledge, providers, and apps that make Kucedr yours.
 ```
 
 **Actions**
@@ -352,7 +352,7 @@ Use Kucedr's existing product identity rather than generic AI imagery.
 - Carry the mark's crisp monochrome contrast into focus rings, active paths, and restrained graphic details.
 - Mirror the desktop application's clean borders, compact controls, calm spacing, and rounded panels.
 - Use motion and contrast to signal intelligence moving through the system; do not cover every card in gradients or glass effects.
-- Prefer real product UI compositions, source-page diagrams, file cards, tool activity, and extension windows over abstract brains, robots, stock photos, or floating chat bubbles.
+- Prefer real product UI compositions, source-page diagrams, file cards, tool activity, and app windows over abstract brains, robots, stock photos, or floating chat bubbles.
 - Use a modern sans-serif for interface and marketing copy and a restrained monospace for paths, commands, evidence IDs, and technical labels.
 
 The page should feel capable, precise, and personal. Avoid a noisy cyberpunk aesthetic.
@@ -371,7 +371,7 @@ The page should feel capable, precise, and personal. Avoid a noisy cyberpunk aes
 - Preserve the content order and messaging hierarchy on mobile.
 - Meet WCAG AA contrast for text, controls, focus indicators, and links.
 - Make navigation, menus, and calls to action fully keyboard accessible.
-- Do not rely on color alone to distinguish Skills, Knowledge Base, LLM Wiki, and Extensions.
+- Do not rely on color alone to distinguish Skills, Knowledge Base, LLM Wiki, and Apps.
 - Give product images meaningful alternative text; mark decorative glow and connector elements as decorative.
 - Keep paragraph width readable and avoid horizontal scrolling at 320 CSS pixels.
 
@@ -386,7 +386,7 @@ Kucedr — Desktop AI that turns knowledge into action
 **Description**
 
 ```text
-Kucedr is a cross-platform desktop AI copilot with reusable Skills, a source-aware LLM Wiki, semantic document search, and custom Extensions.
+Kucedr is a cross-platform desktop AI copilot with reusable Skills, a source-aware LLM Wiki, semantic document search, and custom Apps.
 ```
 
 Use the same core message for Open Graph and social metadata. Use the Kucedr icon or a product-composition image, not a fabricated customer or performance statistic.
@@ -401,10 +401,10 @@ The finished page must not imply capabilities that are only planned, partial, or
 - Do not claim arbitrary vector-database support; the current runtime uses Pinecone.
 - Do not present the LLM Wiki as semantic vector search or as a replacement for the Knowledge Base.
 - Do not claim that wiki answers are automatically filed by default.
-- Do not claim a Skills or Extensions marketplace.
+- Do not claim a Skills or Apps marketplace.
 - Do not claim that every Skill metadata declaration is enforced at runtime.
-- Do not claim that Extensions are signed, verified, permission-isolated, or safe to install from untrusted sources.
-- Do not advertise extension hot reload, enable/disable controls, or preinstalled example extensions.
+- Do not claim that Apps are signed, verified, permission-isolated, or safe to install from untrusted sources.
+- Do not advertise app hot reload, enable/disable controls, or preinstalled example apps.
 - Do not market incomplete scheduled-agent execution or database features on this page.
 - Do not invent download counts, supported-company logos, benchmarks, customer quotes, or awards.
 
@@ -413,7 +413,7 @@ The finished page must not imply capabilities that are only planned, partial, or
 The landing page is complete when:
 
 - The hero explains Kucedr's category, action capability, and knowledge advantage without scrolling.
-- Skills, Knowledge Base, LLM Wiki, and Extensions each receive a distinct, implementation-accurate explanation.
+- Skills, Knowledge Base, LLM Wiki, and Apps each receive a distinct, implementation-accurate explanation.
 - The relationship between retrieval and compiled wiki knowledge is visually and verbally clear.
 - The privacy section distinguishes local storage from processing by configured external services.
 - Primary and secondary calls to action are visible in the hero and final section.
@@ -432,7 +432,7 @@ Use these repository sources to validate final copy and product visuals:
 - [RAG settings](../src/renderer/src/pages/settings/pages/rag/Page.tsx)
 - [Knowledge search tool](../src/main/agent/tools/knowledge/rag.ts)
 - [LLM Wiki settings](../src/renderer/src/pages/settings/pages/wiki/Page.tsx)
-- [Extensions settings](../src/renderer/src/pages/settings/pages/extensions/Page.tsx)
-- [Extension window](../src/main/extensions/extension_render.ts)
+- [Apps settings](../src/renderer/src/pages/settings/pages/apps/Page.tsx)
+- [App window](../src/main/apps/app_render.ts)
 - [Kucedr SDK](../packages/sdk/README.md)
 - [Brand mark](../resources/icons/icon.svg)

@@ -2,12 +2,12 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import fs from 'node:fs/promises';
 import { app, BrowserWindow, desktopCapturer, net, protocol, session } from 'electron';
-import { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
-import { extensionsRoot } from '../../../../src/main/extensions/extension_root';
+import { AppRegistry } from '../../../../src/main/apps/app_registry';
+import { appsRoot } from '../../../../src/main/apps/app_root';
 import {
-	EXTENSION_RESOURCE_SCHEME,
-	EXTENSION_SESSION_PARTITION,
-	extensionResourceUrl,
+	APP_RESOURCE_SCHEME,
+	APP_SESSION_PARTITION,
+	appResourceUrl,
 	registerLocalResourceProtocolHandler,
 	registerLocalResourceProtocolScheme,
 	setupMediaPermissionHandlers,
@@ -23,31 +23,31 @@ describe('protocol security', () => {
 		jest.restoreAllMocks();
 	});
 
-	it('denies absolute local files to extension sessions', async () => {
+	it('denies absolute local files to app sessions', async () => {
 		jest.mocked(net.fetch).mockResolvedValue(new Response('ok'));
 		registerLocalResourceProtocolHandler({ error: jest.fn() });
 
 		const mainHandler = jest.mocked(protocol.handle).mock.calls[0][1] as (
 			request: Request
 		) => Promise<Response>;
-		const extension = jest.mocked(session.fromPartition).mock.results[0].value as Electron.Session;
-		const extensionHandler = jest.mocked(extension.protocol.handle).mock.calls[0][1] as (
+		const app = jest.mocked(session.fromPartition).mock.results[0].value as Electron.Session;
+		const appHandler = jest.mocked(app.protocol.handle).mock.calls[0][1] as (
 			request: Request
 		) => Promise<Response>;
 		const privatePath = '/tmp/kucedr-private.txt';
 		const request = new Request(`local-resource://file${privatePath}`);
 
-		await expect(extensionHandler(request)).resolves.toMatchObject({ status: 403 });
+		await expect(appHandler(request)).resolves.toMatchObject({ status: 403 });
 		expect(net.fetch).not.toHaveBeenCalled();
 
 		await mainHandler(request);
 		expect(net.fetch).toHaveBeenCalledWith(pathToFileURL(privatePath).toString(), {
 			headers: request.headers,
 		});
-		expect(session.fromPartition).toHaveBeenCalledWith(EXTENSION_SESSION_PARTITION);
+		expect(session.fromPartition).toHaveBeenCalledWith(APP_SESSION_PARTITION);
 	});
 
-	it('serves extension resources only from the selected extension folder', async () => {
+	it('serves app resources only from the selected app folder', async () => {
 		jest.mocked(net.fetch).mockResolvedValue(new Response('ok'));
 		registerLocalResourceProtocolScheme();
 		registerLocalResourceProtocolHandler({ error: jest.fn() });
@@ -55,41 +55,41 @@ describe('protocol security', () => {
 		expect(protocol.registerSchemesAsPrivileged).toHaveBeenCalledWith(
 			expect.arrayContaining([
 				expect.objectContaining({
-					scheme: EXTENSION_RESOURCE_SCHEME,
+					scheme: APP_RESOURCE_SCHEME,
 					privileges: expect.objectContaining({ secure: true, standard: true }),
 				}),
 			])
 		);
-		const extension = jest.mocked(session.fromPartition).mock.results[0].value as Electron.Session;
-		const extensionHandler = jest
-			.mocked(extension.protocol.handle)
-			.mock.calls.find(([scheme]) => scheme === EXTENSION_RESOURCE_SCHEME)?.[1] as (
+		const app = jest.mocked(session.fromPartition).mock.results[0].value as Electron.Session;
+		const appHandler = jest
+			.mocked(app.protocol.handle)
+			.mock.calls.find(([scheme]) => scheme === APP_RESOURCE_SCHEME)?.[1] as (
 			request: Request
 		) => Promise<Response>;
-		const entry = path.join(extensionsRoot(), 'draw', 'index.html');
-		const request = new Request(extensionResourceUrl(entry, 'draw'));
+		const entry = path.join(appsRoot(), 'draw', 'index.html');
+		const request = new Request(appResourceUrl(entry, 'draw'));
 
-		await expect(extensionHandler(request)).resolves.toMatchObject({ status: 200 });
+		await expect(appHandler(request)).resolves.toMatchObject({ status: 200 });
 		expect(net.fetch).toHaveBeenCalledWith(pathToFileURL(entry).toString(), {
 			headers: request.headers,
 		});
 		await expect(
-			extensionHandler(new Request(`${EXTENSION_RESOURCE_SCHEME}://draw/..%2F..%2Fprivate.txt`))
+			appHandler(new Request(`${APP_RESOURCE_SCHEME}://draw/..%2F..%2Fprivate.txt`))
 		).resolves.toMatchObject({ status: 403 });
 		expect(net.fetch).toHaveBeenCalledTimes(1);
 	});
 
-	it('keeps sensitive read and capture permissions out of extension views', async () => {
-		const extensionRegistry = new ExtensionRegistry();
-		const extensionContents = { id: 7, once: jest.fn() };
-		extensionRegistry.register(extensionContents, 'workspace');
+	it('keeps sensitive read and capture permissions out of app views', async () => {
+		const appRegistry = new AppRegistry();
+		const appContents = { id: 7, once: jest.fn() };
+		appRegistry.register(appContents, 'workspace');
 		const mainContents = { id: 8 };
 		jest
 			.mocked(BrowserWindow.fromWebContents)
 			.mockImplementation((contents) =>
 				contents === mainContents ? ({} as Electron.BrowserWindow) : null
 			);
-		setupMediaPermissionHandlers(extensionRegistry);
+		setupMediaPermissionHandlers(appRegistry);
 
 		const defaultSession = session.defaultSession;
 		const check = jest.mocked(defaultSession.setPermissionCheckHandler).mock.calls[0][0];
@@ -104,17 +104,17 @@ describe('protocol security', () => {
 		} as Electron.PermissionCheckHandlerHandlerDetails;
 
 		expect(
-			check(extensionContents as Electron.WebContents, 'clipboard-read', 'file://', details)
+			check(appContents as Electron.WebContents, 'clipboard-read', 'file://', details)
 		).toBe(false);
 		expect(
 			check(
-				extensionContents as Electron.WebContents,
+				appContents as Electron.WebContents,
 				'clipboard-sanitized-write',
 				'file://',
 				details
 			)
 		).toBe(true);
-		expect(check(extensionContents as Electron.WebContents, 'media', 'file://', details)).toBe(
+		expect(check(appContents as Electron.WebContents, 'media', 'file://', details)).toBe(
 			false
 		);
 		expect(check(mainContents as Electron.WebContents, 'media', 'file://', details)).toBe(true);
@@ -122,7 +122,7 @@ describe('protocol security', () => {
 		const display = jest.mocked(defaultSession.setDisplayMediaRequestHandler).mock.calls[0][0];
 		const denied = jest.fn();
 		display(
-			{ frame: { url: pathToFileURL('/tmp/extension/index.html').toString() } } as never,
+			{ frame: { url: pathToFileURL('/tmp/app/index.html').toString() } } as never,
 			denied
 		);
 		expect(denied).toHaveBeenCalledWith({});

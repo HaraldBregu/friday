@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
-import type { ExtensionTitlebarButton as ExtensionTitlebarButtonDescriptor } from '../../../../../shared/window_types';
-import { ExtensionTitlebarIcon } from './ExtensionTitlebarIcon';
+import type { AppTitlebarButton as AppTitlebarButtonDescriptor } from '../../../../../shared/window_types';
+import { AppTitlebarIcon } from './AppTitlebarIcon';
 
-export function ExtensionTitlebarButton({
+export function AppTitlebarButton({
 	button,
 }: {
-	button: ExtensionTitlebarButtonDescriptor;
+	button: AppTitlebarButtonDescriptor;
 }): React.JSX.Element {
 	return (
 		<Button
@@ -21,7 +21,7 @@ export function ExtensionTitlebarButton({
 			disabled={button.disabled}
 			onClick={() => window.win.clickTitlebarButton(button.id)}
 		>
-			<ExtensionTitlebarIcon icon={button.icon} />
+			<AppTitlebarIcon icon={button.icon} />
 		</Button>
 	);
 }

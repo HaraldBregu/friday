@@ -22,7 +22,7 @@ export function useSettingsBreadcrumbItems(): readonly SettingsBreadcrumbItem[] 
 	const { t } = useTranslation();
 	const location = useLocation();
 	const mcpDetailMatch = useMatch('/settings/providers/mcp/:mcpServerId');
-	const extensionDetailMatch = useMatch('/settings/extensions/:extensionId');
+	const appDetailMatch = useMatch('/settings/apps/:appId');
 
 	if (location.pathname === '/settings') return [];
 	if (location.pathname === '/settings/general/persona') {
@@ -70,10 +70,10 @@ export function useSettingsBreadcrumbItems(): readonly SettingsBreadcrumbItem[] 
 		];
 	}
 
-	if (extensionDetailMatch) {
+	if (appDetailMatch) {
 		return [
-			{ label: t('settings.tabs.extensions'), path: '/settings/extensions' },
-			{ label: extensionDetailMatch.params.extensionId ?? '' },
+			{ label: t('settings.tabs.apps'), path: '/settings/apps' },
+			{ label: appDetailMatch.params.appId ?? '' },
 		];
 	}
 

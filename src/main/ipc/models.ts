@@ -1,7 +1,7 @@
 import type { IpcModule } from './core/module';
 import { TrustedRenderer } from './core/trusted';
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import {
 	EmbeddingChannels,
@@ -37,14 +37,14 @@ import { getRealtimeVoiceSetup, setRealtimeVoiceSetup } from '../agent/realtime_
 
 export interface ModelsIpcDependencies {
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class ModelsIpc implements IpcModule<ModelsIpcDependencies> {
 	readonly name = 'models';
 
-	register({ windows, extensions }: ModelsIpcDependencies, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ windows, apps }: ModelsIpcDependencies, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		trusted.command(EmbeddingChannels.createEmbedding, (request) =>
 			embedding.createEmbedding(request)
 		);

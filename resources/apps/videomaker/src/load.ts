@@ -6,7 +6,7 @@ import type { Project } from './types';
 
 export async function loadProject(): Promise<Project> {
 	const stored = isKucedr()
-		? await app.getExtensionStoreValue('project-v1')
+		? await app.getAppStoreValue('project-v1')
 		: JSON.parse(localStorage.getItem('kucedr-videomaker-project-v1') ?? 'null');
 	if (!stored || typeof stored !== 'object' || !Array.isArray((stored as Project).clips)) {
 		return defaultProject;

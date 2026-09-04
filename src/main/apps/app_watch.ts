@@ -1,16 +1,16 @@
 import { watch } from 'chokidar';
-import { extensionsRoot } from './extension_root';
+import { appsRoot } from './app_root';
 
 const updateDelay = 150;
 
-export function watchExtensions(
+export function watchApps(
 	onChange: () => void,
 	onError: (error: unknown) => void,
 	appLocation?: string
 ): () => Promise<void> {
 	let updateTimer: ReturnType<typeof setTimeout> | undefined;
 	let stopped = false;
-	const watcher = watch(extensionsRoot(appLocation), {
+	const watcher = watch(appsRoot(appLocation), {
 		ignoreInitial: true,
 		followSymlinks: false,
 		awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 25 },

@@ -1,9 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { app, coder as coderApi } from '@kucedr/sdk';
-import { useCoderWorkspace } from '../../../resources/extensions/coder/src/hooks/workspace';
-import { useConfiguration } from '../../../resources/extensions/coder/src/hooks/configuration';
-import { useProjectInstructions } from '../../../resources/extensions/coder/src/hooks/instructions';
-import { canLeaveInstructions } from '../../../resources/extensions/coder/src/navigation';
+import { useCoderWorkspace } from '../../../resources/apps/coder/src/hooks/workspace';
+import { useConfiguration } from '../../../resources/apps/coder/src/hooks/configuration';
+import { useProjectInstructions } from '../../../resources/apps/coder/src/hooks/instructions';
+import { canLeaveInstructions } from '../../../resources/apps/coder/src/navigation';
 
 jest.mock(
 	'@kucedr/sdk',

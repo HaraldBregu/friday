@@ -1,6 +1,6 @@
-import { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
+import { AppRegistry } from '../../../../src/main/apps/app_registry';
 
-describe('extension registry', () => {
+describe('app registry', () => {
 	function webContents(id: number) {
 		const handlers = new Map<string, () => void>();
 		return {
@@ -12,36 +12,36 @@ describe('extension registry', () => {
 		};
 	}
 
-	it('resolves registered extension views and removes crashed views', () => {
-		const registry = new ExtensionRegistry();
+	it('resolves registered app views and removes crashed views', () => {
+		const registry = new AppRegistry();
 		const contents = webContents(7);
 		registry.register(contents.value as never, 'draw');
 
 		expect(registry.resolve(contents.value)).toBe('draw');
 		contents.handlers.get('render-process-gone')?.();
-		expect(() => registry.resolve(contents.value)).toThrow('registered extension views');
+		expect(() => registry.resolve(contents.value)).toThrow('registered app views');
 	});
 
 	it('rejects invalid or conflicting registrations', () => {
-		const registry = new ExtensionRegistry();
+		const registry = new AppRegistry();
 		const invalid = webContents(0);
 		const contents = webContents(7);
 		const conflicting = webContents(7);
 		expect(() => registry.register(invalid.value as never, 'draw')).toThrow('web contents ID');
 		expect(() => registry.register(contents.value as never, '../draw')).toThrow(
-			'Invalid extension ID'
+			'Invalid app ID'
 		);
 
 		registry.register(contents.value as never, 'draw');
 		expect(() => registry.register(conflicting.value as never, 'demo')).toThrow(
 			'already registered'
 		);
-		expect(() => registry.resolve(conflicting.value)).toThrow('registered extension views');
+		expect(() => registry.resolve(conflicting.value)).toThrow('registered app views');
 		expect(registry.resolve(contents.value)).toBe('draw');
 	});
 
-	it('revokes every registered view for an extension', () => {
-		const registry = new ExtensionRegistry();
+	it('revokes every registered view for an app', () => {
+		const registry = new AppRegistry();
 		const first = webContents(7);
 		const second = webContents(8);
 		const other = webContents(9);
@@ -51,8 +51,8 @@ describe('extension registry', () => {
 
 		registry.revoke('draw');
 
-		expect(() => registry.resolve(first.value)).toThrow('registered extension views');
-		expect(() => registry.resolve(second.value)).toThrow('registered extension views');
+		expect(() => registry.resolve(first.value)).toThrow('registered app views');
+		expect(() => registry.resolve(second.value)).toThrow('registered app views');
 		expect(registry.resolve(other.value)).toBe('demo');
 	});
 });

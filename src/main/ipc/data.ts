@@ -7,22 +7,22 @@ import { DataController } from '../data/data_controller';
 import { normalizeDataScope } from '../data/data_scope';
 import type { EventBus } from '../event_bus';
 import type { IpcModule } from './core/module';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 
 export interface DataIpcDeps {
 	agent: Agent;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class DataIpc implements IpcModule<DataIpcDeps> {
 	readonly name = 'data';
 
-	register({ agent, windows, extensions }: DataIpcDeps, _eventBus: EventBus): void {
+	register({ agent, windows, apps }: DataIpcDeps, _eventBus: EventBus): void {
 		const controller = new DataController(agent);
-		const trusted = new TrustedRenderer(windows, extensions);
+		const trusted = new TrustedRenderer(windows, apps);
 		trusted.query(DataChannels.listScopes, () => controller.listScopes());
 		trusted.commandWithEvent(DataChannels.export, async (event, input) => {
 			const scope = normalizeDataScope(input);

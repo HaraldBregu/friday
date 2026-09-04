@@ -5,7 +5,7 @@ import type {
 } from '../../shared/cloud_types';
 import { CloudChannels } from '../../shared/ipc_channels_definitions';
 import type { CloudService } from '../cloud/data';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { EventBus } from '../event_bus';
 import type { WindowContextManager } from '../window_context';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
@@ -15,14 +15,14 @@ import { TrustedRenderer } from './core/trusted';
 export interface CloudIpcDeps {
 	cloud: CloudService;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class CloudIpc implements IpcModule<CloudIpcDeps> {
 	readonly name = 'cloud';
 
-	register({ cloud, windows, extensions }: CloudIpcDeps, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ cloud, windows, apps }: CloudIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		cloud.onSessionChanged((change) => trusted.broadcast(CloudChannels.sessionChanged, change));
 		registerQueryWithEvent(CloudChannels.listSessions, (event) => {
 			trusted.assert(event);

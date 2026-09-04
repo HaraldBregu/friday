@@ -33,7 +33,7 @@ export function useStudio(): StudioController {
 	const [modelId, setModelId] = useState<string>();
 	const [busy, setBusy] = useState<string>();
 	const [message, setMessage] = useState(
-		connected ? 'Ready for a design brief.' : 'Open this extension in Kucedr to generate images.'
+		connected ? 'Ready for a design brief.' : 'Open this app in Kucedr to generate images.'
 	);
 
 	useEffect(() => {

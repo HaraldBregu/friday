@@ -71,7 +71,7 @@ import { renameWorkspaceEntry } from './rename';
 import { readWorkspaceTree } from './tree';
 import { resolveWorkspaceFile } from './workspace';
 import { respondUserInput } from '../agent/user_input/user_input_pending';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import type { IpcResult } from '../../shared/ipc_types';
 import { AgentRenderer } from './core/agent_renderer';
@@ -81,7 +81,7 @@ export interface AgentIpcDeps {
 	agent: Agent;
 	conversation: Conversation;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 const TOOL_PERMISSION_DECISIONS: readonly AgentToolPermissionDecision[] = [
@@ -254,10 +254,10 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 	readonly name = 'agent';
 
 	register(
-		{ logger, agent, conversation, windows, extensions }: AgentIpcDeps,
+		{ logger, agent, conversation, windows, apps }: AgentIpcDeps,
 		eventBus: EventBus
 	): void {
-		const renderer = new AgentRenderer(windows, extensions);
+		const renderer = new AgentRenderer(windows, apps);
 		const mainAccess = renderer.assert.bind(renderer);
 		const workspaceAccess = renderer.assertWorkspace.bind(renderer);
 		let watcherStarted = false;

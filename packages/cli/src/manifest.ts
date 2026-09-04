@@ -10,7 +10,7 @@ const providerSchema = z
 		id: idSchema,
 	})
 	.strict();
-const extensionSchema = z
+const appSchema = z
 	.object({
 		id: idSchema,
 		title: z.string().trim().min(1),
@@ -20,7 +20,7 @@ const extensionSchema = z
 			.string()
 			.refine(isPluginPath)
 			.refine((entry) => entry.toLowerCase().endsWith('.html'))
-			.refine((entry) => entry.startsWith('extensions/')),
+			.refine((entry) => entry.startsWith('apps/')),
 		version: versionSchema.optional(),
 	})
 	.strict();
@@ -92,7 +92,7 @@ const contributionsSchema = z
 	.object({
 		providers: z.array(providerSchema).default([]),
 		skills: z.array(skillSchema).default([]),
-		extensions: z.array(extensionSchema).default([]),
+		apps: z.array(appSchema).default([]),
 		mcpServers: z.array(mcpServerSchema).default([]),
 		languages: z.array(languageSchema).default([]),
 		themes: z.array(themeSchema).default([]),
@@ -104,13 +104,13 @@ const contributionsSchema = z
 		if (groups.every((group) => group.length === 0)) {
 			context.addIssue({
 				code: 'custom',
-				message: 'A plugin must contribute at least one extension.',
+				message: 'A plugin must contribute at least one App.',
 			});
 		}
 		for (const key of [
 			'providers',
 			'skills',
-			'extensions',
+			'apps',
 			'mcpServers',
 			'languages',
 			'themes',
@@ -132,7 +132,7 @@ const contributionsSchema = z
 
 export const pluginManifestSchema = z
 	.object({
-		schemaVersion: z.literal(3),
+		schemaVersion: z.literal(4),
 		id: idSchema,
 		name: z.string().trim().min(1),
 		version: versionSchema,

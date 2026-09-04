@@ -10,7 +10,7 @@ import { ProviderStoreIpc } from '../provider';
 import { SearchIpc } from '../search';
 import { StorageIpc } from '../storage';
 import { DatabaseIpc } from '../database';
-import { ExtensionsIpc } from '../extensions';
+import { AppsIpc } from '../apps';
 import { WikiIpc } from '../wiki';
 import { WindowIpc } from '../window';
 import { DataIpc } from '../data';
@@ -30,8 +30,8 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 		conversationService,
 		channelRegistry,
 		windowFactory,
-		extensionRegistry,
-		extensionStorage,
+		appRegistry,
+		appStorage,
 		storageOperations,
 		terminalManager,
 		windowContextManager,
@@ -53,23 +53,23 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			{
 				logger,
 				channelRegistry,
-				extensionRegistry,
-				extensionStorage,
+				appRegistry,
+				appStorage,
 				sandbox: agentService.sandbox,
 			},
 			eventBus
 		)
 	);
-	safeRegister('a2a', () => new A2aIpc().register({ extensionRegistry }, eventBus));
+	safeRegister('a2a', () => new A2aIpc().register({ appRegistry }, eventBus));
 	safeRegister('auth', () =>
 		new AuthIpc().register(
-			{ auth: authService, windows: windowContextManager, extensions: extensionRegistry },
+			{ auth: authService, windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
 	safeRegister('cloud', () =>
 		new CloudIpc().register(
-			{ cloud: cloudService, windows: windowContextManager, extensions: extensionRegistry },
+			{ cloud: cloudService, windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
@@ -80,38 +80,38 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 				agent: agentService,
 				conversation: conversationService,
 				windows: windowContextManager,
-				extensions: extensionRegistry,
+				apps: appRegistry,
 			},
 			eventBus
 		)
 	);
 	safeRegister('coder', () =>
 		new CoderIpc().register(
-			{ coder: coderService, extensionRegistry, windows: windowContextManager },
+			{ coder: coderService, appRegistry, windows: windowContextManager },
 			eventBus
 		)
 	);
 	safeRegister('recorder', () =>
 		new RecorderIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
 	safeRegister('tasks', () =>
 		new TaskIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
 	safeRegister('mcp', () =>
 		new McpIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
 	safeRegister('models', () =>
 		new ModelsIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
@@ -120,14 +120,14 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			{
 				conversation: conversationService,
 				windows: windowContextManager,
-				extensions: extensionRegistry,
+				apps: appRegistry,
 			},
 			eventBus
 		)
 	);
 	safeRegister('skills', () =>
 		new SkillsIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
@@ -136,38 +136,38 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			{
 				sync: providerSyncService,
 				windows: windowContextManager,
-				extensions: extensionRegistry,
+				apps: appRegistry,
 			},
 			eventBus
 		)
 	);
 	safeRegister('search', () =>
 		new SearchIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
 	safeRegister('storage', () =>
 		new StorageIpc().register(
-			{ extensionRegistry, storageOperations, windows: windowContextManager },
+			{ appRegistry, storageOperations, windows: windowContextManager },
 			eventBus
 		)
 	);
 	safeRegister('database', () =>
 		new DatabaseIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
-	safeRegister('extensions', () =>
-		new ExtensionsIpc().register(
-			{ windowFactory, extensionRegistry, windows: windowContextManager },
+	safeRegister('apps', () =>
+		new AppsIpc().register(
+			{ windowFactory, appRegistry, windows: windowContextManager },
 			eventBus
 		)
 	);
 	safeRegister('wiki', () =>
 		new WikiIpc().register(
-			{ windows: windowContextManager, extensions: extensionRegistry },
+			{ windows: windowContextManager, apps: appRegistry },
 			eventBus
 		)
 	);
@@ -176,19 +176,19 @@ export function registerIpcHandlers(services: MainServices, eventBus: EventBus):
 			{
 				agent: agentService,
 				windows: windowContextManager,
-				extensions: extensionRegistry,
+				apps: appRegistry,
 			},
 			eventBus
 		)
 	);
-	safeRegister('window', () => new WindowIpc().register({ logger, extensionRegistry }, eventBus));
+	safeRegister('window', () => new WindowIpc().register({ logger, appRegistry }, eventBus));
 	safeRegister('terminal', () =>
 		new TerminalIpc().register(
 			{
 				logger,
 				manager: terminalManager,
 				windows: windowContextManager,
-				extensions: extensionRegistry,
+				apps: appRegistry,
 			},
 			eventBus
 		)

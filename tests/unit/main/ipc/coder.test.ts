@@ -11,7 +11,7 @@ beforeEach(() => {
 	windows.has.mockReturnValue(true);
 });
 
-it('streams Coder extension runs back to the originating view and scopes cancellation', async () => {
+it('streams Coder app runs back to the originating view and scopes cancellation', async () => {
 	const send = jest
 		.fn()
 		.mockResolvedValue({ projectId: 'project-1', sessionId: 'session-1', output: 'reply' });
@@ -22,7 +22,7 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		send,
 		cancel,
 	} as unknown as Coder;
-	const extensionRegistry = {
+	const appRegistry = {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('coder'),
 	};
@@ -33,7 +33,7 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 		removeListener: jest.fn(),
 	};
 	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{ coder, appRegistry: appRegistry as never, windows: windows as never },
 		{} as EventBus
 	);
 	const handler = (channel: string) =>
@@ -72,7 +72,7 @@ it('streams Coder extension runs back to the originating view and scopes cancell
 	expect(cancel).toHaveBeenCalledWith('run-1', 23);
 });
 
-it('lets the Coder extension select main-owned projects and read their sessions', async () => {
+it('lets the Coder app select main-owned projects and read their sessions', async () => {
 	const selectedProject = {
 		id: 'project-1',
 		name: 'project',
@@ -91,7 +91,7 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		getProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
 		saveProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
 	} as unknown as Coder;
-	const extensionRegistry = {
+	const appRegistry = {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('coder'),
 	};
@@ -102,7 +102,7 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 		filePaths: ['/project'],
 	});
 	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{ coder, appRegistry: appRegistry as never, windows: windows as never },
 		{} as EventBus
 	);
 	const handler = (channel: string) =>
@@ -146,18 +146,18 @@ it('lets the Coder extension select main-owned projects and read their sessions'
 	expect(coder.saveProjectInstructions).toHaveBeenCalledWith('project-1', update);
 });
 
-it('restricts project instruction files to the Coder extension and validates updates', async () => {
+it('restricts project instruction files to the Coder app and validates updates', async () => {
 	const coder = {
 		getProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
 		saveProjectInstructions: jest.fn().mockResolvedValue({ projectId: 'project-1' }),
 	} as unknown as Coder;
-	const extensionRegistry = {
+	const appRegistry = {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('coder'),
 	};
 	const sender = { id: 23 };
 	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{ coder, appRegistry: appRegistry as never, windows: windows as never },
 		{} as EventBus
 	);
 	const handler = (channel: string) =>
@@ -171,28 +171,28 @@ it('restricts project instruction files to the Coder extension and validates upd
 	).resolves.toEqual(expect.objectContaining({ success: false }));
 	expect(coder.saveProjectInstructions).not.toHaveBeenCalled();
 
-	extensionRegistry.has.mockReturnValue(false);
+	appRegistry.has.mockReturnValue(false);
 	await expect(
 		handler(CoderChannels.getProjectInstructions)({ sender }, 'project-1')
 	).resolves.toEqual(
 		expect.objectContaining({
 			success: false,
 			error: expect.objectContaining({
-				message: 'Project instructions are only available to the Coder extension.',
+				message: 'Project instructions are only available to the Coder app.',
 			}),
 		})
 	);
 	expect(coder.getProjectInstructions).not.toHaveBeenCalled();
 });
 
-it('rejects Coder access from other extensions', async () => {
+it('rejects Coder access from other apps', async () => {
 	const coder = { getSettings: jest.fn(), send: jest.fn() } as unknown as Coder;
-	const extensionRegistry = {
+	const appRegistry = {
 		has: jest.fn().mockReturnValue(true),
 		resolve: jest.fn().mockReturnValue('demo'),
 	};
 	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{ coder, appRegistry: appRegistry as never, windows: windows as never },
 		{} as EventBus
 	);
 	const getSettings = (ipcMain.handle as jest.Mock).mock.calls.find(
@@ -210,7 +210,7 @@ it('rejects Coder access from other extensions', async () => {
 		expect.objectContaining({
 			success: false,
 			error: expect.objectContaining({
-				message: 'Coder is only available to the Coder extension.',
+				message: 'Coder is only available to the Coder app.',
 			}),
 		})
 	);
@@ -223,7 +223,7 @@ it('rejects Coder access from other extensions', async () => {
 	);
 });
 
-it('allows configuration and authentication from the host and Coder extension only', async () => {
+it('allows configuration and authentication from the host and Coder app only', async () => {
 	const connectCodex = jest.fn((_owner, emit) => {
 		emit({ type: 'progress', message: 'Waiting' });
 		return Promise.resolve({ configured: true, type: 'oauth' });
@@ -235,7 +235,7 @@ it('allows configuration and authentication from the host and Coder extension on
 		cancelCodexLogin: jest.fn().mockReturnValue(true),
 		disconnectCodex: jest.fn().mockResolvedValue(undefined),
 	} as unknown as Coder;
-	const extensionRegistry = { has: jest.fn().mockReturnValue(false) };
+	const appRegistry = { has: jest.fn().mockReturnValue(false) };
 	const mainFrame = {};
 	const sender = {
 		id: 8,
@@ -247,7 +247,7 @@ it('allows configuration and authentication from the host and Coder extension on
 	const event = { sender, senderFrame: mainFrame };
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 1, webContents: sender });
 	new CoderIpc().register(
-		{ coder, extensionRegistry: extensionRegistry as never, windows: windows as never },
+		{ coder, appRegistry: appRegistry as never, windows: windows as never },
 		{} as EventBus
 	);
 	const handler = (channel: string) =>
@@ -265,15 +265,15 @@ it('allows configuration and authentication from the host and Coder extension on
 	expect(sender.once).toHaveBeenCalledWith('destroyed', expect.any(Function));
 	expect(sender.removeListener).toHaveBeenCalledWith('destroyed', expect.any(Function));
 
-	extensionRegistry.has.mockReturnValue(true);
-	(extensionRegistry as { resolve?: jest.Mock }).resolve = jest.fn().mockReturnValue('coder');
+	appRegistry.has.mockReturnValue(true);
+	(appRegistry as { resolve?: jest.Mock }).resolve = jest.fn().mockReturnValue('coder');
 	await expect(handler(CoderChannels.listModels)(event)).resolves.toEqual({
 		success: true,
 		data: { providers: [] },
 	});
 	expect(coder.listModels).toHaveBeenCalled();
 
-	(extensionRegistry.resolve as jest.Mock).mockReturnValue('demo');
+	(appRegistry.resolve as jest.Mock).mockReturnValue('demo');
 	await expect(handler(CoderChannels.listModels)(event)).resolves.toEqual(
 		expect.objectContaining({ success: false })
 	);

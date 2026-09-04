@@ -1,9 +1,9 @@
 import { mkdirSync } from 'node:fs';
-import { listExtensions } from './extension_list';
-import { extensionsRoot } from './extension_root';
-import type { Extension } from './extension_types';
+import { listApps } from './app_list';
+import { appsRoot } from './app_root';
+import type { App } from './app_types';
 
-export function ensureExtensions(appLocation?: string): Extension[] {
-	mkdirSync(extensionsRoot(appLocation), { recursive: true });
-	return listExtensions(appLocation);
+export function ensureApps(appLocation?: string): App[] {
+	mkdirSync(appsRoot(appLocation), { recursive: true });
+	return listApps(appLocation);
 }

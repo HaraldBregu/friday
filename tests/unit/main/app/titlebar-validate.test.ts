@@ -1,8 +1,8 @@
-import { isExtensionTitlebarOptions } from '../../../../src/shared/titlebar_validate';
+import { isAppTitlebarOptions } from '../../../../src/shared/titlebar_validate';
 
-it('accepts a complete extension titlebar snapshot and reset', () => {
+it('accepts a complete app titlebar snapshot and reset', () => {
 	expect(
-		isExtensionTitlebarOptions({
+		isAppTitlebarOptions({
 			title: 'Workspace',
 			leftButtons: [
 				{
@@ -18,7 +18,7 @@ it('accepts a complete extension titlebar snapshot and reset', () => {
 			sidebarWidth: 240,
 		})
 	).toBe(true);
-	expect(isExtensionTitlebarOptions(null)).toBe(true);
+	expect(isAppTitlebarOptions(null)).toBe(true);
 });
 
 it.each([
@@ -38,5 +38,5 @@ it.each([
 	},
 	{ rightButtons: new Array(7).fill({ id: 'same', label: 'Same', icon: 'settings' }) },
 ])('rejects malformed titlebar options: %p', (options) => {
-	expect(isExtensionTitlebarOptions(options)).toBe(false);
+	expect(isAppTitlebarOptions(options)).toBe(false);
 });

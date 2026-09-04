@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 import {
 	app,
 	isKucedr,
-	isExtensionStoreValue,
+	isAppStoreValue,
 	win,
 	type AppLanguage,
 	type AppTheme,
@@ -59,7 +59,7 @@ const fallbackLanguage: AppLanguage = 'en';
 const initialStorageKey = 'demo';
 const initialStorageJson = '{\n  "label": "Kucedr demo",\n  "count": 1\n}';
 const initialStoragePath = 'demo/message.txt';
-const initialStorageFileContent = 'Saved by the Kucedr demo extension.';
+const initialStorageFileContent = 'Saved by the Kucedr demo app.';
 const themeBadgeClass = cva(
 	'inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold',
 	{
@@ -81,10 +81,10 @@ export default function App() {
 	const [status, setStatus] = useState(translations.en.waiting);
 	const [storageKey, setStorageKey] = useState(initialStorageKey);
 	const [storageJson, setStorageJson] = useState(initialStorageJson);
-	const [extensionStoreValue, setExtensionStoreValue] = useState('');
+	const [appStoreValue, setAppStoreValue] = useState('');
 	const [storagePath, setStoragePath] = useState(initialStoragePath);
 	const [storageFileContent, setStorageFileContent] = useState(initialStorageFileContent);
-	const [extensionFileValue, setExtensionFileValue] = useState('');
+	const [appFileValue, setAppFileValue] = useState('');
 	const [storageTestResults, setStorageTestResults] = useState<string[]>([]);
 	const [storageBusy, setStorageBusy] = useState(false);
 	const inKucedrApp = isKucedr();
@@ -183,7 +183,7 @@ export default function App() {
 		}
 	};
 
-	const storeExtensionValue = () =>
+	const storeAppValue = () =>
 		runStorageAction(async () => {
 			const key = storageKey.trim();
 			if (!key) throw new Error(text.storageKeyRequired);
@@ -193,57 +193,57 @@ export default function App() {
 			} catch {
 				throw new Error(text.storageJsonInvalid);
 			}
-			if (!isExtensionStoreValue(value)) throw new Error(text.storageValueInvalid);
-			await app.setExtensionStoreValue(key, value);
-			setExtensionStoreValue(JSON.stringify(value, null, 2));
+			if (!isAppStoreValue(value)) throw new Error(text.storageValueInvalid);
+			await app.setAppStoreValue(key, value);
+			setAppStoreValue(JSON.stringify(value, null, 2));
 			return text.storageValueStored;
 		});
 
-	const loadExtensionValue = () =>
+	const loadAppValue = () =>
 		runStorageAction(async () => {
 			const key = storageKey.trim();
 			if (!key) throw new Error(text.storageKeyRequired);
-			const value = await app.getExtensionStoreValue(key);
+			const value = await app.getAppStoreValue(key);
 			const formattedValue = value === undefined ? '' : JSON.stringify(value, null, 2);
-			setExtensionStoreValue(formattedValue);
+			setAppStoreValue(formattedValue);
 			if (formattedValue) setStorageJson(formattedValue);
 			return value === undefined ? text.storageValueMissing : text.storageValueLoaded;
 		});
 
-	const deleteExtensionValue = () =>
+	const deleteAppValue = () =>
 		runStorageAction(async () => {
 			const key = storageKey.trim();
 			if (!key) throw new Error(text.storageKeyRequired);
-			await app.deleteExtensionStoreValue(key);
-			setExtensionStoreValue('');
+			await app.deleteAppStoreValue(key);
+			setAppStoreValue('');
 			return text.storageValueDeleted;
 		});
 
-	const saveExtensionFile = () =>
+	const saveAppFile = () =>
 		runStorageAction(async () => {
 			const path = storagePath.trim();
 			if (!path) throw new Error(text.storagePathRequired);
-			await app.writeExtensionStoreFile(path, new TextEncoder().encode(storageFileContent));
-			setExtensionFileValue(storageFileContent);
+			await app.writeAppStoreFile(path, new TextEncoder().encode(storageFileContent));
+			setAppFileValue(storageFileContent);
 			return text.storageFileSaved;
 		});
 
-	const readExtensionFile = () =>
+	const readAppFile = () =>
 		runStorageAction(async () => {
 			const path = storagePath.trim();
 			if (!path) throw new Error(text.storagePathRequired);
-			const value = new TextDecoder().decode(await app.readExtensionStoreFile(path));
+			const value = new TextDecoder().decode(await app.readAppStoreFile(path));
 			setStorageFileContent(value);
-			setExtensionFileValue(value);
+			setAppFileValue(value);
 			return text.storageFileLoaded;
 		});
 
-	const deleteExtensionFile = () =>
+	const deleteAppFile = () =>
 		runStorageAction(async () => {
 			const path = storagePath.trim();
 			if (!path) throw new Error(text.storagePathRequired);
-			await app.deleteExtensionStoreFile(path);
-			setExtensionFileValue('');
+			await app.deleteAppStoreFile(path);
+			setAppFileValue('');
 			return text.storageFileDeleted;
 		});
 
@@ -361,7 +361,7 @@ export default function App() {
 									size="sm"
 									variant="outline"
 									disabled={storageBusy}
-									onClick={storeExtensionValue}
+									onClick={storeAppValue}
 								>
 									{text.storeStorageValue}
 								</Button>
@@ -369,7 +369,7 @@ export default function App() {
 									size="sm"
 									variant="secondary"
 									disabled={storageBusy}
-									onClick={loadExtensionValue}
+									onClick={loadAppValue}
 								>
 									{text.loadStorageValue}
 								</Button>
@@ -377,7 +377,7 @@ export default function App() {
 									size="sm"
 									variant="destructive"
 									disabled={storageBusy}
-									onClick={deleteExtensionValue}
+									onClick={deleteAppValue}
 								>
 									{text.deleteStorageValue}
 								</Button>
@@ -385,7 +385,7 @@ export default function App() {
 							<div className="space-y-1">
 								<p className="text-xs font-medium text-muted-foreground">{text.storageResult}</p>
 								<pre className="max-h-36 min-h-10 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">
-									{extensionStoreValue || text.storageEmpty}
+									{appStoreValue || text.storageEmpty}
 								</pre>
 							</div>
 						</div>
@@ -414,7 +414,7 @@ export default function App() {
 									size="sm"
 									variant="outline"
 									disabled={storageBusy}
-									onClick={saveExtensionFile}
+									onClick={saveAppFile}
 								>
 									{text.saveStorageFile}
 								</Button>
@@ -422,7 +422,7 @@ export default function App() {
 									size="sm"
 									variant="secondary"
 									disabled={storageBusy}
-									onClick={readExtensionFile}
+									onClick={readAppFile}
 								>
 									{text.readStorageFile}
 								</Button>
@@ -430,7 +430,7 @@ export default function App() {
 									size="sm"
 									variant="destructive"
 									disabled={storageBusy}
-									onClick={deleteExtensionFile}
+									onClick={deleteAppFile}
 								>
 									{text.deleteStorageFile}
 								</Button>
@@ -438,7 +438,7 @@ export default function App() {
 							<div className="space-y-1">
 								<p className="text-xs font-medium text-muted-foreground">{text.storageResult}</p>
 								<pre className="max-h-36 min-h-10 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 text-xs">
-									{extensionFileValue || text.storageEmpty}
+									{appFileValue || text.storageEmpty}
 								</pre>
 							</div>
 						</div>

@@ -187,7 +187,7 @@ it('cancels the IPC UI run without interrupting the channel registry bot run', a
 			agent,
 			conversation,
 			windows: { has: (id: number) => id === 1 || id === 2 } as never,
-			extensions: { has: () => false } as never,
+			apps: { has: () => false } as never,
 		},
 		eventBus
 	);

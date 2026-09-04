@@ -2,15 +2,15 @@ import { Tray as ElectronTray, Menu, nativeImage } from 'electron';
 import path from 'node:path';
 
 import { loadTranslations } from './i18n';
-import type { Extension } from './extensions/extension_index';
+import type { App } from './apps/app_index';
 import { resourceRoot } from './shared/resource_root';
 
 interface TrayManagerCallbacks {
 	onToggleApp: () => void;
 	onQuit: () => void;
 	isAppVisible: () => boolean;
-	getExtensions: () => Extension[];
-	onOpenExtension: (extension: Extension) => void;
+	getApps: () => App[];
+	onOpenApp: (app: App) => void;
 }
 
 export class Tray {
@@ -76,13 +76,13 @@ export class Tray {
 		}
 		const m = loadTranslations(this.currentLanguage, 'tray');
 		const isVisible = this.callbacks.isAppVisible();
-		const extensions = this.callbacks.getExtensions();
-		const extensionItems: Array<Electron.MenuItemConstructorOptions> = extensions.length
-			? extensions.map((extension) => ({
-					label: extension.title,
-					click: (): void => this.callbacks.onOpenExtension(extension),
+		const apps = this.callbacks.getApps();
+		const appItems: Array<Electron.MenuItemConstructorOptions> = apps.length
+			? apps.map((app) => ({
+					label: app.title,
+					click: (): void => this.callbacks.onOpenApp(app),
 				}))
-			: [{ label: m.noExtensions || 'No extensions', enabled: false }];
+			: [{ label: m.noApps || 'No apps', enabled: false }];
 
 		this.contextMenu = Menu.buildFromTemplate([
 			{
@@ -90,8 +90,8 @@ export class Tray {
 				click: () => this.callbacks.onToggleApp(),
 			},
 			{
-				label: m.extensions || 'Extensions',
-				submenu: extensionItems,
+				label: m.apps || 'Apps',
+				submenu: appItems,
 			},
 			{ type: 'separator' },
 			{

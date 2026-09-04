@@ -6,7 +6,7 @@ and whether the current runtime can execute each service.
 
 The inventory covers model, search, and database providers. Telegram and Discord are
 messaging channels and are documented in [Kucedr Feature Reference](FEATURES.md#messaging-channels).
-MCP servers and extensions are integrations rather than providers.
+MCP servers and apps are integrations rather than providers.
 
 ## Support status
 

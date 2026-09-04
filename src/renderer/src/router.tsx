@@ -63,8 +63,8 @@ const ImagePage = lazy(() => import('./pages/settings/pages/image/Page'));
 const EmbeddingPage = lazy(() => import('./pages/settings/pages/embedding/Page'));
 const VideoPage = lazy(() => import('./pages/settings/pages/video/Page'));
 const MusicPage = lazy(() => import('./pages/settings/pages/music/Page'));
-const ExtensionsPage = lazy(() => import('./pages/settings/pages/extensions/Page'));
-const ExtensionDetailsPage = lazy(() => import('./pages/settings/pages/extensions/details/Page'));
+const AppsPage = lazy(() => import('./pages/settings/pages/apps/Page'));
+const AppDetailsPage = lazy(() => import('./pages/settings/pages/apps/details/Page'));
 const SIDEBAR_TRANSITION_MS = 200;
 
 function ModelServiceLegacyRedirect(): React.JSX.Element {
@@ -78,9 +78,9 @@ function ModelServiceLegacyRedirect(): React.JSX.Element {
 	return <Navigate to={isChatHistory ? `${item.path}/chathistory` : item.path} replace />;
 }
 
-function ExtensionDetailsLegacyRedirect(): React.JSX.Element {
-	const { extensionId } = useParams();
-	return <Navigate to={`/settings/extensions/${extensionId ?? ''}`} replace />;
+function AppDetailsLegacyRedirect(): React.JSX.Element {
+	const { appId } = useParams();
+	return <Navigate to={`/settings/apps/${appId ?? ''}`} replace />;
 }
 
 function RouteWrapper({
@@ -614,27 +614,27 @@ const routes: RouteObject[] = [
 						element: <Navigate to="/settings/providers/music" replace />,
 					},
 					{
-						path: 'extensions',
+						path: 'apps',
 						children: [
 							{
 								index: true,
 								element: (
 									<SettingsRouteWrapper>
-										<ExtensionsPage />
+										<AppsPage />
 									</SettingsRouteWrapper>
 								),
 							},
 							{
-								path: ':extensionId',
+								path: ':appId',
 								element: (
 									<SettingsRouteWrapper>
-										<ExtensionDetailsPage />
+										<AppDetailsPage />
 									</SettingsRouteWrapper>
 								),
 							},
 							{
-								path: 'extensiondetails/:extensionId',
-								element: <ExtensionDetailsLegacyRedirect />,
+								path: 'appdetails/:appId',
+								element: <AppDetailsLegacyRedirect />,
 							},
 						],
 					},

@@ -28,18 +28,18 @@ describe('MCP IPC', () => {
 		jest.clearAllMocks();
 	});
 
-	it('rejects extension views before testing a server', async () => {
+	it('rejects app views before testing a server', async () => {
 		const mainFrame = {};
 		const mainSender = { id: 21, mainFrame };
-		const extensionFrame = {};
-		const extensionSender = { id: 22, mainFrame: extensionFrame };
+		const appFrame = {};
+		const appSender = { id: 22, mainFrame: appFrame };
 		const window = { id: 1, webContents: mainSender };
 		jest
 			.mocked(BrowserWindow.fromWebContents)
 			.mockImplementation((sender) => (sender === mainSender ? (window as never) : null));
 		const windows = { has: (id: number) => id === window.id };
-		const extensions = { has: (sender: unknown) => sender === extensionSender };
-		new McpIpc().register({ windows, extensions } as never, {} as never);
+		const apps = { has: (sender: unknown) => sender === appSender };
+		new McpIpc().register({ windows, apps } as never, {} as never);
 
 		const handler = jest
 			.mocked(ipcMain.handle)
@@ -49,7 +49,7 @@ describe('MCP IPC', () => {
 		) => Promise<{ success: boolean }>;
 
 		await expect(
-			handler({ sender: extensionSender, senderFrame: extensionFrame } as never, 'unsafe')
+			handler({ sender: appSender, senderFrame: appFrame } as never, 'unsafe')
 		).resolves.toMatchObject({ success: false });
 		expect(testMcpServer).not.toHaveBeenCalled();
 

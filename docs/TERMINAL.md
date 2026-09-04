@@ -14,7 +14,7 @@ Main renderer resize -> terminalAPI -> node-pty resize
 `node-pty` runs only in the Electron main process. The preload exposes a narrow typed API and never
 exposes `ipcRenderer`, `require`, `fs`, `child_process`, or `node-pty`. Callers cannot choose an
 executable. Every terminal belongs to the approved `webContents` that created it. Only trusted main
-windows may create terminals; extension views, unknown
+windows may create terminals; app views, unknown
 renderers, subframes, and other owners cannot control that session.
 
 macOS sessions merge the Finder/Dock environment with the user's login-shell environment through
@@ -59,12 +59,12 @@ cross-platform artifacts cannot be fully validated from one host OS.
 - Reload, crash, or close the owner and confirm no child shell remains.
 - Verify commands installed through Homebrew, nvm, pnpm, Bun, Cargo, pyenv, and rbenv are found on
   macOS when they are available in the normal login shell.
-- Verify an extension view and a second window cannot control another owner's PTY.
+- Verify an app view and a second window cannot control another owner's PTY.
 - Verify packaged macOS, Windows, and Linux applications load the unpacked native module.
 
 ## Current scope
 
-The main Kucedr renderer currently has no terminal UI. Extension views cannot consume this layer.
+The main Kucedr renderer currently has no terminal UI. App views cannot consume this layer.
 Tabs, split panes, display serialization, and SSH backends are not part of the current scope. PTYs
 live in the Electron main process and end when their owner reloads, closes, crashes, or the
 application quits.

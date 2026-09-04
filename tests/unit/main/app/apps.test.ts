@@ -4,13 +4,13 @@ import path from 'node:path';
 import type { BrowserWindow, WebContentsView } from 'electron';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 import {
-	ensureExtensions,
-	listExtensions,
-	loadExtension,
-} from '../../../../src/main/extensions/extension_index';
-import { extensionEntryPath } from '../../../../src/main/extensions/extension_entry';
-import { extensionManifestPath } from '../../../../src/main/extensions/extension_manifest';
-import type { ExtensionManifest } from '../../../../src/main/extensions/extension_types';
+	ensureApps,
+	listApps,
+	loadApp,
+} from '../../../../src/main/apps/app_index';
+import { appEntryPath } from '../../../../src/main/apps/app_entry';
+import { appManifestPath } from '../../../../src/main/apps/app_manifest';
+import type { AppManifest } from '../../../../src/main/apps/app_types';
 
 function createWindowHarness() {
 	const handlers = new Map<string, () => void>();
@@ -57,22 +57,22 @@ function createWindowHarness() {
 	return { create, createView, handlers, load, shellHandlers, view, win, windowFactory };
 }
 
-function installExtension(
+function installApp(
 	appLocation: string,
 	id: string,
-	manifest: ExtensionManifest,
-	contents = '<h1>Extension</h1>'
+	manifest: AppManifest,
+	contents = '<h1>App</h1>'
 ): string {
-	const entry = extensionEntryPath(id, manifest.metadata.entry, appLocation);
+	const entry = appEntryPath(id, manifest.metadata.entry, appLocation);
 	fs.mkdirSync(path.dirname(entry), { recursive: true });
 	fs.writeFileSync(entry, contents);
-	fs.writeFileSync(extensionManifestPath(id, appLocation), JSON.stringify(manifest));
+	fs.writeFileSync(appManifestPath(id, appLocation), JSON.stringify(manifest));
 	return entry;
 }
 
-describe('extension discovery and loading', () => {
+describe('app discovery and loading', () => {
 	let appLocation: string;
-	const projectManifest: ExtensionManifest = {
+	const projectManifest: AppManifest = {
 		title: 'Project',
 		description: 'A compact project board for tracking work from backlog to completion.',
 		metadata: {
@@ -83,26 +83,26 @@ describe('extension discovery and loading', () => {
 	};
 
 	beforeEach(() => {
-		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extensions-'));
+		appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-apps-'));
 	});
 
 	afterEach(() => {
 		fs.rmSync(appLocation, { recursive: true, force: true });
 	});
 
-	it('initializes an empty extension directory', () => {
-		expect(ensureExtensions(appLocation)).toEqual([]);
-		expect(fs.readdirSync(path.join(appLocation, 'extensions'))).toEqual([]);
+	it('initializes an empty app directory', () => {
+		expect(ensureApps(appLocation)).toEqual([]);
+		expect(fs.readdirSync(path.join(appLocation, 'apps'))).toEqual([]);
 	});
 
-	it('discovers extension folders from their manifests', () => {
-		installExtension(appLocation, 'project', projectManifest);
+	it('discovers app folders from their manifests', () => {
+		installApp(appLocation, 'project', projectManifest);
 
-		expect(listExtensions(appLocation)).toEqual([{ id: 'project', ...projectManifest }]);
+		expect(listApps(appLocation)).toEqual([{ id: 'project', ...projectManifest }]);
 	});
 
 	it('uses metadata.entry and preserves additional metadata', () => {
-		const manifest: ExtensionManifest = {
+		const manifest: AppManifest = {
 			...projectManifest,
 			metadata: {
 				...projectManifest.metadata,
@@ -110,67 +110,67 @@ describe('extension discovery and loading', () => {
 				author: 'Kucedr',
 			},
 		};
-		installExtension(appLocation, 'project', manifest);
+		installApp(appLocation, 'project', manifest);
 
-		expect(listExtensions(appLocation)).toEqual([{ id: 'project', ...manifest }]);
+		expect(listApps(appLocation)).toEqual([{ id: 'project', ...manifest }]);
 	});
 
-	it('sorts discovered extensions by folder name', () => {
-		installExtension(appLocation, 'weather', { ...projectManifest, title: 'Weather' });
-		installExtension(appLocation, 'clock', { ...projectManifest, title: 'Clock' });
+	it('sorts discovered apps by folder name', () => {
+		installApp(appLocation, 'weather', { ...projectManifest, title: 'Weather' });
+		installApp(appLocation, 'clock', { ...projectManifest, title: 'Clock' });
 
-		expect(listExtensions(appLocation).map(({ id }) => id)).toEqual(['clock', 'weather']);
+		expect(listApps(appLocation).map(({ id }) => id)).toEqual(['clock', 'weather']);
 	});
 
 	it('omits folders whose manifest is missing or invalid', () => {
-		const entry = extensionEntryPath('notes', 'index.html', appLocation);
+		const entry = appEntryPath('notes', 'index.html', appLocation);
 		fs.mkdirSync(path.dirname(entry), { recursive: true });
 		fs.writeFileSync(entry, '<h1>Notes</h1>');
-		expect(listExtensions(appLocation)).toEqual([]);
+		expect(listApps(appLocation)).toEqual([]);
 
 		fs.writeFileSync(
-			extensionManifestPath('notes', appLocation),
+			appManifestPath('notes', appLocation),
 			JSON.stringify({ name: 'Notes', description: 'Old schema', metadata: {} })
 		);
-		expect(listExtensions(appLocation)).toEqual([]);
+		expect(listApps(appLocation)).toEqual([]);
 	});
 
-	it('omits extensions whose manifest entry is missing or unsafe', () => {
-		fs.mkdirSync(path.dirname(extensionManifestPath('missing', appLocation)), { recursive: true });
+	it('omits apps whose manifest entry is missing or unsafe', () => {
+		fs.mkdirSync(path.dirname(appManifestPath('missing', appLocation)), { recursive: true });
 		fs.writeFileSync(
-			extensionManifestPath('missing', appLocation),
+			appManifestPath('missing', appLocation),
 			JSON.stringify(projectManifest)
 		);
-		fs.mkdirSync(path.dirname(extensionManifestPath('unsafe', appLocation)), { recursive: true });
+		fs.mkdirSync(path.dirname(appManifestPath('unsafe', appLocation)), { recursive: true });
 		fs.writeFileSync(
-			extensionManifestPath('unsafe', appLocation),
+			appManifestPath('unsafe', appLocation),
 			JSON.stringify({
 				...projectManifest,
 				metadata: { ...projectManifest.metadata, entry: '../outside.html' },
 			})
 		);
 
-		expect(listExtensions(appLocation)).toEqual([]);
+		expect(listApps(appLocation)).toEqual([]);
 	});
 
-	it('loads the manifest entry below the extension titlebar', async () => {
-		const manifest: ExtensionManifest = {
+	it('loads the manifest entry below the app titlebar', async () => {
+		const manifest: AppManifest = {
 			...projectManifest,
 			metadata: { ...projectManifest.metadata, entry: 'pages/project.html' },
 		};
-		const entry = installExtension(appLocation, 'project', manifest);
-		const extension = { id: 'project', ...manifest };
+		const entry = installApp(appLocation, 'project', manifest);
+		const app = { id: 'project', ...manifest };
 		const { create, createView, handlers, load, shellHandlers, view, win, windowFactory } =
 			createWindowHarness();
 
-		expect(loadExtension(windowFactory, extension, appLocation)).toBe(win);
+		expect(loadApp(windowFactory, app, appLocation)).toBe(win);
 		expect(create).toHaveBeenCalledWith(
 			expect.objectContaining({
 				frame: false,
 				title: 'Project',
 				resizable: true,
 			}),
-			{ html: 'extension.html', hash: 'extension/Project' }
+			{ html: 'app.html', hash: 'app/Project' }
 		);
 		expect(createView).not.toHaveBeenCalled();
 
@@ -186,29 +186,29 @@ describe('extension discovery and loading', () => {
 	});
 
 	it('does not open a window when the manifest entry is missing', () => {
-		const extension = { id: 'project', ...projectManifest };
+		const app = { id: 'project', ...projectManifest };
 		const { create, windowFactory } = createWindowHarness();
 
-		expect(() => loadExtension(windowFactory, extension, appLocation)).toThrow(
-			'Extension entry not found: project'
+		expect(() => loadApp(windowFactory, app, appLocation)).toThrow(
+			'App entry not found: project'
 		);
 		expect(create).not.toHaveBeenCalled();
 	});
 
-	it('reuses an extension window while its titlebar is still loading', () => {
-		const manifest: ExtensionManifest = {
+	it('reuses an app window while its titlebar is still loading', () => {
+		const manifest: AppManifest = {
 			...projectManifest,
 			metadata: { ...projectManifest.metadata, entry: 'pages/project.html' },
 		};
-		installExtension(appLocation, 'project', manifest);
-		const extension = { id: 'project', ...manifest };
+		installApp(appLocation, 'project', manifest);
+		const app = { id: 'project', ...manifest };
 		const { create, createView, handlers, win, windowFactory } = createWindowHarness();
 
-		const firstWindow = loadExtension(windowFactory, extension, appLocation);
+		const firstWindow = loadApp(windowFactory, app, appLocation);
 		expect(firstWindow).toBe(win);
 		expect(create).toHaveBeenCalledTimes(1);
 
-		const secondWindow = loadExtension(windowFactory, extension, appLocation);
+		const secondWindow = loadApp(windowFactory, app, appLocation);
 		expect(secondWindow).toBe(win);
 		expect(create).toHaveBeenCalledTimes(1);
 		expect(createView).not.toHaveBeenCalled();
@@ -220,12 +220,12 @@ describe('extension discovery and loading', () => {
 		handlers.get('closed')?.();
 	});
 
-	it('rejects extension paths outside the extensions folder', () => {
-		expect(() => extensionEntryPath('../outside', 'index.html', appLocation)).toThrow(
-			'Invalid extension id'
+	it('rejects app paths outside the apps folder', () => {
+		expect(() => appEntryPath('../outside', 'index.html', appLocation)).toThrow(
+			'Invalid app id'
 		);
-		expect(() => extensionEntryPath('project', '../outside.html', appLocation)).toThrow(
-			'Invalid extension entry'
+		expect(() => appEntryPath('project', '../outside.html', appLocation)).toThrow(
+			'Invalid app entry'
 		);
 	});
 });

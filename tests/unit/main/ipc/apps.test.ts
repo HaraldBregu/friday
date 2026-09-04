@@ -1,23 +1,23 @@
-const listExtensions = jest.fn(() => []);
-const loadExtension = jest.fn();
-const importExtensions = jest.fn();
+const listApps = jest.fn(() => []);
+const loadApp = jest.fn();
+const importApps = jest.fn();
 const openRoot = jest.fn();
-const deleteExtension = jest.fn();
-const destroyExtension = jest.fn();
-const extension = {
-	id: 'demo-extension',
-	title: 'Demo Extension',
-	description: 'A demo extension.',
+const deleteApp = jest.fn();
+const destroyApp = jest.fn();
+const app = {
+	id: 'demo-app',
+	title: 'Demo App',
+	description: 'A demo app.',
 	metadata: { version: '1.0.0', category: 'Demo', entry: 'index.html' },
 };
 
-jest.mock('../../../../src/main/extensions/extension_index', () => ({
-	listExtensions,
-	loadExtension,
-	importExtensions,
+jest.mock('../../../../src/main/apps/app_index', () => ({
+	listApps,
+	loadApp,
+	importApps,
 	openRoot,
-	deleteExtension,
-	destroyExtension,
+	deleteApp,
+	destroyApp,
 }));
 jest.mock('../../../../src/main/ipc/core/gateway', () => ({
 	registerQueryWithEvent: jest.fn(),
@@ -25,69 +25,69 @@ jest.mock('../../../../src/main/ipc/core/gateway', () => ({
 }));
 
 import type { EventBus } from '../../../../src/main/event_bus';
-import { ExtensionsIpc } from '../../../../src/main/ipc/extensions';
+import { AppsIpc } from '../../../../src/main/ipc/apps';
 import { registerCommandWithEvent } from '../../../../src/main/ipc/core/gateway';
 import type { WindowFactory } from '../../../../src/main/window_factory';
-import { ExtensionChannels } from '../../../../src/shared/ipc_channels_definitions';
+import { AppChannels } from '../../../../src/shared/ipc_channels_definitions';
 import { BrowserWindow, dialog } from 'electron';
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	listExtensions.mockReturnValue([extension]);
+	listApps.mockReturnValue([app]);
 	(dialog.showMessageBox as jest.Mock).mockResolvedValue({ response: 0, checkboxChecked: false });
 });
 
-const extensionRegistry = { has: jest.fn(() => false), revoke: jest.fn() };
+const appRegistry = { has: jest.fn(() => false), revoke: jest.fn() };
 const windows = { has: jest.fn(() => true) };
 const mainFrame = {};
 const sender = { mainFrame };
 const event = { sender, senderFrame: mainFrame };
 const owner = { id: 1, webContents: sender };
 
-it('opens the extensions directory in the system file explorer', () => {
+it('opens the apps directory in the system file explorer', () => {
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
-	new ExtensionsIpc().register(
+	new AppsIpc().register(
 		{
 			windowFactory: {} as WindowFactory,
-			extensionRegistry: extensionRegistry as never,
+			appRegistry: appRegistry as never,
 			windows: windows as never,
 		},
 		{} as EventBus
 	);
 
 	const handler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
-		([channel]) => channel === ExtensionChannels.openRoot
+		([channel]) => channel === AppChannels.openRoot
 	)?.[1];
 	handler(event);
 
 	expect(openRoot).toHaveBeenCalledTimes(1);
 });
 
-it('uses a native confirmation before deleting an extension', async () => {
+it('uses a native confirmation before deleting an app', async () => {
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(owner);
-	new ExtensionsIpc().register(
+	new AppsIpc().register(
 		{
 			windowFactory: {} as WindowFactory,
-			extensionRegistry: extensionRegistry as never,
+			appRegistry: appRegistry as never,
 			windows: windows as never,
 		},
 		{} as EventBus
 	);
 
 	const deleteHandler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
-		([channel]) => channel === ExtensionChannels.delete
+		([channel]) => channel === AppChannels.delete
 	)?.[1];
 
-	await expect(deleteHandler(event, extension.id)).resolves.toBe(false);
-	expect(deleteExtension).not.toHaveBeenCalled();
+	await expect(deleteHandler(event, app.id)).resolves.toBe(false);
+	expect(deleteApp).not.toHaveBeenCalled();
 	expect(dialog.showMessageBox).toHaveBeenCalledWith(
 		owner,
 		expect.objectContaining({
 			type: 'warning',
-			buttons: ['Cancel', 'Delete Extension'],
+			buttons: ['Cancel', 'Delete App'],
 			cancelId: 0,
 			defaultId: 0,
-			message: 'Delete “Demo Extension”?',
+			message: 'Delete “Demo App”?',
 		})
 	);
 
@@ -95,13 +95,13 @@ it('uses a native confirmation before deleting an extension', async () => {
 		response: 1,
 		checkboxChecked: false,
 	});
-	await expect(deleteHandler(event, extension.id)).resolves.toBe(true);
-	expect(deleteExtension).toHaveBeenCalledTimes(1);
-	expect(deleteExtension).toHaveBeenCalledWith(extension.id);
-	expect(extensionRegistry.revoke).toHaveBeenCalledWith(extension.id);
-	expect(destroyExtension).toHaveBeenCalledWith(extension.id);
+	await expect(deleteHandler(event, app.id)).resolves.toBe(true);
+	expect(deleteApp).toHaveBeenCalledTimes(1);
+	expect(deleteApp).toHaveBeenCalledWith(app.id);
+	expect(appRegistry.revoke).toHaveBeenCalledWith(app.id);
+	expect(destroyApp).toHaveBeenCalledWith(app.id);
 
-	await expect(deleteHandler(event, 'missing-extension')).rejects.toThrow(
-		'Extension not found: missing-extension'
+	await expect(deleteHandler(event, 'missing-app')).rejects.toThrow(
+		'App not found: missing-app'
 	);
 });

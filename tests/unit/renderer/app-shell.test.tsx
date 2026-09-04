@@ -1,12 +1,12 @@
 import { act, render, screen } from '@testing-library/react';
-import { ExtensionShell } from '../../../src/renderer/src/components/app/titlebar/ExtensionShell';
+import { AppShell } from '../../../src/renderer/src/components/app/titlebar/AppShell';
 
 jest.mock('../../../src/renderer/src/components/app/titlebar/hooks/useAppTheme', () => ({
 	useAppTheme: jest.fn(),
 }));
 
-jest.mock('../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar', () => ({
-	ExtensionTitleBar: ({
+jest.mock('../../../src/renderer/src/components/app/titlebar/AppTitleBar', () => ({
+	AppTitleBar: ({
 		title,
 		leftButtons,
 		rightButtons,
@@ -27,7 +27,7 @@ jest.mock('../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar',
 			data-right-buttons={rightButtons.map((button) => button.id).join(',')}
 			data-sidebar-open={sidebarOpen}
 			data-sidebar-transition-delay={sidebarTransitionDelay}
-			data-testid="extension-titlebar"
+			data-testid="app-titlebar"
 		>
 			{title}
 		</div>
@@ -64,10 +64,10 @@ beforeEach(() => {
 	});
 });
 
-it('paints the extension titlebar over the main translucent window surface', () => {
-	render(<ExtensionShell title="Workspace" />);
+it('paints the app titlebar over the main translucent window surface', () => {
+	render(<AppShell title="Workspace" />);
 
-	const shell = screen.getByTestId('extension-titlebar').parentElement;
+	const shell = screen.getByTestId('app-titlebar').parentElement;
 	expect(shell).toHaveClass(
 		'app-translucent-window',
 		'h-full',
@@ -78,17 +78,17 @@ it('paints the extension titlebar over the main translucent window surface', () 
 	expect(shell).toHaveTextContent('Workspace');
 });
 
-it('keeps the extension titlebar aligned with its sidebar width', () => {
-	render(<ExtensionShell title="Workspace" />);
+it('keeps the app titlebar aligned with its sidebar width', () => {
+	render(<AppShell title="Workspace" />);
 
 	act(() => sidebarWidthChanged(240));
 
-	expect(screen.getByTestId('extension-titlebar')).toHaveAttribute('data-sidebar-width', '240');
+	expect(screen.getByTestId('app-titlebar')).toHaveAttribute('data-sidebar-width', '240');
 });
 
-it('renders the extension title, buttons, and animated sidebar width from one snapshot', () => {
+it('renders the app title, buttons, and animated sidebar width from one snapshot', () => {
 	jest.spyOn(Date, 'now').mockReturnValue(1_040);
-	render(<ExtensionShell title="Manifest title" />);
+	render(<AppShell title="Manifest title" />);
 
 	act(() =>
 		titlebarOptionsChanged({
@@ -101,7 +101,7 @@ it('renders the extension title, buttons, and animated sidebar width from one sn
 		})
 	);
 
-	const titlebar = screen.getByTestId('extension-titlebar');
+	const titlebar = screen.getByTestId('app-titlebar');
 	expect(titlebar).toHaveTextContent('Workspace');
 	expect(titlebar).toHaveAttribute('data-left-buttons', 'toggle-sidebar');
 	expect(titlebar).toHaveAttribute('data-right-buttons', 'settings');
@@ -112,11 +112,11 @@ it('renders the extension title, buttons, and animated sidebar width from one sn
 });
 
 it('restores manifest defaults and unsubscribes when the shell unmounts', () => {
-	const { unmount } = render(<ExtensionShell title="Manifest title" />);
+	const { unmount } = render(<AppShell title="Manifest title" />);
 
 	act(() => titlebarOptionsChanged({ title: 'Configured title' }));
 	act(() => titlebarOptionsChanged(null));
-	expect(screen.getByTestId('extension-titlebar')).toHaveTextContent('Manifest title');
+	expect(screen.getByTestId('app-titlebar')).toHaveTextContent('Manifest title');
 
 	unmount();
 	expect(stopOptions).toHaveBeenCalledTimes(1);

@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { ExtensionTitleBar } from '../../../src/renderer/src/components/app/titlebar/ExtensionTitleBar';
+import { AppTitleBar } from '../../../src/renderer/src/components/app/titlebar/AppTitleBar';
 
 jest.mock(
-	'../../../src/renderer/src/components/app/titlebar/hooks/useExtensionWindowState',
-	() => ({ useExtensionWindowState: jest.fn(() => false) })
+	'../../../src/renderer/src/components/app/titlebar/hooks/useAppWindowState',
+	() => ({ useAppWindowState: jest.fn(() => false) })
 );
 
 beforeEach(() => {
@@ -19,11 +19,11 @@ beforeEach(() => {
 	});
 });
 
-it('continues the extension sidebar surface through the titlebar', () => {
+it('continues the app sidebar surface through the titlebar', () => {
 	const { container } = render(
-		<ExtensionTitleBar title="Workspace" sidebarOpen sidebarWidth={240} />
+		<AppTitleBar title="Workspace" sidebarOpen sidebarWidth={240} />
 	);
-	const surface = container.querySelector('[data-slot="extension-titlebar-sidebar"]');
+	const surface = container.querySelector('[data-slot="app-titlebar-sidebar"]');
 
 	expect(surface).toHaveClass('bg-sidebar', 'border-sidebar-border');
 	expect(surface).not.toHaveClass('border-b');
@@ -33,10 +33,10 @@ it('continues the extension sidebar surface through the titlebar', () => {
 
 it('slides the full-width sidebar surface off canvas during collapse', () => {
 	const { container } = render(
-		<ExtensionTitleBar title="Workspace" sidebarOpen={false} sidebarWidth={240} />
+		<AppTitleBar title="Workspace" sidebarOpen={false} sidebarWidth={240} />
 	);
 
-	expect(container.querySelector('[data-slot="extension-titlebar-sidebar"]')).toHaveStyle({
+	expect(container.querySelector('[data-slot="app-titlebar-sidebar"]')).toHaveStyle({
 		width: '240px',
 		transform: 'translateX(-100%)',
 	});
@@ -44,26 +44,26 @@ it('slides the full-width sidebar surface off canvas during collapse', () => {
 
 it('moves centered content with the visible sidebar boundary', () => {
 	const { rerender } = render(
-		<ExtensionTitleBar title="Workspace" sidebarOpen sidebarWidth={240} />
+		<AppTitleBar title="Workspace" sidebarOpen sidebarWidth={240} />
 	);
 	const center = screen.getByText('Workspace').parentElement;
 	expect(center).toHaveClass('transition-[left]', 'duration-200', 'ease-linear');
 	expect(center).toHaveStyle({ left: '240px' });
 
-	rerender(<ExtensionTitleBar title="Workspace" sidebarOpen={false} sidebarWidth={240} />);
+	rerender(<AppTitleBar title="Workspace" sidebarOpen={false} sidebarWidth={240} />);
 	expect(center).toHaveStyle({ left: '0px' });
 });
 
-it('catches up to a sidebar transition that started in the extension renderer', () => {
+it('catches up to a sidebar transition that started in the app renderer', () => {
 	const { container } = render(
-		<ExtensionTitleBar
+		<AppTitleBar
 			title="Workspace"
 			sidebarOpen={false}
 			sidebarTransitionDelay={-45}
 			sidebarWidth={240}
 		/>
 	);
-	const surface = container.querySelector('[data-slot="extension-titlebar-sidebar"]');
+	const surface = container.querySelector('[data-slot="app-titlebar-sidebar"]');
 	const center = screen.getByText('Workspace').parentElement;
 
 	expect(surface).toHaveStyle({ transitionDelay: '-45ms' });
@@ -72,7 +72,7 @@ it('catches up to a sidebar transition that started in the extension renderer', 
 
 it('renders centered titlebar content and relays left and right button ids', () => {
 	render(
-		<ExtensionTitleBar
+		<AppTitleBar
 			title="Workspace"
 			leftButtons={[
 				{
@@ -98,7 +98,7 @@ it('renders centered titlebar content and relays left and right button ids', () 
 
 it('does not dispatch disabled titlebar buttons', () => {
 	render(
-		<ExtensionTitleBar
+		<AppTitleBar
 			title="Workspace"
 			rightButtons={[
 				{ id: 'settings', label: 'Settings', icon: 'settings', disabled: true },

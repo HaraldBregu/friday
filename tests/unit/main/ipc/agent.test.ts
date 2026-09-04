@@ -31,7 +31,7 @@ describe('AgentIpc run ownership', () => {
 				agent,
 				conversation,
 				windows: { has: (id: number) => id === 7 } as never,
-				extensions: { has: () => false } as never,
+				apps: { has: () => false } as never,
 			},
 			eventBus
 		);
@@ -78,7 +78,7 @@ describe('AgentIpc run ownership', () => {
 				agent,
 				conversation: { execute: jest.fn() } as unknown as Conversation,
 				windows: { has: () => false } as never,
-				extensions: { has: () => false } as never,
+				apps: { has: () => false } as never,
 			},
 			{ sendTo: jest.fn() } as unknown as EventBus
 		);
@@ -93,7 +93,7 @@ describe('AgentIpc run ownership', () => {
 		expect(cancel).not.toHaveBeenCalled();
 	});
 
-	it('rejects assistant execution and policy changes from extension views', async () => {
+	it('rejects assistant execution and policy changes from app views', async () => {
 		const execute = jest.fn();
 		const sender = { id: 22, mainFrame: {} };
 		const event = { sender, senderFrame: sender.mainFrame };
@@ -104,7 +104,7 @@ describe('AgentIpc run ownership', () => {
 				agent: { config: { location: '/agent' } } as unknown as Agent,
 				conversation: { execute } as unknown as Conversation,
 				windows: { has: () => true } as never,
-				extensions: { has: () => true } as never,
+				apps: { has: () => true } as never,
 			},
 			{ sendTo: jest.fn() } as unknown as EventBus
 		);

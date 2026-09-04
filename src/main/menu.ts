@@ -1,12 +1,12 @@
 import { app, BrowserWindow, Menu as ElectronMenu } from 'electron';
 import { loadTranslations } from './i18n';
-import type { Extension } from './extensions/extension_index';
+import type { App } from './apps/app_index';
 
 interface MenuManagerCallbacks {
 	onLanguageChange: (lng: string) => void;
 	onNewWindow: () => void;
-	getExtensions: () => Extension[];
-	onOpenExtension: (extension: Extension) => void;
+	getApps: () => App[];
+	onOpenApp: (app: App) => void;
 	onOpenAppDataFolder?: () => void;
 	onOpenDataFolder?: () => void;
 	getTrayEnabled?: () => boolean;
@@ -38,14 +38,14 @@ export class Menu {
 		const isMac = process.platform === 'darwin';
 		const m = loadTranslations(this.currentLanguage, 'menu');
 
-		const extensions = this.callbacks.getExtensions();
-		const extensionSubmenu =
-			extensions.length > 0
-				? extensions.map((extension) => ({
-						label: extension.title,
-						click: (): void => this.callbacks.onOpenExtension(extension),
+		const apps = this.callbacks.getApps();
+		const appSubmenu =
+			apps.length > 0
+				? apps.map((app) => ({
+						label: app.title,
+						click: (): void => this.callbacks.onOpenApp(app),
 					}))
-				: [{ label: m.noExtensions || 'No extensions', enabled: false }];
+				: [{ label: m.noApps || 'No apps', enabled: false }];
 
 		const switchLanguage = (lng: string): void => {
 			this.currentLanguage = lng;
@@ -173,8 +173,8 @@ export class Menu {
 				],
 			},
 			{
-				label: m.extensions,
-				submenu: extensionSubmenu,
+				label: m.apps,
+				submenu: appSubmenu,
 			},
 			{
 				label: m.window,

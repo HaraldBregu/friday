@@ -8,7 +8,7 @@ export async function validatePluginEntries(
 ): Promise<void> {
 	const root = await fs.realpath(directory);
 	const entries = [
-		...manifest.contributes.extensions.map((item) => item.entry),
+		...manifest.contributes.apps.map((item) => item.entry),
 		...manifest.contributes.skills.map((item) => `${item.path}/SKILL.md`),
 		...manifest.contributes.providers.flatMap((item) => [
 			`providers/${item.id}/manifest.json`,

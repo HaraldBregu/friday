@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FormatToggle } from '../../../resources/extensions/workspace/src/components/format-toggle';
+import { FormatToggle } from '../../../resources/apps/workspace/src/components/format-toggle';
 
-jest.mock('../../../resources/extensions/workspace/src/components/ui/toggle-group', () => {
+jest.mock('../../../resources/apps/workspace/src/components/ui/toggle-group', () => {
 	const React = jest.requireActual<typeof import('react')>('react');
 	type ToggleGroupProps = {
 		'aria-label'?: string;
@@ -25,7 +25,7 @@ jest.mock('../../../resources/extensions/workspace/src/components/ui/toggle-grou
 	};
 });
 
-jest.mock('../../../resources/extensions/workspace/src/components/ui/toggle-item', () => ({
+jest.mock('../../../resources/apps/workspace/src/components/ui/toggle-item', () => ({
 	ToggleGroupItem: (
 		props: import('react').ButtonHTMLAttributes<HTMLButtonElement> & { value: string }
 	) => <button type="button" {...props} />,

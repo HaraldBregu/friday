@@ -6,13 +6,13 @@ import path from 'node:path';
 import { resolveWorkspaceFile } from './ipc/workspace';
 import { agentLocation } from './shared/agent_location';
 import type { LoggerService } from './shared';
-import type { ExtensionRegistry } from './extensions/extension_registry';
-import { extensionsRoot } from './extensions/extension_root';
-import { isExtensionId } from './extensions/extension_id';
+import type { AppRegistry } from './apps/app_registry';
+import { appsRoot } from './apps/app_root';
+import { isAppId } from './apps/app_id';
 
 const LOCAL_RESOURCE_SCHEME = 'local-resource';
-export const EXTENSION_RESOURCE_SCHEME = 'kucedr-extension';
-export const EXTENSION_SESSION_PARTITION = 'persist:kucedr-extensions';
+export const APP_RESOURCE_SCHEME = 'kucedr-app';
+export const APP_SESSION_PARTITION = 'persist:kucedr-apps';
 
 export function registerLocalResourceProtocolScheme(): void {
 	protocol.registerSchemesAsPrivileged([
@@ -27,7 +27,7 @@ export function registerLocalResourceProtocolScheme(): void {
 			},
 		},
 		{
-			scheme: EXTENSION_RESOURCE_SCHEME,
+			scheme: APP_RESOURCE_SCHEME,
 			privileges: {
 				standard: true,
 				secure: true,
@@ -39,15 +39,15 @@ export function registerLocalResourceProtocolScheme(): void {
 	]);
 }
 
-export function extensionResourceUrl(file: string, extensionId: string): string {
-	if (!isExtensionId(extensionId)) throw new Error('Invalid extension ID.');
-	const root = path.resolve(extensionsRoot(), extensionId);
+export function appResourceUrl(file: string, appId: string): string {
+	if (!isAppId(appId)) throw new Error('Invalid app ID.');
+	const root = path.resolve(appsRoot(), appId);
 	const target = path.resolve(file);
 	const relative = path.relative(root, target);
 	if (!relative || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
-		throw new Error('Extension entry resolves outside its folder.');
+		throw new Error('App entry resolves outside its folder.');
 	}
-	const url = new URL(`${EXTENSION_RESOURCE_SCHEME}://${extensionId}`);
+	const url = new URL(`${APP_RESOURCE_SCHEME}://${appId}`);
 	url.pathname = `/${relative.split(path.sep).join('/')}`;
 	return url.toString();
 }
@@ -78,13 +78,13 @@ export function registerLocalResourceProtocolHandler(logger: Pick<LoggerService,
 		};
 
 	protocol.handle(LOCAL_RESOURCE_SCHEME, handler(true));
-	const extensionSession = session.fromPartition(EXTENSION_SESSION_PARTITION);
-	extensionSession.protocol.handle(LOCAL_RESOURCE_SCHEME, handler(false));
-	extensionSession.protocol.handle(EXTENSION_RESOURCE_SCHEME, async (request) => {
+	const appSession = session.fromPartition(APP_SESSION_PARTITION);
+	appSession.protocol.handle(LOCAL_RESOURCE_SCHEME, handler(false));
+	appSession.protocol.handle(APP_RESOURCE_SCHEME, async (request) => {
 		try {
 			const url = new URL(request.url);
-			if (!isExtensionId(url.host)) return new Response(null, { status: 403 });
-			const root = path.resolve(extensionsRoot(), url.host);
+			if (!isAppId(url.host)) return new Response(null, { status: 403 });
+			const root = path.resolve(appsRoot(), url.host);
 			const pathname = decodeURIComponent(url.pathname).replace(/^\/+/, '');
 			const target = path.resolve(root, pathname);
 			const lexicalRelative = path.relative(root, target);
@@ -105,26 +105,26 @@ export function registerLocalResourceProtocolHandler(logger: Pick<LoggerService,
 				headers: request.headers,
 			});
 		} catch (err) {
-			logger.error('Extensions', `Extension resource fetch failed for ${request.url}`, err);
+			logger.error('Apps', `App resource fetch failed for ${request.url}`, err);
 			return new Response(null, { status: 404 });
 		}
 	});
 }
 
-export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistry): void {
+export function setupMediaPermissionHandlers(appRegistry: AppRegistry): void {
 	const configure = (targetSession: Electron.Session, allowDisplayCapture: boolean): void => {
 		targetSession.setPermissionCheckHandler(
 			(webContents, permission, requestingOrigin, details) => {
-				const isAppContents = isAppWindowWebContents(webContents, extensionRegistry);
+				const isAppContents = isAppWindowWebContents(webContents, appRegistry);
 				if (permission === 'fullscreen')
-					return Boolean(webContents && extensionRegistry.has(webContents));
+					return Boolean(webContents && appRegistry.has(webContents));
 				if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
 					return Boolean(
 						details.isMainFrame &&
 						(permission === 'clipboard-sanitized-write'
 							? isAppContents
 							: webContents &&
-								!extensionRegistry.has(webContents) &&
+								!appRegistry.has(webContents) &&
 								BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(
 							requestingOrigin,
@@ -136,7 +136,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 				if (permission !== 'media') return false;
 				if (details.mediaType !== 'audio' && details.mediaType !== 'video') return false;
 				if (!details.isMainFrame) return false;
-				if (webContents && extensionRegistry.has(webContents)) return false;
+				if (webContents && appRegistry.has(webContents)) return false;
 				if (!webContents || !BrowserWindow.fromWebContents(webContents)) return false;
 				return isTrustedMediaRequestSource(
 					requestingOrigin,
@@ -148,7 +148,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 
 		targetSession.setPermissionRequestHandler((webContents, permission, callback, details) => {
 			if (permission === 'fullscreen') {
-				callback(Boolean(webContents && extensionRegistry.has(webContents)));
+				callback(Boolean(webContents && appRegistry.has(webContents)));
 				return;
 			}
 			if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
@@ -156,9 +156,9 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 					Boolean(
 						details.isMainFrame &&
 						(permission === 'clipboard-sanitized-write'
-							? isAppWindowWebContents(webContents, extensionRegistry)
+							? isAppWindowWebContents(webContents, appRegistry)
 							: webContents &&
-								!extensionRegistry.has(webContents) &&
+								!appRegistry.has(webContents) &&
 								BrowserWindow.fromWebContents(webContents)) &&
 						isTrustedMediaRequestSource(undefined, details.requestingUrl, undefined)
 					)
@@ -176,7 +176,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 			const allowed =
 				(requestsAudio || requestsVideo) &&
 				mediaDetails.isMainFrame &&
-				!extensionRegistry.has(webContents) &&
+				!appRegistry.has(webContents) &&
 				Boolean(webContents && BrowserWindow.fromWebContents(webContents)) &&
 				isTrustedMediaRequestSource(
 					undefined,
@@ -204,7 +204,7 @@ export function setupMediaPermissionHandlers(extensionRegistry: ExtensionRegistr
 	};
 
 	configure(session.defaultSession, true);
-	configure(session.fromPartition(EXTENSION_SESSION_PARTITION), false);
+	configure(session.fromPartition(APP_SESSION_PARTITION), false);
 }
 
 function rendererDevOrigin(): string | null {
@@ -222,7 +222,7 @@ function isTrustedRendererOrigin(origin?: string): boolean {
 	if (!origin) return false;
 	if (origin === 'file://') return true;
 	try {
-		if (new URL(origin).protocol === `${EXTENSION_RESOURCE_SCHEME}:`) return true;
+		if (new URL(origin).protocol === `${APP_RESOURCE_SCHEME}:`) return true;
 	} catch {
 		return false;
 	}
@@ -237,7 +237,7 @@ function isTrustedRendererUrl(url?: string): boolean {
 	try {
 		const parsed = new URL(url);
 		return (
-			parsed.protocol === `${EXTENSION_RESOURCE_SCHEME}:` || isTrustedRendererOrigin(parsed.origin)
+			parsed.protocol === `${APP_RESOURCE_SCHEME}:` || isTrustedRendererOrigin(parsed.origin)
 		);
 	} catch {
 		return false;
@@ -262,11 +262,11 @@ export function isTrustedAppRendererUrl(url?: string): boolean {
 
 function isAppWindowWebContents(
 	webContents: Electron.WebContents | null,
-	extensionRegistry: ExtensionRegistry
+	appRegistry: AppRegistry
 ): boolean {
 	return Boolean(
 		webContents &&
-		(BrowserWindow.fromWebContents(webContents) || extensionRegistry.has(webContents))
+		(BrowserWindow.fromWebContents(webContents) || appRegistry.has(webContents))
 	);
 }
 

@@ -10,12 +10,12 @@ import {
 	syncFolders,
 } from '../storage';
 import type { StorageOperations } from '../storage';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 
 export interface StorageIpcDeps {
-	extensionRegistry: ExtensionRegistry;
+	appRegistry: AppRegistry;
 	storageOperations: StorageOperations;
 	windows: WindowContextManager;
 }
@@ -24,10 +24,10 @@ export class StorageIpc implements IpcModule<StorageIpcDeps> {
 	readonly name = 'storage';
 
 	register(
-		{ extensionRegistry, storageOperations, windows }: StorageIpcDeps,
+		{ appRegistry, storageOperations, windows }: StorageIpcDeps,
 		_eventBus: EventBus
 	): void {
-		const trusted = new TrustedRenderer(windows, extensionRegistry);
+		const trusted = new TrustedRenderer(windows, appRegistry);
 		registerQueryWithEvent(StorageChannels.getSettings, (event) => {
 			trusted.assert(event);
 			return getStorageSettings();

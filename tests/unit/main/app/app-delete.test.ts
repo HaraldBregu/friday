@@ -1,23 +1,23 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { deleteExtension } from '../../../../src/main/extensions/extension_delete';
+import { deleteApp } from '../../../../src/main/apps/app_delete';
 
-it('deletes only a validated extension directory', () => {
-	const appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-extension-delete-'));
-	const extension = path.join(appLocation, 'extensions', 'demo-extension');
-	const extensionData = path.join(appLocation, 'extensions-data', 'demo-extension');
+it('deletes only a validated app directory', () => {
+	const appLocation = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-app-delete-'));
+	const app = path.join(appLocation, 'apps', 'demo-app');
+	const appData = path.join(appLocation, 'apps-data', 'demo-app');
 	const outside = path.join(appLocation, 'outside');
-	fs.mkdirSync(extension, { recursive: true });
-	fs.mkdirSync(extensionData, { recursive: true });
-	fs.writeFileSync(path.join(extensionData, 'store.json'), '{}');
+	fs.mkdirSync(app, { recursive: true });
+	fs.mkdirSync(appData, { recursive: true });
+	fs.writeFileSync(path.join(appData, 'store.json'), '{}');
 	fs.mkdirSync(outside);
 
 	try {
-		deleteExtension('demo-extension', appLocation);
-		expect(fs.existsSync(extension)).toBe(false);
-		expect(fs.existsSync(extensionData)).toBe(true);
-		expect(() => deleteExtension('../outside', appLocation)).toThrow('Invalid extension ID.');
+		deleteApp('demo-app', appLocation);
+		expect(fs.existsSync(app)).toBe(false);
+		expect(fs.existsSync(appData)).toBe(true);
+		expect(() => deleteApp('../outside', appLocation)).toThrow('Invalid app ID.');
 		expect(fs.existsSync(outside)).toBe(true);
 	} finally {
 		fs.rmSync(appLocation, { recursive: true, force: true });

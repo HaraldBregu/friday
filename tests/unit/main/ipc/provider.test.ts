@@ -72,7 +72,7 @@ function register() {
 		sync: jest.fn(),
 	};
 	new ProviderStoreIpc().register(
-		{ sync: sync as never, windows: {} as never, extensions: {} as never },
+		{ sync: sync as never, windows: {} as never, apps: {} as never },
 		{} as EventBus
 	);
 	return sync;

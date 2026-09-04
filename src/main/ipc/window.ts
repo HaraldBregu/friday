@@ -10,11 +10,11 @@ import { wrapIpcHandler } from './core/error_handler';
 import { WindowChannels } from '../../shared/ipc_channels_definitions';
 import type { LoggerService } from '../shared';
 import type { ContextMenuDescriptor, ContextMenuRole } from '../../shared/window_types';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
-import { openExtensionWindows } from '../extensions/extension_render';
-import { isExtensionTitlebarOptions } from '../../shared/titlebar_validate';
-import { setExtensionTitlebar } from '../extensions/extension_titlebar_set';
-import { dispatchExtensionTitlebarButton } from '../extensions/extension_titlebar_click';
+import type { AppRegistry } from '../apps/app_registry';
+import { openAppWindows } from '../apps/app_render';
+import { isAppTitlebarOptions } from '../../shared/titlebar_validate';
+import { setAppTitlebar } from '../apps/app_titlebar_set';
+import { dispatchAppTitlebarButton } from '../apps/app_titlebar_click';
 
 const contextMenuRoles = new Set<ContextMenuRole>([
 	'undo',
@@ -31,7 +31,7 @@ const maxContextMenuTextLength = 120;
 
 export interface WindowIpcDeps {
 	logger: LoggerService;
-	extensionRegistry: ExtensionRegistry;
+	appRegistry: AppRegistry;
 }
 
 /**
@@ -54,7 +54,7 @@ export interface WindowIpcDeps {
 export class WindowIpc implements IpcModule<WindowIpcDeps> {
 	readonly name = 'window';
 
-	register({ logger, extensionRegistry }: WindowIpcDeps, _eventBus: EventBus): void {
+	register({ logger, appRegistry }: WindowIpcDeps, _eventBus: EventBus): void {
 		// --- Send handlers (fire-and-forget) ---
 
 		ipcMain.on(WindowChannels.minimize, (event) => {
@@ -96,31 +96,31 @@ export class WindowIpc implements IpcModule<WindowIpcDeps> {
 			) {
 				return;
 			}
-			let extensionId: string;
+			let appId: string;
 			try {
-				extensionId = extensionRegistry.resolve(event.sender);
+				appId = appRegistry.resolve(event.sender);
 			} catch {
 				return;
 			}
-			const extensionWindow = openExtensionWindows.get(extensionId)?.window;
-			if (!extensionWindow || extensionWindow.isDestroyed()) return;
-			extensionWindow.webContents.send(WindowChannels.titlebarSidebarWidthChanged, width);
+			const appWindow = openAppWindows.get(appId)?.window;
+			if (!appWindow || appWindow.isDestroyed()) return;
+			appWindow.webContents.send(WindowChannels.titlebarSidebarWidthChanged, width);
 		});
 
 		ipcMain.on(WindowChannels.titlebarOptionsSet, (event, options) => {
-			if (!isExtensionTitlebarOptions(options)) return;
-			let extensionId: string;
+			if (!isAppTitlebarOptions(options)) return;
+			let appId: string;
 			try {
-				extensionId = extensionRegistry.resolve(event.sender);
+				appId = appRegistry.resolve(event.sender);
 			} catch {
 				return;
 			}
-			setExtensionTitlebar(extensionId, options);
+			setAppTitlebar(appId, options);
 		});
 
 		ipcMain.on(WindowChannels.titlebarButtonClick, (event, buttonId) => {
 			if (typeof buttonId !== 'string' || !buttonId.trim() || buttonId.length > 120) return;
-			dispatchExtensionTitlebarButton(event.sender, buttonId);
+			dispatchAppTitlebarButton(event.sender, buttonId);
 		});
 
 		// --- Query handlers (invoke/handle) ---

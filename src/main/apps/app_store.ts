@@ -1,41 +1,41 @@
-import type { ExtensionStoreValue } from '../../shared/extension_store_types';
-import { extensionDataRoot } from './extension_data_root';
-import { ExtensionFileStorage } from './extension_files';
-import { ExtensionValueStorage } from './extension_values';
+import type { AppStoreValue } from '../../shared/app_store_types';
+import { appDataRoot } from './app_data_root';
+import { AppFileStorage } from './app_files';
+import { AppValueStorage } from './app_values';
 
-export class ExtensionStorage {
-	private readonly files: ExtensionFileStorage;
-	private readonly values: ExtensionValueStorage;
+export class AppStorage {
+	private readonly files: AppFileStorage;
+	private readonly values: AppValueStorage;
 
-	constructor(root = extensionDataRoot()) {
-		this.files = new ExtensionFileStorage(root);
-		this.values = new ExtensionValueStorage(root);
+	constructor(root = appDataRoot()) {
+		this.files = new AppFileStorage(root);
+		this.values = new AppValueStorage(root);
 	}
 
-	get<T extends ExtensionStoreValue = ExtensionStoreValue>(
-		extensionId: string,
+	get<T extends AppStoreValue = AppStoreValue>(
+		appId: string,
 		key: string
 	): T | undefined {
-		return this.values.get<T>(extensionId, key);
+		return this.values.get<T>(appId, key);
 	}
 
-	set(extensionId: string, key: string, value: ExtensionStoreValue): void {
-		this.values.set(extensionId, key, value);
+	set(appId: string, key: string, value: AppStoreValue): void {
+		this.values.set(appId, key, value);
 	}
 
-	delete(extensionId: string, key: string): void {
-		this.values.delete(extensionId, key);
+	delete(appId: string, key: string): void {
+		this.values.delete(appId, key);
 	}
 
-	readFile(extensionId: string, filePath: string): Promise<Uint8Array> {
-		return this.files.read(extensionId, filePath);
+	readFile(appId: string, filePath: string): Promise<Uint8Array> {
+		return this.files.read(appId, filePath);
 	}
 
-	writeFile(extensionId: string, filePath: string, data: Uint8Array): Promise<void> {
-		return this.files.write(extensionId, filePath, data);
+	writeFile(appId: string, filePath: string, data: Uint8Array): Promise<void> {
+		return this.files.write(appId, filePath, data);
 	}
 
-	deleteFile(extensionId: string, filePath: string): Promise<void> {
-		return this.files.delete(extensionId, filePath);
+	deleteFile(appId: string, filePath: string): Promise<void> {
+		return this.files.delete(appId, filePath);
 	}
 }

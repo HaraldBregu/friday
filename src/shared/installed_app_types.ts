@@ -1,27 +1,27 @@
-export type ExtensionMetadata = {
+export type AppMetadata = {
 	version: string;
 	category: string;
 	entry: string;
 	[key: string]: unknown;
 };
 
-export type ExtensionManifest = {
+export type AppManifest = {
 	title: string;
 	description: string;
-	metadata: ExtensionMetadata;
+	metadata: AppMetadata;
 };
 
-export type Extension = ExtensionManifest & {
+export type App = AppManifest & {
 	id: string;
 };
 
-export interface ExtensionImportSkipped {
+export interface AppImportSkipped {
 	name: string;
 	sourcePath: string;
 	reason: string;
 }
 
-export interface ExtensionImportResult {
-	imported: Extension[];
-	skipped: ExtensionImportSkipped[];
+export interface AppImportResult {
+	imported: App[];
+	skipped: AppImportSkipped[];
 }

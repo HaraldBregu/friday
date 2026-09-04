@@ -14,9 +14,9 @@ import { processTool } from '../tools/core/process';
 import { readTool } from '../tools/core/read';
 import { requestUserInputTool } from '../tools/core/ask';
 import { writeTool } from '../tools/core/write';
-import { closeExtensionsTool } from '../tools/extensions/close_extensions';
-import { listExtensionsTool } from '../tools/extensions/list_extensions';
-import { openExtensionsTool } from '../tools/extensions/open_extensions';
+import { closeAppsTool } from '../tools/apps/close_apps';
+import { listAppsTool } from '../tools/apps/list_apps';
+import { openAppsTool } from '../tools/apps/open_apps';
 import { updateHealthSettingsTool } from '../tools/health/update_health_settings';
 import { updateHealthTool } from '../tools/health/update_health';
 import { getKnowledgeTools, getPlanWikiTools, getWikiTools } from '../tools/knowledge';
@@ -96,9 +96,9 @@ export function builtinTools(
 		getTaskTool,
 		listTasksTool,
 		runTaskNowTool,
-		listExtensionsTool,
-		...(windowFactory ? [openExtensionsTool(windowFactory)] : []),
-		closeExtensionsTool,
+		listAppsTool,
+		...(windowFactory ? [openAppsTool(windowFactory)] : []),
+		closeAppsTool,
 		completeBootstrapTool,
 	];
 }

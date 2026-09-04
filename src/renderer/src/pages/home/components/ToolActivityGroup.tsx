@@ -2,7 +2,7 @@ import { createElement, useState, type ReactElement } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useNow } from '@/components/hooks/use-now';
 import { formatDuration } from '@/components/prompt-kit/duration';
-import { isExtensionToolType } from '@/components/prompt-kit/extension';
+import { isAppToolType } from '@/components/prompt-kit/app';
 import { TextShimmer } from '@/components/prompt-kit/text-shimmer';
 import { isTaskToolType } from '@/components/prompt-kit/task';
 import { Tool, toolIcon } from '@/components/prompt-kit/tool';
@@ -22,8 +22,8 @@ function groupToolsByType(tools: readonly AgentToolPart[]): ToolTypeGroup[] {
 	for (const tool of tools) {
 		const type = isTaskToolType(tool.type)
 			? 'task'
-			: isExtensionToolType(tool.type)
-				? 'extension'
+			: isAppToolType(tool.type)
+				? 'app'
 				: tool.type;
 		const last = groups[groups.length - 1];
 		if (last && last.type === type) {

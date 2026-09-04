@@ -1,9 +1,9 @@
 import type { BrowserWindow, WebContentsView } from 'electron';
-import { closeExtension } from '../../../../src/main/extensions/extension_close';
+import { closeApp } from '../../../../src/main/apps/app_close';
 import {
-	openExtensionWindows,
+	openAppWindows,
 	render,
-} from '../../../../src/main/extensions/extension_render';
+} from '../../../../src/main/apps/app_render';
 import type { WindowFactory } from '../../../../src/main/window_factory';
 
 jest.mock('../../../../src/main/translucency', () => ({
@@ -81,11 +81,11 @@ function createHarness() {
 	};
 }
 
-describe('extension renderer', () => {
-	it('loads the titlebar shell before attaching and loading extension content', async () => {
+describe('app renderer', () => {
+	it('loads the titlebar shell before attaching and loading app content', async () => {
 		const harness = createHarness();
 
-		expect(render(harness.windowFactory, '/extension/index.html', 'Project', 'project-order')).toBe(
+		expect(render(harness.windowFactory, '/app/index.html', 'Project', 'project-order')).toBe(
 			harness.win
 		);
 		expect(harness.create).toHaveBeenCalledWith(
@@ -97,7 +97,7 @@ describe('extension renderer', () => {
 				vibrancy: 'under-window',
 				visualEffectState: 'followWindow',
 			}),
-			{ html: 'extension.html', hash: 'extension/Project' }
+			{ html: 'app.html', hash: 'app/Project' }
 		);
 		expect(harness.createView).not.toHaveBeenCalled();
 
@@ -105,7 +105,7 @@ describe('extension renderer', () => {
 		expect(harness.win.show).not.toHaveBeenCalled();
 
 		harness.shellHandlers.get('did-finish-load')?.();
-		expect(harness.createView).toHaveBeenCalledWith('/extension/index.html', 'project-order');
+		expect(harness.createView).toHaveBeenCalledWith('/app/index.html', 'project-order');
 		expect(harness.view.setVisible).toHaveBeenCalledWith(false);
 		expect(harness.win.contentView.addChildView).toHaveBeenCalledWith(harness.view);
 		expect(harness.view.setBounds).toHaveBeenCalledWith({
@@ -115,7 +115,7 @@ describe('extension renderer', () => {
 			height: 592,
 		});
 		expect(harness.load).toHaveBeenCalledTimes(1);
-		expect(openExtensionWindows.get('project-order')).toMatchObject({
+		expect(openAppWindows.get('project-order')).toMatchObject({
 			contents: harness.viewWebContents,
 			titlebarOptions: null,
 		});
@@ -135,12 +135,12 @@ describe('extension renderer', () => {
 		expect(harness.win.setTitle).toHaveBeenCalledWith('Project');
 
 		harness.handlers.get('closed')?.();
-		expect(openExtensionWindows.has('project-order')).toBe(false);
+		expect(openAppWindows.has('project-order')).toBe(false);
 	});
 
-	it('keeps a failed extension view hidden and closes its shell', async () => {
+	it('keeps a failed app view hidden and closes its shell', async () => {
 		const harness = createHarness();
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-failure');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-failure');
 
 		harness.handlers.get('ready-to-show')?.();
 		harness.shellHandlers.get('did-finish-load')?.();
@@ -153,21 +153,21 @@ describe('extension renderer', () => {
 		harness.handlers.get('closed')?.();
 	});
 
-	it('discards a crashed titlebar shell so the extension can be opened again', () => {
+	it('discards a crashed titlebar shell so the app can be opened again', () => {
 		const harness = createHarness();
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-crash');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-crash');
 
 		harness.shellHandlers.get('render-process-gone')?.();
 		expect(harness.win.destroy).toHaveBeenCalledTimes(1);
 
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-crash');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-crash');
 		expect(harness.create).toHaveBeenCalledTimes(2);
 		harness.handlers.get('closed')?.();
 	});
 
-	it('lets the extension finish before closing the titlebar shell', () => {
+	it('lets the app finish before closing the titlebar shell', () => {
 		const harness = createHarness();
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-close');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-close');
 		const closeEvent = { preventDefault: jest.fn() };
 
 		harness.handlers.get('close')?.(closeEvent);
@@ -193,25 +193,25 @@ describe('extension renderer', () => {
 		expect(harness.viewWebContents.close).toHaveBeenCalledTimes(2);
 	});
 
-	it('requests closing a tracked extension and forgets it once closed', () => {
+	it('requests closing a tracked app and forgets it once closed', () => {
 		const harness = createHarness();
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-request-close');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-request-close');
 
-		expect(closeExtension('project-request-close')).toBe(true);
+		expect(closeApp('project-request-close')).toBe(true);
 		expect(harness.win.close).toHaveBeenCalledTimes(1);
 
 		harness.handlers.get('closed')?.();
-		expect(closeExtension('project-request-close')).toBe(false);
+		expect(closeApp('project-request-close')).toBe(false);
 		expect(harness.win.close).toHaveBeenCalledTimes(1);
 	});
 
-	it('does not close missing or destroyed extension windows', () => {
+	it('does not close missing or destroyed app windows', () => {
 		const harness = createHarness();
-		render(harness.windowFactory, '/extension/index.html', 'Project', 'project-destroyed');
+		render(harness.windowFactory, '/app/index.html', 'Project', 'project-destroyed');
 		harness.win.isDestroyed = jest.fn(() => true);
 
-		expect(closeExtension('missing')).toBe(false);
-		expect(closeExtension('project-destroyed')).toBe(false);
+		expect(closeApp('missing')).toBe(false);
+		expect(closeApp('project-destroyed')).toBe(false);
 		expect(harness.win.close).not.toHaveBeenCalled();
 	});
 });

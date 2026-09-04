@@ -20,7 +20,7 @@ import { A2aIpc } from '../../../../src/main/ipc/a2a';
 import { A2aChannels } from '../../../../src/shared/ipc_channels_definitions';
 import { BrowserWindow } from 'electron';
 
-const extensionRegistry = { has: jest.fn() };
+const appRegistry = { has: jest.fn() };
 const event = { sender: { id: 1 } };
 
 function command(channel: string): (...args: unknown[]) => unknown {
@@ -33,9 +33,9 @@ function query(channel: string): (...args: unknown[]) => unknown {
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	extensionRegistry.has.mockReturnValue(false);
+	appRegistry.has.mockReturnValue(false);
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({ id: 1 });
-	new A2aIpc().register({ extensionRegistry: extensionRegistry as never }, {} as never);
+	new A2aIpc().register({ appRegistry: appRegistry as never }, {} as never);
 });
 
 it('redacts tokens from list and save results', async () => {
@@ -75,13 +75,13 @@ it('redacts tokens from list and save results', async () => {
 
 it('rejects unknown or revoked non-window renderers', () => {
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue(null);
-	expect(() => query(A2aChannels.list)(event)).toThrow('unavailable to extension views');
+	expect(() => query(A2aChannels.list)(event)).toThrow('unavailable to app views');
 });
 
-it('rejects A2A settings access from extension views', async () => {
-	extensionRegistry.has.mockReturnValue(true);
-	expect(() => query(A2aChannels.list)(event)).toThrow('unavailable to extension views');
+it('rejects A2A settings access from app views', async () => {
+	appRegistry.has.mockReturnValue(true);
+	expect(() => query(A2aChannels.list)(event)).toThrow('unavailable to app views');
 	await expect(
 		command(A2aChannels.save)(event, { name: '', url: 'https://agent.example' })
-	).rejects.toThrow('unavailable to extension views');
+	).rejects.toThrow('unavailable to app views');
 });

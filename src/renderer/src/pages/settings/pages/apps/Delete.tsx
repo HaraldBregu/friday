@@ -2,17 +2,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Extension } from '../../../../../../shared/extension_types';
+import type { App } from '../../../../../../shared/installed_app_types';
 
 interface DeleteProps {
-	readonly extension: Extension;
+	readonly app: App;
 	readonly disabled: boolean;
-	readonly onDeleted: (extensionId: string) => void;
+	readonly onDeleted: (appId: string) => void;
 	readonly onError: (message: string) => void;
 }
 
 export default function Delete({
-	extension,
+	app,
 	disabled,
 	onDeleted,
 	onError,
@@ -26,22 +26,22 @@ export default function Delete({
 			variant="ghost"
 			size="icon-sm"
 			className="mr-3 flex-none text-muted-foreground hover:text-destructive"
-			aria-label={t('settings.extensions.deleteAction', { name: extension.title })}
-			title={t('settings.extensions.deleteAction', { name: extension.title })}
+			aria-label={t('settings.apps.deleteAction', { name: app.title })}
+			title={t('settings.apps.deleteAction', { name: app.title })}
 			disabled={disabled || deleting}
 			onClick={() => {
 				setDeleting(true);
 				onError('');
-				void window.extensions
-					.delete(extension.id)
+				void window.apps
+					.delete(app.id)
 					.then((deleted) => {
-						if (deleted) onDeleted(extension.id);
+						if (deleted) onDeleted(app.id);
 					})
 					.catch((error: unknown) => {
 						onError(
 							error instanceof Error && error.message.trim().length > 0
 								? error.message
-								: t('settings.extensions.deleteError')
+								: t('settings.apps.deleteError')
 						);
 					})
 					.finally(() => setDeleting(false));

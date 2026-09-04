@@ -4,7 +4,7 @@ import { WindowContextManager } from './window_context';
 import { WindowFactory } from './window_factory';
 import { LoggerService } from './shared';
 import { createChannelRegistry, type ChannelRegistry } from './channels';
-import { ExtensionRegistry, ExtensionStorage } from './extensions/extension_index';
+import { AppRegistry, AppStorage } from './apps/app_index';
 
 import { Agent } from './agent/agent';
 import { Conversation } from './agent/conversation';
@@ -42,8 +42,8 @@ export interface MainServices {
 	channelRegistry: ChannelRegistry;
 	windowFactory: WindowFactory;
 	windowContextManager: WindowContextManager;
-	extensionRegistry: ExtensionRegistry;
-	extensionStorage: ExtensionStorage;
+	appRegistry: AppRegistry;
+	appStorage: AppStorage;
 	storageOperations: StorageOperations;
 	terminalManager: PtyManager;
 	authService: AuthService;
@@ -57,9 +57,9 @@ export function bootstrapServices(): BootstrapResult {
 	const appState = new AppState();
 	const eventBus = new EventBus();
 	const logger = new LoggerService(eventBus);
-	const extensionRegistry = new ExtensionRegistry();
-	const extensionStorage = new ExtensionStorage();
-	const windowFactory = new WindowFactory(logger, extensionRegistry);
+	const appRegistry = new AppRegistry();
+	const appStorage = new AppStorage();
+	const windowFactory = new WindowFactory(logger, appRegistry);
 	const agentService = new Agent(windowFactory, new ExecSandbox());
 	const coderStore = new CoderStore();
 	const coderService = new Coder({
@@ -135,8 +135,8 @@ export function bootstrapServices(): BootstrapResult {
 		channelRegistry,
 		windowFactory,
 		windowContextManager,
-		extensionRegistry,
-		extensionStorage,
+		appRegistry,
+		appStorage,
 		storageOperations,
 		terminalManager,
 		authService,

@@ -25,7 +25,7 @@ import type {
 	McpStdioData,
 	McpTestResult,
 } from './mcp_types';
-import type { Extension, ExtensionImportResult } from './extension_types';
+import type { App, AppImportResult } from './installed_app_types';
 import type { TaskRuntime, TaskSchedule, TaskScheduledTask } from '../main/tasks/tasks_types';
 import type { HealthSettings } from '../main/agent/health/health_types';
 import type { RagIndexResult, RagMatch } from '../main/agent/knowledge/rag';
@@ -92,9 +92,9 @@ import type {
 	AppTheme,
 } from './app_types';
 import type { WikiRunResult, WikiSettings, WikiStatus } from './wiki_types';
-import type { ContextMenuDescriptor, ExtensionTitlebarOptions } from './window_types';
+import type { ContextMenuDescriptor, AppTitlebarOptions } from './window_types';
 import type { WorkspaceAsset } from './workspace';
-import type { ExtensionStorageApi } from './extension_store_types';
+import type { AppStorageApi } from './app_store_types';
 import type { SandboxStatus } from './sandbox';
 import type {
 	CoderAuthEvent,
@@ -126,9 +126,9 @@ export interface WindowApi {
 	onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void;
 	isFullScreen: () => Promise<boolean>;
 	onFullScreenChange: (callback: (isFullScreen: boolean) => void) => () => void;
-	setTitlebarOptions: (options: ExtensionTitlebarOptions | null) => void;
+	setTitlebarOptions: (options: AppTitlebarOptions | null) => void;
 	onTitlebarOptionsChanged: (
-		callback: (options: ExtensionTitlebarOptions | null) => void
+		callback: (options: AppTitlebarOptions | null) => void
 	) => () => void;
 	clickTitlebarButton: (buttonId: string) => void;
 	onTitlebarButtonClick: (callback: (buttonId: string) => void) => () => void;
@@ -306,12 +306,12 @@ export interface DatabaseApi {
 	saveConfiguration: (configuration: DatabaseConfiguration) => Promise<DatabaseConfiguration>;
 }
 
-export interface ExtensionsApi {
-	list: () => Promise<Extension[]>;
-	open: (extensionId: string) => Promise<void>;
+export interface AppsApi {
+	list: () => Promise<App[]>;
+	open: (appId: string) => Promise<void>;
 	openRoot: () => Promise<void>;
-	delete: (extensionId: string) => Promise<boolean>;
-	import: () => Promise<ExtensionImportResult | undefined>;
+	delete: (appId: string) => Promise<boolean>;
+	import: () => Promise<AppImportResult | undefined>;
 }
 
 export interface SearchApi {
@@ -437,7 +437,7 @@ export interface ModelsApi {
 	};
 }
 
-export interface AppApi extends ExtensionStorageApi {
+export interface AppApi extends AppStorageApi {
 	models: () => Promise<CatalogModel[]>;
 	databases: () => Promise<CatalogService[]>;
 	webSearches: () => Promise<CatalogWebSearch[]>;

@@ -13,12 +13,12 @@ import { is } from '@electron-toolkit/utils';
 import type { LoggerService } from './shared';
 import { resourceRoot } from './shared/resource_root';
 import { setupPdfContextMenu } from './pdf';
-import type { ExtensionRegistry } from './extensions/extension_registry';
+import type { AppRegistry } from './apps/app_registry';
 import { externalUrl } from './external';
 import {
-	EXTENSION_RESOURCE_SCHEME,
-	EXTENSION_SESSION_PARTITION,
-	extensionResourceUrl,
+	APP_RESOURCE_SCHEME,
+	APP_SESSION_PARTITION,
+	appResourceUrl,
 } from './protocol';
 
 export interface WindowPreset {
@@ -43,7 +43,7 @@ export class WindowFactory {
 
 	constructor(
 		private readonly logger: LoggerService | undefined,
-		private readonly extensionRegistry: ExtensionRegistry
+		private readonly appRegistry: AppRegistry
 	) {
 		// Use path.resolve to ensure absolute path for preload
 		// Output as .js (CommonJS) for Electron preload compatibility
@@ -69,10 +69,10 @@ export class WindowFactory {
 	private secureNavigation(
 		webContents: WebContents,
 		fileRoot?: string,
-		extensionId?: string
+		appId?: string
 	): void {
 		webContents.setWindowOpenHandler(({ url }) => {
-			if (fileRoot || extensionId) {
+			if (fileRoot || appId) {
 				const target = externalUrl(url);
 				if (target) {
 					void shell.openExternal(target).catch((error) => {
@@ -88,9 +88,9 @@ export class WindowFactory {
 		webContents.on('will-navigate', (event, url) => {
 			const target = new URL(url);
 			if (
-				extensionId &&
-				target.protocol === `${EXTENSION_RESOURCE_SCHEME}:` &&
-				target.host === extensionId
+				appId &&
+				target.protocol === `${APP_RESOURCE_SCHEME}:` &&
+				target.host === appId
 			) {
 				return;
 			}
@@ -106,7 +106,7 @@ export class WindowFactory {
 			const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
 			if (is.dev && rendererUrl && target.origin === new URL(rendererUrl).origin) return;
 			event.preventDefault();
-			const externalTarget = fileRoot || extensionId ? externalUrl(url) : null;
+			const externalTarget = fileRoot || appId ? externalUrl(url) : null;
 			if (externalTarget) {
 				void shell.openExternal(externalTarget).catch((error) => {
 					this.logger?.warn('WindowFactory', 'Failed to open external URL', {
@@ -153,25 +153,25 @@ export class WindowFactory {
 		return win;
 	}
 
-	createView(file: string, extensionId: string): LoadableView {
+	createView(file: string, appId: string): LoadableView {
 		const view = new WebContentsView({
 			webPreferences: {
 				...this.getBaseWebPreferences(),
-				partition: EXTENSION_SESSION_PARTITION,
+				partition: APP_SESSION_PARTITION,
 			},
 		});
 		const viewContents = view.webContents;
-		const resourceUrl = extensionResourceUrl(file, extensionId);
-		this.extensionRegistry.register(viewContents, extensionId);
-		this.secureNavigation(viewContents, undefined, extensionId);
+		const resourceUrl = appResourceUrl(file, appId);
+		this.appRegistry.register(viewContents, appId);
+		this.secureNavigation(viewContents, undefined, appId);
 		viewContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
-			this.logger?.error('Extensions', `Extension view failed to load: ${validatedURL}`, {
+			this.logger?.error('Apps', `App view failed to load: ${validatedURL}`, {
 				errorCode,
 				errorDescription,
 			});
 		});
 		viewContents.on('render-process-gone', (_event, details) => {
-			this.logger?.error('Extensions', `Extension renderer exited: ${file}`, {
+			this.logger?.error('Apps', `App renderer exited: ${file}`, {
 				reason: details.reason,
 				exitCode: details.exitCode,
 			});
@@ -180,7 +180,7 @@ export class WindowFactory {
 			try {
 				await viewContents.loadURL(resourceUrl);
 			} catch (error) {
-				this.logger?.error('Extensions', `Unable to open extension entry: ${file}`, {
+				this.logger?.error('Apps', `Unable to open app entry: ${file}`, {
 					error: error instanceof Error ? error.message : String(error),
 				});
 				throw error;

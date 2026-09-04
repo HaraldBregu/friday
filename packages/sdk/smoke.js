@@ -5,7 +5,7 @@ import {
 	app,
 	coder,
 	connect,
-	isExtensionStoreValue,
+	isAppStoreValue,
 	isKucedr,
 	models,
 	terminal,
@@ -22,8 +22,8 @@ assert.throws(() => models.image.createImage, /unavailable/);
 assert.throws(() => terminal.create, /unavailable/);
 assert.throws(() => win.showContextMenu, /unavailable/);
 
-const extensionValues = new Map();
-const extensionFiles = new Map();
+const appValues = new Map();
+const appFiles = new Map();
 const workspaceFile = {
 	name: 'USER.md',
 	path: 'USER.md',
@@ -33,16 +33,16 @@ const workspaceFile = {
 	updatedAt: '2026-08-18T10:00:00.000Z',
 };
 globalThis.app = {
-	getExtensionStoreValue: async (key) => extensionValues.get(key),
-	setExtensionStoreValue: async (key, value) => extensionValues.set(key, value),
-	deleteExtensionStoreValue: async (key) => extensionValues.delete(key),
-	readExtensionStoreFile: async (path) => {
-		const data = extensionFiles.get(path);
-		if (!data) throw new Error('Extension file not found.');
+	getAppStoreValue: async (key) => appValues.get(key),
+	setAppStoreValue: async (key, value) => appValues.set(key, value),
+	deleteAppStoreValue: async (key) => appValues.delete(key),
+	readAppStoreFile: async (path) => {
+		const data = appFiles.get(path);
+		if (!data) throw new Error('App file not found.');
 		return data;
 	},
-	writeExtensionStoreFile: async (path, data) => extensionFiles.set(path, new Uint8Array(data)),
-	deleteExtensionStoreFile: async (path) => extensionFiles.delete(path),
+	writeAppStoreFile: async (path, data) => appFiles.set(path, new Uint8Array(data)),
+	deleteAppStoreFile: async (path) => appFiles.delete(path),
 	getThemeData: async () => ({
 		themeMode: 'system',
 		isDark: false,
@@ -194,28 +194,28 @@ globalThis.win = {
 };
 
 assert.equal(isKucedr(), true);
-assert.equal(isExtensionStoreValue({ color: 'blue', sizes: [1, 2] }), true);
-assert.equal(isExtensionStoreValue({ invalid: Number.NaN }), false);
+assert.equal(isAppStoreValue({ color: 'blue', sizes: [1, 2] }), true);
+assert.equal(isAppStoreValue({ invalid: Number.NaN }), false);
 assert.deepEqual(await app.getThemeData(), {
 	themeMode: 'system',
 	isDark: false,
 	colors: { background: '#fff' },
 });
-await app.setExtensionStoreValue('config', { color: 'blue' });
-assert.deepEqual(await app.getExtensionStoreValue('config'), { color: 'blue' });
-await app.deleteExtensionStoreValue('config');
-assert.equal(await app.getExtensionStoreValue('config'), undefined);
-await app.writeExtensionStoreFile('assets/data.bin', new Uint8Array([4, 5, 6]));
-assert.deepEqual(await app.readExtensionStoreFile('assets/data.bin'), new Uint8Array([4, 5, 6]));
-await app.deleteExtensionStoreFile('assets/data.bin');
-await assert.rejects(app.readExtensionStoreFile('assets/data.bin'), /not found/);
-const writeExtensionStoreFile = globalThis.app.writeExtensionStoreFile;
-delete globalThis.app.writeExtensionStoreFile;
+await app.setAppStoreValue('config', { color: 'blue' });
+assert.deepEqual(await app.getAppStoreValue('config'), { color: 'blue' });
+await app.deleteAppStoreValue('config');
+assert.equal(await app.getAppStoreValue('config'), undefined);
+await app.writeAppStoreFile('assets/data.bin', new Uint8Array([4, 5, 6]));
+assert.deepEqual(await app.readAppStoreFile('assets/data.bin'), new Uint8Array([4, 5, 6]));
+await app.deleteAppStoreFile('assets/data.bin');
+await assert.rejects(app.readAppStoreFile('assets/data.bin'), /not found/);
+const writeAppStoreFile = globalThis.app.writeAppStoreFile;
+delete globalThis.app.writeAppStoreFile;
 assert.throws(
-	() => app.writeExtensionStoreFile,
-	/app\.writeExtensionStoreFile.*update the Kucedr host/
+	() => app.writeAppStoreFile,
+	/app\.writeAppStoreFile.*update the Kucedr host/
 );
-globalThis.app.writeExtensionStoreFile = writeExtensionStoreFile;
+globalThis.app.writeAppStoreFile = writeAppStoreFile;
 assert.equal(await agent.getWorkspaceLocation(), '/tmp/kucedr-workspace');
 assert.deepEqual(await agent.listWorkspaceFiles(), [workspaceFile]);
 assert.equal(await agent.readWorkspaceFile('USER.md'), 'content:USER.md');
@@ -373,7 +373,7 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const kucedr = connect({ url: `http://127.0.0.1:${server.address().port}`, token: 'secret' });
 
 assert.deepEqual(await kucedr.ping(), { name: 'kucedr', version: '1.0.0' });
-assert.throws(() => kucedr.app.getExtensionStoreValue, /not available over the API/);
+assert.throws(() => kucedr.app.getAppStoreValue, /not available over the API/);
 await kucedr.app.getThemeData();
 assert.equal(await kucedr.agent.getWorkspaceLocation(), '/tmp/kucedr-workspace');
 assert.deepEqual(await kucedr.agent.listWorkspaceFiles(), [workspaceFile]);

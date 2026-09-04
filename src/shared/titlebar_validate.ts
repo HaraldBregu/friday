@@ -1,16 +1,16 @@
 import {
-	EXTENSION_TITLEBAR_BUTTON_ICONS,
-	type ExtensionTitlebarButton,
-	type ExtensionTitlebarOptions,
+	APP_TITLEBAR_BUTTON_ICONS,
+	type AppTitlebarButton,
+	type AppTitlebarOptions,
 } from './window_types';
 
-const icons = new Set<string>(EXTENSION_TITLEBAR_BUTTON_ICONS);
+const icons = new Set<string>(APP_TITLEBAR_BUTTON_ICONS);
 const maxButtonsPerSide = 6;
 const maxTextLength = 120;
 
-export function isExtensionTitlebarOptions(
+export function isAppTitlebarOptions(
 	value: unknown
-): value is ExtensionTitlebarOptions | null {
+): value is AppTitlebarOptions | null {
 	if (value === null) return true;
 	if (typeof value !== 'object' || Array.isArray(value)) return false;
 	const options = value as Record<string, unknown>;
@@ -48,7 +48,7 @@ export function isExtensionTitlebarOptions(
 		if (!Array.isArray(buttons) || buttons.length > maxButtonsPerSide) return false;
 		for (const value of buttons) {
 			if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-			const button = value as Partial<ExtensionTitlebarButton>;
+			const button = value as Partial<AppTitlebarButton>;
 			if (
 				typeof button.id !== 'string' ||
 				!button.id.trim() ||

@@ -17,7 +17,7 @@ it('routes realtime voice lifecycle commands through the invoking window owner',
 	const dependencies = {
 		conversation: { execute } as never,
 		windows: { has: () => true } as never,
-		extensions: { has: () => false } as never,
+		apps: { has: () => false } as never,
 	};
 	jest
 		.mocked(BrowserWindow.fromWebContents)

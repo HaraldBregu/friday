@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { AlertTriangle, Blocks, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemTitle } from '@/components/ui/item';
-import type { Extension } from '../../../../../../../shared/extension_types';
+import type { App } from '../../../../../../../shared/installed_app_types';
 import {
 	SettingsEmptyState,
 	SettingsLoadingRows,
@@ -17,51 +17,51 @@ import {
 
 const KNOWN_METADATA_KEYS = ['version', 'category', 'entry'];
 
-const ExtensionDetailsPage: React.FC = () => {
+const AppDetailsPage: React.FC = () => {
 	const { t } = useTranslation();
-	const { extensionId } = useParams<{ extensionId: string }>();
-	const decodedExtensionId = decodeURIComponent(extensionId ?? '');
-	const [extension, setExtension] = useState<Extension | null>(null);
+	const { appId } = useParams<{ appId: string }>();
+	const decodedAppId = decodeURIComponent(appId ?? '');
+	const [app, setApp] = useState<App | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [opening, setOpening] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
-	const loadErrorFallback = t('settings.extensions.loadError');
+	const loadErrorFallback = t('settings.apps.loadError');
 
-	const loadExtension = useCallback(async (): Promise<void> => {
+	const loadApp = useCallback(async (): Promise<void> => {
 		setLoading(true);
 		setErrorMessage('');
 		try {
-			const list = await window.extensions.list();
-			setExtension(list.find((item) => item.id === decodedExtensionId) ?? null);
+			const list = await window.apps.list();
+			setApp(list.find((item) => item.id === decodedAppId) ?? null);
 		} catch {
 			setErrorMessage(loadErrorFallback);
-			setExtension(null);
+			setApp(null);
 		} finally {
 			setLoading(false);
 		}
-	}, [decodedExtensionId, loadErrorFallback]);
+	}, [decodedAppId, loadErrorFallback]);
 
 	useEffect(() => {
-		void loadExtension();
-	}, [loadExtension]);
+		void loadApp();
+	}, [loadApp]);
 
 	const handleOpen = useCallback(async (): Promise<void> => {
-		if (!extension) return;
+		if (!app) return;
 		setOpening(true);
 		setErrorMessage('');
 		try {
-			await window.extensions.open(extension.id);
+			await window.apps.open(app.id);
 		} catch {
-			setErrorMessage(t('settings.extensions.openError'));
+			setErrorMessage(t('settings.apps.openError'));
 		} finally {
 			setOpening(false);
 		}
-	}, [extension, t]);
+	}, [app, t]);
 
 	if (loading) {
 		return (
 			<SettingsPageShell>
-				<SettingsPageHeader title={t('settings.extensions.details')} />
+				<SettingsPageHeader title={t('settings.apps.details')} />
 				<SettingsPanel>
 					<SettingsLoadingRows rows={3} />
 				</SettingsPanel>
@@ -69,10 +69,10 @@ const ExtensionDetailsPage: React.FC = () => {
 		);
 	}
 
-	if (!extension) {
+	if (!app) {
 		return (
 			<SettingsPageShell>
-				<SettingsPageHeader title={t('settings.extensions.details')} />
+				<SettingsPageHeader title={t('settings.apps.details')} />
 				{errorMessage && (
 					<SettingsNotice variant="destructive" icon={AlertTriangle}>
 						{errorMessage}
@@ -81,8 +81,8 @@ const ExtensionDetailsPage: React.FC = () => {
 				<SettingsPanel>
 					<SettingsEmptyState
 						icon={Blocks}
-						title={decodedExtensionId || t('settings.extensions.empty')}
-						description={t('settings.extensions.emptyDescription')}
+						title={decodedAppId || t('settings.apps.empty')}
+						description={t('settings.apps.emptyDescription')}
 						className="min-h-28"
 					/>
 				</SettingsPanel>
@@ -90,19 +90,19 @@ const ExtensionDetailsPage: React.FC = () => {
 		);
 	}
 
-	const extraMetadata = Object.entries(extension.metadata).filter(
+	const extraMetadata = Object.entries(app.metadata).filter(
 		([key]) => !KNOWN_METADATA_KEYS.includes(key)
 	);
 
 	return (
 		<SettingsPageShell>
 			<SettingsPageHeader
-				title={extension.title}
-				description={extension.description}
+				title={app.title}
+				description={app.description}
 				action={
 					<Button variant="outline" size="xs" onClick={() => void handleOpen()} disabled={opening}>
 						<ExternalLink className="size-3" />
-						{t('settings.extensions.open')}
+						{t('settings.apps.open')}
 					</Button>
 				}
 			/>
@@ -113,24 +113,24 @@ const ExtensionDetailsPage: React.FC = () => {
 				</SettingsNotice>
 			)}
 
-			<SettingsSection title={t('settings.extensions.details')}>
+			<SettingsSection title={t('settings.apps.details')}>
 				<SettingsPanel>
-					<ExtensionDetail label={t('settings.extensions.detailId')} value={extension.id} mono />
-					<ExtensionDetail
-						label={t('settings.extensions.detailVersion')}
-						value={extension.metadata.version}
+					<AppDetail label={t('settings.apps.detailId')} value={app.id} mono />
+					<AppDetail
+						label={t('settings.apps.detailVersion')}
+						value={app.metadata.version}
 					/>
-					<ExtensionDetail
-						label={t('settings.extensions.detailCategory')}
-						value={extension.metadata.category}
+					<AppDetail
+						label={t('settings.apps.detailCategory')}
+						value={app.metadata.category}
 					/>
-					<ExtensionDetail
-						label={t('settings.extensions.detailEntry')}
-						value={extension.metadata.entry}
+					<AppDetail
+						label={t('settings.apps.detailEntry')}
+						value={app.metadata.entry}
 						mono
 					/>
 					{extraMetadata.map(([key, value]) => (
-						<ExtensionDetail
+						<AppDetail
 							key={key}
 							label={key}
 							value={typeof value === 'string' ? value : JSON.stringify(value)}
@@ -142,7 +142,7 @@ const ExtensionDetailsPage: React.FC = () => {
 	);
 };
 
-function ExtensionDetail({
+function AppDetail({
 	label,
 	value,
 	mono,
@@ -171,4 +171,4 @@ function ExtensionDetail({
 	);
 }
 
-export default ExtensionDetailsPage;
+export default AppDetailsPage;

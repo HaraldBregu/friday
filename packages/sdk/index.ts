@@ -48,12 +48,12 @@ export {
 	type WorkspaceFileType,
 } from '../../src/shared/workspace';
 export {
-	EXTENSION_TITLEBAR_BUTTON_ICONS,
+	APP_TITLEBAR_BUTTON_ICONS,
 	type ContextMenuDescriptor,
 	type ContextMenuRole,
-	type ExtensionTitlebarButton,
-	type ExtensionTitlebarButtonIcon,
-	type ExtensionTitlebarOptions,
+	type AppTitlebarButton,
+	type AppTitlebarButtonIcon,
+	type AppTitlebarOptions,
 } from '../../src/shared/window_types';
 export {
 	CODER_PROVIDER_IDS,
@@ -84,10 +84,10 @@ export {
 	type CoderToolMode,
 } from '../../src/shared/coder_types';
 export type {
-	ExtensionStorageApi,
-	ExtensionStoreValue,
-} from '../../src/shared/extension_store_types';
-export { isExtensionStoreValue } from '../../src/shared/extension_store_value';
+	AppStorageApi,
+	AppStoreValue,
+} from '../../src/shared/app_store_types';
+export { isAppStoreValue } from '../../src/shared/app_store_value';
 
 // Typed lazy views over the host preload globals.
 function bridge<T extends object>(name: string): T {

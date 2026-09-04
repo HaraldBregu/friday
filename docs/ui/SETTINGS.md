@@ -42,7 +42,7 @@ The visible sidebar is grouped as follows:
 | Assistant    | Assistant, Coder, Skills, Background tasks, MCP servers, Bots, RAG, LLM Wiki, Health, Permissions |
 | Providers    | Models, Search engines                                                                            |
 | Channels     | Channels                                                                                          |
-| Integrations | A2A agents, Extensions                                                                            |
+| Integrations | A2A agents, Apps                                                                            |
 
 The `/settings` route redirects to `/settings/general`. The username link, title-bar user button,
 Settings route-search item, and `Cmd+,` shortcut also open General directly.
@@ -232,18 +232,18 @@ Chat history should list stored sessions with dates and confirm before deleting 
 management should expose memory and session export or purge actions. RAG and Wiki own the equivalent
 controls for their data scopes.
 
-## Skills and extensions
+## Skills and apps
 
 Skills should open the skills folder, refresh discovery, import from a selected file or folder, and
 show imported/skipped feedback. A skill detail page should show its manifest, trust, hash, format,
 compatibility, allowed tools, resources, loaded instructions, and diagnostics. It should also allow
 download and confirmed deletion.
 
-Extensions should open the extensions folder, refresh discovery, import extensions, and show each
-extension's category and detail metadata. The list should allow deletion and surface a failed delete;
-the detail page should open the extension in its own window.
+Apps should open the apps folder, refresh discovery, import apps, and show each
+app's category and detail metadata. The list should allow deletion and surface a failed delete;
+the detail page should open the app in its own window.
 
-Extensions do not currently expose enable/disable controls in Settings.
+Apps do not currently expose enable/disable controls in Settings.
 
 ## MCP servers and A2A agents
 
@@ -302,7 +302,7 @@ required. Filesystem policy should:
   a saved-output library.
 - Data-control **Purge** does not show a renderer confirmation dialog; it immediately performs the
   backend preview-token and purge sequence.
-- Permissions **Reset** and extension deletion are immediate and do not request confirmation.
+- Permissions **Reset** and app deletion are immediate and do not request confirmation.
 - A2A deletion has no confirmation or inline failure handling.
 - Ordinary Settings links do not close the mobile sidebar sheet after navigation; **Return to
   Chat** does.

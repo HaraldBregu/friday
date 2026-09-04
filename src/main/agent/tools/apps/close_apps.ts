@@ -1,15 +1,15 @@
 import { z } from 'zod';
-import { closeExtension } from '../../../extensions/extension_index';
+import { closeApp } from '../../../apps/app_index';
 import { tool } from '../tool';
 
-export const closeExtensionsTool = tool({
-	id: 'close_extensions',
-	name: 'Close extensions',
-	description: 'Request closure of one or more open Kucedr extensions by exact ID.',
+export const closeAppsTool = tool({
+	id: 'close_apps',
+	name: 'Close apps',
+	description: 'Request closure of one or more open Kucedr apps by exact ID.',
 	inputSchema: z.object({
 		ids: z
 			.union([z.string().trim().min(1), z.array(z.string().trim().min(1)).min(1)])
-			.describe('One extension ID or a list of extension IDs. IDs that are not open are reported.'),
+			.describe('One app ID or a list of app IDs. IDs that are not open are reported.'),
 	}),
 	execute: ({ ids }, signal) => {
 		const requestedIds = [...new Set(typeof ids === 'string' ? [ids] : ids)];
@@ -18,7 +18,7 @@ export const closeExtensionsTool = tool({
 
 		for (const id of requestedIds) {
 			signal?.throwIfAborted();
-			if (closeExtension(id)) {
+			if (closeApp(id)) {
 				requested.push(id);
 			} else {
 				notOpen.push(id);

@@ -1,13 +1,13 @@
 import { Copy, Minus, Square, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface ExtensionWindowControlsProps {
+interface AppWindowControlsProps {
 	isMaximized: boolean;
 }
 
-export function ExtensionWindowControls({
+export function AppWindowControls({
 	isMaximized,
-}: ExtensionWindowControlsProps): React.JSX.Element {
+}: AppWindowControlsProps): React.JSX.Element {
 	return (
 		<div
 			className="z-10 flex h-full items-center"

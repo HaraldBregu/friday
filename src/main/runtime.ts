@@ -19,12 +19,12 @@ import { Menu } from './menu';
 import { setKeepAwake } from './keep_awake';
 import { userDataLocation } from './shared/user_data_location';
 import {
-	destroyAllExtensions,
-	ensureExtensions,
-	listExtensions,
-	loadExtension,
-	watchExtensions,
-} from './extensions/extension_index';
+	destroyAllApps,
+	ensureApps,
+	listApps,
+	loadApp,
+	watchApps,
+} from './apps/app_index';
 import { ShortcutManager } from './shortcuts';
 import { setupAppLifecycle } from './lifecycle';
 import {
@@ -107,8 +107,8 @@ const trayManager = new Tray({
 		app.quit();
 	},
 	isAppVisible: () => mainWindow.isVisible(),
-	getExtensions: () => listExtensions(),
-	onOpenExtension: (extension) => loadExtension(windowFactory, extension),
+	getApps: () => listApps(),
+	onOpenApp: (app) => loadApp(windowFactory, app),
 });
 
 const menuManager = new Menu({
@@ -123,8 +123,8 @@ const menuManager = new Menu({
 		logger.info('Menu', 'Creating new launcher window');
 		mainWindow.createAdditionalWindow();
 	},
-	getExtensions: () => listExtensions(),
-	onOpenExtension: (extension) => loadExtension(windowFactory, extension),
+	getApps: () => listApps(),
+	onOpenApp: (app) => loadApp(windowFactory, app),
 	onOpenAppDataFolder: () => {
 		void shell.openPath(app.getPath('userData'));
 	},
@@ -169,17 +169,17 @@ app.whenReady().then(() => {
 	void authInitialization.then(() => authLinks.flush());
 	setKeepAwake(getKeepAwake());
 	registerLocalResourceProtocolHandler(logger);
-	setupMediaPermissionHandlers(services.extensionRegistry);
-	ensureExtensions();
-	const stopWatchingExtensions = watchExtensions(
+	setupMediaPermissionHandlers(services.appRegistry);
+	ensureApps();
+	const stopWatchingApps = watchApps(
 		() => {
 			menuManager.create();
 			trayManager.updateContextMenu();
 		},
-		(error) => logger.error('Extensions', 'Extension watcher failed', error)
+		(error) => logger.error('Apps', 'App watcher failed', error)
 	);
 	app.once('before-quit', () => {
-		void stopWatchingExtensions();
+		void stopWatchingApps();
 	});
 	startWiki(logger);
 	// Apply persisted settings on startup (updateLanguage builds the menu)
@@ -239,7 +239,7 @@ app.on('before-quit', (event) => {
 	event.preventDefault();
 	if (shutdownPromise) return;
 	shutdownPromise = Promise.resolve().then(async () => {
-		destroyAllExtensions();
+		destroyAllApps();
 		unbindStorageSync();
 		stopRagSchedule();
 		stopWiki();

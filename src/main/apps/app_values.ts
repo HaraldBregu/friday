@@ -1,61 +1,61 @@
 import { lstatSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import Store from 'electron-store';
-import type { ExtensionStoreValue } from '../../shared/extension_store_types';
-import { isExtensionStoreValue } from '../../shared/extension_store_value';
-import { isExtensionId } from './extension_id';
+import type { AppStoreValue } from '../../shared/app_store_types';
+import { isAppStoreValue } from '../../shared/app_store_value';
+import { isAppId } from './app_id';
 
-type ExtensionStoreState = Record<string, ExtensionStoreValue>;
+type AppStoreState = Record<string, AppStoreValue>;
 
-export class ExtensionValueStorage {
-	private readonly stores = new Map<string, Store<ExtensionStoreState>>();
+export class AppValueStorage {
+	private readonly stores = new Map<string, Store<AppStoreState>>();
 
 	constructor(private readonly root: string) {}
 
-	get<T extends ExtensionStoreValue = ExtensionStoreValue>(
-		extensionId: string,
+	get<T extends AppStoreValue = AppStoreValue>(
+		appId: string,
 		key: string
 	): T | undefined {
 		this.validateKey(key);
-		return this.store(extensionId).get(key) as T | undefined;
+		return this.store(appId).get(key) as T | undefined;
 	}
 
-	set(extensionId: string, key: string, value: ExtensionStoreValue): void {
+	set(appId: string, key: string, value: AppStoreValue): void {
 		this.validateKey(key);
-		if (!isExtensionStoreValue(value)) throw new Error('Invalid extension store value.');
-		this.store(extensionId).set(key, value);
+		if (!isAppStoreValue(value)) throw new Error('Invalid app store value.');
+		this.store(appId).set(key, value);
 	}
 
-	delete(extensionId: string, key: string): void {
+	delete(appId: string, key: string): void {
 		this.validateKey(key);
-		this.store(extensionId).delete(key);
+		this.store(appId).delete(key);
 	}
 
-	private store(extensionId: string): Store<ExtensionStoreState> {
-		const existing = this.stores.get(extensionId);
+	private store(appId: string): Store<AppStoreState> {
+		const existing = this.stores.get(appId);
 		if (existing) {
 			this.assertDirectory(this.root);
-			this.assertDirectory(this.namespace(extensionId));
+			this.assertDirectory(this.namespace(appId));
 			this.assertStoreFile(existing.path);
 			return existing;
 		}
 
-		const directory = this.ensureDirectory(extensionId);
+		const directory = this.ensureDirectory(appId);
 		const storePath = path.join(directory, 'store.json');
 		this.assertStoreFile(storePath);
-		const created = new Store<ExtensionStoreState>({
+		const created = new Store<AppStoreState>({
 			name: 'store',
 			cwd: directory,
 			accessPropertiesByDotNotation: false,
 			clearInvalidConfig: false,
 			configFileMode: 0o600,
 		});
-		this.stores.set(extensionId, created);
+		this.stores.set(appId, created);
 		return created;
 	}
 
-	private ensureDirectory(extensionId: string): string {
-		const directory = this.namespace(extensionId);
+	private ensureDirectory(appId: string): string {
+		const directory = this.namespace(appId);
 		mkdirSync(this.root, { recursive: true });
 		this.assertDirectory(this.root);
 		try {
@@ -67,15 +67,15 @@ export class ExtensionValueStorage {
 		return directory;
 	}
 
-	private namespace(extensionId: string): string {
-		if (!isExtensionId(extensionId)) throw new Error('Invalid extension ID.');
-		return path.join(this.root, extensionId);
+	private namespace(appId: string): string {
+		if (!isAppId(appId)) throw new Error('Invalid app ID.');
+		return path.join(this.root, appId);
 	}
 
 	private assertDirectory(directory: string): void {
 		const stats = lstatSync(directory);
 		if (stats.isSymbolicLink() || !stats.isDirectory()) {
-			throw new Error('Invalid extension storage directory.');
+			throw new Error('Invalid app storage directory.');
 		}
 	}
 
@@ -83,7 +83,7 @@ export class ExtensionValueStorage {
 		try {
 			const stats = lstatSync(filePath);
 			if (stats.isSymbolicLink() || !stats.isFile()) {
-				throw new Error('Invalid extension store file.');
+				throw new Error('Invalid app store file.');
 			}
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
@@ -101,7 +101,7 @@ export class ExtensionValueStorage {
 			key === '__internal__' ||
 			key.startsWith('__internal__.')
 		) {
-			throw new Error('Invalid extension store key.');
+			throw new Error('Invalid app store key.');
 		}
 	}
 }

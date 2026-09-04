@@ -1,11 +1,11 @@
-import type { ExtensionStoreValue } from './extension_store_types';
+import type { AppStoreValue } from './app_store_types';
 
 interface ValueFrame {
 	value?: unknown;
 	exit?: object;
 }
 
-export function isExtensionStoreValue(value: unknown): value is ExtensionStoreValue {
+export function isAppStoreValue(value: unknown): value is AppStoreValue {
 	const ancestors = new Set<object>();
 	const pending: ValueFrame[] = [{ value }];
 

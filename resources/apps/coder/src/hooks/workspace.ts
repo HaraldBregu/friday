@@ -163,8 +163,8 @@ export function useCoderWorkspace(): CoderController {
 		void Promise.all([
 			coderApi.getSettings(),
 			coderApi.listProjects(),
-			app.getExtensionStoreValue<string>(ACTIVE_PROJECT_KEY),
-			app.getExtensionStoreValue<boolean>(SIDEBAR_OPEN_KEY),
+			app.getAppStoreValue<string>(ACTIVE_PROJECT_KEY),
+			app.getAppStoreValue<boolean>(SIDEBAR_OPEN_KEY),
 		])
 			.then(async ([nextSettings, nextProjects, savedProjectId, savedSidebarOpen]) => {
 				if (!active) return;
@@ -205,7 +205,7 @@ export function useCoderWorkspace(): CoderController {
 
 	useEffect(() => {
 		if (!preview && runState !== 'loading') {
-			void app.setExtensionStoreValue(SIDEBAR_OPEN_KEY, leftOpen);
+			void app.setAppStoreValue(SIDEBAR_OPEN_KEY, leftOpen);
 		}
 	}, [leftOpen, preview, runState]);
 
@@ -224,7 +224,7 @@ export function useCoderWorkspace(): CoderController {
 			window.requestAnimationFrame(() =>
 				document.querySelector<HTMLTextAreaElement>('#coder-composer')?.focus()
 			);
-			if (!preview) void app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, projectId);
+			if (!preview) void app.setAppStoreValue(ACTIVE_PROJECT_KEY, projectId);
 		},
 		[activeProjectId, preview, settings.modelId]
 	);
@@ -250,7 +250,7 @@ export function useCoderWorkspace(): CoderController {
 		async (projectId: string): Promise<void> => {
 			if (runningRef.current || projectId === activeProjectId) return;
 			await loadProject(projectId);
-			if (!preview) await app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, projectId);
+			if (!preview) await app.setAppStoreValue(ACTIVE_PROJECT_KEY, projectId);
 			setExpandedProjectIds((current) =>
 				current.includes(projectId) ? current : [...current, projectId]
 			);
@@ -279,7 +279,7 @@ export function useCoderWorkspace(): CoderController {
 								block.type === 'message' ? { ...block, status: 'complete' } : block
 						)
 					);
-					await app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, projectId);
+					await app.setAppStoreValue(ACTIVE_PROJECT_KEY, projectId);
 				}
 				setExpandedProjectIds((current) =>
 					current.includes(projectId) ? current : [...current, projectId]
@@ -305,7 +305,7 @@ export function useCoderWorkspace(): CoderController {
 			setSessionsByProject((current) => ({ ...current, [project.id]: [] }));
 			setExpandedProjectIds((current) => [...new Set([...current, project.id])]);
 			await loadProject(project.id);
-			await app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, project.id);
+			await app.setAppStoreValue(ACTIVE_PROJECT_KEY, project.id);
 		} catch (reason) {
 			setError(reason instanceof Error ? reason.message : 'Unable to add this project.');
 		} finally {
@@ -332,12 +332,12 @@ export function useCoderWorkspace(): CoderController {
 					const nextProject = nextProjects[0];
 					if (nextProject) {
 						await loadProject(nextProject.id);
-						await app.setExtensionStoreValue(ACTIVE_PROJECT_KEY, nextProject.id);
+						await app.setAppStoreValue(ACTIVE_PROJECT_KEY, nextProject.id);
 					} else {
 						setActiveProjectId(undefined);
 						setActiveSessionId(undefined);
 						setBlocks([]);
-						await app.deleteExtensionStoreValue(ACTIVE_PROJECT_KEY);
+						await app.deleteAppStoreValue(ACTIVE_PROJECT_KEY);
 					}
 				}
 			} catch (reason) {

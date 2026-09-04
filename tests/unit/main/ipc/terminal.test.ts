@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import type { IpcMainInvokeEvent } from 'electron';
 import type { EventBus } from '../../../../src/main/event_bus';
-import type { ExtensionRegistry } from '../../../../src/main/extensions/extension_registry';
+import type { AppRegistry } from '../../../../src/main/apps/app_registry';
 import { TerminalIpc } from '../../../../src/main/ipc/terminal';
 import type { LoggerService } from '../../../../src/main/shared';
 import type { PtyManager } from '../../../../src/main/terminal/manager';
@@ -30,17 +30,17 @@ it('validates create requests and accepts only registered main windows', async (
 	} as unknown as PtyManager;
 	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
 	const windows = { has: jest.fn(() => true) } as unknown as WindowContextManager;
-	const extensions = {
+	const apps = {
 		has: jest.fn(() => false),
 		resolve: jest.fn(),
-	} as unknown as ExtensionRegistry;
+	} as unknown as AppRegistry;
 	const event = createEvent();
 	(BrowserWindow.fromWebContents as jest.Mock).mockReturnValue({
 		id: 42,
 		webContents: event.sender,
 	});
 
-	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
+	new TerminalIpc().register({ logger, manager, windows, apps }, {} as EventBus);
 	const handler = (ipcMain.handle as jest.Mock).mock.calls
 		.filter(([channel]) => channel === TerminalChannels.create)
 		.at(-1)?.[1];
@@ -73,7 +73,7 @@ it('validates create requests and accepts only registered main windows', async (
 	});
 });
 
-it('rejects terminal creation from extension views', async () => {
+it('rejects terminal creation from app views', async () => {
 	const manager = {
 		create: jest.fn(async (_sender, request) => ({
 			...request,
@@ -84,11 +84,11 @@ it('rejects terminal creation from extension views', async () => {
 	} as unknown as PtyManager;
 	const logger = { info: jest.fn(), warn: jest.fn() } as unknown as LoggerService;
 	const windows = { has: jest.fn(() => false) } as unknown as WindowContextManager;
-	const extensions = {
+	const apps = {
 		has: () => true,
-	} as unknown as ExtensionRegistry;
+	} as unknown as AppRegistry;
 
-	new TerminalIpc().register({ logger, manager, windows, extensions }, {} as EventBus);
+	new TerminalIpc().register({ logger, manager, windows, apps }, {} as EventBus);
 	const handler = (ipcMain.handle as jest.Mock).mock.calls
 		.filter(([channel]) => channel === TerminalChannels.create)
 		.at(-1)?.[1];
@@ -98,7 +98,7 @@ it('rejects terminal creation from extension views', async () => {
 	await expect(handler(event, { id: 'terminal-coder', cols: 80, rows: 24 })).resolves.toMatchObject(
 		{
 			success: false,
-			error: { message: 'Terminal IPC is unavailable to extension views.' },
+			error: { message: 'Terminal IPC is unavailable to app views.' },
 		}
 	);
 	expect(manager.create).not.toHaveBeenCalled();

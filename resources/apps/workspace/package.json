@@ -2,7 +2,7 @@
 	"name": "workspace",
 	"private": true,
 	"version": "1.0.0",
-	"description": "Kucedr workspace extension.",
+	"description": "Kucedr workspace app.",
 	"keywords": [
 		"utility"
 	],

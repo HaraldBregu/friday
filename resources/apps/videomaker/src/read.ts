@@ -4,7 +4,7 @@ import { openDatabase } from './database';
 
 export async function readMedia(assetPath: string, mime: string): Promise<string> {
 	if (isKucedr()) {
-		const bytes = await app.readExtensionStoreFile(assetPath);
+		const bytes = await app.readAppStoreFile(assetPath);
 		return URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: mime }));
 	}
 	const database = await openDatabase();

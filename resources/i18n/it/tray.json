@@ -1,8 +1,8 @@
 {
 	"showKucedr": "Mostra Kucedr",
 	"hideKucedr": "Nascondi Kucedr",
-	"extensions": "Extension",
 	"apps": "App",
-	"noExtensions": "Nessuna estensione",
+	"apps": "App",
+	"noApps": "Nessuna estensione",
 	"quit": "Esci"
 }

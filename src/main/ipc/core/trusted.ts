@@ -1,21 +1,21 @@
 import { BrowserWindow, type IpcMainInvokeEvent } from 'electron';
 import type { InvokeChannelMap } from '../../../shared/ipc_channels_types';
-import type { ExtensionRegistry } from '../../extensions/extension_registry';
+import type { AppRegistry } from '../../apps/app_registry';
 import type { WindowContextManager } from '../../window_context';
 import { registerCommandWithEvent, registerQueryWithEvent } from './gateway';
 
 export class TrustedRenderer {
 	constructor(
 		private readonly windows: WindowContextManager,
-		private readonly extensions: ExtensionRegistry
+		private readonly apps: AppRegistry
 	) {}
 
 	assert(event: IpcMainInvokeEvent): BrowserWindow {
 		if (!event.senderFrame || event.senderFrame !== event.sender.mainFrame) {
 			throw new Error('Privileged IPC is restricted to the main frame.');
 		}
-		if (this.extensions.has(event.sender)) {
-			throw new Error('Privileged IPC is unavailable to extension views.');
+		if (this.apps.has(event.sender)) {
+			throw new Error('Privileged IPC is unavailable to app views.');
 		}
 		const window = BrowserWindow.fromWebContents(event.sender);
 		if (!window || window.webContents !== event.sender || !this.windows.has(window.id)) {

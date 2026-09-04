@@ -189,12 +189,12 @@ export const AppChannels = {
 	stopTelegram: 'app:channels:telegram:stop',
 	restartTelegram: 'app:channels:telegram:restart',
 	channelsStatusChanged: 'app:channels:status-changed',
-	getExtensionStoreValue: 'app:extension-store:value:get',
-	setExtensionStoreValue: 'app:extension-store:value:set',
-	deleteExtensionStoreValue: 'app:extension-store:value:delete',
-	readExtensionStoreFile: 'app:extension-store:file:read',
-	writeExtensionStoreFile: 'app:extension-store:file:write',
-	deleteExtensionStoreFile: 'app:extension-store:file:delete',
+	getAppStoreValue: 'app:app-store:value:get',
+	setAppStoreValue: 'app:app-store:value:set',
+	deleteAppStoreValue: 'app:app-store:value:delete',
+	readAppStoreFile: 'app:app-store:file:read',
+	writeAppStoreFile: 'app:app-store:file:write',
+	deleteAppStoreFile: 'app:app-store:file:delete',
 } as const;
 
 export const AuthChannels = {
@@ -370,12 +370,12 @@ export const VideoChannels = {
 	setProviderId: 'video:set-provider-id',
 } as const;
 
-export const ExtensionChannels = {
-	list: 'extensions:list',
-	open: 'extensions:open',
-	openRoot: 'extensions:open-root',
-	delete: 'extensions:delete',
-	import: 'extensions:import',
+export const AppChannels = {
+	list: 'apps:list',
+	open: 'apps:open',
+	openRoot: 'apps:open-root',
+	delete: 'apps:delete',
+	import: 'apps:import',
 } as const;
 
 export const WindowChannels = {

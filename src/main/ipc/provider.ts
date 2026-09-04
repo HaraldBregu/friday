@@ -12,7 +12,7 @@ import {
 	setChannelProvider,
 } from '../channels';
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import { loadDatabases, loadProviders } from '../models';
 import type { ProviderSyncService } from '../providers/sync';
 import { getProvider, listProviders, setProvider } from '../settings_store';
@@ -24,7 +24,7 @@ import { TrustedRenderer } from './core/trusted';
 export interface ProviderStoreIpcDeps {
 	sync: ProviderSyncService;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 type SavedCredentialKind = Exclude<ProviderCredentialKind, 'search_engines'>;
@@ -32,8 +32,8 @@ type SavedCredentialKind = Exclude<ProviderCredentialKind, 'search_engines'>;
 export class ProviderStoreIpc implements IpcModule<ProviderStoreIpcDeps> {
 	readonly name = 'provider-store';
 
-	register({ sync, windows, extensions }: ProviderStoreIpcDeps, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ sync, windows, apps }: ProviderStoreIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 		registerQueryWithEvent(ProviderStoreChannels.get, (event, id, kind) => {
 			trusted.assert(event);
 			const normalizedId = this.id(id);

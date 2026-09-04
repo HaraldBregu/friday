@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { ExtensionTitleBar } from './ExtensionTitleBar';
+import { AppTitleBar } from './AppTitleBar';
 import { useAppTheme } from './hooks/useAppTheme';
-import type { ExtensionTitlebarOptions } from '../../../../../shared/window_types';
+import type { AppTitlebarOptions } from '../../../../../shared/window_types';
 
-interface ExtensionShellProps {
+interface AppShellProps {
 	title: string;
 }
 
-export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Element {
+export function AppShell({ title }: AppShellProps): React.JSX.Element {
 	useAppTheme();
-	const [options, setOptions] = useState<ExtensionTitlebarOptions | null>(null);
+	const [options, setOptions] = useState<AppTitlebarOptions | null>(null);
 	const [sidebarWidth, setSidebarWidth] = useState<number | null>(null);
 	const [sidebarTransitionDelay, setSidebarTransitionDelay] = useState<number>();
 
@@ -34,7 +34,7 @@ export function ExtensionShell({ title }: ExtensionShellProps): React.JSX.Elemen
 
 	return (
 		<div className="app-translucent-window flex h-full flex-col overflow-hidden bg-background text-foreground">
-			<ExtensionTitleBar
+			<AppTitleBar
 				title={options?.title ?? title}
 				leftButtons={options?.leftButtons ?? []}
 				rightButtons={options?.rightButtons ?? []}

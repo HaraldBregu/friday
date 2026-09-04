@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron';
 import { RealtimeVoiceChannels } from '../../shared/ipc_channels_definitions';
 import type { EventBus } from '../event_bus';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import type { Conversation } from '../agent/conversation';
 import type { IpcModule } from './core/module';
@@ -10,17 +10,17 @@ import { TrustedRenderer } from './core/trusted';
 export interface RealtimeVoiceIpcDependencies {
 	conversation: Conversation;
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class RealtimeVoiceIpc implements IpcModule<RealtimeVoiceIpcDependencies> {
 	readonly name = 'realtime-voice';
 
 	register(
-		{ conversation, windows, extensions }: RealtimeVoiceIpcDependencies,
+		{ conversation, windows, apps }: RealtimeVoiceIpcDependencies,
 		_eventBus: EventBus
 	): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+		const trusted = new TrustedRenderer(windows, apps);
 		trusted.commandWithEvent(RealtimeVoiceChannels.startSession, (event, request) =>
 			conversation.execute({
 				type: 'voice',

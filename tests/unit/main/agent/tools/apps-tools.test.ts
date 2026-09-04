@@ -1,26 +1,26 @@
-const listExtensions = jest.fn();
-const loadExtension = jest.fn();
-const closeExtension = jest.fn();
+const listApps = jest.fn();
+const loadApp = jest.fn();
+const closeApp = jest.fn();
 
-jest.mock('../../../../../src/main/extensions/extension_index', () => ({
-	closeExtension,
-	listExtensions,
-	loadExtension,
+jest.mock('../../../../../src/main/apps/app_index', () => ({
+	closeApp,
+	listApps,
+	loadApp,
 }));
 
-import { closeExtensionsTool } from '../../../../../src/main/agent/tools/extensions/close_extensions';
-import { listExtensionsTool } from '../../../../../src/main/agent/tools/extensions/list_extensions';
-import { openExtensionsTool } from '../../../../../src/main/agent/tools/extensions/open_extensions';
+import { closeAppsTool } from '../../../../../src/main/agent/tools/apps/close_apps';
+import { listAppsTool } from '../../../../../src/main/agent/tools/apps/list_apps';
+import { openAppsTool } from '../../../../../src/main/agent/tools/apps/open_apps';
 import type { WindowFactory } from '../../../../../src/main/window_factory';
-import type { Extension } from '../../../../../src/shared/extension_types';
+import type { App } from '../../../../../src/shared/installed_app_types';
 
-const project: Extension = {
+const project: App = {
 	id: 'project',
 	title: 'Project',
 	description: 'Project board',
 	metadata: { version: '1.0.0', category: 'productivity', entry: 'index.html' },
 };
-const weather: Extension = {
+const weather: App = {
 	id: 'weather',
 	title: 'Weather',
 	description: 'Weather dashboard',
@@ -30,87 +30,87 @@ const windowFactory = {} as WindowFactory;
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	closeExtension.mockReturnValue(true);
-	listExtensions.mockReturnValue([project, weather]);
+	closeApp.mockReturnValue(true);
+	listApps.mockReturnValue([project, weather]);
 });
 
-it('lists installed extensions and defines the tool identity', async () => {
-	await expect(listExtensionsTool.run({})).resolves.toEqual({ extensions: [project, weather] });
-	expect(listExtensionsTool).toMatchObject({
-		id: 'list_extensions',
-		name: 'List extensions',
+it('lists installed apps and defines the tool identity', async () => {
+	await expect(listAppsTool.run({})).resolves.toEqual({ apps: [project, weather] });
+	expect(listAppsTool).toMatchObject({
+		id: 'list_apps',
+		name: 'List apps',
 	});
 });
 
 it.each([
-	['one extension', 'project', [project]],
-	['multiple extensions', ['project', 'weather'], [project, weather]],
+	['one app', 'project', [project]],
+	['multiple apps', ['project', 'weather'], [project, weather]],
 ] as const)('opens %s by exact ID', async (_label, ids, expected) => {
-	const extensionTool = openExtensionsTool(windowFactory);
+	const appTool = openAppsTool(windowFactory);
 
-	await expect(extensionTool.run({ ids })).resolves.toEqual({
-		opened: expected.map((extension) => extension.id),
+	await expect(appTool.run({ ids })).resolves.toEqual({
+		opened: expected.map((app) => app.id),
 	});
-	expect(loadExtension.mock.calls).toEqual(expected.map((extension) => [windowFactory, extension]));
+	expect(loadApp.mock.calls).toEqual(expected.map((app) => [windowFactory, app]));
 });
 
-it('rejects missing IDs before opening any extension', async () => {
-	const extensionTool = openExtensionsTool(windowFactory);
+it('rejects missing IDs before opening any app', async () => {
+	const appTool = openAppsTool(windowFactory);
 
-	await expect(extensionTool.run({ ids: ['project', 'missing'] })).rejects.toThrow(
-		'Extensions not found: missing'
+	await expect(appTool.run({ ids: ['project', 'missing'] })).rejects.toThrow(
+		'Apps not found: missing'
 	);
-	expect(loadExtension).not.toHaveBeenCalled();
+	expect(loadApp).not.toHaveBeenCalled();
 });
 
-it('defines the extension open tool identity', () => {
-	expect(openExtensionsTool(windowFactory)).toMatchObject({
-		id: 'open_extensions',
-		name: 'Open extensions',
+it('defines the app open tool identity', () => {
+	expect(openAppsTool(windowFactory)).toMatchObject({
+		id: 'open_apps',
+		name: 'Open apps',
 	});
 });
 
-it('requests closing open extensions and reports IDs that are not open', async () => {
-	closeExtension.mockImplementation((id: string) => id === 'project');
+it('requests closing open apps and reports IDs that are not open', async () => {
+	closeApp.mockImplementation((id: string) => id === 'project');
 
 	await expect(
-		closeExtensionsTool.run({ ids: ['project', 'weather', 'project'] })
+		closeAppsTool.run({ ids: ['project', 'weather', 'project'] })
 	).resolves.toEqual({
 		requested: ['project'],
 		notOpen: ['weather'],
 	});
-	expect(closeExtension.mock.calls).toEqual([['project'], ['weather']]);
+	expect(closeApp.mock.calls).toEqual([['project'], ['weather']]);
 });
 
-it('accepts one extension ID when requesting a close', async () => {
-	await expect(closeExtensionsTool.run({ ids: 'project' })).resolves.toEqual({
+it('accepts one app ID when requesting a close', async () => {
+	await expect(closeAppsTool.run({ ids: 'project' })).resolves.toEqual({
 		requested: ['project'],
 		notOpen: [],
 	});
-	expect(closeExtension).toHaveBeenCalledWith('project');
+	expect(closeApp).toHaveBeenCalledWith('project');
 });
 
-it('stops requesting extension closes when aborted', async () => {
+it('stops requesting app closes when aborted', async () => {
 	const controller = new AbortController();
-	closeExtension.mockImplementation(() => {
+	closeApp.mockImplementation(() => {
 		controller.abort();
 		return true;
 	});
 
 	await expect(
-		closeExtensionsTool.run({ ids: ['project', 'weather'] }, controller.signal)
+		closeAppsTool.run({ ids: ['project', 'weather'] }, controller.signal)
 	).rejects.toMatchObject({ name: 'AbortError' });
-	expect(closeExtension).toHaveBeenCalledTimes(1);
+	expect(closeApp).toHaveBeenCalledTimes(1);
 });
 
-it('rejects empty extension close inputs', () => {
-	expect(() => closeExtensionsTool.parseInput({ ids: '' })).toThrow();
-	expect(() => closeExtensionsTool.parseInput({ ids: [] })).toThrow();
+it('rejects empty app close inputs', () => {
+	expect(() => closeAppsTool.parseInput({ ids: '' })).toThrow();
+	expect(() => closeAppsTool.parseInput({ ids: [] })).toThrow();
 });
 
-it('defines the extension close tool identity', () => {
-	expect(closeExtensionsTool).toMatchObject({
-		id: 'close_extensions',
-		name: 'Close extensions',
+it('defines the app close tool identity', () => {
+	expect(closeAppsTool).toMatchObject({
+		id: 'close_apps',
+		name: 'Close apps',
 	});
 });

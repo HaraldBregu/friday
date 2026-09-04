@@ -1,20 +1,20 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { isExtensionId } from './extension_id';
+import { isAppId } from './app_id';
 
-export class ExtensionFileStorage {
+export class AppFileStorage {
 	constructor(private readonly root: string) {}
 
-	async read(extensionId: string, filePath: string): Promise<Uint8Array> {
-		const target = await this.existingFile(extensionId, filePath);
-		if (!target) throw new Error('Extension file not found.');
+	async read(appId: string, filePath: string): Promise<Uint8Array> {
+		const target = await this.existingFile(appId, filePath);
+		if (!target) throw new Error('App file not found.');
 		return new Uint8Array(await fs.readFile(target));
 	}
 
-	async write(extensionId: string, filePath: string, data: Uint8Array): Promise<void> {
-		if (!(data instanceof Uint8Array)) throw new Error('Extension file data must be bytes.');
-		const target = await this.writableFile(extensionId, filePath);
+	async write(appId: string, filePath: string, data: Uint8Array): Promise<void> {
+		if (!(data instanceof Uint8Array)) throw new Error('App file data must be bytes.');
+		const target = await this.writableFile(appId, filePath);
 		const temporary = path.join(
 			path.dirname(target),
 			`.${path.basename(target)}.${randomUUID()}.tmp`
@@ -27,14 +27,14 @@ export class ExtensionFileStorage {
 		}
 	}
 
-	async delete(extensionId: string, filePath: string): Promise<void> {
-		const target = await this.existingFile(extensionId, filePath);
+	async delete(appId: string, filePath: string): Promise<void> {
+		const target = await this.existingFile(appId, filePath);
 		if (target) await fs.unlink(target);
 	}
 
-	private namespace(extensionId: string): string {
-		if (!isExtensionId(extensionId)) throw new Error('Invalid extension ID.');
-		return path.join(this.root, extensionId);
+	private namespace(appId: string): string {
+		if (!isAppId(appId)) throw new Error('Invalid app ID.');
+		return path.join(this.root, appId);
 	}
 
 	private fileSegments(filePath: string): string[] {
@@ -47,21 +47,21 @@ export class ExtensionFileStorage {
 			path.posix.isAbsolute(filePath) ||
 			path.win32.isAbsolute(filePath)
 		) {
-			throw new Error('Invalid extension file path.');
+			throw new Error('Invalid app file path.');
 		}
 		const segments = filePath.split('/');
 		if (segments.some((segment) => !segment || segment === '.' || segment === '..')) {
-			throw new Error('Invalid extension file path.');
+			throw new Error('Invalid app file path.');
 		}
 		return segments;
 	}
 
-	private async existingFile(extensionId: string, filePath: string): Promise<string | undefined> {
+	private async existingFile(appId: string, filePath: string): Promise<string | undefined> {
 		const segments = this.fileSegments(filePath);
-		const namespace = this.namespace(extensionId);
+		const namespace = this.namespace(appId);
 		const filesRoot = path.join(namespace, 'files');
 		let current = this.root;
-		for (const segment of [extensionId, 'files', ...segments.slice(0, -1)]) {
+		for (const segment of [appId, 'files', ...segments.slice(0, -1)]) {
 			if (!(await this.isExistingDirectory(current))) return undefined;
 			current = path.join(current, segment);
 		}
@@ -76,15 +76,15 @@ export class ExtensionFileStorage {
 			throw error;
 		}
 		if (stats.isSymbolicLink() || !stats.isFile()) {
-			throw new Error('Extension file path is not a regular file.');
+			throw new Error('App file path is not a regular file.');
 		}
 		await this.assertContained(filesRoot, target);
 		return target;
 	}
 
-	private async writableFile(extensionId: string, filePath: string): Promise<string> {
+	private async writableFile(appId: string, filePath: string): Promise<string> {
 		const segments = this.fileSegments(filePath);
-		const namespace = this.namespace(extensionId);
+		const namespace = this.namespace(appId);
 		const filesRoot = path.join(namespace, 'files');
 		await fs.mkdir(this.root, { recursive: true });
 		await this.requireDirectory(this.root);
@@ -101,7 +101,7 @@ export class ExtensionFileStorage {
 		try {
 			const stats = await fs.lstat(target);
 			if (stats.isSymbolicLink() || !stats.isFile()) {
-				throw new Error('Extension file path is not a regular file.');
+				throw new Error('App file path is not a regular file.');
 			}
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
@@ -132,7 +132,7 @@ export class ExtensionFileStorage {
 	private async requireDirectory(directory: string): Promise<void> {
 		const stats = await fs.lstat(directory);
 		if (stats.isSymbolicLink() || !stats.isDirectory()) {
-			throw new Error('Invalid extension storage directory.');
+			throw new Error('Invalid app storage directory.');
 		}
 	}
 
@@ -143,7 +143,7 @@ export class ExtensionFileStorage {
 		]);
 		const relative = path.relative(resolvedRoot, resolvedTarget);
 		if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
-			throw new Error('Extension file path escapes its storage folder.');
+			throw new Error('App file path escapes its storage folder.');
 		}
 	}
 }

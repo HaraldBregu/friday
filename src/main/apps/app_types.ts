@@ -1,5 +1,5 @@
 export type {
-	Extension,
-	ExtensionManifest,
-	ExtensionMetadata,
-} from '../../shared/extension_types';
+	App,
+	AppManifest,
+	AppMetadata,
+} from '../../shared/installed_app_types';

@@ -1,8 +1,8 @@
-import { openExtensionWindows } from './extension_render';
+import { openAppWindows } from './app_render';
 
-export function closeExtension(extensionId: string): boolean {
-	const extension = openExtensionWindows.get(extensionId);
-	if (!extension || extension.window.isDestroyed()) return false;
-	extension.window.close();
+export function closeApp(appId: string): boolean {
+	const app = openAppWindows.get(appId);
+	if (!app || app.window.isDestroyed()) return false;
+	app.window.close();
 	return true;
 }

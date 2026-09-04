@@ -1,18 +1,18 @@
-export type ExtensionStoreValue =
+export type AppStoreValue =
 	| null
 	| boolean
 	| number
 	| string
-	| ExtensionStoreValue[]
-	| { [key: string]: ExtensionStoreValue };
+	| AppStoreValue[]
+	| { [key: string]: AppStoreValue };
 
-export interface ExtensionStorageApi {
-	getExtensionStoreValue<T extends ExtensionStoreValue = ExtensionStoreValue>(
+export interface AppStorageApi {
+	getAppStoreValue<T extends AppStoreValue = AppStoreValue>(
 		key: string
 	): Promise<T | undefined>;
-	setExtensionStoreValue(key: string, value: ExtensionStoreValue): Promise<void>;
-	deleteExtensionStoreValue(key: string): Promise<void>;
-	readExtensionStoreFile(path: string): Promise<Uint8Array>;
-	writeExtensionStoreFile(path: string, data: Uint8Array): Promise<void>;
-	deleteExtensionStoreFile(path: string): Promise<void>;
+	setAppStoreValue(key: string, value: AppStoreValue): Promise<void>;
+	deleteAppStoreValue(key: string): Promise<void>;
+	readAppStoreFile(path: string): Promise<Uint8Array>;
+	writeAppStoreFile(path: string, data: Uint8Array): Promise<void>;
+	deleteAppStoreFile(path: string): Promise<void>;
 }

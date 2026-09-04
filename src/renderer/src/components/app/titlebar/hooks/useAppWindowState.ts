@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export function useExtensionWindowState(): boolean {
+export function useAppWindowState(): boolean {
 	const [isMaximized, setIsMaximized] = useState(false);
 
 	useEffect(() => {

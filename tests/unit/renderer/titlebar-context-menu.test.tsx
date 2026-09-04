@@ -13,7 +13,7 @@ const contextMenuItems = [
 	{ id: '/settings/general', label: 'settings.tabs.general' },
 	{ id: '/settings/assistant', label: 'settings.overview.groups.agent' },
 	{ id: '/settings/system', label: 'settings.tabs.system' },
-	{ id: '/settings/extensions', label: 'settings.tabs.extensions' },
+	{ id: '/settings/apps', label: 'settings.tabs.apps' },
 ];
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ it.each([
 	['settings.tabs.general', '/settings/general'],
 	['settings.overview.groups.agent', '/settings/assistant'],
 	['settings.tabs.system', '/settings/system'],
-	['settings.tabs.extensions', '/settings/extensions'],
+	['settings.tabs.apps', '/settings/apps'],
 ])('opens a native context menu and navigates from %s to %s', async (_label, path) => {
 	showContextMenu.mockResolvedValue(path);
 	const { container } = render(

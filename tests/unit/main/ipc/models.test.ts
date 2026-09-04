@@ -50,7 +50,7 @@ import { RealtimeVoiceChannels } from '../../../../src/shared/ipc_channels_defin
 import { BrowserWindow } from 'electron';
 
 let event: Record<string, unknown>;
-const extensionHas = jest.fn(() => false);
+const appHas = jest.fn(() => false);
 
 function command(channel: string): (...args: unknown[]) => unknown {
 	const handler = registerCommandWithEvent.mock.calls.find(
@@ -68,7 +68,7 @@ function query(channel: string): (...args: unknown[]) => unknown {
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	extensionHas.mockReturnValue(false);
+	appHas.mockReturnValue(false);
 	const mainFrame = {};
 	const sender = { mainFrame };
 	event = { sender, senderFrame: mainFrame };
@@ -76,7 +76,7 @@ beforeEach(() => {
 		.mocked(BrowserWindow.fromWebContents)
 		.mockReturnValue({ id: 1, webContents: sender } as never);
 	new ModelsIpc().register(
-		{ windows: { has: () => true } as never, extensions: { has: extensionHas } as never },
+		{ windows: { has: () => true } as never, apps: { has: appHas } as never },
 		{} as never
 	);
 });
@@ -116,9 +116,9 @@ it('rejects unsafe realtime voice selection inputs in main', () => {
 	);
 });
 
-it('rejects model operations from extension renderers', () => {
-	extensionHas.mockReturnValue(true);
+it('rejects model operations from app renderers', () => {
+	appHas.mockReturnValue(true);
 	expect(() => query(RealtimeVoiceChannels.getSetup)()).toThrow(
-		'Privileged IPC is unavailable to extension views.'
+		'Privileged IPC is unavailable to app views.'
 	);
 });

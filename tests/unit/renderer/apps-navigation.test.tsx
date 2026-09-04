@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from '../../../src/renderer/src/pages/settings/Layout';
 import { SettingsBreadcrumb } from '../../../src/renderer/src/pages/settings/Breadcrumb';
-import ExtensionsPage from '../../../src/renderer/src/pages/settings/pages/extensions/Page';
-import type { Extension } from '../../../src/shared/extension_types';
+import AppsPage from '../../../src/renderer/src/pages/settings/pages/apps/Page';
+import type { App } from '../../../src/shared/installed_app_types';
 
 jest.mock('react-i18next', () => {
 	const t = (key: string, values?: Record<string, string>): string =>
@@ -12,11 +12,11 @@ jest.mock('react-i18next', () => {
 	return { useTranslation: () => ({ t }) };
 });
 
-const extensions: Extension[] = [
+const apps: App[] = [
 	{
-		id: 'demo-extension',
-		title: 'Demo Extension',
-		description: 'A demo extension.',
+		id: 'demo-app',
+		title: 'Demo App',
+		description: 'A demo app.',
 		metadata: {
 			version: '1.0.0',
 			category: 'Demo',
@@ -26,10 +26,10 @@ const extensions: Extension[] = [
 ];
 
 beforeEach(() => {
-	Object.defineProperty(window, 'extensions', {
+	Object.defineProperty(window, 'apps', {
 		configurable: true,
 		value: {
-			list: jest.fn().mockResolvedValue(extensions),
+			list: jest.fn().mockResolvedValue(apps),
 			open: jest.fn(),
 			openRoot: jest.fn(),
 			delete: jest.fn().mockResolvedValue(undefined),
@@ -51,21 +51,21 @@ beforeEach(() => {
 	});
 });
 
-it('confirms before deleting an extension', async () => {
+it('confirms before deleting an app', async () => {
 	const user = userEvent.setup();
-	const deleteExtension = window.extensions.delete as jest.Mock;
-	deleteExtension
+	const deleteApp = window.apps.delete as jest.Mock;
+	deleteApp
 		.mockResolvedValueOnce(false)
 		.mockRejectedValueOnce(new Error('Delete failed'))
 		.mockResolvedValueOnce(true);
 
 	render(
-		<MemoryRouter initialEntries={['/settings/extensions']}>
+		<MemoryRouter initialEntries={['/settings/apps']}>
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
-					<Route path="extensions">
-						<Route index element={<ExtensionsPage />} />
-						<Route path=":extensionId" element={<p>Extension detail</p>} />
+					<Route path="apps">
+						<Route index element={<AppsPage />} />
+						<Route path=":appId" element={<p>App detail</p>} />
 					</Route>
 				</Route>
 			</Routes>
@@ -73,53 +73,53 @@ it('confirms before deleting an extension', async () => {
 	);
 
 	const deleteButton = await screen.findByRole('button', {
-		name: /settings.extensions.deleteAction/,
+		name: /settings.apps.deleteAction/,
 	});
 	await user.click(deleteButton);
 
 	expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-	await waitFor(() => expect(deleteExtension).toHaveBeenCalledTimes(1));
-	expect(screen.getByText('Demo Extension')).toBeInTheDocument();
+	await waitFor(() => expect(deleteApp).toHaveBeenCalledTimes(1));
+	expect(screen.getByText('Demo App')).toBeInTheDocument();
 
 	await user.click(deleteButton);
 	expect(await screen.findByText('Delete failed')).toBeInTheDocument();
-	expect(screen.getByText('Demo Extension')).toBeInTheDocument();
+	expect(screen.getByText('Demo App')).toBeInTheDocument();
 
 	await user.click(deleteButton);
-	await waitFor(() => expect(deleteExtension).toHaveBeenCalledTimes(3));
-	expect(deleteExtension).toHaveBeenLastCalledWith('demo-extension');
-	await waitFor(() => expect(screen.queryByText('Demo Extension')).not.toBeInTheDocument());
-	expect(screen.queryByText('Extension detail')).not.toBeInTheDocument();
+	await waitFor(() => expect(deleteApp).toHaveBeenCalledTimes(3));
+	expect(deleteApp).toHaveBeenLastCalledWith('demo-app');
+	await waitFor(() => expect(screen.queryByText('Demo App')).not.toBeInTheDocument());
+	expect(screen.queryByText('App detail')).not.toBeInTheDocument();
 });
 
-it('opens the extensions folder from the page header', async () => {
+it('opens the apps folder from the page header', async () => {
 	const user = userEvent.setup();
 
 	render(
-		<MemoryRouter initialEntries={['/settings/extensions']}>
+		<MemoryRouter initialEntries={['/settings/apps']}>
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
-					<Route path="extensions" element={<ExtensionsPage />} />
+					<Route path="apps" element={<AppsPage />} />
 				</Route>
 			</Routes>
 		</MemoryRouter>
 	);
 
-	await user.click(screen.getByRole('button', { name: 'settings.extensions.openFolder' }));
+	await user.click(screen.getByRole('button', { name: 'settings.apps.openFolder' }));
 
-	expect(window.extensions.openRoot).toHaveBeenCalledTimes(1);
+	expect(window.apps.openRoot).toHaveBeenCalledTimes(1);
 });
 
-it('navigates extension clicks to the extension detail subroute', async () => {
+it('navigates app clicks to the app detail subroute', async () => {
 	const user = userEvent.setup();
 
 	render(
-		<MemoryRouter initialEntries={['/settings/extensions']}>
+		<MemoryRouter initialEntries={['/settings/apps']}>
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
-					<Route path="extensions">
-						<Route index element={<ExtensionsPage />} />
-						<Route path=":extensionId" element={<p>Extension detail</p>} />
+					<Route path="apps">
+						<Route index element={<AppsPage />} />
+						<Route path=":appId" element={<p>App detail</p>} />
 					</Route>
 				</Route>
 			</Routes>
@@ -127,23 +127,23 @@ it('navigates extension clicks to the extension detail subroute', async () => {
 	);
 
 	await user.click(
-		await screen.findByRole('button', { name: 'Demo Extension A demo extension. Demo' })
+		await screen.findByRole('button', { name: 'Demo App A demo app. Demo' })
 	);
 
-	expect(await screen.findByText('Extension detail')).toBeInTheDocument();
+	expect(await screen.findByText('App detail')).toBeInTheDocument();
 });
 
-it('treats an extension detail route as a child of the extensions breadcrumb', async () => {
+it('treats an app detail route as a child of the apps breadcrumb', async () => {
 	const user = userEvent.setup();
 
 	render(
-		<MemoryRouter initialEntries={['/settings/extensions/demo-extension']}>
+		<MemoryRouter initialEntries={['/settings/apps/demo-app']}>
 			<SettingsBreadcrumb />
 			<Routes>
 				<Route path="/settings" element={<Layout />}>
-					<Route path="extensions">
-						<Route index element={<p>Extensions list</p>} />
-						<Route path=":extensionId" element={<p>Extension detail</p>} />
+					<Route path="apps">
+						<Route index element={<p>Apps list</p>} />
+						<Route path=":appId" element={<p>App detail</p>} />
 					</Route>
 				</Route>
 			</Routes>
@@ -151,8 +151,8 @@ it('treats an extension detail route as a child of the extensions breadcrumb', a
 	);
 
 	const breadcrumb = screen.getByRole('navigation', { name: 'settings.breadcrumb.label' });
-	expect(within(breadcrumb).getByText('demo-extension')).toBeInTheDocument();
+	expect(within(breadcrumb).getByText('demo-app')).toBeInTheDocument();
 
-	await user.click(within(breadcrumb).getByRole('link', { name: 'settings.tabs.extensions' }));
-	expect(await screen.findByText('Extensions list')).toBeInTheDocument();
+	await user.click(within(breadcrumb).getByRole('link', { name: 'settings.tabs.apps' }));
+	expect(await screen.findByText('Apps list')).toBeInTheDocument();
 });

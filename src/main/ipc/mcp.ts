@@ -23,7 +23,7 @@ import {
 import type { McpData, McpOAuthStart, McpSettings } from '../../shared/mcp_types';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
-import type { ExtensionRegistry } from '../extensions/extension_registry';
+import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 import { parseMcpUrl } from '../mcp/url';
@@ -139,14 +139,14 @@ function getHttpMcpServer(id: string): {
 
 export interface McpIpcDeps {
 	windows: WindowContextManager;
-	extensions: ExtensionRegistry;
+	apps: AppRegistry;
 }
 
 export class McpIpc implements IpcModule<McpIpcDeps> {
 	readonly name = 'mcp';
 
-	register({ windows, extensions }: McpIpcDeps, _eventBus: EventBus): void {
-		const trusted = new TrustedRenderer(windows, extensions);
+	register({ windows, apps }: McpIpcDeps, _eventBus: EventBus): void {
+		const trusted = new TrustedRenderer(windows, apps);
 
 		registerQueryWithEvent(McpChannels.list, (event) => {
 			trusted.assert(event);

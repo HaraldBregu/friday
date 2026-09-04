@@ -26,7 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useNow } from '@/components/hooks/use-now';
 import { cn } from '@/lib/utils';
 import { formatDuration } from './duration';
-import { isExtensionToolType } from './extension';
+import { isAppToolType } from './app';
 import { isTaskToolType } from './task';
 import { estimateTokens } from './tokens';
 
@@ -74,7 +74,7 @@ export function toolIcon(toolPart: ToolPart): typeof Wrench {
 	const type = toolPart.type.toLowerCase();
 	if (isTaskToolType(type)) return CalendarClock;
 	if (toolPart.serviceKind === 'mcp' || type.startsWith('mcp__')) return Plug;
-	if (isExtensionToolType(type)) return Blocks;
+	if (isAppToolType(type)) return Blocks;
 	if (type.includes('skill')) return Sparkles;
 	if (type === 'create_image') return Image;
 	if (type === 'create_video') return Video;

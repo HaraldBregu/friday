@@ -1,7 +1,7 @@
-import { openExtensionWindows } from './extension_render';
+import { openAppWindows } from './app_render';
 
-export function destroyAllExtensions(): void {
-	for (const extension of openExtensionWindows.values()) {
-		if (!extension.window.isDestroyed()) extension.window.destroy();
+export function destroyAllApps(): void {
+	for (const app of openAppWindows.values()) {
+		if (!app.window.isDestroyed()) app.window.destroy();
 	}
 }
