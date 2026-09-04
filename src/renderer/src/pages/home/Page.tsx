@@ -822,7 +822,10 @@ function PageContent(): ReactElement {
 							/>
 						</div>
 					</ChatContainerRoot>
-					<div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 py-3">
+					<div
+						data-slot="home-composer-shell"
+						className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-5 pt-3"
+					>
 						<div className="mx-auto w-full max-w-2xl">
 							<RecorderErrorMessage
 								message={voiceErrorMessage}

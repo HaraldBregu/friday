@@ -127,11 +127,15 @@ test('the home composer uses the compact sizing', async () => {
 		'xpath=ancestor::div[contains(@class, "max-w-2xl")][1]'
 	);
 
-	await expect(composer).toHaveCSS('height', '48px');
+	await expect(composer).toHaveCSS('height', '50px');
 	await expect(attachmentButton).toHaveCSS('width', '40px');
 	await expect(attachmentButton).toHaveCSS('height', '40px');
 	await expect(attachmentButton.locator('svg')).toHaveCSS('width', '20px');
 	await expect(composerWidth).toHaveCSS('max-width', '672px');
+	await expect(page.locator('[data-slot="home-composer-shell"]')).toHaveCSS(
+		'padding-bottom',
+		'20px'
+	);
 });
 
 test('the leading /plan command activates Plan mode and requires prompt text', async () => {
