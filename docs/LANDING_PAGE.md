@@ -347,7 +347,7 @@ Include links for GitHub, Documentation, Releases, Security, Contributing, and L
 
 Use Kucedr's existing product identity rather than generic AI imagery.
 
-- Use `resources/icons/kucedra-mark.svg` as the canonical brand mark and `resources/icons/icon-rounded.png` where a raster app icon is required.
+- Use `resources/icons/kucedra-mark.svg` as the canonical brand mark.
 - Start with near-black or deep graphite foundations and restrained off-white surfaces.
 - Carry the mark's crisp monochrome contrast into focus rings, active paths, and restrained graphic details.
 - Mirror the desktop application's clean borders, compact controls, calm spacing, and rounded panels.

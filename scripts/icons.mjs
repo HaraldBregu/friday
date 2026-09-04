@@ -11,7 +11,7 @@ const rendered = new Map();
 
 await mkdir(outputDirectory, { recursive: true });
 
-for (const size of [...pngSizes, 288]) {
+for (const size of pngSizes) {
 	const inset = Math.max(1, Math.round(size * 0.04));
 	const radius = Math.round(size * 0.2);
 	const markSize = Math.round(size * 0.8);
@@ -50,7 +50,6 @@ for (const size of [...pngSizes, 288]) {
 }
 
 await writeFile(path.join(root, 'resources/icons/icon.png'), rendered.get(1024));
-await writeFile(path.join(root, 'resources/icons/icon-rounded.png'), rendered.get(288));
 
 const icoSizes = pngSizes.filter((size) => size <= 256);
 const icoHeader = Buffer.alloc(6);
