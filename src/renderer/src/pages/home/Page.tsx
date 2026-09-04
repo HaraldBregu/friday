@@ -747,7 +747,7 @@ function PageContent(): ReactElement {
 							className={cn(
 								'mx-auto w-full max-w-4xl gap-5 px-4',
 								showEmptyConversation
-									? 'h-full min-h-0 justify-center overflow-hidden pb-36 pt-12'
+									? 'h-full min-h-0 justify-center overflow-hidden pb-36 pt-20'
 									: voiceMode === 'conversation'
 										? 'min-h-full pb-80 pt-6'
 										: 'min-h-full pb-28 pt-6'
