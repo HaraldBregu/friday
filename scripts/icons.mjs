@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const source = await readFile(path.join(root, 'resources/icons/kucedra-mark.svg'));
+const source = await readFile(path.join(root, 'resources/icons/icon.svg'));
 const outputDirectory = path.join(root, 'resources/icons/png');
 const pngSizes = [16, 24, 32, 48, 64, 128, 256, 512, 1024];
 const rendered = new Map();

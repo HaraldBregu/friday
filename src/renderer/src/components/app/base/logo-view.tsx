@@ -1,5 +1,5 @@
 import React from 'react';
-import mark from '@resources/icons/kucedra-mark.svg';
+import mark from '@resources/icons/icon.svg';
 
 export function LogoView({
 	className = 'size-20 rounded-2xl',

@@ -347,7 +347,7 @@ Include links for GitHub, Documentation, Releases, Security, Contributing, and L
 
 Use Kucedr's existing product identity rather than generic AI imagery.
 
-- Use `resources/icons/kucedra-mark.svg` as the canonical brand mark.
+- Use `resources/icons/icon.svg` as the canonical brand mark.
 - Start with near-black or deep graphite foundations and restrained off-white surfaces.
 - Carry the mark's crisp monochrome contrast into focus rings, active paths, and restrained graphic details.
 - Mirror the desktop application's clean borders, compact controls, calm spacing, and rounded panels.
@@ -435,4 +435,4 @@ Use these repository sources to validate final copy and product visuals:
 - [Extensions settings](../src/renderer/src/pages/settings/pages/extensions/Page.tsx)
 - [Extension window](../src/main/extensions/extension_render.ts)
 - [Kucedr SDK](../packages/sdk/README.md)
-- [Brand mark](../resources/icons/kucedra-mark.svg)
+- [Brand mark](../resources/icons/icon.svg)

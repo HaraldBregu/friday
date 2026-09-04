@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="resources/icons/kucedra-mark.svg" alt="Kucedr logo" width="144" />
+  <img src="resources/icons/icon.svg" alt="Kucedr logo" width="144" />
 </p>
 
 <h1 align="center">Kucedr</h1>
