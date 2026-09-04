@@ -20,6 +20,10 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 			<p className="mt-3 max-w-md text-lg leading-relaxed text-muted-foreground">
 				Personal multi-task desktop ai assistant
 			</p>
+			<p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+				Kucedr helps with everyday tasks, works across your tools, and keeps important context close
+				at hand.
+			</p>
 			<Button className="mt-8" size="sm" disabled={loading} onClick={onStart}>
 				{loading ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" /> : null}
 				{loading ? 'Checking your session…' : 'Get started'}
