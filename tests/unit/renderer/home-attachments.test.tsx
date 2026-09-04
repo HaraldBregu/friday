@@ -177,9 +177,15 @@ describe('Home prompt attachments', () => {
 		modelCatalogChanged = undefined;
 	});
 
-	it('shows the full empty-state prompt set and fills a selected suggestion', () => {
+	it('shows the full empty-state prompt set and fills a selected suggestion', async () => {
 		const getCapabilities = jest.fn().mockResolvedValue(textCapabilities);
 		renderPage(getCapabilities);
+		await waitFor(() =>
+			expect(screen.getByLabelText('Attachment files')).toHaveAttribute(
+				'accept',
+				textCapabilities.accept
+			)
+		);
 
 		expect(screen.getByText('What can I do for you?')).toBeInTheDocument();
 		for (const label of [
