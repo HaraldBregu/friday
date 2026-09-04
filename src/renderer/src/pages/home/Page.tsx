@@ -823,7 +823,7 @@ function PageContent(): ReactElement {
 						</div>
 					</ChatContainerRoot>
 					<div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 py-3">
-						<div className="mx-auto w-full max-w-4xl">
+						<div className="mx-auto w-full max-w-3xl">
 							<RecorderErrorMessage
 								message={voiceErrorMessage}
 								actionLabel={voiceErrorAction?.label}
