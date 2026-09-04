@@ -8,10 +8,6 @@ jest.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string): string => key }),
 }));
 
-jest.mock('@/components/ui/gradient-sphere', () => ({
-	GradientSphere: () => <span data-testid="kucedr-logo" />,
-}));
-
 const showContextMenu = jest.fn();
 const contextMenuItems = [
 	{ id: '/settings/general', label: 'settings.tabs.general' },
@@ -167,7 +163,7 @@ it('shows the Kucedr logo and label inside the Home button on Settings', async (
 	);
 	const homeButton = screen.getByRole('button', { name: 'titleBar.home' });
 
-	expect(within(homeButton).getByTestId('kucedr-logo')).toBeInTheDocument();
+	expect(within(homeButton).getByRole('img', { name: 'Kucedr logo' })).toBeInTheDocument();
 	expect(within(homeButton).getByText('Kucedr')).toBeInTheDocument();
 
 	await user.click(homeButton);

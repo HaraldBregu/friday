@@ -9,7 +9,7 @@ import { TitleBarProvider } from './context/TitleBarContext';
 // import { NavigationButtons } from './components/NavigationButtons';
 import { WindowControls } from './components/WindowControls';
 import { useWindowState } from './hooks/useWindowState';
-import { GradientSphere } from '@/components/ui/gradient-sphere';
+import { LogoView } from '@/components/app/base/logo-view';
 import { cn } from '@/lib/utils';
 
 // Synchronous platform check — no hooks, no async, no state.
@@ -77,7 +77,7 @@ export const TitleBar = React.memo(function TitleBar({
 			title={homeButtonLabel}
 			aria-label={homeButtonLabel}
 		>
-			<GradientSphere size={18} mode="css" className="pointer-events-none" />
+			<LogoView className="pointer-events-none size-[18px]" />
 			Kucedr
 		</Button>
 	) : !isOnboarding ? (
