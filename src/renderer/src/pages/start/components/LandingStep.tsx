@@ -14,10 +14,10 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 			<div className="flex size-24 items-center justify-center rounded-2xl bg-background shadow-sm">
 				<LogoView className="size-20 rounded-xl" />
 			</div>
-			<h1 className="mt-6 text-3xl font-bold leading-tight tracking-tight text-foreground">
+			<h1 className="mt-6 text-2xl font-bold leading-tight tracking-tight text-foreground">
 				Kucedr
 			</h1>
-			<p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+			<p className="mt-3 max-w-md text-lg leading-relaxed text-muted-foreground">
 				Personal multi-task desktop ai assistant
 			</p>
 			<Button className="mt-8" size="sm" disabled={loading} onClick={onStart}>
