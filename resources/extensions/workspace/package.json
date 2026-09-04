@@ -39,7 +39,7 @@
 		"@tldraw/assets": "5.3.0",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
-		"katex": "^0.16.47",
+		"katex": "^0.18.5",
 		"lucide-react": "^0.468.0",
 		"media-chrome": "^4.19.2",
 		"mermaid": "^11.16.1",
