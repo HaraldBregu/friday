@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer, Split } from '@/components/app/base/page';
+import { LogoView } from '@/components/app/base/logo-view';
 import { AudioPlayer } from '@/components/audio-player';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +29,6 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from '@/components/ui/empty';
-import logo from '@resources/icons/icon.png';
 import { PromptEditor } from '@/components/prompt-editor';
 import {
 	PromptInputAction,
@@ -153,7 +153,7 @@ function EmptyConversation(): ReactElement {
 		<Empty className="mx-auto max-w-sm border-0 p-0">
 			<EmptyHeader>
 				<EmptyMedia className="mt-8">
-					<img src={logo} alt="" className="size-[72px] rounded-2xl object-contain" />
+					<LogoView className="size-[72px] rounded-2xl" />
 				</EmptyMedia>
 				<EmptyTitle>What can I do for you?</EmptyTitle>
 				<EmptyDescription>

@@ -72,8 +72,6 @@ jest.mock('@/components/app/base/page', () => ({
 	),
 }));
 
-jest.mock('@resources/icons/icon.png', () => 'icon.png');
-
 jest.mock('@/components/ui/chat-container', () => ({
 	ChatContainerRoot: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
 	ChatContainerContent: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,

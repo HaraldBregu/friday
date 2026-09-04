@@ -347,15 +347,15 @@ Include links for GitHub, Documentation, Releases, Security, Contributing, and L
 
 Use Kucedr's existing product identity rather than generic AI imagery.
 
-- Use `resources/icons/icon-rounded.png` as the primary brand mark.
+- Use `resources/icons/kucedra-mark.svg` as the canonical brand mark and `resources/icons/icon-rounded.png` where a raster app icon is required.
 - Start with near-black or deep graphite foundations and restrained off-white surfaces.
-- Pull electric violet, magenta, and blue accents from the icon for focus rings, active paths, and small glows.
+- Carry the mark's crisp monochrome contrast into focus rings, active paths, and restrained graphic details.
 - Mirror the desktop application's clean borders, compact controls, calm spacing, and rounded panels.
-- Let the neon accent signal intelligence moving through the system; do not cover every card in gradients or glass effects.
+- Use motion and contrast to signal intelligence moving through the system; do not cover every card in gradients or glass effects.
 - Prefer real product UI compositions, source-page diagrams, file cards, tool activity, and extension windows over abstract brains, robots, stock photos, or floating chat bubbles.
 - Use a modern sans-serif for interface and marketing copy and a restrained monospace for paths, commands, evidence IDs, and technical labels.
 
-The page should feel capable, precise, and personal. Avoid a noisy cyberpunk aesthetic even though the icon is luminous.
+The page should feel capable, precise, and personal. Avoid a noisy cyberpunk aesthetic.
 
 ## Motion and interaction
 
@@ -435,4 +435,4 @@ Use these repository sources to validate final copy and product visuals:
 - [Extensions settings](../src/renderer/src/pages/settings/pages/extensions/Page.tsx)
 - [Extension window](../src/main/extensions/extension_render.ts)
 - [Kucedr SDK](../packages/sdk/README.md)
-- [Brand icon](../resources/icons/icon-rounded.png)
+- [Brand mark](../resources/icons/kucedra-mark.svg)
