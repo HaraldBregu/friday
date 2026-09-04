@@ -10,7 +10,7 @@ type LandingStepProps = {
 
 export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.Element {
 	return (
-		<div className="mx-auto flex min-h-full w-full max-w-xl flex-col items-center justify-center px-4 py-8 text-center sm:px-6">
+		<div className="mx-auto flex min-h-full w-full max-w-xl flex-col items-center justify-center px-4 pt-8 pb-24 text-center sm:px-6">
 			<div className="flex size-24 items-center justify-center rounded-2xl bg-background shadow-sm">
 				<LogoView className="size-20 rounded-xl" />
 			</div>
