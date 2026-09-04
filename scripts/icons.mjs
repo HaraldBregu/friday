@@ -12,34 +12,15 @@ const rendered = new Map();
 await mkdir(outputDirectory, { recursive: true });
 
 for (const size of pngSizes) {
-	const inset = Math.max(1, Math.round(size * 0.04));
-	const radius = Math.round(size * 0.2);
-	const markSize = Math.round(size * 0.8);
-	const tile = Buffer.from(
-		`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect x="${inset}" y="${inset}" width="${size - inset * 2}" height="${size - inset * 2}" rx="${radius}" fill="#000000"/></svg>`
-	);
-	const mark = await sharp(source)
+	const icon = await sharp(source)
+		.trim()
 		.resize({
-			width: markSize,
-			height: markSize,
+			width: size,
+			height: size,
 			fit: 'contain',
 			background: { r: 0, g: 0, b: 0, alpha: 0 },
 		})
 		.negate({ alpha: false })
-		.png()
-		.toBuffer();
-	const icon = await sharp({
-		create: {
-			width: size,
-			height: size,
-			channels: 4,
-			background: { r: 0, g: 0, b: 0, alpha: 0 },
-		},
-	})
-		.composite([
-			{ input: tile, gravity: 'centre' },
-			{ input: mark, gravity: 'centre' },
-		])
 		.png({ compressionLevel: 9 })
 		.toBuffer();
 
