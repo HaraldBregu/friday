@@ -76,6 +76,22 @@ const promptSuggestions = [
 		label: 'Create a video',
 		prompt: 'Create a short video of waves rolling onto a beach at dawn.',
 	},
+	{
+		label: 'Create music',
+		prompt: 'Create a relaxing ambient music track for focused work.',
+	},
+	{
+		label: 'Contact an agent',
+		prompt: 'Contact an agent to help me research and plan my next project.',
+	},
+	{
+		label: 'Summarize a document',
+		prompt: 'Summarize the key points from a document I upload.',
+	},
+	{
+		label: 'Plan a trip',
+		prompt: 'Plan a five-day trip to Rome with food, art, and quiet neighborhoods.',
+	},
 ] as const;
 
 function attachmentId(): string {
@@ -150,13 +166,15 @@ const realtimeVoiceStatusLabels: Record<RealtimeVoiceUiStatus, string> = {
 
 function EmptyConversation(): ReactElement {
 	return (
-		<Empty className="mx-auto max-w-sm border-0 p-0">
-			<EmptyHeader>
-				<EmptyMedia className="mt-8">
+		<Empty className="mx-auto max-w-xl border-0 p-0">
+			<EmptyHeader className="max-w-lg gap-4">
+				<EmptyMedia className="mb-2">
 					<LogoView className="size-[72px] rounded-2xl" />
 				</EmptyMedia>
-				<EmptyTitle>What can I do for you?</EmptyTitle>
-				<EmptyDescription>
+				<EmptyTitle className="text-2xl font-bold leading-tight text-foreground">
+					What can I do for you?
+				</EmptyTitle>
+				<EmptyDescription className="max-w-md text-base/relaxed font-medium">
 					I schedule tasks, watch your system, and create images, video and music. Pick an example
 					below or type your own.
 				</EmptyDescription>
@@ -171,14 +189,17 @@ function PromptSuggestions({
 	readonly onUseSuggestion: (prompt: string) => void;
 }): ReactElement {
 	return (
-		<div className="mb-2 flex flex-wrap justify-center gap-2 px-1" aria-label="Prompt suggestions">
+		<div
+			className="mx-auto mb-2 mt-3 flex w-full max-w-md flex-wrap justify-center gap-2.5 px-1"
+			aria-label="Prompt suggestions"
+		>
 			{promptSuggestions.map((suggestion) => (
 				<PromptSuggestion
 					key={suggestion.label}
 					type="button"
 					variant="outline"
 					size="sm"
-					className="h-8 max-w-full border-border/70 bg-card/95 px-3 text-xs font-medium text-muted-foreground shadow-sm shadow-foreground/5 hover:text-foreground"
+					className="h-9 max-w-full border-border/70 bg-card/95 px-4 text-xs font-medium text-muted-foreground shadow-sm shadow-foreground/5 hover:bg-muted hover:text-foreground"
 					aria-label={suggestion.prompt}
 					onClick={() => onUseSuggestion(suggestion.prompt)}
 				>

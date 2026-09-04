@@ -45,7 +45,8 @@ After history finishes loading, a session with no visible messages and no active
 - the Kucedr icon;
 - **What can I do for you?**;
 - a short capability description;
-- **Schedule a task**, **Create a sound**, **Create an image**, and **Create a video** suggestions.
+- **Schedule a task**, **Create a sound**, **Create an image**, **Create a video**, **Create music**,
+  **Contact an agent**, **Summarize a document**, and **Plan a trip** suggestions.
 
 Selecting a suggestion should fill and focus the composer without submitting it. The empty state
 should disappear when a real user or assistant message exists, while a response is running, or

@@ -7,6 +7,7 @@ import type { PromptAttachment } from '../../../src/renderer/src/pages/home/atta
 
 const handleSubmit = jest.fn();
 const setInput = jest.fn();
+const useSuggestion = jest.fn();
 let modelCatalogChanged: (() => void) | undefined;
 
 jest.mock('../../../src/renderer/src/pages/home/hooks', () => ({
@@ -21,7 +22,7 @@ jest.mock('../../../src/renderer/src/pages/home/hooks', () => ({
 		setInput,
 		setInteractionMode: jest.fn(),
 		switchToTyping: jest.fn(),
-		useSuggestion: jest.fn(),
+		useSuggestion,
 	}),
 	useRealtimeVoice: () => ({
 		analyser: null,
@@ -172,7 +173,32 @@ function renderPage(getCapabilities: jest.Mock): void {
 describe('Home prompt attachments', () => {
 	beforeEach(() => {
 		handleSubmit.mockResolvedValue(true);
+		useSuggestion.mockClear();
 		modelCatalogChanged = undefined;
+	});
+
+	it('shows the full empty-state prompt set and fills a selected suggestion', () => {
+		const getCapabilities = jest.fn().mockResolvedValue(textCapabilities);
+		renderPage(getCapabilities);
+
+		expect(screen.getByText('What can I do for you?')).toBeInTheDocument();
+		for (const label of [
+			'Schedule a task',
+			'Create a sound',
+			'Create an image',
+			'Create a video',
+			'Create music',
+			'Contact an agent',
+			'Summarize a document',
+			'Plan a trip',
+		]) {
+			expect(screen.getByText(label)).toBeInTheDocument();
+		}
+
+		fireEvent.click(screen.getByText('Plan a trip'));
+		expect(useSuggestion).toHaveBeenCalledWith(
+			'Plan a five-day trip to Rome with food, art, and quiet neighborhoods.'
+		);
 	});
 
 	it('keeps local text available on text-only models and disables the picker on resolution failure', async () => {
