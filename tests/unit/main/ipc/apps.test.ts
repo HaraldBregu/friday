@@ -28,7 +28,7 @@ import type { EventBus } from '../../../../src/main/event_bus';
 import { AppsIpc } from '../../../../src/main/ipc/apps';
 import { registerCommandWithEvent } from '../../../../src/main/ipc/core/gateway';
 import type { WindowFactory } from '../../../../src/main/window_factory';
-import { AppChannels } from '../../../../src/shared/ipc_channels_definitions';
+import { AppsChannels } from '../../../../src/shared/ipc_channels_definitions';
 import { BrowserWindow, dialog } from 'electron';
 
 beforeEach(() => {
@@ -56,7 +56,7 @@ it('opens the apps directory in the system file explorer', () => {
 	);
 
 	const handler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
-		([channel]) => channel === AppChannels.openRoot
+		([channel]) => channel === AppsChannels.openRoot
 	)?.[1];
 	handler(event);
 
@@ -75,7 +75,7 @@ it('uses a native confirmation before deleting an app', async () => {
 	);
 
 	const deleteHandler = (registerCommandWithEvent as jest.Mock).mock.calls.find(
-		([channel]) => channel === AppChannels.delete
+		([channel]) => channel === AppsChannels.delete
 	)?.[1];
 
 	await expect(deleteHandler(event, app.id)).resolves.toBe(false);

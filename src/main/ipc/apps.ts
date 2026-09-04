@@ -10,7 +10,7 @@ import {
 	loadApp,
 	openRoot,
 } from '../apps/app_index';
-import { AppChannels } from '../../shared/ipc_channels_definitions';
+import { AppsChannels } from '../../shared/ipc_channels_definitions';
 import type { AppImportResult } from '../../shared/installed_app_types';
 import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway';
 import type { IpcModule } from './core/module';
@@ -31,21 +31,21 @@ export class AppsIpc implements IpcModule<AppsIpcDeps> {
 		_eventBus: EventBus
 	): void {
 		const trusted = new TrustedRenderer(windows, appRegistry);
-		registerQueryWithEvent(AppChannels.list, (event) => {
+		registerQueryWithEvent(AppsChannels.list, (event) => {
 			trusted.assert(event);
 			return listApps();
 		});
-		registerCommandWithEvent(AppChannels.open, (event, appId: string) => {
+		registerCommandWithEvent(AppsChannels.open, (event, appId: string) => {
 			trusted.assert(event);
 			const app = listApps().find((item) => item.id === appId);
 			if (!app) throw new Error(`App not found: ${appId}`);
 			loadApp(windowFactory, app);
 		});
-		registerCommandWithEvent(AppChannels.openRoot, (event) => {
+		registerCommandWithEvent(AppsChannels.openRoot, (event) => {
 			trusted.assert(event);
 			return openRoot();
 		});
-		registerCommandWithEvent(AppChannels.delete, async (event, appId) => {
+		registerCommandWithEvent(AppsChannels.delete, async (event, appId) => {
 			const window = trusted.assert(event);
 			const app = listApps().find((item) => item.id === appId);
 			if (!app) throw new Error(`App not found: ${appId}`);
@@ -67,7 +67,7 @@ export class AppsIpc implements IpcModule<AppsIpcDeps> {
 			return true;
 		});
 		registerCommandWithEvent(
-			AppChannels.import,
+			AppsChannels.import,
 			async (event): Promise<AppImportResult | undefined> => {
 				const window = trusted.assert(event);
 				const result = await dialog.showOpenDialog(window, {

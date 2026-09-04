@@ -1,21 +1,21 @@
 import { typedInvokeUnwrap } from '../shared/ipc_types';
-import { AppChannels } from '../shared/ipc_channels_definitions';
+import { AppsChannels } from '../shared/ipc_channels_definitions';
 import type { AppsApi } from './index.d';
 
 export const apps: AppsApi = {
 	list: () => {
-		return typedInvokeUnwrap(AppChannels.list);
+		return typedInvokeUnwrap(AppsChannels.list);
 	},
 	open: (appId) => {
-		return typedInvokeUnwrap(AppChannels.open, appId);
+		return typedInvokeUnwrap(AppsChannels.open, appId);
 	},
 	openRoot: () => {
-		return typedInvokeUnwrap(AppChannels.openRoot);
+		return typedInvokeUnwrap(AppsChannels.openRoot);
 	},
 	delete: (appId) => {
-		return typedInvokeUnwrap(AppChannels.delete, appId);
+		return typedInvokeUnwrap(AppsChannels.delete, appId);
 	},
 	import: () => {
-		return typedInvokeUnwrap(AppChannels.import);
+		return typedInvokeUnwrap(AppsChannels.import);
 	},
 };

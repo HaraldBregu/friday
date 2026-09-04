@@ -50,7 +50,7 @@ import {
 	SttChannels,
 	TextChannels,
 	VideoChannels,
-	AppChannels,
+	AppsChannels,
 	WikiChannels,
 	DataChannels,
 	WindowChannels,
@@ -975,13 +975,13 @@ export interface SttEventChannelMap {
 }
 
 export interface AppsInvokeChannelMap {
-	[AppChannels.list]: { args: []; result: import('./app_types').App[] };
-	[AppChannels.open]: { args: [appId: string]; result: void };
-	[AppChannels.openRoot]: { args: []; result: void };
-	[AppChannels.delete]: { args: [appId: string]; result: boolean };
-	[AppChannels.import]: {
+	[AppsChannels.list]: { args: []; result: import('./installed_app_types').App[] };
+	[AppsChannels.open]: { args: [appId: string]; result: void };
+	[AppsChannels.openRoot]: { args: []; result: void };
+	[AppsChannels.delete]: { args: [appId: string]; result: boolean };
+	[AppsChannels.import]: {
 		args: [];
-		result: import('./app_types').AppImportResult | undefined;
+		result: import('./installed_app_types').AppImportResult | undefined;
 	};
 }
 

@@ -370,7 +370,7 @@ export const VideoChannels = {
 	setProviderId: 'video:set-provider-id',
 } as const;
 
-export const AppChannels = {
+export const AppsChannels = {
 	list: 'apps:list',
 	open: 'apps:open',
 	openRoot: 'apps:open-root',
