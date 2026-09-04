@@ -123,7 +123,7 @@
 	},
 	"dependencies": {
 		"@a2a-js/sdk": "^1.1.0",
-		"@anthropic-ai/sandbox-runtime": "0.0.71",
+		"@anthropic-ai/sandbox-runtime": "0.0.75",
 		"@anthropic-ai/sdk": "^0.92.0",
 		"@base-ui/react": "^1.6.0",
 		"@earendil-works/pi-coding-agent": "0.84.4",
