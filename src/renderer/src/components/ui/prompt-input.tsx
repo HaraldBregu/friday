@@ -446,7 +446,7 @@ function PromptInput({
 									? 'flex h-[min(42vh,18rem)] min-h-56 cursor-default flex-col gap-2 overflow-hidden rounded-[1.75rem] p-2 focus-within:ring-0'
 									: isPromptExpanded
 										? 'flex max-h-[min(48vh,30rem)] min-h-24 flex-col rounded-xl px-4 py-3'
-										: 'flex min-h-14 items-center gap-2 rounded-full p-2',
+										: 'flex min-h-12 items-center gap-2 rounded-full p-1',
 								disabled && 'cursor-not-allowed opacity-60',
 								className
 							)}

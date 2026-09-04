@@ -295,12 +295,12 @@ function AttachmentButton({
 				type="button"
 				variant="ghost"
 				size="icon"
-				className="size-9 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+				className="size-10 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
 				aria-label="Add attachment"
 				disabled={disabled}
 				onClick={triggerFileUpload}
 			>
-				<Plus className="size-[18px]" />
+				<Plus className="size-5" />
 			</Button>
 		</PromptInputAction>
 	);
@@ -823,7 +823,7 @@ function PageContent(): ReactElement {
 						</div>
 					</ChatContainerRoot>
 					<div className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-4 py-3">
-						<div className="mx-auto w-full max-w-[46rem]">
+						<div className="mx-auto w-full max-w-2xl">
 							<RecorderErrorMessage
 								message={voiceErrorMessage}
 								actionLabel={voiceErrorAction?.label}
