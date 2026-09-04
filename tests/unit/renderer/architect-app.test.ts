@@ -22,7 +22,7 @@ const catalog = [
 	},
 ] as CatalogModel[];
 
-describe('Architect extension workflow', () => {
+describe('Architect app workflow', () => {
 	it('builds a domain-specific interior visualization prompt', () => {
 		const prompt = buildBriefPrompt({
 			description: 'a sunken conversation area facing the garden',

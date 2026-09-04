@@ -11,9 +11,9 @@ jest.mock(
 		isKucedr: () => true,
 		app: {
 			openExternalUrl: jest.fn(),
-			getExtensionStoreValue: jest.fn(),
-			setExtensionStoreValue: jest.fn(),
-			deleteExtensionStoreValue: jest.fn(),
+			getAppStoreValue: jest.fn(),
+			setAppStoreValue: jest.fn(),
+			deleteAppStoreValue: jest.fn(),
 		},
 		coder: {
 			getSettings: jest.fn(),
@@ -87,8 +87,8 @@ const projectInstructions = {
 
 beforeEach(() => {
 	jest.clearAllMocks();
-	(app.getExtensionStoreValue as jest.Mock).mockResolvedValue(project.id);
-	(app.setExtensionStoreValue as jest.Mock).mockResolvedValue(undefined);
+	(app.getAppStoreValue as jest.Mock).mockResolvedValue(project.id);
+	(app.setAppStoreValue as jest.Mock).mockResolvedValue(undefined);
 	(coderApi.getSettings as jest.Mock).mockResolvedValue({
 		runtime: 'pi',
 		providerId: 'openai-codex',
@@ -221,7 +221,7 @@ it('groups sessions by workspace and opens an inactive workspace session', async
 	expect(result.current.blocks).toEqual([expect.objectContaining({ content: 'Website response' })]);
 });
 
-it('loads and saves the extension configuration through the Coder SDK', async () => {
+it('loads and saves the app configuration through the Coder SDK', async () => {
 	const { result } = renderHook(() => useConfiguration());
 
 	await waitFor(() => expect(result.current.loading).toBe(false));
@@ -235,7 +235,7 @@ it('loads and saves the extension configuration through the Coder SDK', async ()
 	);
 });
 
-it('projects Codex device authentication into the extension configuration', async () => {
+it('projects Codex device authentication into the app configuration', async () => {
 	(coderApi.connectCodex as jest.Mock).mockImplementation(async (onEvent) => {
 		onEvent({
 			type: 'device-code',
