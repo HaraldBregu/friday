@@ -217,7 +217,7 @@
 		"supabase": "2.116.0",
 		"tailwindcss": "^4.3.3",
 		"ts-jest": "^29.4.12",
-		"typescript": "^5.9.2",
+		"typescript": "^7.0.2",
 		"vite": "^7.1.4",
 		"vite-tsconfig-paths": "^5.1.4"
 	}
