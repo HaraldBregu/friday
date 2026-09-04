@@ -115,6 +115,25 @@ test('the platform shortcut creates a new chat session', async () => {
 	await expect(page.getByRole('textbox', { name: 'Message Kucedr' })).toBeFocused();
 });
 
+test('the home composer uses the compact sizing', async () => {
+	await page.evaluate(() => {
+		window.location.hash = '#/home';
+	});
+
+	const editor = page.getByRole('textbox', { name: 'Message Kucedr' });
+	const composer = editor.locator('xpath=ancestor::*[@data-expanded][1]');
+	const attachmentButton = page.getByRole('button', { name: 'Add attachment' });
+	const composerWidth = attachmentButton.locator(
+		'xpath=ancestor::div[contains(@class, "max-w-2xl")][1]'
+	);
+
+	await expect(composer).toHaveCSS('height', '48px');
+	await expect(attachmentButton).toHaveCSS('width', '40px');
+	await expect(attachmentButton).toHaveCSS('height', '40px');
+	await expect(attachmentButton.locator('svg')).toHaveCSS('width', '20px');
+	await expect(composerWidth).toHaveCSS('max-width', '672px');
+});
+
 test('the leading /plan command activates Plan mode and requires prompt text', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/home';
