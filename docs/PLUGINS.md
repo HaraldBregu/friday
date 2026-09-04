@@ -43,7 +43,7 @@ built-in `resources/providers/<id>/` catalog:
 
 ```json
 {
-	"schemaVersion": 3,
+	"schemaVersion": 4,
 	"id": "acme-tools",
 	"name": "Acme Tools",
 	"version": "1.0.0",
