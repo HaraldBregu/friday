@@ -115,18 +115,22 @@ test('the platform shortcut creates a new chat session', async () => {
 	await expect(page.getByRole('textbox', { name: 'Message Kucedr' })).toBeFocused();
 });
 
-test('the home composer uses the compact sizing', async () => {
+test('the empty home state and composer use the intended spacing', async () => {
 	await page.evaluate(() => {
 		window.location.hash = '#/home';
 	});
 
 	const editor = page.getByRole('textbox', { name: 'Message Kucedr' });
+	const emptyContent = page
+		.getByText('What can I do for you?')
+		.locator('xpath=ancestor::*[contains(@class, "pt-20")][1]');
 	const composer = editor.locator('xpath=ancestor::*[@data-expanded][1]');
 	const attachmentButton = page.getByRole('button', { name: 'Add attachment' });
 	const composerWidth = attachmentButton.locator(
 		'xpath=ancestor::div[contains(@class, "max-w-2xl")][1]'
 	);
 
+	await expect(emptyContent).toHaveCSS('padding-top', '80px');
 	await expect(composer).toHaveCSS('height', '50px');
 	await expect(attachmentButton).toHaveCSS('width', '40px');
 	await expect(attachmentButton).toHaveCSS('height', '40px');
