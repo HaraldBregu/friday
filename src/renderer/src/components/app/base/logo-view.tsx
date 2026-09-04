@@ -1,10 +1,10 @@
 import React from 'react';
-import mark from '@resources/icons/kucedra-mark.svg';
+import icon from '@resources/icons/icon.png';
 
 export function LogoView({
 	className = 'size-20 rounded-2xl',
 }: {
 	readonly className?: string;
 }): React.JSX.Element {
-	return <img src={mark} alt="Kucedr logo" className={`object-contain dark:invert ${className}`} />;
+	return <img src={icon} alt="Kucedr logo" className={`object-contain ${className}`} />;
 }

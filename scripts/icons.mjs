@@ -16,7 +16,7 @@ for (const size of [...pngSizes, 288]) {
 	const radius = Math.round(size * 0.2);
 	const markSize = Math.round(size * 0.8);
 	const tile = Buffer.from(
-		`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect x="${inset}" y="${inset}" width="${size - inset * 2}" height="${size - inset * 2}" rx="${radius}" fill="#fbfbfa"/></svg>`
+		`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect x="${inset}" y="${inset}" width="${size - inset * 2}" height="${size - inset * 2}" rx="${radius}" fill="#000000"/></svg>`
 	);
 	const mark = await sharp(source)
 		.resize({
@@ -25,6 +25,7 @@ for (const size of [...pngSizes, 288]) {
 			fit: 'contain',
 			background: { r: 0, g: 0, b: 0, alpha: 0 },
 		})
+		.negate({ alpha: false })
 		.png()
 		.toBuffer();
 	const icon = await sharp({
