@@ -134,9 +134,7 @@ it.each(['/auth', '/setup', '/config', '/home'])(
 		window.auth = authApi({ status: 'signedOut', persistence: 'encrypted' });
 		renderFlow(path);
 
-		expect(
-			await screen.findByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-		).toBeInTheDocument();
+		expect(await screen.findByRole('heading', { name: 'Kucedr' })).toBeInTheDocument();
 		expect(screen.getByLabelText('Current route')).toHaveTextContent('/start');
 	}
 );
@@ -158,9 +156,7 @@ it.each(['/home', '/settings/account'])(
 
 		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
 		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
-		expect(
-			screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-		).not.toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: 'Kucedr' })).not.toBeInTheDocument();
 	}
 );
 
@@ -181,9 +177,7 @@ it.each(['/home', '/settings/account'])(
 
 		await waitFor(() => expect(window.agent.getProvider).toHaveBeenCalled());
 		expect(screen.getByLabelText('Current route')).toHaveTextContent(path);
-		expect(
-			screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-		).not.toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: 'Kucedr' })).not.toBeInTheDocument();
 	}
 );
 
@@ -204,9 +198,7 @@ it('preserves home when a skipped local-only session is refreshed', async () => 
 	renderFlow('/home');
 	expect(await screen.findByLabelText('Current route')).toHaveTextContent('/home');
 	expect(window.agent.getProvider.mock.calls.length).toBeGreaterThan(1);
-	expect(
-		screen.queryByRole('heading', { name: 'The Personal Desktop AI Assistant' })
-	).not.toBeInTheDocument();
+	expect(screen.queryByRole('heading', { name: 'Kucedr' })).not.toBeInTheDocument();
 });
 
 it('moves from landing to auth without a back action or bottom navigation', async () => {
