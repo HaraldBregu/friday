@@ -183,7 +183,7 @@
 				"heartbeat": "Periodic agent checks",
 				"health": "Periodic health checks",
 				"permissions": "Tool permissions and path rules",
-				"apps": "Installed app apps",
+				"apps": "Installed apps",
 				"rag": "Document search and index",
 				"wiki": "Assistant knowledge and notes",
 				"plugins": "Installable app plugins",

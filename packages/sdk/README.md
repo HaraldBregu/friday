@@ -158,7 +158,7 @@ list the Pi model catalog, and run Codex OAuth; other apps are rejected. Coder i
 the registered Coder app. It exposes the narrow preload bridge; shell selection, PTY ownership,
 and process lifecycle remain in the Electron main process. It is not exposed by `connect()`.
 
-App titlebars are rendered by the Kucedr host. In-app apps can provide a centered title,
+App titlebars are rendered by the Kucedr host. Embedded Apps can provide a centered title,
 left and right button descriptors, and optional sidebar state with
 `win.setTitlebarOptions()`. Button IDs are returned through `win.onTitlebarButtonClick()` so the
 app remains the owner of its application state. Passing `null` restores the manifest title and

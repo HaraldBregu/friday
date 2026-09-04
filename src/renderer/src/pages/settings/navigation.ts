@@ -235,7 +235,7 @@ export const SETTINGS_DETAIL_ITEMS: readonly SettingsDetailItem[] = [
 		path: '/settings/apps',
 		labelKey: 'settings.apps.title',
 		descriptionKey: 'settings.apps.description',
-		keywords: 'external app apps window manifest api install folder entry',
+		keywords: 'external apps window manifest api install folder entry',
 	},
 	// Channels
 	{

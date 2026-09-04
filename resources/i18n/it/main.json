@@ -183,10 +183,10 @@
 				"heartbeat": "Controlli periodici agente",
 				"health": "Controlli salute periodici",
 				"permissions": "Permessi strumenti e regole di percorso",
-				"apps": "Estensioni app installate",
+				"apps": "App installate",
 				"rag": "Ricerca e indice documenti",
 				"wiki": "Note e conoscenza assistant",
-				"plugins": "Estensioni dell'app",
+				"plugins": "Plugin installabili",
 				"configurationDescription": "Configura modelli, archiviazione e integrazioni"
 			}
 		},
