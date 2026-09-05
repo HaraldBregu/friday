@@ -127,6 +127,12 @@ const McpDetailsPage: React.FC = () => {
 						</Button>
 					}
 				/>
+				{server.data.type === 'stdio' && (
+					<SettingsNotice>
+						Save, enable or test only local server commands you trust. They run with your desktop
+						account's privileges. Changed launch settings require renewed trust.
+					</SettingsNotice>
+				)}
 				{error && (
 					<SettingsNotice variant="destructive" icon={AlertTriangle}>
 						{error}
@@ -174,7 +180,7 @@ const McpDetailsPage: React.FC = () => {
 							) : (
 								<FlaskConical className="size-3" />
 							)}
-							{testing ? 'Testing' : 'Test'}
+							{testing ? 'Testing' : server.data.type === 'stdio' ? 'Trust and test' : 'Test'}
 						</Button>
 						<label className="flex items-center gap-1.5 text-xs text-muted-foreground">
 							<Switch
@@ -191,6 +197,12 @@ const McpDetailsPage: React.FC = () => {
 				}
 			/>
 
+			{server.data.type === 'stdio' && (
+				<SettingsNotice>
+					Save, enable or test only local server commands you trust. They run with your desktop
+					account's privileges. Changed launch settings require renewed trust.
+				</SettingsNotice>
+			)}
 			{error && (
 				<SettingsNotice variant="destructive" icon={AlertTriangle}>
 					{error}

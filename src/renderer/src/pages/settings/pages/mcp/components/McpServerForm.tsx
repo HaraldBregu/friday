@@ -74,7 +74,9 @@ export function McpServerForm({
 	);
 	const [command, setCommand] = useState(entry?.type === 'stdio' ? entry.command : '');
 	const [args, setArgs] = useState(entry?.type === 'stdio' ? (entry.args?.join(' ') ?? '') : '');
-	const [env, setEnv] = useState<EnvVariable[]>(entry?.type === 'stdio' ? parseEnvEntries(entry.env) : []);
+	const [env, setEnv] = useState<EnvVariable[]>(
+		entry?.type === 'stdio' ? parseEnvEntries(entry.env) : []
+	);
 	const [envKey, setEnvKey] = useState('');
 	const [envValue, setEnvValue] = useState('');
 	const [cwd, setCwd] = useState(entry?.type === 'stdio' ? (entry.cwd ?? '') : '');
@@ -135,9 +137,7 @@ export function McpServerForm({
 
 	const updateEnvironmentVariable = (indexToUpdate: number, patch: Partial<EnvVariable>): void => {
 		setEnv((current) =>
-			current.map((entry, index) =>
-				index === indexToUpdate ? { ...entry, ...patch } : entry
-			)
+			current.map((entry, index) => (index === indexToUpdate ? { ...entry, ...patch } : entry))
 		);
 	};
 
@@ -175,8 +175,8 @@ export function McpServerForm({
 					<DialogHeader>
 						<DialogTitle>Delete MCP server</DialogTitle>
 						<DialogDescription>
-							Remove <span className="font-medium text-foreground">{serverName}</span>?
-							This cannot be undone.
+							Remove <span className="font-medium text-foreground">{serverName}</span>? This cannot
+							be undone.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -294,14 +294,14 @@ export function McpServerForm({
 				<>
 					<Field>
 						<Label htmlFor="mcp-url">Server URL</Label>
-							<Input
-								id="mcp-url"
-								value={url}
-								onChange={(e) => setUrl(e.target.value)}
-								placeholder="https://example.com/mcp"
-								className={SMALL_INPUT_CLASS}
-							/>
-						</Field>
+						<Input
+							id="mcp-url"
+							value={url}
+							onChange={(e) => setUrl(e.target.value)}
+							placeholder="https://example.com/mcp"
+							className={SMALL_INPUT_CLASS}
+						/>
+					</Field>
 					{isEdit && isValid ? (
 						<McpOAuthButton id={serverId} beforeStart={persist} />
 					) : (
@@ -376,10 +376,7 @@ export function McpServerForm({
 						<Label htmlFor="mcp-env-key">Environment variables (optional)</Label>
 						<div className="grid gap-2">
 							{env.map((entry, index) => (
-								<div
-									key={`${entry.key}-${index}`}
-									className="grid grid-cols-[1fr_1fr_auto] gap-2"
-								>
+								<div key={`${entry.key}-${index}`} className="grid grid-cols-[1fr_1fr_auto] gap-2">
 									<Field className="mb-0">
 										<Label
 											htmlFor={`mcp-env-key-${index}`}
@@ -407,9 +404,7 @@ export function McpServerForm({
 										<Input
 											id={`mcp-env-value-${index}`}
 											value={entry.value}
-											onChange={(e) =>
-												updateEnvironmentVariable(index, { value: e.target.value })
-											}
+											onChange={(e) => updateEnvironmentVariable(index, { value: e.target.value })}
 											autoComplete="off"
 											placeholder="VALUE"
 											spellCheck={false}
@@ -503,6 +498,12 @@ export function McpServerForm({
 				</>
 			)}
 
+			{type === 'stdio' && (
+				<p className="text-[13px] text-muted-foreground">
+					Saving trusts this command, its arguments, environment and working directory to run with
+					your desktop account's privileges. Tool approvals apply after the server launches.
+				</p>
+			)}
 			{error && <p className="text-[13px] text-destructive">{error}</p>}
 
 			<div className="flex justify-end gap-2">
@@ -510,7 +511,13 @@ export function McpServerForm({
 					Cancel
 				</Button>
 				<Button type="submit" disabled={saving}>
-					{saving ? 'Saving' : isEdit ? 'Save' : 'Add MCP server'}
+					{saving
+						? 'Saving'
+						: type === 'stdio'
+							? 'Save and trust'
+							: isEdit
+								? 'Save'
+								: 'Add MCP server'}
 				</Button>
 			</div>
 		</form>

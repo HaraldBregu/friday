@@ -27,6 +27,7 @@ import type { AppRegistry } from '../apps/app_registry';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 import { parseMcpUrl } from '../mcp/url';
+import { authorizeMcpLaunch } from '../mcp/launch/authorize';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -164,6 +165,8 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 			trusted.assert(event);
 			const next = normalizeMcpSettings(input);
 			setMcpServers(next);
+			const effective = getMcpServers();
+			for (const id of Object.keys(next)) if (effective[id]) authorizeMcpLaunch(id, effective[id]);
 			return listMcp();
 		});
 
@@ -173,6 +176,8 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 			const entry = normalizeMcpSettings({ [connectorId]: input })[connectorId];
 			if (!entry) throw new Error('Invalid MCP server configuration.');
 			upsertMcpServer(connectorId, entry);
+			const effective = getMcpServers()[connectorId];
+			if (effective) authorizeMcpLaunch(connectorId, effective);
 			return listMcp();
 		});
 
@@ -190,19 +195,23 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 		registerCommandWithEvent(McpChannels.importLocal, async (event) => {
 			const window = trusted.assert(event);
 			const options: Electron.OpenDialogOptions = {
-				title: 'Select local MCP server folder(s)',
+				title: 'Import and trust local MCP server launches',
 				properties: ['openDirectory', 'multiSelections'],
 			};
 			const result = window
 				? await dialog.showOpenDialog(window, options)
 				: await dialog.showOpenDialog(options);
 			if (result.canceled) return undefined;
-			return importLocalMcpServers(result.filePaths);
+			const imported = importLocalMcpServers(result.filePaths);
+			for (const server of imported.imported) authorizeMcpLaunch(server.id, server.data);
+			return imported;
 		});
 
 		registerCommandWithEvent(McpChannels.configureLocal, (event, id, input) => {
 			trusted.assert(event);
-			return configureLocalMcpServer(resolveMcpId(id), input);
+			const server = configureLocalMcpServer(resolveMcpId(id), input);
+			authorizeMcpLaunch(server.id, server.data);
+			return server;
 		});
 
 		registerQueryWithEvent(McpChannels.getRoot, (event) => {
@@ -220,7 +229,10 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 
 		registerCommandWithEvent(McpChannels.test, (event, id: string) => {
 			trusted.assert(event);
-			return testMcpServer(resolveMcpId(id));
+			const connectorId = resolveMcpId(id);
+			const data = getMcpServers()[connectorId];
+			if (data) authorizeMcpLaunch(connectorId, data);
+			return testMcpServer(connectorId);
 		});
 
 		registerCommandWithEvent(
