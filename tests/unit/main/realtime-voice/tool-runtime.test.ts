@@ -32,6 +32,7 @@ it('runs native Realtime function calls through the existing tool runner and emi
 		tools: [
 			{
 				id: 'echo',
+				capability: { effects: ['read'] },
 				name: 'Echo',
 				description: 'Echo input.',
 				schema: { type: 'object' },
@@ -123,6 +124,7 @@ it('persists failed Realtime tool calls with their canonical input and error out
 		tools: [
 			{
 				id: 'explode',
+				capability: { effects: ['read'] },
 				name: 'Explode',
 				description: 'Fail.',
 				schema: { type: 'object' },
@@ -187,6 +189,7 @@ it('preserves the existing permission request identity and returns rejected tool
 		tools: [
 			{
 				id: 'write',
+				capability: { effects: ['write'] },
 				name: 'Write file',
 				description: 'Write a file.',
 				schema: { type: 'object' },
@@ -305,6 +308,7 @@ it('cancels queued response actions while allowing a subsequent response', async
 		tools: [
 			{
 				id: 'probe',
+				capability: { effects: ['read'] },
 				name: 'Probe',
 				description: 'Probe',
 				schema: { type: 'object' },
@@ -374,6 +378,7 @@ it('denies the next action before execution after its output budget is exhausted
 		tools: [
 			{
 				id: 'probe',
+				capability: { effects: ['read'] },
 				name: 'Probe',
 				description: 'Probe',
 				schema: { type: 'object' },
@@ -416,4 +421,76 @@ it('denies the next action before execution after its output budget is exhausted
 	expect(executed).toBe(3);
 	expect(results).toHaveLength(4);
 	expect(results[3]).toContain('budget exhausted');
+});
+
+it('invalidates pending response approvals on interruption', async () => {
+	const run = jest.fn(() => 'unexpected');
+	let requested = (_event: Record<string, unknown>): void => undefined;
+	const permission = new Promise<Record<string, unknown>>((resolve) => {
+		requested = resolve;
+	});
+	const completed: unknown[] = [];
+	const runtime = new RealtimeVoiceToolRuntime({
+		sessionId: 'voice-cancel-approval',
+		windowId: 7,
+		tools: [
+			{
+				id: 'external_probe',
+				name: 'Probe',
+				description: 'Probe',
+				schema: { type: 'object' },
+				timeoutMs: 1000,
+				maxOutputBytes: 1000,
+				capability: { effects: ['external'], approval: true },
+				parseInput: (input) => input as Record<string, unknown>,
+				run,
+			},
+		],
+		signal: new AbortController().signal,
+		resources: new KeyedMutex(),
+		conversation: {
+			addToolCall: () => undefined,
+			addToolResult: (call) => {
+				completed.push(call.result);
+			},
+		},
+		connection: () => ({
+			appendAudio: async () => undefined,
+			interrupt: async () => undefined,
+			stop: async () => undefined,
+			addToolResult: async () => undefined,
+		}),
+		emit: (event) => {
+			if (event.type === 'tool_permission_request') requested(event);
+		},
+		onThinking: () => undefined,
+		onError: (error) => {
+			throw error;
+		},
+	});
+	runtime.handle({
+		type: 'tool_call',
+		callId: 'approval',
+		itemId: 'approval',
+		responseId: 'old',
+		name: 'external_probe',
+		arguments: '{}',
+	});
+	const event = await permission;
+	runtime.interrupt();
+	await new Promise((resolve) => setImmediate(resolve));
+	expect(run).not.toHaveBeenCalled();
+	expect(completed).toEqual([expect.objectContaining({ isError: true })]);
+	expect(
+		respondToolPermission(
+			{
+				approvalId: String(event.approvalId),
+				runId: String(event.runId),
+				toolName: String(event.toolName),
+				inputFingerprint: String(event.inputFingerprint),
+			},
+			'approve',
+			7
+		)
+	).toBe(false);
 });

@@ -365,6 +365,7 @@ it('rejects late tool effects from a response interrupted before its first tool 
 			tools: [
 				{
 					id: 'probe',
+					capability: { effects: ['read'] },
 					name: 'Probe',
 					description: 'Probe',
 					schema: { type: 'object' },
