@@ -127,12 +127,6 @@ const McpDetailsPage: React.FC = () => {
 						</Button>
 					}
 				/>
-				{server.data.type === 'stdio' && (
-					<SettingsNotice>
-						Save, enable or test only local server commands you trust. They run with your desktop
-						account's privileges. Changed launch settings require renewed trust.
-					</SettingsNotice>
-				)}
 				{error && (
 					<SettingsNotice variant="destructive" icon={AlertTriangle}>
 						{error}
