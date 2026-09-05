@@ -12,5 +12,6 @@ export const searchWikiTool = tool({
 		query: z.string().trim().min(1),
 		count: z.number().int().min(1).max(20).optional(),
 	}),
-	execute: async ({ query, count }, signal) => JSON.stringify(await searchWiki(query, count, undefined, signal), null, 2),
+	execute: async ({ query, count }, signal) =>
+		JSON.stringify(await searchWiki(query, count, undefined, signal), null, 2),
 });
