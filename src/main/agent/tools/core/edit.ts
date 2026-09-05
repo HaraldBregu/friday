@@ -1,9 +1,8 @@
-import fs from 'node:fs/promises';
 import { z } from 'zod';
-import { agentLocation } from '../../../shared/agent_location';
-import { resolveUserPath } from '../../../shared/user_path';
 import { tool } from '../tool';
-import { atomicWrite } from '../../../shared/atomic_write';
+import { writeAuthorizedFile } from '../../files/write';
+import { readFileBounded } from '../../files/read';
+import { authorizeFilePath } from '../../files/authorize';
 
 export const editTool = tool({
 	id: 'edit',
@@ -20,9 +19,9 @@ export const editTool = tool({
 		oldText: z.string().min(1).describe('Exact text to replace.'),
 		newText: z.string().describe('Replacement text.'),
 	}),
-	execute: async ({ path: filePath, oldText, newText }) => {
-		const resolved = resolveUserPath(filePath, agentLocation());
-		const content = await fs.readFile(resolved, 'utf8');
+	execute: async ({ path: filePath, oldText, newText }, signal) => {
+		const resolved = authorizeFilePath(filePath);
+		const content = (await readFileBounded(resolved, 2 * 1024 * 1024, signal)).toString('utf8');
 		const firstIndex = content.indexOf(oldText);
 		if (firstIndex === -1) {
 			throw new Error('edit oldText was not found.');
@@ -31,7 +30,7 @@ export const editTool = tool({
 			throw new Error('edit oldText matched multiple locations.');
 		}
 
-		await atomicWrite(resolved, content.replace(oldText, newText));
+		await writeAuthorizedFile(resolved, content.replace(oldText, newText), signal);
 		return { path: resolved };
 	},
 });

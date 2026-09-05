@@ -1,3 +1,6 @@
+import { authorizeFilePath } from '../../files/authorize';
+import { fileHistoryTargets } from '../../history/targets';
+import { validateFilePath } from '../../files/validate';
 import { z } from 'zod';
 import { undoFileOperation } from '../../history/undo';
 import type { FileHistory } from '../../history/types';
@@ -12,6 +15,7 @@ export function undoFileTool(history: FileHistory) {
 		hardApproval: true,
 		inputSchema: z.object({}),
 		execute: () => {
+			for (const target of fileHistoryTargets(history, 'undo')) validateFilePath(authorizeFilePath(target), true);
 			const operation = undoFileOperation(history);
 			return {
 				operationId: operation.id,

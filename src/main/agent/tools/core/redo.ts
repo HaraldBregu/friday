@@ -1,3 +1,6 @@
+import { authorizeFilePath } from '../../files/authorize';
+import { fileHistoryTargets } from '../../history/targets';
+import { validateFilePath } from '../../files/validate';
 import { z } from 'zod';
 import { redoFileOperation } from '../../history/redo';
 import type { FileHistory } from '../../history/types';
@@ -12,6 +15,7 @@ export function redoFileTool(history: FileHistory) {
 		hardApproval: true,
 		inputSchema: z.object({}),
 		execute: () => {
+			for (const target of fileHistoryTargets(history, 'redo')) validateFilePath(authorizeFilePath(target), true);
 			const operation = redoFileOperation(history);
 			return {
 				operationId: operation.id,

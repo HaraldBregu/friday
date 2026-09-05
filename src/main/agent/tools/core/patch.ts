@@ -1,10 +1,12 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fs from 'node:fs';
 import { z } from 'zod';
 import { agentLocation } from '../../../shared/agent_location';
 import { resolveUserPath } from '../../../shared/user_path';
 import { tool } from '../tool';
-import { atomicWrite } from '../../../shared/atomic_write';
+import { writeAuthorizedFile } from '../../files/write';
+import { removeAuthorizedFile } from '../../files/remove';
+import { readFileBounded } from '../../files/read';
+import { authorizeFilePath } from '../../files/authorize';
 
 import { parsePatch } from './patch/parse';
 import { applyUpdateChunks } from './patch/update';
@@ -15,36 +17,36 @@ export const applyPatchTool = tool({
 	description:
 		'Apply a multi-file patch using the *** Begin Patch/*** End Patch format. Supports Add File, Delete File, and Update File (with optional Move to) hunks.',
 	hardApproval: ({ input }) =>
-		/^\s*\*\*\* Delete File:/m.test(input) || /^\s*\*\*\* Move to:/m.test(input),
+		parsePatch(input).some((hunk) => hunk.kind === 'delete' ||
+			(hunk.kind === 'update' && Boolean(hunk.movePath)) ||
+			(hunk.kind === 'add' && fs.existsSync(resolveUserPath(hunk.path, agentLocation())))),
 	inputSchema: z.object({
 		input: z.string().min(1).describe('Patch content using the *** Begin Patch/End Patch format.'),
 	}),
-	execute: async ({ input }) => {
+	execute: async ({ input }, signal) => {
 		const hunks = parsePatch(input);
 		const added: string[] = [];
 		const modified: string[] = [];
 		const deleted: string[] = [];
 
 		for (const hunk of hunks) {
-			const target = resolveUserPath(hunk.path, agentLocation());
+			const target = authorizeFilePath(hunk.path);
 			if (hunk.kind === 'add') {
-				await fs.mkdir(path.dirname(target), { recursive: true });
-				await atomicWrite(target, hunk.contents);
+				await writeAuthorizedFile(target, hunk.contents, signal);
 				added.push(target);
 			} else if (hunk.kind === 'delete') {
-				await fs.rm(target);
+				await removeAuthorizedFile(target, signal);
 				deleted.push(target);
 			} else {
-				const contents = await fs.readFile(target, 'utf8');
+				const contents = (await readFileBounded(target, 2 * 1024 * 1024, signal)).toString('utf8');
 				const applied = applyUpdateChunks(target, contents, hunk.chunks);
 				if (hunk.movePath) {
-					const moveTarget = resolveUserPath(hunk.movePath, agentLocation());
-					await fs.mkdir(path.dirname(moveTarget), { recursive: true });
-					await atomicWrite(moveTarget, applied);
-					if (moveTarget !== target) await fs.rm(target);
+					const moveTarget = authorizeFilePath(hunk.movePath);
+					await writeAuthorizedFile(moveTarget, applied, signal);
+					if (moveTarget !== target) await removeAuthorizedFile(target, signal);
 					modified.push(moveTarget);
 				} else {
-					await atomicWrite(target, applied);
+					await writeAuthorizedFile(target, applied, signal);
 					modified.push(target);
 				}
 			}

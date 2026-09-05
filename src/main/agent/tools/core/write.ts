@@ -1,11 +1,10 @@
 import fs from 'node:fs';
-import fsPromises from 'node:fs/promises';
-import path from 'node:path';
 import { z } from 'zod';
 import { agentLocation } from '../../../shared/agent_location';
 import { resolveUserPath } from '../../../shared/user_path';
 import { tool } from '../tool';
-import { atomicWrite } from '../../../shared/atomic_write';
+import { writeAuthorizedFile } from '../../files/write';
+import { authorizeFilePath } from '../../files/authorize';
 
 export const writeTool = tool({
 	id: 'write',
@@ -22,10 +21,9 @@ export const writeTool = tool({
 			),
 		content: z.string().describe('UTF-8 text content to write.'),
 	}),
-	execute: async ({ path: filePath, content }) => {
-		const resolved = resolveUserPath(filePath, agentLocation());
-		await fsPromises.mkdir(path.dirname(resolved), { recursive: true });
-		await atomicWrite(resolved, content);
+	execute: async ({ path: filePath, content }, signal) => {
+		const resolved = authorizeFilePath(filePath);
+		await writeAuthorizedFile(resolved, content, signal);
 		return { path: resolved };
 	},
 });
