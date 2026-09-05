@@ -1,4 +1,4 @@
-import os from 'node:os';
+import path from 'node:path';
 
 const initialize = jest.fn().mockResolvedValue(undefined);
 const wrapWithSandboxArgv = jest.fn().mockResolvedValue({ argv: ['/bin/sh', '-lc', 'pwd'], env: {} });
@@ -50,10 +50,21 @@ describe('ExecSandbox permissions', () => {
 			expect.arrayContaining(['/workspace/**', '/shared/**'])
 		);
 		expect(configuration.config.filesystem.denyRead).toEqual(
-			expect.arrayContaining([os.homedir(), '/shared/private/**'])
+			expect.arrayContaining([path.parse(agentLocation()).root, '/shared/private/**'])
 		);
 		expect(configuration.config.filesystem.denyRead).toContain('/workspace/private/**');
-		expect(configuration.config.filesystem.denyWrite).toEqual(['/shared/private/**', '/workspace/private/**']);
+		expect(configuration.config.filesystem.denyWrite).toEqual(['/shared/private/**', '/workspace/private/**', '/tmp/claude', '/home/user/.npm/_logs']);
+		expect(configuration.config.filesystem.allowRead).toContain('/usr');
+	});
+
+	it('removes a runtime cache write restriction only for its approved invocation', async () => {
+		const sandbox = new ExecSandbox();
+		await sandbox.wrap('pwd', '/workspace', 'approved-cache', undefined, ['/tmp/claude']);
+		const approved = wrapWithSandboxArgv.mock.calls.at(-1)?.[2];
+		expect(approved.filesystem.denyWrite).not.toContain('/tmp/claude');
+		expect(approved.filesystem.allowWrite).toContain('/tmp/claude/**');
+		await sandbox.wrap('pwd', '/workspace', 'unapproved-cache');
+		expect(wrapWithSandboxArgv.mock.calls.at(-1)?.[2].filesystem.denyWrite).toContain('/tmp/claude');
 	});
 
 	it('adds an approved outside root only to the wrapped invocation', async () => {

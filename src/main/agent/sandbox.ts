@@ -21,6 +21,7 @@ import { permissionRuleRoot } from './permissions/permission_rule_root';
 import { recursivePermissionRule } from './permissions/recursive_permission_rule';
 import type { AgentInteractionMode } from '../../shared/agent_types';
 import { agentLocation } from '../shared/agent_location';
+import { sandboxSystemReads } from './sandbox/reads';
 
 const WINDOWS_SANDBOX_GUIDANCE =
 	'Open Settings > Permissions and complete Windows sandbox setup; administrator or IT approval may be required. Chat and non-command tools remain available.';
@@ -58,7 +59,7 @@ export class ExecSandbox {
 				'One-time access to an outside location is unavailable on Windows. Trust the location to continue.'
 			);
 		}
-		const { config } = await this.configuration();
+		const { config } = await this.configuration(approvedRoots);
 		const approvedPatterns = approvedRoots.map(recursivePermissionRule);
 		const customConfig = process.platform !== 'win32' || approvedPatterns.length > 0
 			? {
@@ -225,7 +226,7 @@ export class ExecSandbox {
 		}
 	}
 
-	private async configuration(): Promise<{
+	private async configuration(approvedRoots: readonly string[] = []): Promise<{
 		config: SandboxRuntimeConfig;
 		fingerprint: string;
 	}> {
@@ -236,7 +237,11 @@ export class ExecSandbox {
 		const explicitWriteDenies = resolveRules([...permissions.exec.deny, ...permissions.write.deny]);
 		if ([...explicitReadDenies, ...explicitWriteDenies].some((rule) => /[*?[\]{}]/.test(rule.replace(/[\\/]\*\*$/, ''))))
 			throw new Error('Command sandbox rules must use exact paths or a trailing /**. Refine the blocked pattern before executing commands.');
-		const allowRead = resolveRules(permissions.exec.allow).filter((rule) => {
+		const allowRead = [
+			...sandboxSystemReads(),
+			this.temporaryDirectory,
+			...resolveRules(permissions.exec.allow),
+		].filter((rule) => {
 			const allowed = permissionRuleRoot(rule);
 			return !explicitReadDenies.some((denied) => {
 				const root = permissionRuleRoot(denied);
@@ -248,8 +253,14 @@ export class ExecSandbox {
 			...resolveRules(permissions.exec.allow),
 			this.temporaryDirectory,
 		];
-		const denyWrite = explicitWriteDenies;
-		const denyRead = [os.homedir(), ...explicitReadDenies];
+		const denyWrite = [
+			...explicitWriteDenies,
+			...getDefaultWritePaths().filter((value) =>
+				!value.startsWith('/dev/') &&
+				permissionFor({ allow: [...allowWrite, ...approvedRoots.map(recursivePermissionRule)], deny: [] }, value, 'write') !== 'allow'
+			),
+		];
+		const denyRead = [path.parse(os.homedir()).root, ...explicitReadDenies];
 		const windowsPath = this.vendoredWindowsPath();
 		const seccompPath = this.vendoredSeccompPath();
 		const config: SandboxRuntimeConfig = {
@@ -290,20 +301,8 @@ export class ExecSandbox {
 		const readPaths = [
 			agentLocation(),
 			this.temporaryDirectory,
-			'/bin',
-			'/sbin',
-			'/usr',
-			'/etc',
-			'/dev',
-			'/System',
-			'/Library/Developer',
-			'/private/etc',
-			'/opt/homebrew',
-			'/usr/local',
-			'/nix/store',
-			process.env.SystemRoot,
-			path.dirname(process.execPath),
-		].filter((value): value is string => Boolean(value)).filter((value) =>
+			...sandboxSystemReads(),
+		].filter((value) =>
 			permissionFor({ allow: [], deny: deniedReads }, value, 'read') !== 'deny'
 		);
 		const persistentDefaults = getDefaultWritePaths().filter(
