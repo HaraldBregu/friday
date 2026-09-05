@@ -7,7 +7,7 @@ import { redoFileOperation } from '../../../../../src/main/agent/history/redo';
 import type { FileHistory } from '../../../../../src/main/agent/history/types';
 import { undoFileOperation } from '../../../../../src/main/agent/history/undo';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-history-'));
+const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-history-')));
 let history: FileHistory;
 
 beforeEach(() => { history = { operations: [] }; });
@@ -44,4 +44,21 @@ it('isolates operations between active sessions', () => {
 	const other: FileHistory = { operations: [] };
 	expect(() => undoFileOperation(other)).toThrow('no file operation');
 	expect(history.operations).toEqual([]);
+});
+
+it('rejects oversized history snapshots before loading their contents', () => {
+	fs.mkdirSync(root, { recursive: true });
+	const target = path.join(root, 'large.txt');
+	fs.writeFileSync(target, '');
+	fs.truncateSync(target, 2 * 1024 * 1024 + 1);
+	expect(() => captureFiles([target])).toThrow('byte limit');
+});
+
+it('rejects symlinked history targets instead of following them', () => {
+	fs.mkdirSync(root, { recursive: true });
+	const target = path.join(root, 'original.txt');
+	fs.writeFileSync(target, 'private');
+	const link = path.join(root, 'linked.txt');
+	fs.symlinkSync(target, link);
+	expect(() => captureFiles([link])).toThrow('Symbolic links');
 });

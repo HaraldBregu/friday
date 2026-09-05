@@ -835,10 +835,10 @@
 			}
 		},
 		"permissions": {
-			"locationsNotice": "Trusted locations allow file tools and sandboxed commands. Blocked locations take precedence. Kucedr asks before using tools anywhere else or running outside the sandbox.",
+			"locationsNotice": "Workspace access is allowed by default. Blocked locations override grants, including inside the workspace. Sandboxed commands also respect blocked read and write locations.",
 			"locationsTitle": "Locations",
 			"locationsDescription": "Choose which tools may use each folder and its subfolders.",
-			"workspaceDescription": "Workspace · includes subfolders · always trusted",
+			"workspaceDescription": "Workspace · includes subfolders · explicit blocks still apply",
 			"trusted": "Trusted",
 			"blocked": "Blocked",
 			"removeLocation": "Remove location",

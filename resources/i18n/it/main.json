@@ -834,10 +834,10 @@
 			}
 		},
 		"permissions": {
-			"locationsNotice": "Le posizioni attendibili consentono strumenti file e comandi in sandbox. Le posizioni bloccate hanno la precedenza. Kucedr chiede conferma prima di usare strumenti altrove o fuori dalla sandbox.",
+			"locationsNotice": "L'accesso all'area di lavoro è consentito per impostazione predefinita. Le posizioni bloccate hanno la precedenza, anche al suo interno. I comandi in sandbox rispettano anche i blocchi di lettura e scrittura.",
 			"locationsTitle": "Posizioni",
 			"locationsDescription": "Scegli quali strumenti possono usare ogni cartella e le relative sottocartelle.",
-			"workspaceDescription": "Area di lavoro · include sottocartelle · sempre attendibile",
+			"workspaceDescription": "Area di lavoro · include sottocartelle · rispetta i blocchi espliciti",
 			"trusted": "Attendibile",
 			"blocked": "Bloccata",
 			"removeLocation": "Rimuovi posizione",

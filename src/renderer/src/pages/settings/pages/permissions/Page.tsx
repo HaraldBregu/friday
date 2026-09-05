@@ -165,7 +165,7 @@ const PermissionsPage: React.FC = () => {
 			/>
 
 			{error && <SettingsNotice variant="destructive" icon={AlertTriangle}>{error}</SettingsNotice>}
-			<SettingsNotice>Workspace access is allowed by default. Blocked locations override grants, including inside the workspace. Sandboxed commands also respect blocked read and write locations.</SettingsNotice>
+			<SettingsNotice>{t('settings.permissions.locationsNotice')}</SettingsNotice>
 			<Sandbox />
 
 			{!permissions ? (
@@ -176,7 +176,7 @@ const PermissionsPage: React.FC = () => {
 						<SettingsRow
 							icon={FolderCheck}
 							title={<span className="break-all font-mono text-xs">{workspace}</span>}
-							description="Allowed by default; explicit blocked locations still apply."
+							description={t('settings.permissions.workspaceDescription')}
 							actions={<Badge variant="secondary">{t('settings.permissions.trusted')}</Badge>}
 						/>
 						{customRows.map((row) => (
