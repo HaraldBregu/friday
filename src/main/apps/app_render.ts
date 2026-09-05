@@ -4,6 +4,7 @@ import type { WindowFactory } from '../window_factory';
 import { attachWindowHandlers } from '../window_events';
 import { getPlatformTranslucencyOptions } from '../translucency';
 import type { AppTitlebarOptions } from '../../shared/window_types';
+import { APP_WINDOW_DEFAULTS, type ResolvedAppWindowSettings } from '../../shared/app_window_settings';
 
 export interface AppWindow {
 	window: BrowserWindow;
@@ -20,7 +21,8 @@ export function render(
 	windowFactory: WindowFactory,
 	file: string,
 	title: string,
-	appId: string
+	appId: string,
+	settings: ResolvedAppWindowSettings = APP_WINDOW_DEFAULTS
 ): BrowserWindow {
 	const existing = windows.get(appId);
 	if (existing && !existing.window.isDestroyed()) {
@@ -33,11 +35,12 @@ export function render(
 	const isMac = process.platform === 'darwin';
 	const win = windowFactory.create(
 		{
-			width: 820,
-			height: 640,
-			minWidth: 620,
-			minHeight: 480,
-			resizable: true,
+			width: settings.width,
+			height: settings.height,
+			minWidth: settings.minWidth,
+			minHeight: settings.minHeight,
+			resizable: settings.resizable,
+			maximizable: settings.maximizable,
 			frame: false,
 			transparent: true,
 			...(isMac && {

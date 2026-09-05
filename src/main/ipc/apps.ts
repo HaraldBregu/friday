@@ -16,6 +16,7 @@ import { registerCommandWithEvent, registerQueryWithEvent } from './core/gateway
 import type { IpcModule } from './core/module';
 import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
+import { AppWindowPreferences } from '../apps/app_preferences';
 
 export interface AppsIpcDeps {
 	windowFactory: WindowFactory;
@@ -31,6 +32,18 @@ export class AppsIpc implements IpcModule<AppsIpcDeps> {
 		_eventBus: EventBus
 	): void {
 		const trusted = new TrustedRenderer(windows, appRegistry);
+		registerQueryWithEvent(AppsChannels.getSettings, (event, appId) => {
+			trusted.assert(event);
+			const app = listApps().find((item) => item.id === appId);
+			if (!app) throw new Error(`App not found: ${appId}`);
+			return new AppWindowPreferences().get(app);
+		});
+		registerQueryWithEvent(AppsChannels.setSettings, (event, appId, settings) => {
+			trusted.assert(event);
+			const app = listApps().find((item) => item.id === appId);
+			if (!app) throw new Error(`App not found: ${appId}`);
+			return new AppWindowPreferences().set(app, settings);
+		});
 		registerQueryWithEvent(AppsChannels.list, (event) => {
 			trusted.assert(event);
 			return listApps();

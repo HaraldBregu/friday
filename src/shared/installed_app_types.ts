@@ -1,3 +1,5 @@
+import type { AppWindowSettings } from './app_window_settings';
+
 export type AppMetadata = {
 	version: string;
 	category: string;
@@ -9,6 +11,7 @@ export type AppManifest = {
 	title: string;
 	description: string;
 	metadata: AppMetadata;
+	window?: AppWindowSettings;
 };
 
 export type App = AppManifest & {

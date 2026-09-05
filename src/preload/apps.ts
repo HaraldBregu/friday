@@ -3,6 +3,8 @@ import { AppsChannels } from '../shared/ipc_channels_definitions';
 import type { AppsApi } from './index.d';
 
 export const apps: AppsApi = {
+	getSettings: (appId) => typedInvokeUnwrap(AppsChannels.getSettings, appId),
+	setSettings: (appId, settings) => typedInvokeUnwrap(AppsChannels.setSettings, appId, settings),
 	list: () => {
 		return typedInvokeUnwrap(AppsChannels.list);
 	},

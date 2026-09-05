@@ -1,5 +1,6 @@
 import { isAppEntry } from './app_entry_validate';
 import type { AppManifest } from './app_types';
+import { isAppWindowSettings } from '../../shared/app_window_validate';
 
 export function isAppManifest(value: unknown): value is AppManifest {
 	if (!value || typeof value !== 'object') return false;
@@ -17,6 +18,7 @@ export function isAppManifest(value: unknown): value is AppManifest {
 		metadata.version.trim().length > 0 &&
 		typeof metadata.category === 'string' &&
 		metadata.category.trim().length > 0 &&
-		isAppEntry(metadata.entry)
+		isAppEntry(metadata.entry) &&
+		(manifest.window === undefined || isAppWindowSettings(manifest.window))
 	);
 }

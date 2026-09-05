@@ -371,6 +371,8 @@ export const VideoChannels = {
 } as const;
 
 export const AppsChannels = {
+	getSettings: 'apps:get-settings',
+	setSettings: 'apps:set-settings',
 	list: 'apps:list',
 	open: 'apps:open',
 	openRoot: 'apps:open-root',

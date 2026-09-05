@@ -975,6 +975,14 @@ export interface SttEventChannelMap {
 }
 
 export interface AppsInvokeChannelMap {
+	[AppsChannels.getSettings]: {
+		args: [appId: string];
+		result: import('./app_window_settings').ResolvedAppWindowSettings;
+	};
+	[AppsChannels.setSettings]: {
+		args: [appId: string, settings: import('./app_window_settings').AppWindowSettings];
+		result: import('./app_window_settings').ResolvedAppWindowSettings;
+	};
 	[AppsChannels.list]: { args: []; result: import('./installed_app_types').App[] };
 	[AppsChannels.open]: { args: [appId: string]; result: void };
 	[AppsChannels.openRoot]: { args: []; result: void };
