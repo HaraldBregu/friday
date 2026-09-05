@@ -82,7 +82,7 @@ it('preserves updates from text and two voice writers sharing one coordinator', 
 		releaseSession,
 	} = require('../../../../src/main/agent/session');
 	const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-writers-'));
-	const config = { location: temporaryRoot };
+	const config = { location: path.join(temporaryRoot, 'agent') };
 	const coordinator = new SessionCoordinator();
 	const factory = realtimeVoiceConversationFactory(config, coordinator);
 	const first = factory(SESSION_ID, 'model');
@@ -99,7 +99,7 @@ it('preserves updates from text and two voice writers sharing one coordinator', 
 		first.addAssistantTranscript('First voice.');
 		addAssistantMessage(text, 'Text answer.', []);
 		second.addAssistantTranscript('Second voice.');
-		const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot));
+		const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location));
 		for (const expected of ['Text question.', 'First voice.', 'Text answer.', 'Second voice.']) {
 			expect(serialized).toContain(expected);
 		}
@@ -107,7 +107,7 @@ it('preserves updates from text and two voice writers sharing one coordinator', 
 		expect(text.lease.signal.aborted).toBe(false);
 		addAssistantMessage(text, 'Closed writer callback.', []);
 		second.addAssistantTranscript('Still active voice.');
-		expect(JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot))).not.toContain(
+		expect(JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location))).not.toContain(
 			'Closed writer'
 		);
 	} finally {
@@ -134,7 +134,7 @@ it.each(['clear', 'delete', 'edit'])(
 			releaseSession,
 		} = require('../../../../src/main/agent/session');
 		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-invalidated-'));
-		const config = { location: temporaryRoot };
+		const config = { location: path.join(temporaryRoot, 'agent') };
 		const coordinator = new SessionCoordinator();
 		const state = createSessionState();
 		init(
@@ -166,7 +166,7 @@ it.each(['clear', 'delete', 'edit'])(
 			addAssistantMessage(state, 'Late text callback.', []);
 			appendRun(state, { type: 'run_finished' });
 			persistSystemPrompt(state, 'Late system prompt.');
-			const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot));
+			const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location));
 			expect(serialized).not.toContain('Late');
 			if (operation === 'edit') expect(serialized).toContain('Edited question.');
 			else expect(serialized).toBe('[]');

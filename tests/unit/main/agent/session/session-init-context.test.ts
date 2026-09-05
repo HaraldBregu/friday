@@ -18,8 +18,9 @@ describe('session context boundaries', () => {
 	});
 
 	it('expires stored skill instructions while preserving skills loaded in the current run', () => {
-		const location = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-context-'));
-		roots.push(location);
+		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-context-'));
+		roots.push(temporaryRoot);
+		const location = path.join(temporaryRoot, 'agent');
 		const config = { location };
 		const sessionId = '11111111-1111-4111-8111-111111111111';
 		const historicalSkill: ToolCall = {
