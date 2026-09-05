@@ -31,6 +31,68 @@ beforeEach(() => {
 	addPermissionRule.mockReset();
 });
 
+describe('media path approval', () => {
+	it.each(['create_image', 'create_sound', 'create_video'])(
+		'runs %s in the workspace without an approval event',
+		async (name) => {
+			getPermissions.mockReturnValue({
+				...emptyPermissions,
+				write: { allow: ['/appdata/agent/**'], deny: [] },
+			});
+			const run = jest.fn().mockResolvedValue('done');
+			for (const directory of [undefined, '/appdata/agent/generated']) {
+				const events = runToolCall(
+					fakeTool(name, run),
+					{ id: 'media', name, args: { prompt: 'A living room', directory } },
+					undefined,
+					undefined,
+					{ runId: 'run', windowId: 1 }
+				);
+				await events.next();
+				try {
+					expect((await events.next()).value).toMatchObject({
+						type: 'tool_call_end',
+						isError: undefined,
+					});
+				} finally {
+					await events.return();
+				}
+			}
+			expect(run).toHaveBeenCalledTimes(2);
+		}
+	);
+
+	it.each(['create_image', 'create_sound', 'create_video'])(
+		'asks before %s writes outside the workspace',
+		async (name) => {
+			getPermissions.mockReturnValue({
+				...emptyPermissions,
+				write: { allow: ['/appdata/agent/**'], deny: [] },
+			});
+			const run = jest.fn();
+			const events = runToolCall(
+				fakeTool(name, run),
+				{ id: 'media', name, args: { prompt: 'A living room', directory: '/outside' } },
+				undefined,
+				undefined,
+				{ runId: 'run', windowId: 1 }
+			);
+			await events.next();
+			try {
+				expect((await events.next()).value).toMatchObject({
+					type: 'tool_permission_request',
+					targets: [path.resolve('/outside')],
+					reason: 'outside_trusted_location',
+					persistable: true,
+				});
+				expect(run).not.toHaveBeenCalled();
+			} finally {
+				await events.return();
+			}
+		}
+	);
+});
+
 describe('exec path approval', () => {
 	it('runs shell syntax inside the workspace without an approval event', async () => {
 		getPermissions.mockReturnValue({
