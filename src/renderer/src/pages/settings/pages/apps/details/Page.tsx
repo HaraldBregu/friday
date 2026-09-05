@@ -5,6 +5,7 @@ import { AlertTriangle, Blocks, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Item, ItemActions, ItemContent, ItemTitle } from '@/components/ui/item';
 import type { App } from '../../../../../../../shared/installed_app_types';
+import WindowSettings from './Window';
 import {
 	SettingsEmptyState,
 	SettingsLoadingRows,
@@ -112,6 +113,8 @@ const AppDetailsPage: React.FC = () => {
 					{errorMessage}
 				</SettingsNotice>
 			)}
+
+			<WindowSettings key={app.id} appId={app.id} />
 
 			<SettingsSection title={t('settings.apps.details')}>
 				<SettingsPanel>

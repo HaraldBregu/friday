@@ -1304,7 +1304,25 @@
 			"detailId": "ID",
 			"detailVersion": "Version",
 			"detailCategory": "Category",
-			"detailEntry": "Entry file"
+			"detailEntry": "Entry file",
+			"window": {
+				"title": "Window settings",
+				"nextOpen": "Changes apply the next time you close and reopen this app.",
+				"width": "Default width (px)",
+				"height": "Default height (px)",
+				"minWidth": "Minimum width (px)",
+				"minHeight": "Minimum height (px)",
+				"resizable": "Allow resizing",
+				"maximizable": "Allow maximizing",
+				"save": "Save settings",
+				"saving": "Saving...",
+				"saved": "Window settings saved.",
+				"reset": "Reset to app defaults",
+				"resetDone": "App defaults restored.",
+				"loadError": "Unable to load window settings.",
+				"saveError": "Unable to save window settings. Try again.",
+				"invalid": "Enter whole numbers from 1 to 32768. Minimum dimensions cannot exceed default dimensions."
+			}
 		},
 		"plugins": {
 			"title": "Installed plugins",
