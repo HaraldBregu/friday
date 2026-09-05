@@ -11,7 +11,7 @@ export async function verifyWikiEvidence(
 	signal?.throwIfAborted();
 	const record = repository.sources.store.sources[evidence.sourceId];
 	if (!record) throw new Error(`Wiki evidence source not found: ${evidence.sourceId}`);
-	const content = await readWikiArchive(record, signal);
+	const content = await readWikiArchive(record, signal, repository.paths.evidence);
 	const lineMatch = /^lines?\s+(\d+)(?:-(\d+))?$/i.exec(evidence.locator.trim());
 	let excerpt: string;
 	let locator = evidence.locator.trim();

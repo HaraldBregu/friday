@@ -71,7 +71,7 @@ describe('wiki source ingestion', () => {
 		await symlink(outside, path.join(inbox, 'linked.md'));
 
 		await expect(collectWikiSources(inbox)).rejects.toThrow(
-			'symlink outside the configured wiki folder'
+			'source symlink'
 		);
 	});
 

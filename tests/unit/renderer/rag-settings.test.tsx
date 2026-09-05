@@ -213,6 +213,7 @@ it('records remote embedding consent for the selected provider and model', async
 				embeddingConsent: {
 					providerId: 'openai',
 					modelId: 'text-embedding-3-small',
+					version: 1,
 				},
 			})
 		)

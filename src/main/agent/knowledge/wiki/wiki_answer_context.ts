@@ -47,7 +47,7 @@ export async function buildWikiAnswerContext(
 			signal?.throwIfAborted();
 			const record = repository.sources.store.sources[sourceId];
 			if (!record || record.status !== 'integrated') continue;
-			const content = await readWikiArchive(record, signal).catch(() => '');
+			const content = await readWikiArchive(record, signal, repository.paths.evidence).catch(() => '');
 			signal?.throwIfAborted();
 			if (!content) continue;
 			const match = term ? content.toLowerCase().indexOf(term) : -1;

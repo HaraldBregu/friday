@@ -22,6 +22,7 @@ export async function collectWikiSources(root: string, signal?: AbortSignal): Pr
 		const absolutePath = candidatePath;
 		const sourceStat = candidateStat;
 		if (!WIKI_SOURCE_EXTENSIONS.has(path.extname(entry).toLowerCase())) continue;
+		if (sourceStat.size > MAX_WIKI_SOURCE_BYTES) throw new Error('Refusing to ingest oversized source: ' + entry);
 		const bytes = await readFileBounded(absolutePath, MAX_WIKI_SOURCE_BYTES, signal);
 		if (bytes.length > MAX_WIKI_SOURCE_BYTES) {
 			throw new Error(

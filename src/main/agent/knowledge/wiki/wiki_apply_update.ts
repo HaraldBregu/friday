@@ -63,7 +63,9 @@ export async function applyWikiUpdate(
 	for (const page of pages) {
 		options.signal?.throwIfAborted();
 		const pagePath = path.resolve(targetPath, page.path);
-		const existing = await readKnowledgeText(targetPath, page.path, options.signal, true);
+		let existing: string | undefined;
+		try { existing = await readKnowledgeText(targetPath, page.path, options.signal); }
+		catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
 		const previous = existing ? matter(existing) : undefined;
 		const pageType =
 			page.pageType ??

@@ -26,10 +26,10 @@ const manifest = {
 it('writes the RAG manifest to rag/index.json', () => {
 	writeRagManifest(manifest);
 
-	expect(mkdirSync).toHaveBeenCalledWith(path.join('/user/data', 'rag'), { recursive: true });
+	expect(mkdirSync).toHaveBeenCalledWith(path.join('/user/data', 'rag'), { recursive: true, mode: 0o700 });
 	const temporaryFile = writeFileSync.mock.calls[0][0] as string;
 	expect(temporaryFile).toMatch(/index\.json\..+\.tmp$/);
-	expect(writeFileSync).toHaveBeenCalledWith(temporaryFile, JSON.stringify(manifest), 'utf8');
+	expect(writeFileSync).toHaveBeenCalledWith(temporaryFile, JSON.stringify(manifest), { encoding: 'utf8', mode: 0o600, flag: 'wx' });
 	expect(renameSync).toHaveBeenCalledWith(temporaryFile, path.join('/user/data/rag', 'index.json'));
 	expect(rmSync).toHaveBeenCalledWith(temporaryFile, { force: true });
 });
