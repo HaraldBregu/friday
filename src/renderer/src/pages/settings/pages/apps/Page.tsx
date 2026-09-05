@@ -72,13 +72,22 @@ const AppsPage: React.FC = () => {
 		try {
 			const result = await window.apps.import();
 			if (result) {
-				setSuccessMessage(
-					t('settings.apps.uploaded', {
-						count: String(result.imported.length),
-						skipped: String(result.skipped.length),
-					})
-				);
-				await loadApps();
+				if (result.imported.length > 0) {
+					setSuccessMessage(
+						t('settings.apps.uploaded', {
+							count: String(result.imported.length),
+							skipped: String(result.skipped.length),
+						})
+					);
+					await loadApps();
+				}
+				if (result.skipped.length > 0) {
+					setErrorMessage((current) =>
+						[current, ...result.skipped.map(({ name, reason }) => `${name}: ${reason}`)]
+							.filter(Boolean)
+							.join('\n')
+					);
+				}
 			}
 		} catch (error) {
 			setErrorMessage(getErrorMessage(error, t('settings.apps.uploadError')));
@@ -127,7 +136,7 @@ const AppsPage: React.FC = () => {
 			/>
 
 			{errorMessage && (
-				<SettingsNotice variant="destructive" icon={AlertTriangle}>
+				<SettingsNotice variant="destructive" icon={AlertTriangle} className="whitespace-pre-wrap break-words">
 					{errorMessage}
 				</SettingsNotice>
 			)}

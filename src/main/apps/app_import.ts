@@ -43,7 +43,7 @@ export function importApps(sources: string[], appLocation?: string): AppImportRe
 			skipped.push(createSkipped(source, 'Invalid app folder name.'));
 			continue;
 		}
-		if (id === 'coder' || id === 'workspace') {
+		if (id === 'coder') {
 			skipped.push(createSkipped(source, 'Reserved app folder name.'));
 			continue;
 		}
