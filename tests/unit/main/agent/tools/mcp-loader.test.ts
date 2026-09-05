@@ -138,6 +138,7 @@ describe('loadMcpTools', () => {
 });
 
 it('closes every acquired client if discovery postprocessing fails', async () => {
+	jest.clearAllMocks();
 	getMcpServersMock.mockReturnValue({
 		one: { type: 'http', url: 'https://one.test' },
 		two: { type: 'http', url: 'https://two.test' },
@@ -150,6 +151,7 @@ it('closes every acquired client if discovery postprocessing fails', async () =>
 });
 
 it('closes acquired clients exactly once on cancellation during listing', async () => {
+	jest.clearAllMocks();
 	const controller = new AbortController();
 	getMcpServersMock.mockReturnValue({ one: { type: 'http', url: 'https://one.test' } });
 	connectMock.mockResolvedValue({ id: 'one' });
