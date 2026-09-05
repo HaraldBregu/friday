@@ -1,3 +1,4 @@
+import { authorizeMcpLaunch } from '../../../../src/main/mcp/launch/authorize';
 import path from 'node:path';
 import { callTool } from '../../../../src/main/mcp/mcp_client_call_tool';
 import { close } from '../../../../src/main/mcp/mcp_client_close';
@@ -13,6 +14,7 @@ describe('configured demo MCP server', () => {
 	let client: McpClient;
 
 	beforeAll(async () => {
+		authorizeMcpLaunch(demo.id, demo.data);
 		client = await connect(demo.id, demo.data, 5_000);
 	});
 

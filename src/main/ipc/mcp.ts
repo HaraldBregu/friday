@@ -28,6 +28,7 @@ import type { WindowContextManager } from '../window_context';
 import { TrustedRenderer } from './core/trusted';
 import { parseMcpUrl } from '../mcp/url';
 import { authorizeMcpLaunch } from '../mcp/launch/authorize';
+import { revokeMcpLaunch } from '../mcp/launch/revoke';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -164,6 +165,7 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 		registerCommandWithEvent(McpChannels.save, (event, input: McpSettings) => {
 			trusted.assert(event);
 			const next = normalizeMcpSettings(input);
+			for (const id of Object.keys(getMcpServers())) if (!next[id]) revokeMcpLaunch(id);
 			setMcpServers(next);
 			const effective = getMcpServers();
 			for (const id of Object.keys(next)) if (effective[id]) authorizeMcpLaunch(id, effective[id]);
@@ -184,6 +186,7 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 		registerCommandWithEvent(McpChannels.delete, (event, id: string) => {
 			trusted.assert(event);
 			const connectorId = resolveMcpId(id);
+			revokeMcpLaunch(connectorId);
 			deleteMcpServer(connectorId);
 		});
 

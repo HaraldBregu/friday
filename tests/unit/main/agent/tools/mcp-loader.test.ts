@@ -110,6 +110,9 @@ describe('loadMcpTools', () => {
 			],
 		});
 		expect(JSON.stringify(result.diagnostics)).not.toContain('secret');
+		expect(closeMock).toHaveBeenCalledTimes(1);
+		await result.close();
+		expect(closeMock).toHaveBeenCalledTimes(1);
 	});
 
 	it('starts discovery for enabled servers concurrently', async () => {
@@ -132,4 +135,29 @@ describe('loadMcpTools', () => {
 		releaseFirst?.();
 		await expect(loading).resolves.toMatchObject({ tools: [] });
 	});
+});
+
+it('closes every acquired client if discovery postprocessing fails', async () => {
+	getMcpServersMock.mockReturnValue({
+		one: { type: 'http', url: 'https://one.test' },
+		two: { type: 'http', url: 'https://two.test' },
+	});
+	connectMock.mockImplementation(async (id: string) => ({ id }));
+	closeMock.mockResolvedValue(undefined);
+	listToolsMock.mockResolvedValue({ tools: null });
+	await expect(loadMcpTools()).rejects.toThrow();
+	expect(closeMock).toHaveBeenCalledTimes(2);
+});
+
+it('closes acquired clients exactly once on cancellation during listing', async () => {
+	const controller = new AbortController();
+	getMcpServersMock.mockReturnValue({ one: { type: 'http', url: 'https://one.test' } });
+	connectMock.mockResolvedValue({ id: 'one' });
+	closeMock.mockResolvedValue(undefined);
+	listToolsMock.mockImplementation(async () => {
+		controller.abort(new Error('cancel'));
+		throw controller.signal.reason;
+	});
+	await expect(loadMcpTools(controller.signal)).rejects.toThrow('cancel');
+	expect(closeMock).toHaveBeenCalledTimes(1);
 });

@@ -9,6 +9,8 @@ export function launchFingerprint(data: McpStdioData): string {
 		.update(
 			JSON.stringify({
 				command: data.command,
+				enabled: data.enabled !== false,
+				approval: data.require_approval ?? 'default',
 				args: data.args ?? [],
 				env: Object.fromEntries(
 					Object.entries(environment).sort(([left], [right]) => left.localeCompare(right))

@@ -95,7 +95,7 @@ describe('MCP details', () => {
 		await user.type(envKey, 'DEMO_COMPANY');
 		await user.type(envValue, 'Kucedr Studio');
 		await user.click(screen.getByRole('button', { name: 'Add environment variable' }));
-		await user.click(screen.getByRole('button', { name: 'Save' }));
+		await user.click(screen.getByRole('button', { name: 'Save and trust' }));
 
 		await waitFor(() =>
 			expect(mcpApi.configureLocal).toHaveBeenCalledWith(
