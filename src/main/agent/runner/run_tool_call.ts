@@ -31,11 +31,13 @@ import { recordFileOperation } from '../history/record';
 import type { FileHistory } from '../history/types';
 import { executionScope, type ExecutionScope } from '../execution/scope';
 import { authorizedPaths } from '../permissions/access';
+import type { ExecutionBudget } from '../execution/budget';
 import { captureAccess } from '../permissions/capture_access';
 
 export interface ToolCallSecurityContext {
 	runId: string;
 	scope?: ExecutionScope;
+	budget?: ExecutionBudget;
 	windowId?: number;
 	interactionMode?: AgentInteractionMode;
 }
@@ -85,7 +87,11 @@ export async function* runToolCall(
 		| 'reject'
 		| undefined;
 
-	if (!tool) {
+	const budgetError = security.budget?.admit(tool, canonicalInput);
+	if (budgetError) {
+		output = budgetError;
+		isError = true;
+	} else if (!tool) {
 		output = `Error: unknown tool '${toolCall.name}'`;
 		isError = true;
 	} else if ('__unparsed' in toolCall.args) {
@@ -145,7 +151,7 @@ export async function* runToolCall(
 			isError = !answers;
 		}
 	} else {
-		let resolution = resolveToolPermissionDetails(
+		let resolution = executionScope.run(scope, () => resolveToolPermissionDetails(
 			toolCall.name,
 			canonicalInput,
 			context,
@@ -153,7 +159,7 @@ export async function* runToolCall(
 			'ask',
 			undefined,
 			history
-		);
+		));
 		const capability = typeof tool.capability === 'function' ? tool.capability(canonicalInput) : tool.capability;
 		const channelAllowed = scope.source !== 'channel' || ['search_web', 'fetch_web_page', 'subagent', 'subagents'].includes(tool.id);
 		if (!capability || !channelAllowed) resolution = { ...resolution, mode: 'deny', persistable: false };
@@ -252,7 +258,7 @@ export async function* runToolCall(
 				let execution: Promise<unknown> | undefined;
 				try {
 					toolSignal.throwIfAborted();
-					const current = resolveToolPermissionDetails(toolCall.name, canonicalInput, context, false, 'ask', undefined, history);
+					const current = executionScope.run(scope, () => resolveToolPermissionDetails(toolCall.name, canonicalInput, context, true, 'ask', undefined, history));
 					if (current.mode === 'deny' || (permissionOutcome === 'allow' && current.mode !== 'allow' && resolution.mode === 'allow')) throw new Error('Permission changed before execution.');
 					const aborted = new Promise<never>((_, reject) => {
 						abort = () => reject(toolSignal.reason ?? new Error('Tool call aborted.'));
@@ -306,6 +312,8 @@ export async function* runToolCall(
 		isError,
 	};
 
+	security.budget?.observeOutput(Buffer.byteLength(formatToolOutput(output), 'utf8'));
+	security.budget?.outcomes.set(toolCall.id, structuredClone(toolCall));
 	yield {
 		type: 'tool_call_end',
 		toolCallId: toolCall.id,

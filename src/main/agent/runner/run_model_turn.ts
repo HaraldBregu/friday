@@ -10,6 +10,7 @@ import { modelOutputLimit } from './run_model_output_limit';
 import { modelInputLimit } from './run_model_input_limit';
 import { fitModelContext } from './run_model_context_budget';
 import type { KeyedLimiter } from '../limiter';
+import type { ExecutionBudget } from '../execution/budget';
 import { retryAfterMs } from './run_retry_after';
 
 export interface ModelTurnStream {
@@ -32,7 +33,8 @@ export async function* runModelTurn(
 	contextMessages: Message[] = [],
 	streaming = true,
 	providerLimiter?: KeyedLimiter,
-	onContextAccepted?: () => void
+	onContextAccepted?: () => void,
+	budget?: ExecutionBudget
 ): AsyncGenerator<RuntimeEvent, ModelTurn> {
 	const maxRetries = 2;
 	const maxTokens = modelOutputLimit(provider.id, modelId, modelOptions);
@@ -59,6 +61,7 @@ export async function* runModelTurn(
 			? await providerLimiter.acquire(provider.id.trim().toLowerCase(), signal)
 			: undefined;
 		let retryDelay: number | undefined;
+		let settleUsage: ((usage?: import('../types').SessionUsage) => void) | undefined;
 		if (lease) {
 			yield {
 				type: 'provider_queue_metrics',
@@ -69,6 +72,8 @@ export async function* runModelTurn(
 		}
 
 		try {
+			signal.throwIfAborted();
+			settleUsage = budget?.reserveModel(context.estimatedTokens, maxTokens);
 			for await (const event of llm.stream({
 				provider,
 				model,
@@ -134,6 +139,7 @@ export async function* runModelTurn(
 		} catch (error) {
 			if (
 				signal.aborted ||
+				budget?.exhausted ||
 				error instanceof LlmContextOverflowError ||
 				visibleOutput ||
 				!isTransientModelError(error) ||
@@ -142,6 +148,7 @@ export async function* runModelTurn(
 				throw error;
 			retryDelay = retryAfterMs(error) ?? Math.min(250 * 2 ** attempt, 2_000);
 		} finally {
+			settleUsage?.(usage ? { inputTokens: usage.inputTokens ?? 0, outputTokens: usage.outputTokens ?? 0 } : undefined);
 			lease?.release();
 		}
 		if (retryDelay !== undefined) await wait(retryDelay, undefined, { signal });
