@@ -92,8 +92,8 @@ export async function ensureWikiSchema(
 	includeTarget = true
 ): Promise<void> {
 	await Promise.all([
-		...(includeTarget ? [mkdir(targetPath, { recursive: true })] : []),
-		mkdir(configPath, { recursive: true }),
+		...(includeTarget ? [mkdir(targetPath, { recursive: true, mode: 0o700 })] : []),
+		mkdir(configPath, { recursive: true, mode: 0o700 }),
 	]);
 	const files = [
 		...(includeTarget ? ([[path.resolve(targetPath, 'AGENTS.md'), WIKI_SCHEMA]] as const) : []),
@@ -103,7 +103,7 @@ export async function ensureWikiSchema(
 	] as ReadonlyArray<readonly [string, string]>;
 	await Promise.all(
 		files.map(([file, content]) =>
-			writeFile(file, content, { encoding: 'utf8', flag: 'wx' }).catch(
+			writeFile(file, content, { encoding: 'utf8', flag: 'wx', mode: 0o600 }).catch(
 				(error: NodeJS.ErrnoException) => {
 					if (error.code !== 'EEXIST') throw error;
 				}

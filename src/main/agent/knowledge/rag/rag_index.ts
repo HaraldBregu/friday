@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
-import type { Pinecone } from '@pinecone-database/pinecone';
-import { ragClient } from './rag_client';
+import { createRagMirror } from './mirror';
+import { assertRagConsent } from './consent';
+import { KNOWLEDGE_MAX_RECORDS, KNOWLEDGE_MAX_VECTOR_VALUES, KNOWLEDGE_TIMEOUT_MS } from '../limits';
 import { SelectedEmbeddingProvider } from './embedding';
 import { normalizeRagIndexName } from './rag_index_name';
 import { collectRagSources } from './source';
@@ -32,25 +33,24 @@ export async function indexRag(
 	if (!providerId || !modelId) {
 		throw new Error('Select an embedding provider and model before indexing.');
 	}
-	if (
-		configuration.embeddingConsent?.providerId !== providerId ||
-		configuration.embeddingConsent.modelId !== modelId
-	) {
-		throw new Error(
-			'Confirm remote embedding disclosure for the selected provider and model before indexing.'
-		);
-	}
+	assertRagConsent(configuration, providerId, modelId, selectedIndexName, true);
 
 	const vectorStore = dependencies.vectors ?? ragVectorStore();
 	const embeddingProvider = dependencies.embeddings ?? new SelectedEmbeddingProvider();
 	const generation = `kucedr-${randomUUID()}`;
+	const mirror = dependencies.mirror ?? createRagMirror();
+	const timeout = AbortSignal.timeout(KNOWLEDGE_TIMEOUT_MS);
+	const signal = dependencies.signal ? AbortSignal.any([dependencies.signal, timeout]) : timeout;
+	let uploadStarted = false;
+	let published = false;
+	let vectorValues = 0;
 	const records: VectorRecord[] = [];
 	let dimensions: number | undefined;
 	let indexedFiles = 0;
 
 	try {
-		for await (const { source, file, content } of collectRagSources(sources)) {
-			dependencies.signal?.throwIfAborted();
+		for await (const { source, file, content } of collectRagSources(sources, signal)) {
+			signal.throwIfAborted();
 			const chunks = chunkSpans(content);
 			if (chunks.length === 0) continue;
 			indexedFiles += 1;
@@ -68,14 +68,18 @@ export async function indexRag(
 				modelId
 			);
 			if (reused) {
+				vectorValues += reused.reduce((count, record) => count + record.vector.length, 0);
+				if (records.length + reused.length > KNOWLEDGE_MAX_RECORDS || vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES) throw new Error('Knowledge record or vector budget exceeded.');
 				dimensions ??= reused[0].vector.length;
 				records.push(...reused);
 				continue;
 			}
 
 			for (let start = 0; start < chunks.length; start += BATCH_SIZE) {
-				dependencies.signal?.throwIfAborted();
+				signal.throwIfAborted();
 				const batch = chunks.slice(start, start + BATCH_SIZE);
+				if (records.length + batch.length > KNOWLEDGE_MAX_RECORDS) throw new Error('Knowledge record limit exceeded.');
+				assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
 				const embedded = await embeddingProvider.embed(
 					{
 						texts: batch.map((chunk) => chunk.text),
@@ -83,12 +87,14 @@ export async function indexRag(
 						providerId,
 						modelId,
 					},
-					dependencies.signal
+					signal
 				);
-				dependencies.signal?.throwIfAborted();
+				signal.throwIfAborted();
 				if (embedded.providerId !== providerId || embedded.modelId !== modelId) {
 					throw new Error('Embedding provider did not use the selected provider and model.');
 				}
+				vectorValues += embedded.embeddings.reduce((count, vector) => count + vector.length, 0);
+				if (vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES || embedded.dimensions < 1 || embedded.dimensions > 65_536 || embedded.embeddings.length !== batch.length || embedded.embeddings.some((vector) => vector.length !== embedded.dimensions || vector.some((value) => !Number.isFinite(value)))) throw new Error('Invalid or excessive embedding vectors.');
 				dimensions ??= embedded.dimensions;
 				if (embedded.dimensions !== dimensions) {
 					throw new Error('Embedding dimensions changed while indexing.');
@@ -115,16 +121,12 @@ export async function indexRag(
 		if (!dimensions || records.length === 0) {
 			throw new Error('No indexable text content found in the selected source folders.');
 		}
-		dependencies.signal?.throwIfAborted();
+		signal.throwIfAborted();
 
-		await mirrorToPinecone(
-			selectedIndexName,
-			generation,
-			dimensions,
-			records,
-			dependencies.signal
-		);
-		dependencies.signal?.throwIfAborted();
+		assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
+		uploadStarted = true;
+		await mirror.upload(selectedIndexName, generation, dimensions, records, signal);
+		signal.throwIfAborted();
 
 		const completedAt = new Date().toISOString();
 		vectorStore.publish({
@@ -136,6 +138,7 @@ export async function indexRag(
 			completedAt,
 			records,
 		});
+		published = true;
 		writeRagManifest({
 			indexName: selectedIndexName,
 			activeNamespace: generation,
@@ -145,43 +148,13 @@ export async function indexRag(
 			completedAt,
 		});
 		return { files: indexedFiles, vectors: records.length };
+	} catch (error) {
+		if (uploadStarted && !published) {
+			try { await mirror.discard(selectedIndexName, generation, AbortSignal.timeout(15_000)); }
+			catch (cleanupError) { throw new AggregateError([error, cleanupError], 'RAG indexing failed; its staging namespace cleanup also failed: ' + generation); }
+		}
+		throw error;
 	} finally {
 		if (!dependencies.vectors) vectorStore.close();
 	}
-}
-
-async function mirrorToPinecone(
-	indexName: string,
-	generation: string,
-	dimensions: number,
-	records: readonly VectorRecord[],
-	signal?: AbortSignal
-): Promise<void> {
-	signal?.throwIfAborted();
-	const pinecone = ragClient();
-	const index = (await ensureIndex(pinecone, indexName, dimensions)).namespace(generation);
-	for (let start = 0; start < records.length; start += BATCH_SIZE) {
-		signal?.throwIfAborted();
-		await index.upsert({
-			records: records.slice(start, start + BATCH_SIZE).map((record) => ({
-				id: record.id,
-				values: record.vector,
-				metadata: { path: record.path, text: record.text },
-			})),
-		});
-		signal?.throwIfAborted();
-	}
-}
-
-async function ensureIndex(pinecone: Pinecone, indexName: string, dimension: number) {
-	if (dimension === 0) throw new Error('Embedding provider returned no dimensions.');
-	await pinecone.createIndex({
-		name: indexName,
-		dimension,
-		metric: 'cosine',
-		spec: { serverless: { cloud: 'aws', region: 'us-east-1' } },
-		waitUntilReady: true,
-		suppressConflicts: true,
-	});
-	return pinecone.index(indexName);
 }

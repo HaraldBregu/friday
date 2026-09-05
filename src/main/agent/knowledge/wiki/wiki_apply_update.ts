@@ -258,8 +258,8 @@ export async function applyWikiUpdate(
 			open_questions: openQuestions,
 			change_history: changeHistory,
 		});
-		await mkdir(path.dirname(pagePath), { recursive: true });
-		await writeFile(pagePath, markdown, { encoding: 'utf8', signal: options.signal });
+		await mkdir(path.dirname(pagePath), { recursive: true, mode: 0o700 });
+		await writeFile(pagePath, markdown, { encoding: 'utf8', signal: options.signal, mode: 0o600 });
 		if (existing === undefined) createdPages += 1;
 		else updatedPages += 1;
 	}

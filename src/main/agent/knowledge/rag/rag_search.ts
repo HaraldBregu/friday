@@ -1,3 +1,6 @@
+import { assertRagConsent } from './consent';
+import { getRagConfiguration } from './rag_store';
+import { containsSecret } from '../secrets';
 import { DEFAULT_RAG_INDEX_NAME } from '../../../../shared/rag_types';
 import { SelectedEmbeddingProvider } from './embedding';
 import { normalizeRagIndexName } from './rag_index_name';
@@ -22,6 +25,8 @@ export async function searchRag(
 			throw new Error('Generate the selected RAG index before searching.');
 		}
 
+		assertRagConsent(getRagConfiguration(), index.providerId, index.modelId, selectedIndexName);
+		if (query.length > 16_000 || containsSecret(query)) throw new Error('Query is oversized or contains credential-like content.');
 		const embedded = await embeddingProvider.embed(
 			{
 				texts: [query],

@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
-import { lstat, readFile, readdir, realpath, stat } from 'node:fs/promises';
+import { lstat, realpath } from 'node:fs/promises';
+import { listKnowledgeFiles } from '../list';
+import { readFileBounded } from '../../files/read';
 import path from 'node:path';
 import type { WikiSource } from './types';
 import { assertWikiSourceSafe } from '../safety';
@@ -10,31 +12,17 @@ const WIKI_SOURCE_EXTENSIONS = new Set(['.txt', '.md', '.markdown', '.json', '.c
 export async function collectWikiSources(root: string, signal?: AbortSignal): Promise<WikiSource[]> {
 	signal?.throwIfAborted();
 	const sourceRoot = await realpath(root);
-	const entries = await readdir(sourceRoot, { recursive: true });
+	const entries = await listKnowledgeFiles(sourceRoot, signal);
 	const sources: WikiSource[] = [];
 
 	for (const entry of entries.sort()) {
 		signal?.throwIfAborted();
 		const candidatePath = path.resolve(sourceRoot, entry);
 		const candidateStat = await lstat(candidatePath);
-		const absolutePath = await realpath(candidatePath);
-		const relativeTarget = path.relative(sourceRoot, absolutePath);
-		if (
-			path.isAbsolute(relativeTarget) ||
-			relativeTarget === '..' ||
-			relativeTarget.startsWith(`..${path.sep}`)
-		) {
-			const relativePath = entry.split(path.sep).join('/');
-			throw new Error(
-				candidateStat.isSymbolicLink()
-					? `Refusing to ingest source symlink outside the configured wiki folder: ${relativePath}`
-					: `Refusing to ingest source outside the configured wiki folder: ${relativePath}`
-			);
-		}
-		const sourceStat = candidateStat.isSymbolicLink() ? await stat(absolutePath) : candidateStat;
-		if (!sourceStat.isFile()) continue;
+		const absolutePath = candidatePath;
+		const sourceStat = candidateStat;
 		if (!WIKI_SOURCE_EXTENSIONS.has(path.extname(entry).toLowerCase())) continue;
-		const bytes = await readFile(absolutePath, { signal });
+		const bytes = await readFileBounded(absolutePath, MAX_WIKI_SOURCE_BYTES, signal);
 		if (bytes.length > MAX_WIKI_SOURCE_BYTES) {
 			throw new Error(
 				`Refusing to ingest oversized source (${bytes.length} bytes; maximum ${MAX_WIKI_SOURCE_BYTES}): ${entry}`

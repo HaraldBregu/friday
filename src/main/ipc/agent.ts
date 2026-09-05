@@ -687,7 +687,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 				mainAccess,
 				async (value: unknown): Promise<PermissionsSchema> => {
 					const permissions = setPermissions(toPermissions(value));
-					if (process.platform === 'win32') await agent.sandbox.invalidate();
+					await agent.sandbox.invalidate();
 					return permissions;
 				},
 				AgentChannels.policySet
@@ -700,7 +700,7 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 				mainAccess,
 				async (): Promise<PermissionsSchema> => {
 					const permissions = resetPermissions();
-					if (process.platform === 'win32') await agent.sandbox.invalidate();
+					await agent.sandbox.invalidate();
 					return permissions;
 				},
 				AgentChannels.policyReset

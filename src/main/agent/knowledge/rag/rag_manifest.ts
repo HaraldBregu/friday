@@ -19,9 +19,9 @@ export function readRagManifest(): RagManifest | undefined {
 export function writeRagManifest(manifest: RagManifest): void {
 	const file = manifestPath();
 	const temporaryFile = `${file}.${randomUUID()}.tmp`;
-	mkdirSync(path.dirname(file), { recursive: true });
+	mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
 	try {
-		writeFileSync(temporaryFile, JSON.stringify(manifest), 'utf8');
+		writeFileSync(temporaryFile, JSON.stringify(manifest), { encoding: 'utf8', mode: 0o600, flag: 'wx' });
 		renameSync(temporaryFile, file);
 	} finally {
 		rmSync(temporaryFile, { force: true });

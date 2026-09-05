@@ -1,5 +1,6 @@
+import { readFileBounded } from '../../files/read';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getWikiSettings } from './wiki_get_settings';
 import { getWikiRepository } from './wiki_repository';
@@ -16,7 +17,7 @@ export async function registerWikiSource(
 ): Promise<WikiRegisteredSource> {
 	signal?.throwIfAborted();
 	const evidenceRoot = repository.paths.evidence;
-	const bytes = await readFile(source.absolutePath, { signal });
+	const bytes = await readFileBounded(source.absolutePath, MAX_WIKI_SOURCE_BYTES, signal);
 	if (bytes.length > MAX_WIKI_SOURCE_BYTES) {
 		throw new Error(
 			`Refusing to ingest oversized source (${bytes.length} bytes; maximum ${MAX_WIKI_SOURCE_BYTES}): ${source.relativePath}`
@@ -75,12 +76,12 @@ export async function registerWikiSource(
 	const originalName = path.basename(source.relativePath).replace(/[^a-zA-Z0-9._-]+/g, '-');
 	const archiveDirectory = path.resolve(evidenceRoot, sourceId);
 	const archivePath = path.resolve(archiveDirectory, originalName || 'source.txt');
-	await mkdir(archiveDirectory, { recursive: true });
+	await mkdir(archiveDirectory, { recursive: true, mode: 0o700 });
 	signal?.throwIfAborted();
-	await writeFile(archivePath, bytes, { flag: 'wx', signal }).catch(
+	await writeFile(archivePath, bytes, { flag: 'wx', mode: 0o600, signal }).catch(
 		async (error: NodeJS.ErrnoException) => {
 			if (error.code !== 'EEXIST') throw error;
-			const archived = await readFile(archivePath, { signal });
+			const archived = await readFileBounded(archivePath, MAX_WIKI_SOURCE_BYTES, signal);
 			if (createHash('sha256').update(archived).digest('hex') !== checksum) {
 				throw new Error(`Immutable source archive checksum mismatch: ${sourceId}`);
 			}

@@ -35,6 +35,7 @@ export interface RagChunkSpan {
 export interface RagIndexDependencies {
 	embeddings?: EmbeddingProvider;
 	vectors?: VectorStore;
+	mirror?: RagMirror;
 	signal?: AbortSignal;
 }
 
@@ -151,4 +152,9 @@ export interface RecordRow {
 	checksum: string;
 	indexed_at: string;
 	vector: Uint8Array;
+}
+
+export interface RagMirror {
+	upload(indexName: string, generation: string, dimensions: number, records: readonly VectorRecord[], signal?: AbortSignal): Promise<void>;
+	discard(indexName: string, generation: string, signal?: AbortSignal): Promise<void>;
 }

@@ -1,3 +1,4 @@
+import { restrictSettingsFile } from '../../../shared/restrict_settings_file';
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync, type StatementSync } from 'node:sqlite';
@@ -21,8 +22,9 @@ export class SqliteVectorStore implements VectorStore {
 	private readonly deleteOldRecordsStatement: StatementSync;
 
 	constructor(file: string) {
-		if (file !== ':memory:') mkdirSync(path.dirname(file), { recursive: true });
+		if (file !== ':memory:') mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
 		this.database = new DatabaseSync(file);
+		if (file !== ':memory:') restrictSettingsFile(file);
 		this.database.exec(`
 			PRAGMA journal_mode = WAL;
 			PRAGMA foreign_keys = ON;
