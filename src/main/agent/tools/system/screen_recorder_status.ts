@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { screen } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -15,7 +16,9 @@ export const screenRecorderStatusTool: Tool = tool({
 			.optional()
 			.describe('Wait for the recording to finish before returning. Defaults to false.'),
 	}),
-	execute: async ({ id, wait }) => {
+	execute: async ({ id, wait }, signal) => {
+		signal?.throwIfAborted();
+		recordingOwner(screen, id);
 		const recording = wait ? await screen.waitFor(id) : screen.get(id);
 		if (!recording) throw new Error(`Unknown screen recording: ${id}`);
 		return {

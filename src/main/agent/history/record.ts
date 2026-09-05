@@ -21,4 +21,13 @@ export function recordFileOperation(
 		state: 'applied',
 	});
 	history.operations = history.operations.slice(-100);
+	let retainedBytes = 0;
+	let first = history.operations.length;
+	while (first > 0) {
+		const operation = history.operations[first - 1];
+		retainedBytes += [...operation.before, ...operation.after].reduce((total, snapshot) => total + (snapshot.content?.length ?? 0), 0);
+		if (retainedBytes > 16 * 1024 * 1024) break;
+		first -= 1;
+	}
+	history.operations = history.operations.slice(first);
 }

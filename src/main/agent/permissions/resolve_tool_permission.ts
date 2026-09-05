@@ -25,7 +25,7 @@ export function resolveToolPermissionDetails(
 	if (!kind) return { mode: 'allow', targets: [], approvalTargets: [], persistable: false };
 
 	if (toolName === 'process') {
-		const session = typeof args.sessionId === 'string' ? registry.get(args.sessionId) : undefined;
+		const session = typeof args.sessionId === 'string' ? registry.owned(args.sessionId) : undefined;
 		if (session?.executionMode === 'sandbox')
 			return { mode: 'allow', kind, targets: [], approvalTargets: [], persistable: false };
 		if (

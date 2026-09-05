@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { screen } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -9,6 +10,7 @@ export const screenRecorderStopTool: Tool = tool({
 	description: 'Stop an active screen recording and begin saving its captured data.',
 	inputSchema: z.object({ id: z.string().uuid() }),
 	execute: ({ id }) => {
+		recordingOwner(screen, id);
 		const recording = screen.get(id);
 		if (!recording) throw new Error(`Unknown screen recording: ${id}`);
 		screen.stop(id);

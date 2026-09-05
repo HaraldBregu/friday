@@ -1,3 +1,5 @@
+import { recordingOwner } from '../../recordings/owner';
+import { rememberRecording } from '../../recordings/remember';
 import path from 'node:path';
 import { z } from 'zod';
 import { screen } from '../../../recorder';
@@ -28,9 +30,12 @@ export function screenRecorderTool(): Tool {
 				),
 		}),
 		execute: async ({ duration, directory, filename }, signal) => {
+			signal?.throwIfAborted();
+			const owner = recordingOwner(screen);
 			const targetDir = resolveUserPath(directory ?? '.', agentLocation());
 			const url = path.join(targetDir, path.basename(filename ?? `screen-${Date.now()}.webm`));
 			const recording = screen.start({ url, duration: duration * 1000 });
+			rememberRecording(screen, recording.id, owner);
 			signal?.addEventListener('abort', () => screen.cancel(recording.id), { once: true });
 			return {
 				id: recording.id,

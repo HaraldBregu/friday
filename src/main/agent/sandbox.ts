@@ -234,7 +234,7 @@ export class ExecSandbox {
 			rules.map((rule) => rule === '*' ? path.parse(os.homedir()).root : resolveUserPath(rule, os.homedir()));
 		const explicitReadDenies = resolveRules([...permissions.exec.deny, ...permissions.read.deny]);
 		const explicitWriteDenies = resolveRules([...permissions.exec.deny, ...permissions.write.deny]);
-		if ([...explicitReadDenies, ...explicitWriteDenies].some((rule) => /[*?\[\]{}]/.test(rule.replace(/[\\/]\*\*$/, ''))))
+		if ([...explicitReadDenies, ...explicitWriteDenies].some((rule) => /[*?[\]{}]/.test(rule.replace(/[\\/]\*\*$/, ''))))
 			throw new Error('Command sandbox rules must use exact paths or a trailing /**. Refine the blocked pattern before executing commands.');
 		const allowRead = resolveRules(permissions.exec.allow).filter((rule) => {
 			const allowed = permissionRuleRoot(rule);

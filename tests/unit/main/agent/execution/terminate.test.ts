@@ -13,7 +13,7 @@ unix('escalates termination for a process group that ignores SIGTERM', async () 
 		terminateProcessTree(child);
 		await expect(closed).resolves.toEqual([null, 'SIGKILL']);
 	} finally {
-		if (child.pid) { try { process.kill(-child.pid, 'SIGKILL'); } catch {} }
+		if (child.pid) { try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } }
 	}
 }, 5_000);
 
@@ -29,6 +29,6 @@ unix('retains cancellation ownership after a shell exits with a live descendant'
 		await new Promise((resolve) => setTimeout(resolve, 1_200));
 		expect(() => process.kill(-child.pid!, 0)).toThrow();
 	} finally {
-		if (child.pid) { try { process.kill(-child.pid, 'SIGKILL'); } catch {} }
+		if (child.pid) { try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); } }
 	}
 }, 5_000);

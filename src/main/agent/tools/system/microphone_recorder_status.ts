@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { microphone } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -15,7 +16,9 @@ export const microphoneRecorderStatusTool: Tool = tool({
 			.optional()
 			.describe('Wait for the recording to finish before returning. Defaults to false.'),
 	}),
-	execute: async ({ id, wait }) => {
+	execute: async ({ id, wait }, signal) => {
+		signal?.throwIfAborted();
+		recordingOwner(microphone, id);
 		const recording = wait ? await microphone.waitFor(id) : microphone.get(id);
 		if (!recording) throw new Error(`Unknown microphone recording: ${id}`);
 		return {

@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { camera } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -9,6 +10,7 @@ export const cameraRecorderStopTool: Tool = tool({
 	description: 'Stop an active camera recording and begin saving its captured data.',
 	inputSchema: z.object({ id: z.string().uuid() }),
 	execute: ({ id }) => {
+		recordingOwner(camera, id);
 		const recording = camera.get(id);
 		if (!recording) throw new Error(`Unknown camera recording: ${id}`);
 		camera.stop(id);

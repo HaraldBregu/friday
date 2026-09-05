@@ -1,3 +1,5 @@
+import { recordingOwner } from '../../recordings/owner';
+import { rememberRecording } from '../../recordings/remember';
 import path from 'node:path';
 import { z } from 'zod';
 import { camera } from '../../../recorder';
@@ -28,9 +30,12 @@ export function cameraRecorderTool(): Tool {
 				),
 		}),
 		execute: async ({ duration, directory, filename }, signal) => {
+			signal?.throwIfAborted();
+			const owner = recordingOwner(camera);
 			const targetDir = resolveUserPath(directory ?? '.', agentLocation());
 			const url = path.join(targetDir, path.basename(filename ?? `camera-${Date.now()}.webm`));
 			const recording = camera.start({ url, duration: duration * 1000 });
+			rememberRecording(camera, recording.id, owner);
 			signal?.addEventListener('abort', () => camera.cancel(recording.id), { once: true });
 			return {
 				id: recording.id,

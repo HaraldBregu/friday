@@ -1,3 +1,5 @@
+import { recordingOwner } from '../../recordings/owner';
+import { rememberRecording } from '../../recordings/remember';
 import path from 'node:path';
 import { z } from 'zod';
 import { microphone } from '../../../recorder';
@@ -28,9 +30,12 @@ export function microphoneRecorderTool(): Tool {
 				),
 		}),
 		execute: async ({ duration, directory, filename }, signal) => {
+			signal?.throwIfAborted();
+			const owner = recordingOwner(microphone);
 			const targetDir = resolveUserPath(directory ?? '.', agentLocation());
 			const url = path.join(targetDir, path.basename(filename ?? `microphone-${Date.now()}.webm`));
 			const recording = microphone.start({ url, duration: duration * 1000 });
+			rememberRecording(microphone, recording.id, owner);
 			signal?.addEventListener('abort', () => microphone.cancel(recording.id), { once: true });
 			return {
 				id: recording.id,

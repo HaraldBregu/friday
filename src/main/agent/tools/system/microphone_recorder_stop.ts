@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { microphone } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -9,6 +10,7 @@ export const microphoneRecorderStopTool: Tool = tool({
 	description: 'Stop an active microphone recording and begin saving its captured data.',
 	inputSchema: z.object({ id: z.string().uuid() }),
 	execute: ({ id }) => {
+		recordingOwner(microphone, id);
 		const recording = microphone.get(id);
 		if (!recording) throw new Error(`Unknown microphone recording: ${id}`);
 		microphone.stop(id);

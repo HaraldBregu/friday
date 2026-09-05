@@ -1,3 +1,4 @@
+import { recordingOwner } from '../../recordings/owner';
 import { z } from 'zod';
 import { camera } from '../../../recorder';
 import type { Tool } from '../../types';
@@ -15,7 +16,9 @@ export const cameraRecorderStatusTool: Tool = tool({
 			.optional()
 			.describe('Wait for the recording to finish before returning. Defaults to false.'),
 	}),
-	execute: async ({ id, wait }) => {
+	execute: async ({ id, wait }, signal) => {
+		signal?.throwIfAborted();
+		recordingOwner(camera, id);
 		const recording = wait ? await camera.waitFor(id) : camera.get(id);
 		if (!recording) throw new Error(`Unknown camera recording: ${id}`);
 		return {
