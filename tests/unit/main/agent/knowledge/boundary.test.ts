@@ -44,3 +44,11 @@ it('honors cancellation and returns a normal contained page', async () => {
 	await expect(readFileBounded(path.join(root, 'page.md'), 100, controller.signal)).rejects.toThrow('stopped');
 	await expect(listKnowledgeFiles(root, controller.signal)).rejects.toThrow('stopped');
 });
+
+it('rejects replacing the configured wiki root with a symlink', async () => {
+	const outside = path.join(root, 'outside'); await mkdir(outside);
+	await writeFile(path.join(outside, 'page.md'), 'outside bytes');
+	const linked = path.join(root, 'wiki'); await symlink(outside, linked);
+	await expect(readKnowledgeText(linked, 'page.md')).rejects.toThrow('Symbolic links');
+	await expect(listKnowledgeFiles(linked)).rejects.toThrow('Symbolic links');
+});

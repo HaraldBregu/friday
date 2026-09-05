@@ -1,4 +1,5 @@
-import { realpath, stat } from 'node:fs/promises';
+import { knowledgeRoot } from '../root';
+import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { assertWikiSourceSafe } from '../safety';
@@ -14,7 +15,7 @@ export async function* collectRagSources(sources: readonly string[], signal?: Ab
 	let files = 0;
 	for (const [sourceIndex, selected] of sources.entries()) {
 		signal?.throwIfAborted();
-		const source = await realpath(selected);
+		const source = knowledgeRoot(selected);
 		if (!(await stat(source)).isDirectory()) throw new Error('The selected source is not a folder: ' + source);
 		for (const file of await listKnowledgeFiles(source, signal)) {
 			signal?.throwIfAborted();

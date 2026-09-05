@@ -1,4 +1,4 @@
-import { realpath } from 'node:fs/promises';
+import { knowledgeRoot } from './root';
 import path from 'node:path';
 import { readFileBounded } from '../files/read';
 import { KNOWLEDGE_MAX_FILE_BYTES } from './limits';
@@ -12,7 +12,7 @@ export async function readKnowledgeText(
 ): Promise<string> {
 	signal?.throwIfAborted();
 	try {
-		const canonicalRoot = await realpath(root);
+		const canonicalRoot = knowledgeRoot(root);
 		const file = path.resolve(canonicalRoot, relativePath);
 		const relative = path.relative(canonicalRoot, file);
 		if (!relative || path.isAbsolute(relative) || relative === '..' || relative.startsWith('..' + path.sep))

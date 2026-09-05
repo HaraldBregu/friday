@@ -1,4 +1,5 @@
-import { lstat, opendir, realpath } from 'node:fs/promises';
+import { knowledgeRoot } from './root';
+import { lstat, opendir } from 'node:fs/promises';
 import path from 'node:path';
 import { validateFilePath } from '../files/validate';
 import { KNOWLEDGE_MAX_DEPTH, KNOWLEDGE_MAX_ENTRIES, KNOWLEDGE_MAX_FILES, KNOWLEDGE_MAX_TOTAL_BYTES } from './limits';
@@ -6,7 +7,7 @@ import { KNOWLEDGE_MAX_DEPTH, KNOWLEDGE_MAX_ENTRIES, KNOWLEDGE_MAX_FILES, KNOWLE
 export async function listKnowledgeFiles(root: string, signal?: AbortSignal): Promise<string[]> {
 	signal?.throwIfAborted();
 	let canonicalRoot: string;
-	try { canonicalRoot = await realpath(root); }
+	try { canonicalRoot = knowledgeRoot(root); }
 	catch (error) {
 		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
 		throw error;

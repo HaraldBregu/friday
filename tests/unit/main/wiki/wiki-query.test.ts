@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import matter from 'gray-matter';
@@ -24,8 +24,9 @@ describe('wiki-first query retrieval', () => {
 	it('prioritizes exact aliases, traverses related pages, and separates raw evidence', async () => {
 		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-query-'));
 		const target = path.join(root, 'wiki');
-		const archive = path.join(root, 'memory.md');
 		const repository = getWikiRepository(target);
+		await mkdir(repository.paths.evidence, { recursive: true });
+		const archive = path.join(repository.paths.evidence, 'memory.md');
 		await writeFile(archive, source.content, 'utf8');
 		repository.sources.store = {
 			version: 1,

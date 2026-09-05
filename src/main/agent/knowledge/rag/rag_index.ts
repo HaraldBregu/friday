@@ -79,7 +79,8 @@ export async function indexRag(
 				signal.throwIfAborted();
 				const batch = chunks.slice(start, start + BATCH_SIZE);
 				if (records.length + batch.length > KNOWLEDGE_MAX_RECORDS) throw new Error('Knowledge record limit exceeded.');
-				assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
+				assertRagConsent(configuration, providerId, modelId, selectedIndexName, true);
+		assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
 				const embedded = await embeddingProvider.embed(
 					{
 						texts: batch.map((chunk) => chunk.text),
@@ -123,6 +124,7 @@ export async function indexRag(
 		}
 		signal.throwIfAborted();
 
+		assertRagConsent(configuration, providerId, modelId, selectedIndexName, true);
 		assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
 		uploadStarted = true;
 		await mirror.upload(selectedIndexName, generation, dimensions, records, signal);

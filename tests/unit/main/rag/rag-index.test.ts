@@ -25,6 +25,7 @@ let root: string;
 let configuration: RagConfiguration;
 
 beforeEach(async () => {
+	jest.resetAllMocks();
 	root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'kucedr-rag-index-')));
 	await writeFile(path.join(root, 'guide.md'), '# Guide');
 	process.env.PINECONE_API_KEY = 'synthetic-pinecone-account';

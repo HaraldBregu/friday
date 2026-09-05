@@ -1,5 +1,6 @@
+import { knowledgeRoot } from '../root';
 import { createHash } from 'node:crypto';
-import { lstat, realpath } from 'node:fs/promises';
+import { lstat } from 'node:fs/promises';
 import { listKnowledgeFiles } from '../list';
 import { readFileBounded } from '../../files/read';
 import path from 'node:path';
@@ -11,7 +12,7 @@ const WIKI_SOURCE_EXTENSIONS = new Set(['.txt', '.md', '.markdown', '.json', '.c
 
 export async function collectWikiSources(root: string, signal?: AbortSignal): Promise<WikiSource[]> {
 	signal?.throwIfAborted();
-	const sourceRoot = await realpath(root);
+	const sourceRoot = knowledgeRoot(root);
 	const entries = await listKnowledgeFiles(sourceRoot, signal);
 	const sources: WikiSource[] = [];
 

@@ -1,6 +1,7 @@
+import { knowledgeRoot } from '../root';
 import { readFileBounded } from '../../files/read';
 import { createHash } from 'node:crypto';
-import { mkdir, realpath, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getWikiSettings } from './wiki_get_settings';
 import { getWikiRepository } from './wiki_repository';
@@ -17,7 +18,7 @@ export async function registerWikiSource(
 ): Promise<WikiRegisteredSource> {
 	signal?.throwIfAborted();
 	const evidenceRoot = repository.paths.evidence;
-	const bytes = await readFileBounded(path.join(await realpath(path.dirname(source.absolutePath)), path.basename(source.absolutePath)), MAX_WIKI_SOURCE_BYTES, signal);
+	const bytes = await readFileBounded(path.join(knowledgeRoot(path.dirname(source.absolutePath)), path.basename(source.absolutePath)), MAX_WIKI_SOURCE_BYTES, signal);
 	if (bytes.length > MAX_WIKI_SOURCE_BYTES) {
 		throw new Error(
 			`Refusing to ingest oversized source (${bytes.length} bytes; maximum ${MAX_WIKI_SOURCE_BYTES}): ${source.relativePath}`
@@ -81,7 +82,7 @@ export async function registerWikiSource(
 	await writeFile(archivePath, bytes, { flag: 'wx', mode: 0o600, signal }).catch(
 		async (error: NodeJS.ErrnoException) => {
 			if (error.code !== 'EEXIST') throw error;
-			const archived = await readFileBounded(path.join(await realpath(path.dirname(archivePath)), path.basename(archivePath)), MAX_WIKI_SOURCE_BYTES, signal);
+			const archived = await readFileBounded(path.join(knowledgeRoot(path.dirname(archivePath)), path.basename(archivePath)), MAX_WIKI_SOURCE_BYTES, signal);
 			if (createHash('sha256').update(archived).digest('hex') !== checksum) {
 				throw new Error(`Immutable source archive checksum mismatch: ${sourceId}`);
 			}
