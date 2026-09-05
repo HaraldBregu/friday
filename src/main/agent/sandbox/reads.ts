@@ -4,6 +4,9 @@ export function sandboxSystemReads(): string[] {
 	return [
 		'/bin',
 		'/sbin',
+		'/lib',
+		'/lib64',
+		'/lib32',
 		'/usr',
 		'/etc',
 		'/dev',

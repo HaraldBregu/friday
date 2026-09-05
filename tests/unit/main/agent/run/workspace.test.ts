@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 jest.mock('../../../../../src/main/shared/user_data_location', () => {
-	const directory = require('node:fs').mkdtempSync(require('node:path').join(require('node:os').tmpdir(), 'kucedr-workspace-'));
+	const directory = jest.requireActual<typeof fs>('node:fs').mkdtempSync(jest.requireActual<typeof path>('node:path').join(jest.requireActual<typeof os>('node:os').tmpdir(), 'kucedr-workspace-'));
 	return { userDataLocation: () => directory };
 });
 
@@ -66,6 +66,13 @@ it.each(['save_memory', 'forget_memory', 'update_health', 'bash'])('allows works
 	const tool = jsonTool({ id, name: id, description: id, schema: {}, execute: run });
 	expect((await execute(tool, id === 'bash' ? { command: 'node tools/example.js' } : {})).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow' });
 	expect(run).toHaveBeenCalled();
+});
+
+it('allows overwriting workspace names beginning with two dots', async () => {
+	fs.mkdirSync(path.join(workspace, '..cache'));
+	fs.writeFileSync(path.join(workspace, '..cache/file.txt'), 'old');
+	expect((await execute(writeTool, { path: '..cache/file.txt', content: 'new' })).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow' });
+	expect(fs.readFileSync(path.join(workspace, '..cache/file.txt'), 'utf8')).toBe('new');
 });
 
 it.each(['kill', 'clear', 'remove'])('allows %s for an owned workspace sandbox process', async (action) => {

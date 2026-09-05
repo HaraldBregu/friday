@@ -21,6 +21,7 @@ describe('isPathWithin', () => {
 	it('is true for equal paths and descendants', () => {
 		expect(isPathWithin('/a', '/a')).toBe(true);
 		expect(isPathWithin('/a', '/a/b/c')).toBe(true);
+		expect(isPathWithin('/a', '/a/..cache/file')).toBe(true);
 	});
 	it('is false for siblings and ancestors', () => {
 		expect(isPathWithin('/a/b', '/a')).toBe(false);

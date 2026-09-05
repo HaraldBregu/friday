@@ -55,6 +55,7 @@ describe('ExecSandbox permissions', () => {
 		expect(configuration.config.filesystem.denyRead).toContain('/workspace/private/**');
 		expect(configuration.config.filesystem.denyWrite).toEqual(['/shared/private/**', '/workspace/private/**', '/tmp/claude', '/home/user/.npm/_logs']);
 		expect(configuration.config.filesystem.allowRead).toContain('/usr');
+		expect(configuration.config.filesystem.allowRead).toEqual(expect.arrayContaining(['/lib', '/lib64', '/lib32']));
 	});
 
 	it('removes a runtime cache write restriction only for its approved invocation', async () => {
