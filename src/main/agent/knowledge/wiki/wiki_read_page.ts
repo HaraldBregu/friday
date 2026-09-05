@@ -7,7 +7,8 @@ import type { WikiSearchResult } from './types';
 
 export async function readWikiPage(
 	page: string,
-	targetPath = getWikiSettings().targetPath
+	targetPath = getWikiSettings().targetPath,
+	signal?: AbortSignal
 ): Promise<WikiSearchResult> {
 	const requested = page.trim();
 	if (!requested) throw new Error('Wiki page identifier is required.');
@@ -19,12 +20,12 @@ export async function readWikiPage(
 	) {
 		throw new Error(`Unsafe wiki page identifier: ${page}`);
 	}
-	const entries = await listKnowledgeFiles(targetPath);
+	const entries = await listKnowledgeFiles(targetPath, signal);
 	for (const entry of entries) {
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
-		const parsed = matter(await readKnowledgeText(targetPath, entry));
+		const parsed = matter(await readKnowledgeText(targetPath, entry, signal));
 		const title = String(parsed.data.title ?? path.posix.basename(relativePath, '.md')).trim();
 		const aliases = Array.isArray(parsed.data.aliases) ? parsed.data.aliases.map(String) : [];
 		const candidates = [
