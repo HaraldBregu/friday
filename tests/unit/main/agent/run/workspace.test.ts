@@ -25,9 +25,10 @@ import type { RuntimeEvent, Tool } from '../../../../../src/main/agent/types';
 const workspace = agentLocation();
 const scope = { ownerId: 'workspace-test', source: 'interactive', sessionId: 'workspace-test', runId: 'workspace-test' } as const;
 
-async function execute(tool: Tool, args: Record<string, unknown>, history?: FileHistory): Promise<RuntimeEvent[]> {
+async function execute(tool: Tool, args: Record<string, unknown>, history?: FileHistory, source?: 'task' | 'health' | 'child'): Promise<RuntimeEvent[]> {
 	const events: RuntimeEvent[] = [];
-	for await (const event of runToolCall(tool, { id: crypto.randomUUID(), name: tool.id, args }, undefined, undefined, { runId: scope.runId, windowId: 1, scope }, undefined, history)) {
+	const security = source ? { runId: scope.runId, scope: { ...scope, source } } : { runId: scope.runId, windowId: 1, scope };
+	for await (const event of runToolCall(tool, { id: crypto.randomUUID(), name: tool.id, args }, undefined, undefined, security, undefined, history)) {
 		events.push(event);
 		if (event.type === 'tool_permission_request') break;
 	}
@@ -41,7 +42,7 @@ beforeEach(() => {
 
 afterAll(() => fs.rmSync(userDataLocation(), { recursive: true, force: true }));
 
-it('creates, reads, overwrites, edits, moves, deletes, undoes and redoes workspace files without approval', async () => {
+it.each([undefined, 'task', 'health', 'child'] as const)('creates, reads, overwrites, edits, moves, deletes, undoes and redoes workspace files without approval (source: %s)', async (source) => {
 	const history: FileHistory = { operations: [] };
 	const operations: [Tool, Record<string, unknown>][] = [
 		[writeTool, { path: 'tools/example.txt', content: 'first' }],
@@ -54,11 +55,36 @@ it('creates, reads, overwrites, edits, moves, deletes, undoes and redoes workspa
 		[redoFileTool(history), {}],
 	];
 	for (const [tool, args] of operations) {
-		expect((await execute(tool, args, history)).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow', isError: undefined });
+		expect((await execute(tool, args, history, source)).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow', isError: undefined });
 	}
 	expect(fs.existsSync(path.join(workspace, 'tools/example.txt'))).toBe(false);
 	expect(fs.existsSync(path.join(workspace, 'tools/moved.txt'))).toBe(false);
 	expect(history.operations).toHaveLength(5);
+});
+
+it.each(['task', 'health', 'child'] as const)('allows workspace commands and memory updates without a window for %s', async (source) => {
+	for (const id of ['bash', 'save_memory', 'forget_memory', 'update_health']) {
+		const run = jest.fn().mockResolvedValue('done');
+		const tool = jsonTool({ id, name: id, description: id, schema: {}, execute: run });
+		expect((await execute(tool, id === 'bash' ? { command: 'node tools/example.js' } : {}, undefined, source)).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow' });
+		expect(run).toHaveBeenCalled();
+	}
+});
+
+it.each(['task', 'health', 'child'] as const)('blocks unapproved outside access without a window for %s', async (source) => {
+	const run = jest.fn();
+	const bash = jsonTool({ id: 'bash', name: 'bash', description: 'bash', schema: {}, execute: run });
+	const operations: [Tool, Record<string, unknown>][] = [
+		[writeTool, { path: '../background-outside.txt', content: 'outside' }],
+		[bash, { command: 'pwd', workdir: '..' }],
+		[bash, { command: 'pwd', additionalRoots: ['..'] }],
+		[bash, { command: 'pwd', elevated: true }],
+	];
+	for (const [tool, args] of operations) {
+		expect((await execute(tool, args, undefined, source)).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'deny', isError: true });
+	}
+	expect(run).not.toHaveBeenCalled();
+	expect(fs.existsSync(path.resolve(workspace, '../background-outside.txt'))).toBe(false);
 });
 
 it.each(['save_memory', 'forget_memory', 'update_health', 'bash'])('allows workspace %s without approval', async (id) => {
