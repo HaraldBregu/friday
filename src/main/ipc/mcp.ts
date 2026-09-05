@@ -165,7 +165,7 @@ export class McpIpc implements IpcModule<McpIpcDeps> {
 		registerCommandWithEvent(McpChannels.save, (event, input: McpSettings) => {
 			trusted.assert(event);
 			const next = normalizeMcpSettings(input);
-			for (const id of Object.keys(getMcpServers())) if (!next[id]) revokeMcpLaunch(id);
+			for (const id of Object.keys(listConfiguredMcpServers())) if (!next[id]) revokeMcpLaunch(id);
 			setMcpServers(next);
 			const effective = getMcpServers();
 			for (const id of Object.keys(next)) if (effective[id]) authorizeMcpLaunch(id, effective[id]);
