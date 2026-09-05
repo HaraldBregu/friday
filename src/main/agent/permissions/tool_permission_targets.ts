@@ -2,17 +2,7 @@ import { realPath } from '../../shared/real_path';
 import { resolveUserPath } from '../../shared/user_path';
 import { registry } from '../tools/core/process';
 
-const PATCH_TARGET = /^[ \t]*[*]{3} (?:Add|Delete|Update) File: (.+?)[ \t]*$/gm;
-const PATCH_MOVE = /^[ \t]*[*]{3} Move to: (.+?)[ \t]*$/gm;
-
-function patchTargets(input: string, baseDir: string): string[] {
-	const targets: string[] = [];
-	for (const match of input.matchAll(PATCH_TARGET))
-		targets.push(realPath(resolveUserPath(match[1], baseDir)));
-	for (const match of input.matchAll(PATCH_MOVE))
-		targets.push(realPath(resolveUserPath(match[1], baseDir)));
-	return targets;
-}
+import { parsePatch } from '../tools/core/patch/parse';
 
 export function toolPermissionTargets(
 	toolName: string,
@@ -20,7 +10,12 @@ export function toolPermissionTargets(
 	baseDir: string
 ): string[] {
 	if (toolName === 'patch')
-		return typeof args.input === 'string' ? patchTargets(args.input, baseDir) : [];
+		return typeof args.input === 'string'
+			? parsePatch(args.input).flatMap((hunk) =>
+				[hunk.path, ...(hunk.kind === 'update' && hunk.movePath ? [hunk.movePath] : [])]
+					.map((target) => realPath(resolveUserPath(target, baseDir)))
+			)
+			: [];
 	if (toolName === 'bash')
 		return typeof args.command === 'string' && args.command.length > 0 ? [args.command] : [];
 	if (toolName === 'process') {
