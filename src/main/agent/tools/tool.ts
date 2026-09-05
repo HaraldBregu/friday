@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { JSONSchema, JsonToolConfig, Tool, ToolConfig } from '../types';
+import { builtinCapability } from '../execution/capability';
 
 function toJsonSchema(schema: z.ZodType): JSONSchema {
 	const jsonSchema = { ...z.toJSONSchema(schema) } as JSONSchema;
@@ -15,6 +16,7 @@ export function tool<T extends z.ZodType>({
 	maxOutputBytes = 200_000,
 	planSafe,
 	hardApproval,
+	capability,
 	inputSchema,
 	execute,
 }: ToolConfig<T>): Tool {
@@ -25,6 +27,7 @@ export function tool<T extends z.ZodType>({
 		timeoutMs,
 		maxOutputBytes,
 		planSafe,
+		capability: capability ?? ((input) => builtinCapability(id, input)),
 		hardApproval: typeof hardApproval === 'function'
 			? (input) => hardApproval(inputSchema.parse(input))
 			: hardApproval,
@@ -46,6 +49,7 @@ export function jsonTool({
 	maxOutputBytes = 200_000,
 	planSafe,
 	hardApproval,
+	capability,
 	parseInput,
 	schema,
 	execute,
@@ -58,6 +62,7 @@ export function jsonTool({
 		maxOutputBytes,
 		planSafe,
 		hardApproval,
+		capability: capability ?? ((input) => builtinCapability(id, input)),
 		schema,
 		parseInput(input: unknown) {
 			if (parseInput) return parseInput(input);

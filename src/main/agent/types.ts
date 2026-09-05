@@ -40,6 +40,7 @@ export interface Tool {
 	readonly maxOutputBytes: number;
 	readonly planSafe?: boolean;
 	readonly hardApproval?: boolean | ((input: Record<string, unknown>) => boolean);
+	readonly capability?: import('./execution/capability').ToolCapability | ((input: Record<string, unknown>) => import('./execution/capability').ToolCapability | undefined);
 	parseInput(input: unknown): Record<string, unknown>;
 	run(input: Record<string, unknown>, signal?: AbortSignal): Promise<unknown> | unknown;
 }
@@ -52,6 +53,7 @@ export type ToolConfig<T extends z.ZodType> = {
 	maxOutputBytes?: number;
 	planSafe?: boolean;
 	hardApproval?: boolean | ((input: z.infer<T>) => boolean);
+	capability?: import('./execution/capability').ToolCapability;
 	inputSchema: T;
 	execute: (input: z.infer<T>, signal?: AbortSignal) => Promise<unknown> | unknown;
 };
@@ -64,6 +66,7 @@ export type JsonToolConfig = {
 	maxOutputBytes?: number;
 	planSafe?: boolean;
 	hardApproval?: boolean | ((input: Record<string, unknown>) => boolean);
+	capability?: import('./execution/capability').ToolCapability;
 	parseInput?: (input: unknown) => Record<string, unknown>;
 	schema: JSONSchema;
 	execute: (input: Record<string, unknown>, signal?: AbortSignal) => Promise<unknown> | unknown;
@@ -128,6 +131,7 @@ type RuntimeInputBase = Pick<
 	toolsDeny?: string[];
 	approvalWindowId?: number;
 	explicitSkill?: string;
+	scope?: import('./execution/scope').ExecutionScope;
 };
 
 export type RuntimeInput = RuntimeInputBase &

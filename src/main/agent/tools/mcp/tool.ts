@@ -13,7 +13,7 @@ export function mcpTool(
 	description: string,
 	schema: JSONSchema,
 	serverId: string,
-	_approval?: McpApprovalPolicy,
+	approval?: McpApprovalPolicy,
 	runtimeName = mcpToolName(serverId, toolName, new Set())
 ) {
 	const parseInput = mcpInputParser(schema);
@@ -21,6 +21,8 @@ export function mcpTool(
 		id: runtimeName,
 		name: toolName.charAt(0).toUpperCase() + toolName.slice(1).replaceAll('_', ' '),
 		description,
+		capability: { effects: ['external'], approval: approval !== 'never' },
+		hardApproval: approval !== 'never',
 		timeoutMs: MCP_TOOL_TIMEOUT_MS,
 		maxOutputBytes: MCP_MAX_OUTPUT_BYTES,
 		parseInput,
