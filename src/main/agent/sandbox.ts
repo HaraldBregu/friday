@@ -48,7 +48,7 @@ export class ExecSandbox {
 
 	requiredRoots(roots: readonly string[]): string[] {
 		const resolved = roots.map(realPath);
-		return getDefaultWritePaths().filter((value) => !value.startsWith('/dev/')).map(realPath).filter((root) =>
+		return [...new Set(getDefaultWritePaths().filter((value) => !value.startsWith('/dev/')).map(realPath))].filter((root) =>
 			resolved.some((target) => isPathWithin(root, target)) &&
 			!resolved.some((target) => isPathWithin(target, root))
 		);
