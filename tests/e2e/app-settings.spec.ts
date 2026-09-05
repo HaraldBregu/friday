@@ -35,7 +35,7 @@ test('uploaded app settings survive restart and replacement and control new wind
 		await page.getByRole('spinbutton', { name: 'Default height (px)' }).fill('720');
 		await page.getByRole('switch', { name: 'Allow resizing' }).click();
 		await page.getByRole('switch', { name: 'Allow maximizing' }).click();
-		await page.getByRole('button', { name: 'Save changes' }).click();
+		await page.getByRole('button', { name: 'Save settings' }).click();
 		await expect(page.getByRole('status')).toContainText('saved');
 		const stored = JSON.parse(await readFile(path.join(userDataDir, 'settings/apps/window-demo/store.json'), 'utf8'));
 		expect(stored.window).toMatchObject({ width: 1000, height: 720, resizable: false, maximizable: false });
@@ -68,7 +68,7 @@ test('uploaded app settings survive restart and replacement and control new wind
 		await page.reload();
 		await expect(page).toHaveURL(/#\/home$/);
 		await page.evaluate(() => { window.location.hash = '#/settings/apps/window-demo'; });
-		await page.getByRole('button', { name: 'Reset to defaults' }).click();
+		await page.getByRole('button', { name: 'Reset to app defaults' }).click();
 		await expect(page.getByRole('spinbutton', { name: 'Default width (px)' })).toHaveValue('920');
 		await expect(page.getByRole('switch', { name: 'Allow resizing' })).toBeChecked();
 		await page.getByRole('button', { name: 'Open', exact: true }).click();
