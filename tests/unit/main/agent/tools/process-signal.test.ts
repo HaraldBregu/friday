@@ -162,3 +162,25 @@ it('cancels a process poll without killing or removing its existing session', as
 	expect(registry.get(session.id)).toBe(session);
 	registry.remove(session.id);
 });
+
+it('limits process listing and input to the originating owner and session', async () => {
+	const child = childProcess();
+	const session: ProcessSession = {
+		id: 'isolated', scope, pid: child.pid, command: 'sensitive command', workdir: '/tmp', roots: [],
+		executionMode: 'sandbox', startedAt: Date.now(), stdout: 'private output', stderr: '',
+		exitCode: undefined, exitSignal: undefined, exited: false, child: child as never,
+	};
+	registry.register(session);
+	try {
+		const foreign = { ...scope, ownerId: 'channel:untrusted', source: 'channel' as const };
+		await expect(executionScope.run(foreign, () => processTool.run({ action: 'list' }))).resolves.toEqual([]);
+		await expect(executionScope.run(foreign, () => processTool.run({ action: 'log', sessionId: session.id }))).rejects.toThrow('not found');
+		await expect(executionScope.run(foreign, () => processTool.run({ action: 'write', sessionId: session.id, text: 'whoami' }))).rejects.toThrow('not found');
+		expect(child.stdin.write).not.toHaveBeenCalled();
+		await expect(ownedRun(processTool, { action: 'write', sessionId: session.id, text: 'ok' })).resolves.toMatchObject({ written: 2 });
+	} finally { registry.remove(session.id); }
+});
+
+it('requires an owner for direct process access', async () => {
+	await expect(processTool.run({ action: 'list' })).rejects.toThrow('owning session');
+});

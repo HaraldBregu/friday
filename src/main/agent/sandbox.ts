@@ -15,6 +15,7 @@ import type { SandboxStatus } from '../../shared/sandbox';
 import { getPermissions } from './agent_store';
 import { userDataLocation } from '../shared/user_data_location';
 import { resolveUserPath } from '../shared/user_path';
+import { permissionFor } from './permissions/permission_for';
 import { permissionRuleRoot } from './permissions/permission_rule_root';
 import { recursivePermissionRule } from './permissions/recursive_permission_rule';
 import type { AgentInteractionMode } from '../../shared/agent_types';
@@ -275,6 +276,9 @@ export class ExecSandbox {
 	}
 
 	private async wrapPlan(command: string, commandId: string): Promise<SandboxedCommand> {
+		await this.configuration();
+		const permissions = getPermissions();
+		const deniedReads = [...permissions.exec.deny, ...permissions.read.deny];
 		await fs.mkdir(this.temporaryDirectory, { recursive: true });
 		const settingsPath = path.join(this.temporaryDirectory, `${commandId}.json`);
 		const readPaths = [
@@ -293,7 +297,9 @@ export class ExecSandbox {
 			'/nix/store',
 			process.env.SystemRoot,
 			path.dirname(process.execPath),
-		].filter((value): value is string => Boolean(value));
+		].filter((value): value is string => Boolean(value)).filter((value) =>
+			permissionFor({ allow: [], deny: deniedReads }, value, 'read') !== 'deny'
+		);
 		const persistentDefaults = getDefaultWritePaths().filter(
 			(value) => !value.startsWith('/dev/')
 		);
@@ -306,7 +312,7 @@ export class ExecSandbox {
 				allowAllUnixSockets: false,
 			},
 			filesystem: {
-				denyRead: [path.parse(agentLocation()).root, ...getPermissions().read.deny.map((rule) => rule === '*' ? path.parse(agentLocation()).root : resolveUserPath(rule, os.homedir()))],
+				denyRead: [path.parse(agentLocation()).root, ...deniedReads.map((rule) => rule === '*' ? path.parse(agentLocation()).root : resolveUserPath(rule, os.homedir()))],
 				allowRead: readPaths,
 				allowWrite: [this.temporaryDirectory],
 				denyWrite: [agentLocation(), ...persistentDefaults],
