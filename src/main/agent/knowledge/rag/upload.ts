@@ -10,7 +10,7 @@ export async function uploadRagMirror(apiKey: string, indexName: string, generat
 	signal?.throwIfAborted();
 	assertMirrorCurrent(apiKey, indexName);
 	const description = await client.describeIndex(indexName);
-	if (description.spec.serverless?.cloud !== 'aws' || description.spec.serverless.region !== 'us-east-1') throw new Error('Pinecone index location differs from the consented AWS us-east-1 recipient.');
+	if (!('serverless' in description.spec) || description.spec.serverless?.cloud !== 'aws' || description.spec.serverless.region !== 'us-east-1') throw new Error('Pinecone index location differs from the consented AWS us-east-1 recipient.');
 	const index = client.index(indexName).namespace(generation);
 	for (let start = 0; start < records.length; start += 64) {
 		signal?.throwIfAborted();

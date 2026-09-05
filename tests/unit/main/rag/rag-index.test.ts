@@ -55,7 +55,7 @@ it.each(['embedding', 'mirror', 'account', 'model', 'index'])('blocks unapproved
 	expect(embed).not.toHaveBeenCalled(); expect(upload).not.toHaveBeenCalled(); expect(publish).not.toHaveBeenCalled();
 });
 
-it.each(['{"api_key":"abcdefghijklmnopqrstuvwxyz123456"}', 'sk-abcdefghijklmnopqrstuvwxyz123456', '-----BEGIN PRIVATE KEY-----'])('rejects synthetic secrets before export', async (content) => {
+it.each(['{"api_key":"abcdefghijklmnopqrstuvwxyz123456"}', 'sk-abcdefghijklmnopqrstuvwxyz123456', '-----BEGIN PRIVATE KEY-----', 'Authorization: Bearer syntheticcredential1234'])('rejects synthetic secrets before export', async (content) => {
 	await writeFile(path.join(root, 'guide.md'), content);
 	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow('credential-like');
 	expect(embed).not.toHaveBeenCalled(); expect(upload).not.toHaveBeenCalled();

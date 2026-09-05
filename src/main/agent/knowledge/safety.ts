@@ -7,7 +7,7 @@ export function assertWikiSourceSafe(source: SourceSafetyInput): void {
 	const normalized = source.relativePath.split(path.sep).join('/');
 	if (SECRET_FILE.test(normalized))
 		throw new Error(`Refusing to ingest credential-like file: ${normalized}`);
-	if (containsSecret(source.content)) {
+	if (containsSecret(source.content) || containsSecret(normalized)) {
 		throw new Error(`Refusing to ingest source containing credential-like content: ${normalized}`);
 	}
 }

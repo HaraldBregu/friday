@@ -20,7 +20,7 @@ export async function* collectRagSources(sources: readonly string[], signal?: Ab
 		if (!(await stat(source)).isDirectory()) throw new Error('The selected source is not a folder: ' + source);
 		for (const file of await listKnowledgeFiles(source, signal, budget)) {
 			signal?.throwIfAborted();
-			assertWikiSourceSafe({ relativePath: file, content: '' });
+			assertWikiSourceSafe({ relativePath: path.join(path.basename(source), file), content: '' });
 			if (++files > KNOWLEDGE_MAX_FILES) throw new Error('Knowledge source file limit exceeded.');
 			const bytes = await readFileBounded(path.join(source, file), KNOWLEDGE_MAX_FILE_BYTES, signal);
 			totalBytes += bytes.length;
