@@ -33,13 +33,13 @@ function renderDetails(id: string): ReturnType<typeof render> {
 	);
 }
 
-	beforeEach(() => {
-		jest.clearAllMocks();
-		Object.defineProperty(window, 'PointerEvent', { configurable: true, value: MouseEvent });
-		Object.defineProperty(window, 'mcp', { configurable: true, value: mcpApi });
-		mcpApi.registry.mockImplementation(async () => ({ servers: [server], diagnostics: [] }));
-		mcpApi.configureLocal.mockImplementation(async (_id: string, data: McpData) => {
-			server = { ...server, data };
+beforeEach(() => {
+	jest.clearAllMocks();
+	Object.defineProperty(window, 'PointerEvent', { configurable: true, value: MouseEvent });
+	Object.defineProperty(window, 'mcp', { configurable: true, value: mcpApi });
+	mcpApi.registry.mockImplementation(async () => ({ servers: [server], diagnostics: [] }));
+	mcpApi.configureLocal.mockImplementation(async (_id: string, data: McpData) => {
+		server = { ...server, data };
 		return server;
 	});
 	mcpApi.upsert.mockImplementation(async (_id: string, data: McpData) => {

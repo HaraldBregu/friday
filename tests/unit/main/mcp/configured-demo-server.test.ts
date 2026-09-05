@@ -42,12 +42,9 @@ describe('configured demo MCP server', () => {
 			'create_quote',
 			'compose_customer_message',
 		]);
-		expect(result.tools.find((tool) => tool.name === 'create_quote')?.inputSchema.required).toEqual([
-			'customer',
-			'item',
-			'quantity',
-			'unitPrice',
-		]);
+		expect(result.tools.find((tool) => tool.name === 'create_quote')?.inputSchema.required).toEqual(
+			['customer', 'item', 'quantity', 'unitPrice']
+		);
 	});
 
 	it('uses server values together with tool inputs', async () => {
