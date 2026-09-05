@@ -1,7 +1,6 @@
 import { readKnowledgeText } from '../read';
 import { createHash } from 'node:crypto';
 import { writeKnowledgeText } from '../write';
-import path from 'node:path';
 import matter from 'gray-matter';
 import type {
 	WikiApplyOptions,

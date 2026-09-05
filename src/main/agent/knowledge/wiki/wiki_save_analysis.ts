@@ -26,7 +26,7 @@ export async function saveWikiAnalysis(
 	const content = input.content.trim();
 	if (!title || !summary || !content)
 		throw new Error('Analysis title, summary, and content are required.');
-	if (containsSecret([title, summary, content].join("\n"))) {
+	if (containsSecret([title, summary, content].join('\n'))) {
 		throw new Error('Refusing to save analysis containing credential-like content.');
 	}
 	const sourceIds = [...new Set(input.sourceIds)];

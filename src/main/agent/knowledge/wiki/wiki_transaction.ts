@@ -1,5 +1,9 @@
 import { listKnowledgeFiles } from '../list';
-import { cp, mkdir, mkdtemp, rename, rm, stat } from 'node:fs/promises';
+import { mkdir, mkdtemp, rename, rm, stat } from 'node:fs/promises';
+import { readFileBounded } from '../../files/read';
+import { knowledgeRoot } from '../root';
+import { writeKnowledgeText } from '../write';
+import { KNOWLEDGE_MAX_FILE_BYTES } from '../limits';
 import path from 'node:path';
 import { getWikiRepository } from './wiki_repository';
 import type { WikiTransactionInput } from './types';
@@ -17,8 +21,11 @@ export async function transactWiki<T>(input: WikiTransactionInput<T>): Promise<T
 		.catch(() => false);
 	try {
 		if (targetExists) {
-			await listKnowledgeFiles(input.targetPath, input.signal);
-			await cp(input.targetPath, stagedPath, { recursive: true, force: false });
+			const root = knowledgeRoot(input.targetPath);
+			await mkdir(stagedPath, { recursive: true, mode: 0o700 });
+			for (const file of await listKnowledgeFiles(root, input.signal)) {
+				await writeKnowledgeText(stagedPath, file, await readFileBounded(path.join(root, file), KNOWLEDGE_MAX_FILE_BYTES, input.signal), input.signal);
+			}
 		}
 		else await mkdir(stagedPath, { recursive: true, mode: 0o700 });
 		input.signal?.throwIfAborted();
