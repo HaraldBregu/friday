@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { importApps } from '../../../../src/main/apps/app_import';
+import { listApps } from '../../../../src/main/apps/app_list';
 
 describe('app import', () => {
 	let appLocation: string;

@@ -110,6 +110,44 @@ it('opens the apps folder from the page header', async () => {
 	expect(window.apps.openRoot).toHaveBeenCalledTimes(1);
 });
 
+it.each([false, true])('shows skipped upload reasons with partial success: %s', async (partial) => {
+	const user = userEvent.setup();
+	(window.apps.import as jest.Mock).mockResolvedValue({
+		imported: partial ? apps : [],
+		skipped: [
+			{ name: 'workspace', sourcePath: '/apps/workspace', reason: 'Unable to install app: permission denied' },
+			{ name: 'notes', sourcePath: '/apps/notes', reason: 'Missing or invalid manifest.' },
+		],
+	});
+
+	render(<MemoryRouter><AppsPage /></MemoryRouter>);
+	await screen.findByText('Demo App');
+	await user.click(screen.getByRole('button', { name: 'settings.apps.upload' }));
+
+	const alert = await screen.findByRole('alert');
+	expect(alert).toHaveTextContent('workspace: Unable to install app: permission denied');
+	expect(alert).toHaveTextContent('notes: Missing or invalid manifest.');
+	if (partial) {
+		expect(screen.getByText(/settings.apps.uploaded/)).toBeInTheDocument();
+		expect(window.apps.list).toHaveBeenCalledTimes(2);
+	} else {
+		expect(screen.queryByText(/settings.apps.uploaded/)).not.toBeInTheDocument();
+	}
+});
+
+it('keeps a canceled upload quiet', async () => {
+	const user = userEvent.setup();
+	(window.apps.import as jest.Mock).mockResolvedValue(undefined);
+	render(<MemoryRouter><AppsPage /></MemoryRouter>);
+	await screen.findByText('Demo App');
+	await user.click(screen.getByRole('button', { name: 'settings.apps.upload' }));
+
+	expect(window.apps.import).toHaveBeenCalledTimes(1);
+	expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+	expect(screen.queryByText(/settings.apps.uploaded/)).not.toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.apps.upload' })).toBeEnabled();
+});
+
 it('navigates app clicks to the app detail subroute', async () => {
 	const user = userEvent.setup();
 
