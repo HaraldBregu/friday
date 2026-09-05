@@ -9,7 +9,7 @@ import { APP_WINDOW_DEFAULTS } from '../../../../src/shared/app_window_settings'
 it('reads resolved settings for the selected app', async () => {
 	invoke.mockResolvedValue({ success: true, data: APP_WINDOW_DEFAULTS });
 	await expect(apps.getSettings('notes')).resolves.toEqual(APP_WINDOW_DEFAULTS);
-		expect(invoke).toHaveBeenCalledWith(AppsChannels.getSettings, 'notes');
+	expect(invoke).toHaveBeenCalledWith(AppsChannels.getSettings, 'notes');
 });
 
 it('saves window preferences and sends an empty object to reset', async () => {

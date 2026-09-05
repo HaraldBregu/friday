@@ -83,13 +83,20 @@ it('resets overrides and displays current app defaults returned by the host', as
 it('disables editing and duplicate saves while settings are being saved', async () => {
 	const user = userEvent.setup();
 	let complete!: (value: typeof settings) => void;
-	(window.apps.setSettings as jest.Mock).mockReturnValue(new Promise((resolve) => { complete = resolve; }));
+	(window.apps.setSettings as jest.Mock).mockReturnValue(
+		new Promise((resolve) => {
+			complete = resolve;
+		})
+	);
 	render(<WindowSettings appId="my-app" />);
 	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
 	fireEvent.change(width, { target: { value: '1400' } });
 	await user.click(screen.getByRole('button', { name: 'settings.apps.window.save' }));
 	expect(width).toBeDisabled();
-	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toHaveAttribute('aria-disabled', 'true');
+	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toHaveAttribute(
+		'aria-disabled',
+		'true'
+	);
 	expect(screen.getByRole('button', { name: 'settings.apps.window.saving' })).toBeDisabled();
 	expect(screen.getByRole('button', { name: 'settings.apps.window.reset' })).toBeDisabled();
 	fireEvent.submit(width.closest('form')!);
