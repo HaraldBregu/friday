@@ -32,7 +32,7 @@ export function builtinCapability(id: string, input: Record<string, unknown>): T
 	if (PERSIST.has(id)) return { effects: ['write', 'persistence'], approval: true };
 	if (RECORD.has(id)) return { effects: ['sensor', 'write'], approval: true };
 	if (CONTROL.has(id)) return { effects: ['sensor'], approval: true };
-	if (PAID.has(id)) return { effects: ['paid', 'write'], approval: true };
+	if (PAID.has(id)) return { effects: ['paid', 'write'] };
 	if (EXTERNAL.has(id)) return { effects: ['external'], approval: true };
 	if (id === 'bash') return { effects: ['execute'] };
 	if (id === 'process') return { effects: ['list', 'log', 'poll'].includes(String(input.action)) ? ['read'] : ['execute'] };
