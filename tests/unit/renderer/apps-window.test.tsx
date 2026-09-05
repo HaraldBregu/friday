@@ -13,6 +13,7 @@ jest.mock('react-i18next', () => {
 const settings = { ...APP_WINDOW_DEFAULTS, width: 1200, height: 900, resizable: false };
 
 beforeEach(() => {
+	Object.defineProperty(window, 'PointerEvent', { configurable: true, value: MouseEvent });
 	Object.defineProperty(window, 'apps', {
 		configurable: true,
 		value: {
@@ -77,6 +78,24 @@ it('resets overrides and displays current app defaults returned by the host', as
 	expect(await screen.findByText('settings.apps.window.resetDone')).toBeInTheDocument();
 	expect(screen.getByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1000);
 	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toBeChecked();
+});
+
+it('disables editing and duplicate saves while settings are being saved', async () => {
+	const user = userEvent.setup();
+	let complete!: (value: typeof settings) => void;
+	(window.apps.setSettings as jest.Mock).mockReturnValue(new Promise((resolve) => { complete = resolve; }));
+	render(<WindowSettings appId="my-app" />);
+	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
+	fireEvent.change(width, { target: { value: '1400' } });
+	await user.click(screen.getByRole('button', { name: 'settings.apps.window.save' }));
+	expect(width).toBeDisabled();
+	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toHaveAttribute('aria-disabled', 'true');
+	expect(screen.getByRole('button', { name: 'settings.apps.window.saving' })).toBeDisabled();
+	expect(screen.getByRole('button', { name: 'settings.apps.window.reset' })).toBeDisabled();
+	fireEvent.submit(width.closest('form')!);
+	expect(window.apps.setSettings).toHaveBeenCalledTimes(1);
+	complete({ ...settings, width: 1400 });
+	expect(await screen.findByText('settings.apps.window.saved')).toBeInTheDocument();
 });
 
 it.each(['', '0', '-1', '1.5', '32769', '619'])(

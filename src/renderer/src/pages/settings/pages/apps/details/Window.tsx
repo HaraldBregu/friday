@@ -151,6 +151,7 @@ export default function WindowSettings({ appId }: { readonly appId: string }): R
 										actions={
 											<Switch
 												checked={draft[key]}
+												disabled={saving}
 												aria-label={t(`settings.apps.window.${key}`)}
 												onCheckedChange={(checked) => {
 													setDraft({ ...draft, [key]: checked });
