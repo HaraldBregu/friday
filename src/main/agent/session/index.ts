@@ -1,3 +1,5 @@
+export { SessionCoordinator } from './coordinator';
+export { releaseSession } from './release';
 export { addAssistantMessage } from './session_add_assistant_message';
 export { addToolResults } from './session_add_tool_results';
 export { addUserMessage } from './session_add_user_message';

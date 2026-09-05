@@ -6,7 +6,7 @@ import { messagesFilePath } from './session_messages_file_path';
 import { writeMessagesFile } from './session_write_messages';
 
 export function persist(state: SessionState): void {
-	if (!state.sessionsPath) return;
+	if (!state.sessionsPath || state.lease?.signal.aborted) return;
 	ensureSession(state);
 	writeMessagesFile(
 		messagesFilePath(state),

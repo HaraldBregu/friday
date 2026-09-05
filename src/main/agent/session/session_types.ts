@@ -52,7 +52,14 @@ export interface SessionTurn {
 	};
 }
 
+export interface SessionLease {
+	messages: Message[];
+	signal: AbortSignal;
+	release(): void;
+}
+
 export interface SessionState {
+	lease?: SessionLease;
 	id: string;
 	category: SessionCategory;
 	messages: Message[];

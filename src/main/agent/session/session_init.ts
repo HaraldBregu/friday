@@ -8,13 +8,18 @@ import { sanitizeMessages } from './session_sanitize_messages';
 import { sessionFolderName } from './session_session_folder_name';
 import { sessionsRoot } from './session_sessions_root';
 import { DEFAULT_CATEGORY } from './session_types';
+import type { SessionCoordinator } from './coordinator';
+import { messagesFilePath } from './session_messages_file_path';
 
 export function init(
 	state: SessionState,
 	config: Config,
 	input: SessionInput,
-	category: SessionCategory = DEFAULT_CATEGORY
+	category: SessionCategory = DEFAULT_CATEGORY,
+	coordinator?: SessionCoordinator
 ): void {
+	state.lease?.release();
+	state.lease = undefined;
 	state.id = resolveSessionId(input.sessionId, config.location, category);
 	state.category = category;
 	state.folderName = sessionFolderName(state.id);
@@ -29,6 +34,10 @@ export function init(
 		...(storedMessages.length > 0 ? storedMessages : legacyMessages),
 		...(input.messages ?? []),
 	]);
+	if (coordinator) {
+		state.lease = coordinator.open(messagesFilePath(state), state.messages);
+		state.messages = state.lease.messages;
+	}
 	if (input.message || (input.files?.length ?? 0) > 0) {
 		state.messages.push({ role: 'user', content: toUserContent(input.message, input.files ?? []) });
 	}

@@ -4,12 +4,14 @@ import { messagesFile } from './session_messages_file';
 import { parseMessages } from './session_parse_messages';
 import { sessionsRoot } from './session_sessions_root';
 import { writeMessagesFile } from './session_write_messages';
+import type { SessionCoordinator } from './coordinator';
 
 export function updateUserMessageBySessionId(
 	sessionId: string,
 	location: string,
 	userOffsetFromEnd: number,
-	content: string
+	content: string,
+	coordinator?: SessionCoordinator
 ): boolean {
 	const root = sessionsRoot(location);
 	const filePath = messagesFile(root, sessionId);
@@ -29,6 +31,7 @@ export function updateUserMessageBySessionId(
 				continue;
 			}
 
+			coordinator?.invalidate(filePath);
 			messages[index] = { ...message, content };
 			writeMessagesFile(filePath, backupPath, `${JSON.stringify(messages, null, '\t')}\n`);
 			return true;

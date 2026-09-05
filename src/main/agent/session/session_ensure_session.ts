@@ -8,6 +8,7 @@ import { sessionDir } from './session_session_dir';
 import { writeMessagesFile } from './session_write_messages';
 
 export function ensureSession(state: SessionState): void {
+	state.lease?.signal.throwIfAborted();
 	mkdirSync(sessionDir(state), { recursive: true });
 	const infoPath = infoFile(state.sessionsPath, state.id);
 	if (!existsSync(infoPath))

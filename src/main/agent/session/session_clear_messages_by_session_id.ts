@@ -6,10 +6,12 @@ import { messagesFile } from './session_messages_file';
 import { sessionFolderName } from './session_session_folder_name';
 import { sessionPath } from './session_session_path';
 import { sessionsRoot } from './session_sessions_root';
+import type { SessionCoordinator } from './coordinator';
 import { writeMessagesFile } from './session_write_messages';
 
-export function clearMessagesBySessionId(sessionId: string, location: string): void {
+export function clearMessagesBySessionId(sessionId: string, location: string, coordinator?: SessionCoordinator): void {
 	const root = sessionsRoot(location);
+	if (isUuid(sessionId)) coordinator?.invalidate(messagesFile(root, sessionId));
 	const currentPath = isUuid(sessionId) ? messagesFile(root, sessionId) : undefined;
 	const filePath = currentPath && existsSync(currentPath) ? currentPath : legacyFilePath(root, sessionId);
 	if (!existsSync(filePath)) return;
