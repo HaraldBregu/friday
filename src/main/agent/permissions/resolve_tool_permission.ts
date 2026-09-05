@@ -27,7 +27,13 @@ export function resolveToolPermissionDetails(
 	if (toolName === 'process') {
 		const session = typeof args.sessionId === 'string' ? registry.owned(args.sessionId) : undefined;
 		if (session?.executionMode === 'sandbox')
-			return { mode: 'allow', kind, targets: [], approvalTargets: [], persistable: false };
+			return {
+				mode: 'allow',
+				kind,
+				targets: directoryPermissionTargets(toolName, args, AGENT_DIRECTORY, history),
+				approvalTargets: [],
+				persistable: false,
+			};
 		if (
 			!session ||
 			['list', 'poll', 'log', 'kill', 'clear', 'remove'].includes(String(args.action))
