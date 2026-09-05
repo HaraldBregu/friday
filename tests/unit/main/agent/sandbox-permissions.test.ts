@@ -39,14 +39,19 @@ import { execTool } from '../../../../src/main/agent/tools/core/bash';
 
 describe('ExecSandbox permissions', () => {
 	it('allows the Linux sandbox helper under both execution profiles', async () => {
-		jest.replaceProperty(process, 'platform', 'linux');
-		const sandbox = new ExecSandbox();
-		await sandbox.wrap('pwd', '/workspace', 'linux-command');
-		const config = initialize.mock.calls.at(-1)?.[0];
-		expect(config.filesystem.allowRead).toContain(config.seccomp.applyPath);
-		await sandbox.wrap('pwd', agentLocation(), 'linux-plan', undefined, [], 'plan');
-		const plan = JSON.parse(writeFile.mock.calls.at(-1)?.[1] as string);
-		expect(plan.filesystem.allowRead).toContain(plan.seccomp.applyPath);
+		const platform = Object.getOwnPropertyDescriptor(process, 'platform')!;
+		Object.defineProperty(process, 'platform', { ...platform, value: 'linux' });
+		try {
+			const sandbox = new ExecSandbox();
+			await sandbox.wrap('pwd', '/workspace', 'linux-command');
+			const config = initialize.mock.calls.at(-1)?.[0];
+			expect(config.filesystem.allowRead).toContain(config.seccomp.applyPath);
+			await sandbox.wrap('pwd', agentLocation(), 'linux-plan', undefined, [], 'plan');
+			const plan = JSON.parse(writeFile.mock.calls.at(-1)?.[1] as string);
+			expect(plan.filesystem.allowRead).toContain(plan.seccomp.applyPath);
+		} finally {
+			Object.defineProperty(process, 'platform', platform);
+		}
 	});
 
 	it('includes the cache ancestor in canonical command input before approval, preserving the working directory', () => {
