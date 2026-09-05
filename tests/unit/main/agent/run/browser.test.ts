@@ -31,6 +31,7 @@ import { createBackgroundBrowser } from '../../../../../src/main/agent/tools/web
 import { userDataLocation } from '../../../../../src/main/shared/user_data_location';
 import type { ExecSandbox } from '../../../../../src/main/agent/sandbox';
 import type { Tool } from '../../../../../src/main/agent/types';
+import { setModelId } from '../../../../../src/main/agent/agent_store';
 
 function browserContext() {
 	const events = new EventEmitter();
@@ -42,6 +43,7 @@ function browserContext() {
 }
 
 beforeEach(() => {
+	setModelId('test-model');
 	launchPersistentContext.mockReset();
 	model.mockReset().mockImplementation(async function* () {
 		yield* [];
