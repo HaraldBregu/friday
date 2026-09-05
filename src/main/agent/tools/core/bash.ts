@@ -1,3 +1,4 @@
+import { superviseProcess } from '../../execution/supervise';
 import { executionScope } from '../../execution/scope';
 import { commandEnvironment } from '../../execution/environment';
 import { terminateProcessTree } from '../../execution/terminate';
@@ -197,6 +198,7 @@ async function runExec(
 			detached: process.platform !== 'win32',
 			stdio: 'ignore',
 		});
+		superviseProcess(child, abortSignal);
 		if (executionMode === 'sandbox') sandbox.track(child);
 		let timeoutTimer: NodeJS.Timeout | undefined;
 		if (timeoutMs !== undefined) {
@@ -256,6 +258,7 @@ async function runExec(
 		detached: process.platform !== 'win32',
 	});
 
+	superviseProcess(child, abortSignal);
 	if (executionMode === 'sandbox') sandbox.track(child);
 	const maxOutputLength = 200000;
 	let stdout = '';

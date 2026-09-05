@@ -1,3 +1,4 @@
+import { processTreeAlive } from './execution/alive';
 import { terminateProcessTree } from './execution/terminate';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -90,8 +91,13 @@ export class ExecSandbox {
 	}
 
 	track(child: ChildProcess): void {
+		for (const previous of this.children) {
+			if (!processTreeAlive(previous)) this.children.delete(previous);
+		}
 		this.children.add(child);
-		child.once('close', () => this.children.delete(child));
+		child.once('close', () => {
+			if (!processTreeAlive(child)) this.children.delete(child);
+		});
 	}
 
 	annotate(commandId: string, stderr: string): string {
@@ -377,7 +383,7 @@ export class ExecSandbox {
 			children.map(
 				(child) =>
 					new Promise<void>((resolve) => {
-						if (child.exitCode !== null || child.signalCode !== null) {
+						if (!processTreeAlive(child)) {
 							resolve();
 							return;
 						}
