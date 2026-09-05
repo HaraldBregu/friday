@@ -4,9 +4,11 @@ import path from 'node:path';
 import { launchApp } from './helpers';
 import { closeApp } from './close';
 
-test('uploaded app settings survive restart and replacement and control new windows', async ({}, testInfo) => {
+test('uploaded app settings survive restart and replacement and control new windows', async ({ browserName: _browserName }, testInfo) => {
 	test.setTimeout(90_000);
-	let { app, page, userDataDir } = await launchApp();
+	const launched = await launchApp();
+	let { app, page } = launched;
+	const { userDataDir } = launched;
 	try {
 		const source = path.join(userDataDir, 'upload', 'window-demo');
 		await mkdir(source, { recursive: true });
@@ -39,8 +41,17 @@ test('uploaded app settings survive restart and replacement and control new wind
 		await expect(page.getByRole('status')).toContainText('saved');
 		const stored = JSON.parse(await readFile(path.join(userDataDir, 'settings/apps/window-demo/store.json'), 'utf8'));
 		expect(stored.window).toMatchObject({ width: 1000, height: 720, resizable: false, maximizable: false });
+		await app.evaluate(({ BrowserWindow }) => {
+			const win = BrowserWindow.getAllWindows()[0];
+			win.setMinimumSize(390, 600);
+			win.setSize(390, 800);
+		});
+		await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(390);
+		await page.getByRole('spinbutton', { name: 'Default width (px)' }).scrollIntoViewIfNeeded();
 		await page.screenshot({ path: testInfo.outputPath('app-settings-narrow.png'), fullPage: true });
+		expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 		await app.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0].setSize(1100, 850); });
+		await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(1100);
 		await page.screenshot({ path: testInfo.outputPath('app-settings-desktop.png'), fullPage: true });
 		await page.getByRole('button', { name: 'Open', exact: true }).click();
 		await expect.poll(() => app.evaluate(({ BrowserWindow }) => {
