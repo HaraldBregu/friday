@@ -1,0 +1,113 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import AppDetailsPage from '../../../src/renderer/src/pages/settings/pages/apps/details/Page';
+import WindowSettings from '../../../src/renderer/src/pages/settings/pages/apps/details/Window';
+import { APP_WINDOW_DEFAULTS } from '../../../src/shared/app_window_settings';
+
+jest.mock('react-i18next', () => {
+	const t = (key: string): string => key;
+	return { useTranslation: () => ({ t }) };
+});
+
+const settings = { ...APP_WINDOW_DEFAULTS, width: 1200, height: 900, resizable: false };
+
+beforeEach(() => {
+	Object.defineProperty(window, 'apps', {
+		configurable: true,
+		value: {
+			list: jest.fn().mockResolvedValue([{
+				id: 'my-app', title: 'My App', description: 'Uploaded app',
+				metadata: { version: '1.0.0', category: 'Tools', entry: 'index.html' },
+			}]),
+			getSettings: jest.fn().mockResolvedValue(settings),
+			setSettings: jest.fn().mockResolvedValue(settings),
+			open: jest.fn().mockResolvedValue(undefined),
+		},
+	});
+});
+
+it('loads settings for the selected app inside its details page', async () => {
+	render(<MemoryRouter initialEntries={['/settings/apps/my-app']}>
+		<Routes><Route path="/settings/apps/:appId" element={<AppDetailsPage />} /></Routes>
+	</MemoryRouter>);
+
+	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1200);
+	expect(screen.getByRole('spinbutton', { name: 'settings.apps.window.height' })).toHaveValue(900);
+	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).not.toBeChecked();
+	expect(window.apps.getSettings).toHaveBeenCalledWith('my-app');
+	expect(screen.getByText('settings.apps.window.nextOpen')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
+});
+
+it('saves edited dimensions and behavior for only the selected app', async () => {
+	const user = userEvent.setup();
+	const updated = { ...settings, width: 1400, resizable: true, maximizable: false };
+	(window.apps.setSettings as jest.Mock).mockResolvedValue(updated);
+	render(<WindowSettings appId="my-app" />);
+	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
+	await user.clear(width);
+	await user.type(width, '1400');
+	await user.click(screen.getByRole('switch', { name: 'settings.apps.window.resizable' }));
+	await user.click(screen.getByRole('switch', { name: 'settings.apps.window.maximizable' }));
+	await user.click(screen.getByRole('button', { name: 'settings.apps.window.save' }));
+
+	await waitFor(() => expect(window.apps.setSettings).toHaveBeenCalledWith('my-app', updated));
+	expect(await screen.findByText('settings.apps.window.saved')).toBeInTheDocument();
+	expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
+});
+
+it('resets overrides and displays current app defaults returned by the host', async () => {
+	const user = userEvent.setup();
+	(window.apps.setSettings as jest.Mock).mockResolvedValue({ ...APP_WINDOW_DEFAULTS, width: 1000 });
+	render(<WindowSettings appId="my-app" />);
+	await user.click(await screen.findByRole('button', { name: 'settings.apps.window.reset' }));
+
+	expect(window.apps.setSettings).toHaveBeenCalledWith('my-app', {});
+	expect(await screen.findByText('settings.apps.window.resetDone')).toBeInTheDocument();
+	expect(screen.getByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1000);
+	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toBeChecked();
+});
+
+it.each(['', '0', '-1', '1.5', '32769', '619'])('prevents saving invalid width %s', async (value) => {
+	render(<WindowSettings appId="my-app" />);
+	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
+	fireEvent.change(width, { target: { value } });
+	expect(screen.getByRole('alert')).toHaveTextContent('settings.apps.window.invalid');
+	expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
+	fireEvent.submit(width.closest('form')!);
+	expect(window.apps.setSettings).not.toHaveBeenCalled();
+});
+
+it('prevents minimum height exceeding default height', async () => {
+	render(<WindowSettings appId="my-app" />);
+	const minimum = await screen.findByRole('spinbutton', { name: 'settings.apps.window.minHeight' });
+	fireEvent.change(minimum, { target: { value: '901' } });
+	expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
+	expect(screen.getByRole('alert')).toHaveTextContent('settings.apps.window.invalid');
+});
+
+it('offers retry after a load error and keeps the form unavailable until loaded', async () => {
+	const user = userEvent.setup();
+	(window.apps.getSettings as jest.Mock).mockRejectedValueOnce(new Error('Read failed'));
+	render(<WindowSettings appId="my-app" />);
+	expect(await screen.findByRole('alert')).toHaveTextContent('settings.apps.window.loadError');
+	expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
+	await user.click(screen.getByRole('button', { name: 'settings.apps.refresh' }));
+	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1200);
+	expect(window.apps.getSettings).toHaveBeenCalledTimes(2);
+});
+
+it('preserves edits and lets the user retry a failed save', async () => {
+	const user = userEvent.setup();
+	(window.apps.setSettings as jest.Mock).mockRejectedValueOnce(new Error('Write failed'));
+	render(<WindowSettings appId="my-app" />);
+	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
+	fireEvent.change(width, { target: { value: '1400' } });
+	await user.click(screen.getByRole('button', { name: 'settings.apps.window.save' }));
+	expect(await screen.findByRole('alert')).toHaveTextContent('settings.apps.window.saveError');
+	expect(width).toHaveValue(1400);
+	await user.click(screen.getByRole('button', { name: 'settings.apps.window.save' }));
+	expect(await screen.findByText('settings.apps.window.saved')).toBeInTheDocument();
+	expect(window.apps.setSettings).toHaveBeenCalledTimes(2);
+});

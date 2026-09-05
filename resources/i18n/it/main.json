@@ -1303,7 +1303,25 @@
 			"detailId": "ID",
 			"detailVersion": "Versione",
 			"detailCategory": "Categoria",
-			"detailEntry": "File di ingresso"
+			"detailEntry": "File di ingresso",
+			"window": {
+				"title": "Impostazioni finestra",
+				"nextOpen": "Le modifiche si applicano quando chiudi e riapri questa app.",
+				"width": "Larghezza predefinita (px)",
+				"height": "Altezza predefinita (px)",
+				"minWidth": "Larghezza minima (px)",
+				"minHeight": "Altezza minima (px)",
+				"resizable": "Consenti ridimensionamento",
+				"maximizable": "Consenti ingrandimento",
+				"save": "Salva impostazioni",
+				"saving": "Salvataggio...",
+				"saved": "Impostazioni finestra salvate.",
+				"reset": "Ripristina valori dell'app",
+				"resetDone": "Valori predefiniti dell'app ripristinati.",
+				"loadError": "Impossibile caricare le impostazioni della finestra.",
+				"saveError": "Impossibile salvare le impostazioni della finestra. Riprova.",
+				"invalid": "Inserisci numeri interi da 1 a 32768. Le dimensioni minime non possono superare quelle predefinite."
+			}
 		},
 		"plugins": {
 			"title": "Plugin installati",
