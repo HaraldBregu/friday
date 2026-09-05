@@ -1,3 +1,4 @@
+import { planCommandError } from '../../../../../src/main/agent/plan/command';
 import { commandEnvironment } from '../../../../../src/main/agent/execution/environment';
 
 it('does not inherit application credentials into shell commands', () => {
@@ -10,4 +11,8 @@ it.each(['NODE_OPTIONS', 'NODE_PATH', 'LD_PRELOAD', 'DYLD_INSERT_LIBRARIES', 'BA
 
 it('supports explicitly supplied command environment values', () => {
 	expect(commandEnvironment({ BUILD_MODE: 'test' }, { PATH: '/bin' })).toEqual({ PATH: '/bin', BUILD_MODE: 'test' });
+});
+
+it('rejects Plan environment overrides before launching its sandbox helper', () => {
+	expect(planCommandError({ command: 'pwd', env: { PATH: '/untrusted' } }, '/workspace')).toContain('helper environment');
 });

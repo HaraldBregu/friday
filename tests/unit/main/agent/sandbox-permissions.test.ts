@@ -101,7 +101,7 @@ describe('ExecSandbox permissions', () => {
 			allowLocalBinding: false,
 		});
 		expect(config.filesystem).toMatchObject({
-			denyRead: ['/', '/workspace/private/**'],
+			denyRead: ['/', '/shared/private/**', '/workspace/private/**'],
 			allowRead: expect.arrayContaining([agentLocation()]),
 			allowWrite: expect.any(Array),
 			denyWrite: expect.arrayContaining([
