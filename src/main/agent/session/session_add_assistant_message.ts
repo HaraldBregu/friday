@@ -10,6 +10,7 @@ export function addAssistantMessage(
 	providerItems: MessageContentBlock[] = [],
 	usage?: SessionUsage
 ): void {
+	if (state.lease && !state.lease.active) return;
 	if (!hasAssistantPayload(content, toolCalls)) return;
 	const contentBlocks: MessageContentBlock[] = [...providerItems];
 	if (content || contentBlocks.length === 0) {

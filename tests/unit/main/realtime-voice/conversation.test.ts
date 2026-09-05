@@ -105,6 +105,11 @@ it('preserves updates from text and two voice writers sharing one coordinator', 
 		}
 		releaseSession(text);
 		expect(text.lease.signal.aborted).toBe(false);
+		addAssistantMessage(text, 'Closed writer callback.', []);
+		second.addAssistantTranscript('Still active voice.');
+		expect(JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot))).not.toContain(
+			'Closed writer'
+		);
 	} finally {
 		first.dispose?.();
 		second.dispose?.();

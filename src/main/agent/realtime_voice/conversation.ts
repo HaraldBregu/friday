@@ -60,6 +60,7 @@ export function realtimeVoiceConversationFactory(
 			dispose: () => releaseSession(state),
 			history: realtimeVoiceHistory(state.messages),
 			beginUserTurn: (itemId) => {
+				if (state.lease && !state.lease.active) return;
 				const turn = pendingUserTurns.get(itemId) ?? {
 					index: state.messages.length,
 					begun: false,
@@ -75,6 +76,7 @@ export function realtimeVoiceConversationFactory(
 				}
 			},
 			finalizeUserTurn: (itemId, transcript) => {
+				if (state.lease && !state.lease.active) return;
 				const turn = pendingUserTurns.get(itemId) ?? {
 					index: state.messages.length,
 					begun: false,
@@ -90,11 +92,13 @@ export function realtimeVoiceConversationFactory(
 			},
 			addAssistantTranscript: (transcript) => addAssistantMessage(state, transcript, []),
 			addToolCall: (toolCall) => {
+				if (state.lease && !state.lease.active) return;
 				if (toolCalls.has(toolCall.id)) return;
 				toolCalls.set(toolCall.id, toolCall);
 				addAssistantMessage(state, '', [toolCall]);
 			},
 			addToolResult: (toolCall) => {
+				if (state.lease && !state.lease.active) return;
 				if (!toolCall.result || completedToolCalls.has(toolCall.id)) return;
 				let persisted = toolCalls.get(toolCall.id);
 				if (!persisted) {
