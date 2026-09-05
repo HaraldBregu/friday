@@ -1,3 +1,9 @@
+import { executionScope } from '../../../../../src/main/agent/execution/scope';
+import type { Tool } from '../../../../../src/main/agent/types';
+
+const scope = { ownerId: 'window:1', source: 'interactive' as const, sessionId: 'session', runId: 'run' };
+const ownedRun = (tool: Tool, input: Record<string, unknown>, signal?: AbortSignal) => executionScope.run(scope, () => tool.run(input, signal));
+
 import { EventEmitter } from 'node:events';
 
 const spawn = jest.fn();
@@ -48,6 +54,7 @@ it('kills only the exec child when its run is cancelled', async () => {
 	spawn.mockReturnValue(child);
 	registry.register({
 		id: 'unrelated',
+		scope,
 		pid: unrelated.pid,
 		command: 'other',
 		workdir: '/tmp',
@@ -62,7 +69,7 @@ it('kills only the exec child when its run is cancelled', async () => {
 		child: unrelated as never,
 	});
 	const controller = new AbortController();
-	const result = execTool(sandbox()).run(
+	const result = ownedRun(execTool(sandbox()),
 		{ command: 'long command', workdir: '/tmp', yieldMs: 10_000 },
 		controller.signal
 	);
@@ -80,7 +87,7 @@ it('kills a background exec cancelled before its spawn acknowledgement', async (
 	const child = childProcess();
 	spawn.mockReturnValue(child);
 	const controller = new AbortController();
-	const result = execTool(sandbox()).run(
+	const result = ownedRun(execTool(sandbox()),
 		{ command: 'background command', workdir: '/tmp', background: true },
 		controller.signal
 	);
@@ -95,7 +102,7 @@ it('keeps background exec ownership until the parent run is cancelled', async ()
 	const child = childProcess();
 	spawn.mockReturnValue(child);
 	const controller = new AbortController();
-	const result = execTool(sandbox()).run(
+	const result = ownedRun(execTool(sandbox()),
 		{ command: 'background command', workdir: '/tmp', background: true },
 		controller.signal
 	);
@@ -111,7 +118,7 @@ it('kills and removes a yielded exec session when its parent run is cancelled', 
 	const child = childProcess();
 	spawn.mockReturnValue(child);
 	const controller = new AbortController();
-	const result = await execTool(sandbox()).run(
+	const result = await ownedRun(execTool(sandbox()),
 		{ command: 'yielded command', workdir: '/tmp', yieldMs: 0 },
 		controller.signal
 	);
@@ -127,6 +134,7 @@ it('cancels a process poll without killing or removing its existing session', as
 	const child = childProcess();
 	const session: ProcessSession = {
 		id: 'existing',
+		scope,
 		pid: child.pid,
 		command: 'existing command',
 		workdir: '/tmp',
@@ -142,7 +150,7 @@ it('cancels a process poll without killing or removing its existing session', as
 	};
 	registry.register(session);
 	const controller = new AbortController();
-	const result = processTool.run(
+	const result = ownedRun(processTool,
 		{ action: 'poll', sessionId: session.id, timeout: 30_000 },
 		controller.signal
 	);

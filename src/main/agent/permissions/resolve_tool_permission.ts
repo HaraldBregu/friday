@@ -49,7 +49,10 @@ export function resolveToolPermissionDetails(
 			? directoryPermissionTargets(toolName, args, AGENT_DIRECTORY, history)
 			: toolPermissionTargets(toolName, args, AGENT_DIRECTORY);
 	const decisions = targets.map((target) =>
-		permissionFor(permissions[kind], target, kind, args.elevated === true)
+		kind === 'exec' && args.elevated !== true &&
+			(['read', 'write'] as const).some((capability) => permissionFor(permissions[capability], target, capability) === 'deny')
+			? 'deny'
+			: permissionFor(permissions[kind], target, kind, args.elevated === true)
 	);
 	const approvalTargets = [
 		...new Set(

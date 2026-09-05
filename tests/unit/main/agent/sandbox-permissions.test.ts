@@ -36,7 +36,7 @@ import { ExecSandbox } from '../../../../src/main/agent/sandbox';
 import { agentLocation } from '../../../../src/main/shared/agent_location';
 
 describe('ExecSandbox permissions', () => {
-	it('uses only execute paths as command read and write boundaries', async () => {
+	it('applies typed read and write denies to command execution', async () => {
 		const configuration = await (
 			new ExecSandbox() as unknown as {
 				configuration: () => Promise<{ config: { filesystem: Record<string, string[]> } }>;
@@ -52,8 +52,8 @@ describe('ExecSandbox permissions', () => {
 		expect(configuration.config.filesystem.denyRead).toEqual(
 			expect.arrayContaining([os.homedir(), '/shared/private/**'])
 		);
-		expect(configuration.config.filesystem.denyRead).not.toContain('/workspace/private/**');
-		expect(configuration.config.filesystem.denyWrite).toEqual(['/shared/private/**']);
+		expect(configuration.config.filesystem.denyRead).toContain('/workspace/private/**');
+		expect(configuration.config.filesystem.denyWrite).toEqual(['/shared/private/**', '/workspace/private/**']);
 	});
 
 	it('adds an approved outside root only to the wrapped invocation', async () => {
@@ -101,7 +101,7 @@ describe('ExecSandbox permissions', () => {
 			allowLocalBinding: false,
 		});
 		expect(config.filesystem).toMatchObject({
-			denyRead: ['/'],
+			denyRead: ['/', '/workspace/private/**'],
 			allowRead: expect.arrayContaining([agentLocation()]),
 			allowWrite: expect.any(Array),
 			denyWrite: expect.arrayContaining([

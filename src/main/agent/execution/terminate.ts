@@ -13,7 +13,7 @@ export function terminateProcessTree(child: ChildProcess, signal: NodeJS.Signals
 			return;
 		}
 		if (child.pid) {
-			try { process.kill(-child.pid, next); return; } catch {}
+			try { process.kill(-child.pid, next); return; } catch { child.kill(next); return; }
 		}
 		child.kill(next);
 	};

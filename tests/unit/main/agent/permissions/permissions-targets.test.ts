@@ -9,8 +9,12 @@ describe('toolPermissionTargets', () => {
 		const input = [
 			'*** Begin Patch',
 			'*** Add File: src/a.ts',
+			'+added',
 			'*** Update File: lib/b.ts',
 			'*** Move to: moved/b.ts',
+			'@@',
+			'-before',
+			'+after',
 			'*** End Patch',
 		].join('\n');
 		expect(toolPermissionTargets('patch', { input }, agentDir)).toEqual([
@@ -21,7 +25,7 @@ describe('toolPermissionTargets', () => {
 	});
 
 	it('extracts whitespace-prefixed patch headers', () => {
-		const input = '  *** Update File: outside/a.ts\n\t*** Move to: outside/b.ts';
+		const input = '*** Begin Patch\n  *** Update File: outside/a.ts\n\t*** Move to: outside/b.ts\n@@\n-old\n+new\n*** End Patch';
 		expect(toolPermissionTargets('patch', { input }, agentDir)).toEqual([
 			resolveUserPath('outside/a.ts', agentDir),
 			resolveUserPath('outside/b.ts', agentDir),

@@ -54,25 +54,25 @@ describe('agent store permissions', () => {
 		expect(saved.exec.allow).toEqual([workspaceRule]);
 	});
 
-	it('removes blocked rules inside the always-trusted workspace', () => {
+	it('preserves explicit blocked rules inside the workspace', () => {
 		const saved = setPermissions({
 			read: { allow: [], deny: [`${AGENT_DIRECTORY}/private/**`] },
 			write: { allow: [], deny: [`${AGENT_DIRECTORY}/private/**`] },
 			exec: { allow: [], deny: [`${AGENT_DIRECTORY}/private/**`] },
 		});
-		expect(saved.read.deny).toEqual([]);
-		expect(saved.write.deny).toEqual([]);
-		expect(saved.exec.deny).toEqual([]);
+		expect(saved.read.deny).toEqual([`${AGENT_DIRECTORY}/private/**`]);
+		expect(saved.write.deny).toEqual([`${AGENT_DIRECTORY}/private/**`]);
+		expect(saved.exec.deny).toEqual([`${AGENT_DIRECTORY}/private/**`]);
 	});
 
-	it('removes an execute ancestor grant when it contains a blocked child', () => {
+	it('preserves an execute ancestor grant and its explicit blocked child', () => {
 		const saved = setPermissions({
 			read: { allow: [], deny: [] },
 			write: { allow: [], deny: [] },
 			exec: { allow: ['/shared/**'], deny: ['/shared/private/**'] },
 		});
 		expect(saved.exec).toEqual({
-			allow: [workspaceRule],
+			allow: [workspaceRule, '/shared/**'],
 			deny: ['/shared/private/**'],
 		});
 	});

@@ -15,6 +15,7 @@ import type { SandboxStatus } from '../../shared/sandbox';
 import { getPermissions } from './agent_store';
 import { userDataLocation } from '../shared/user_data_location';
 import { resolveUserPath } from '../shared/user_path';
+import { permissionRuleRoot } from './permissions/permission_rule_root';
 import { recursivePermissionRule } from './permissions/recursive_permission_rule';
 import type { AgentInteractionMode } from '../../shared/agent_types';
 import { agentLocation } from '../shared/agent_location';
@@ -224,13 +225,24 @@ export class ExecSandbox {
 		const permissions = getPermissions();
 		const resolveRules = (rules: string[]): string[] =>
 			rules.map((rule) => rule === '*' ? path.parse(os.homedir()).root : resolveUserPath(rule, os.homedir()));
-		const allowRead = resolveRules(permissions.exec.allow);
+		const explicitReadDenies = resolveRules([...permissions.exec.deny, ...permissions.read.deny]);
+		const explicitWriteDenies = resolveRules([...permissions.exec.deny, ...permissions.write.deny]);
+		if ([...explicitReadDenies, ...explicitWriteDenies].some((rule) => /[*?\[\]{}]/.test(rule.replace(/[\\/]\*\*$/, ''))))
+			throw new Error('Command sandbox rules must use exact paths or a trailing /**. Refine the blocked pattern before executing commands.');
+		const allowRead = resolveRules(permissions.exec.allow).filter((rule) => {
+			const allowed = permissionRuleRoot(rule);
+			return !explicitReadDenies.some((denied) => {
+				const root = permissionRuleRoot(denied);
+				const relative = path.relative(root, allowed);
+				return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+			});
+		});
 		const allowWrite = [
 			...resolveRules(permissions.exec.allow),
 			this.temporaryDirectory,
 		];
-		const denyWrite = resolveRules([...permissions.exec.deny, ...permissions.write.deny]);
-		const denyRead = [os.homedir(), ...resolveRules([...permissions.exec.deny, ...permissions.read.deny])];
+		const denyWrite = explicitWriteDenies;
+		const denyRead = [os.homedir(), ...explicitReadDenies];
 		const windowsPath = this.vendoredWindowsPath();
 		const seccompPath = this.vendoredSeccompPath();
 		const config: SandboxRuntimeConfig = {
