@@ -7,8 +7,8 @@ import type { WikiSourceRecord } from './types';
 
 export async function readWikiArchive(
 	record: WikiSourceRecord,
-	signal?: AbortSignal,
-	evidenceRoot = path.dirname(record.archivePath)
+	signal: AbortSignal | undefined,
+	evidenceRoot: string
 ): Promise<string> {
 	signal?.throwIfAborted();
 	const root = knowledgeRoot(evidenceRoot);

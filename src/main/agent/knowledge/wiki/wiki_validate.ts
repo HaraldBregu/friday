@@ -38,7 +38,7 @@ export async function validateWiki(
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
 		try {
-			const parsed = matter(await readKnowledgeText(targetPath, entry));
+			const parsed = matter(await readKnowledgeText(targetPath, entry, signal));
 			const title = String(parsed.data.title ?? '').trim();
 			if (!title) errors.push(`Missing title: ${relativePath}`);
 			if (!String(parsed.data.summary ?? '').trim())
@@ -130,7 +130,7 @@ export async function validateWiki(
 			}
 		}
 	}
-	const index = await readKnowledgeText(targetPath, 'index.md', undefined, true);
+	const index = await readKnowledgeText(targetPath, 'index.md', signal, true);
 	for (const page of pages) {
 		if (!index.includes(`[[${page.path.slice(0, -3)}|`))
 			errors.push(`Index missing page: ${page.path}`);
