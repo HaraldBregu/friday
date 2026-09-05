@@ -188,11 +188,60 @@ describe('app discovery and loading', () => {
 	it('does not open a window when the manifest entry is missing', () => {
 		const app = { id: 'project', ...projectManifest };
 		const { create, windowFactory } = createWindowHarness();
+		const entry = installApp(appLocation, 'project', projectManifest);
+		fs.unlinkSync(entry);
 
 		expect(() => loadApp(windowFactory, app, appLocation)).toThrow(
 			'App entry not found: project'
 		);
 		expect(create).not.toHaveBeenCalled();
+	});
+
+	it('rereads the manifest before creating a window even when the caller has stale metadata', () => {
+		const stale = { id: 'project', ...projectManifest };
+		installApp(appLocation, 'project', {
+			...projectManifest,
+			title: 'Updated Project',
+			metadata: { ...projectManifest.metadata, entry: 'new.html' },
+			window: { width: 1000, height: 700, minWidth: 500, minHeight: 300, resizable: false, maximizable: false },
+		});
+		const { create, createView, handlers, shellHandlers, windowFactory } = createWindowHarness();
+		loadApp(windowFactory, stale, appLocation);
+		expect(create).toHaveBeenCalledWith(expect.objectContaining({
+			title: 'Updated Project', width: 1000, height: 700, minWidth: 500, minHeight: 300,
+			resizable: false, maximizable: false,
+		}), { html: 'app.html', hash: 'app/Updated%20Project' });
+		shellHandlers.get('did-finish-load')?.();
+		expect(createView).toHaveBeenCalledWith(appEntryPath('project', 'new.html', appLocation), 'project');
+		handlers.get('closed')?.();
+	});
+
+	it('rejects a missing or invalid current manifest before creating a window', () => {
+		const stale = { id: 'project', ...projectManifest };
+		const { create, windowFactory } = createWindowHarness();
+		expect(() => loadApp(windowFactory, stale, appLocation)).toThrow('App manifest not found or invalid');
+		installApp(appLocation, 'project', projectManifest);
+		fs.writeFileSync(appManifestPath('project', appLocation), JSON.stringify({
+			...projectManifest, window: { width: -1 },
+		}));
+		expect(() => loadApp(windowFactory, stale, appLocation)).toThrow('App manifest not found or invalid');
+		expect(create).not.toHaveBeenCalled();
+	});
+
+	it('keeps an existing window and uses new dimensions after it closes', () => {
+		const app = { id: 'project', ...projectManifest };
+		installApp(appLocation, 'project', projectManifest);
+		const { create, handlers, windowFactory } = createWindowHarness();
+		loadApp(windowFactory, app, appLocation);
+		expect(create.mock.calls[0][0]).toMatchObject({ width: 820, height: 640, minWidth: 620, minHeight: 480 });
+		installApp(appLocation, 'project', { ...projectManifest, window: { width: 420, height: 320 } });
+		loadApp(windowFactory, app, appLocation);
+		expect(create).toHaveBeenCalledTimes(1);
+		handlers.get('closed')?.();
+		loadApp(windowFactory, app, appLocation);
+		expect(create).toHaveBeenCalledTimes(2);
+		expect(create.mock.calls[1][0]).toMatchObject({ width: 420, height: 320, minWidth: 420, minHeight: 320 });
+		handlers.get('closed')?.();
 	});
 
 	it('reuses an app window while its titlebar is still loading', () => {

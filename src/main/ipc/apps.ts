@@ -38,7 +38,7 @@ export class AppsIpc implements IpcModule<AppsIpcDeps> {
 			if (!app) throw new Error(`App not found: ${appId}`);
 			return new AppWindowPreferences().get(app);
 		});
-		registerQueryWithEvent(AppsChannels.setSettings, (event, appId, settings) => {
+		registerCommandWithEvent(AppsChannels.setSettings, (event, appId, settings) => {
 			trusted.assert(event);
 			const app = listApps().find((item) => item.id === appId);
 			if (!app) throw new Error(`App not found: ${appId}`);
