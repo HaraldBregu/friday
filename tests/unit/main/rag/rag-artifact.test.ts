@@ -2,7 +2,9 @@ import path from 'node:path';
 
 const readFileBoundedSync = jest.fn();
 jest.mock('../../../../src/main/agent/files/read_sync', () => ({ readFileBoundedSync }));
-jest.mock('../../../../src/main/agent/knowledge/root', () => ({ knowledgeRoot: (root: string) => root }));
+jest.mock('../../../../src/main/agent/knowledge/root', () => ({
+	knowledgeRoot: (root: string) => root,
+}));
 
 jest.mock('../../../../src/main/agent/knowledge/rag/rag_location', () => ({
 	ragLocation: () => '/user/data/rag',

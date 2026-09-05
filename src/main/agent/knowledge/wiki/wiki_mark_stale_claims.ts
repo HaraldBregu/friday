@@ -32,14 +32,21 @@ export async function markStaleWikiClaims(
 			if (start >= 0) {
 				const end = content.indexOf('\n### ', start + heading.length);
 				const blockEnd = end < 0 ? content.length : end;
-				const block = content.slice(start, blockEnd).replace(/\*\*Status:\*\* [^\n]+/, `**Status:** ${status}`);
+				const block = content
+					.slice(start, blockEnd)
+					.replace(/\*\*Status:\*\* [^\n]+/, `**Status:** ${status}`);
 				content = `${content.slice(0, start)}${block}${content.slice(blockEnd)}`;
 			}
 			pageChanged = true;
 			return { ...claim, status };
 		});
 		if (!pageChanged) continue;
-		await writeKnowledgeText(targetPath, entry, matter.stringify(content, { ...parsed.data, claims }), signal);
+		await writeKnowledgeText(
+			targetPath,
+			entry,
+			matter.stringify(content, { ...parsed.data, claims }),
+			signal
+		);
 		changed += 1;
 	}
 	return changed;

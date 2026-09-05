@@ -13,7 +13,11 @@ export function validateFilePath(filePath: string, allowMissing = false): FileId
 		try {
 			stat = lstatSync(current);
 		} catch (error) {
-			if (allowMissing && current === absolute && (error as NodeJS.ErrnoException).code === 'ENOENT')
+			if (
+				allowMissing &&
+				current === absolute &&
+				(error as NodeJS.ErrnoException).code === 'ENOENT'
+			)
 				return identities;
 			throw error;
 		}

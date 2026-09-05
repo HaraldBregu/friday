@@ -50,7 +50,8 @@ export async function reviewWikiChange(
 				for (const page of item.proposedUpdate.pages) {
 					const parsed = matter(await readKnowledgeText(stagedPath, page.path));
 					await writeKnowledgeText(
-						stagedPath, page.path,
+						stagedPath,
+						page.path,
 						matter.stringify(parsed.content, { ...parsed.data, review_status: 'approved' })
 					);
 				}

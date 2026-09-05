@@ -182,7 +182,8 @@ export class SqliteVectorStore implements VectorStore {
 	search(indexName: string, vector: readonly number[], topK: number): VectorMatch[] {
 		const index = this.getIndex(indexName);
 		if (!index) return [];
-		if (vector.length !== index.dimensions) throw new Error('Query vector dimensions do not match.');
+		if (vector.length !== index.dimensions)
+			throw new Error('Query vector dimensions do not match.');
 		const count = Math.max(1, Math.min(Math.trunc(topK), 100));
 		const rows = this.activeRecordsStatement.all(indexName) as unknown as RecordRow[];
 		return rows

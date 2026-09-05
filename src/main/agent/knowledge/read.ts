@@ -15,7 +15,12 @@ export async function readKnowledgeText(
 		const canonicalRoot = knowledgeRoot(root);
 		const file = path.resolve(canonicalRoot, relativePath);
 		const relative = path.relative(canonicalRoot, file);
-		if (!relative || path.isAbsolute(relative) || relative === '..' || relative.startsWith('..' + path.sep))
+		if (
+			!relative ||
+			path.isAbsolute(relative) ||
+			relative === '..' ||
+			relative.startsWith('..' + path.sep)
+		)
 			throw new Error('Knowledge file escapes its configured root.');
 		return (await readFileBounded(file, maxBytes, signal)).toString('utf8');
 	} catch (error) {

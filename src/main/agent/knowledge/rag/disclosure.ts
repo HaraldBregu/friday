@@ -5,14 +5,34 @@ export function authorizeRagDisclosure(configuration: RagConfiguration): RagConf
 	const next = { ...configuration };
 	const embedding = next.embeddingConsent;
 	if (embedding?.version === 1 && !embedding.recipient) {
-		if (embedding.providerId !== next.embeddingProviderId || embedding.modelId !== next.embeddingModelId)
+		if (
+			embedding.providerId !== next.embeddingProviderId ||
+			embedding.modelId !== next.embeddingModelId
+		)
 			throw new Error('Select the embedding provider and model before granting disclosure.');
-		next.embeddingConsent = { ...embedding, recipient: ragRecipient('embedding', next.embeddingProviderId, next.embeddingModelId, next.indexName) };
+		next.embeddingConsent = {
+			...embedding,
+			recipient: ragRecipient(
+				'embedding',
+				next.embeddingProviderId,
+				next.embeddingModelId,
+				next.indexName
+			),
+		};
 	}
 	const mirror = next.mirrorConsent;
 	if (mirror?.version === 1 && !mirror.recipient) {
-		if (mirror.indexName !== next.indexName) throw new Error('Select the index before granting Pinecone storage.');
-		next.mirrorConsent = { ...mirror, recipient: ragRecipient('mirror', next.embeddingProviderId, next.embeddingModelId, next.indexName) };
+		if (mirror.indexName !== next.indexName)
+			throw new Error('Select the index before granting Pinecone storage.');
+		next.mirrorConsent = {
+			...mirror,
+			recipient: ragRecipient(
+				'mirror',
+				next.embeddingProviderId,
+				next.embeddingModelId,
+				next.indexName
+			),
+		};
 	}
 	return next;
 }

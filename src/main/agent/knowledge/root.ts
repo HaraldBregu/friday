@@ -3,7 +3,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { validateFilePath } from '../files/validate';
 
-const systemTemporaryRoots = [...new Set([tmpdir(), '/tmp'])].filter((root) => existsSync(root)).map((root) => ({ root: path.resolve(root), canonical: realpathSync(root) }));
+const systemTemporaryRoots = [...new Set([tmpdir(), '/tmp'])]
+	.filter((root) => existsSync(root))
+	.map((root) => ({ root: path.resolve(root), canonical: realpathSync(root) }));
 
 export function knowledgeRoot(root: string): string {
 	let absolute = path.resolve(root);

@@ -30,16 +30,19 @@ export async function searchWiki(
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
-		const parsed = matter(
-			await readKnowledgeText(targetPath, entry, signal)
-		);
+		const parsed = matter(await readKnowledgeText(targetPath, entry, signal));
 		if (String(parsed.data.status ?? '') !== 'active') continue;
 		if (!['auto_generated', 'approved'].includes(String(parsed.data.review_status ?? ''))) continue;
 		const claims = (Array.isArray(parsed.data.claims) ? parsed.data.claims : []) as WikiClaim[];
 		const verified = await Promise.all(
-			claims.flatMap((claim) => claim.evidence)
+			claims
+				.flatMap((claim) => claim.evidence)
 				.filter((evidence) => Boolean(evidence.excerptHash))
-				.map((evidence) => verifyWikiEvidence(evidence, repository, signal).then(() => true).catch(() => false))
+				.map((evidence) =>
+					verifyWikiEvidence(evidence, repository, signal)
+						.then(() => true)
+						.catch(() => false)
+				)
 		);
 		if (verified.some((value) => !value)) continue;
 		const title = String(parsed.data.title ?? path.posix.basename(relativePath, '.md')).trim();

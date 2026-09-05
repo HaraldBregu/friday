@@ -11,15 +11,22 @@ export async function readFileBounded(
 	if (!Number.isSafeInteger(maxBytes) || maxBytes < 0) throw new Error('Invalid file byte limit.');
 	const identities = validateFilePath(filePath);
 	const selected = identities.at(-1);
-	const handle = await open(filePath, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+	const handle = await open(
+		filePath,
+		constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK
+	);
 	try {
 		signal?.throwIfAborted();
 		const stat = await handle.stat();
 		if (!stat.isFile()) throw new Error(`Expected a regular file: ${filePath}`);
-		if (stat.dev !== selected?.dev || stat.ino !== selected.ino ||
-			JSON.stringify(validateFilePath(filePath)) !== JSON.stringify(identities))
+		if (
+			stat.dev !== selected?.dev ||
+			stat.ino !== selected.ino ||
+			JSON.stringify(validateFilePath(filePath)) !== JSON.stringify(identities)
+		)
 			throw new Error(`File identity changed before reading: ${filePath}`);
-		if (stat.size > maxBytes) throw new Error(`File exceeds the ${maxBytes}-byte limit: ${filePath}`);
+		if (stat.size > maxBytes)
+			throw new Error(`File exceeds the ${maxBytes}-byte limit: ${filePath}`);
 		const chunks: Buffer[] = [];
 		let total = 0;
 		while (true) {
@@ -33,8 +40,11 @@ export async function readFileBounded(
 		}
 		signal?.throwIfAborted();
 		const after = await handle.stat();
-		if (after.size !== stat.size || after.mtimeMs !== stat.mtimeMs ||
-			JSON.stringify(validateFilePath(filePath)) !== JSON.stringify(identities))
+		if (
+			after.size !== stat.size ||
+			after.mtimeMs !== stat.mtimeMs ||
+			JSON.stringify(validateFilePath(filePath)) !== JSON.stringify(identities)
+		)
 			throw new Error(`File changed while reading: ${filePath}`);
 		return Buffer.concat(chunks, total);
 	} finally {

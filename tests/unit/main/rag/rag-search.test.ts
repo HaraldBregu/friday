@@ -1,7 +1,11 @@
 const configuration = jest.fn();
 const recipient = jest.fn();
-jest.mock('../../../../src/main/agent/knowledge/rag/rag_store', () => ({ getRagConfiguration: configuration }));
-jest.mock('../../../../src/main/agent/knowledge/rag/recipient', () => ({ ragRecipient: recipient }));
+jest.mock('../../../../src/main/agent/knowledge/rag/rag_store', () => ({
+	getRagConfiguration: configuration,
+}));
+jest.mock('../../../../src/main/agent/knowledge/rag/recipient', () => ({
+	ragRecipient: recipient,
+}));
 import type {
 	EmbeddingProvider,
 	VectorStore,
@@ -25,7 +29,14 @@ const vectors: VectorStore = {
 beforeEach(() => {
 	jest.clearAllMocks();
 	recipient.mockReturnValue('approved-recipient');
-	configuration.mockReturnValue({ embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small', version: 1, recipient: 'approved-recipient' } });
+	configuration.mockReturnValue({
+		embeddingConsent: {
+			providerId: 'openai',
+			modelId: 'text-embedding-3-small',
+			version: 1,
+			recipient: 'approved-recipient',
+		},
+	});
 	getIndex.mockReturnValue({
 		indexName: 'knowledge-base',
 		generation: 'kucedr-a1b2c3d4',
@@ -108,14 +119,16 @@ it('passes cancellation to the query embedding provider', async () => {
 it('requires the selected local index to exist', async () => {
 	getIndex.mockReturnValue(undefined);
 
-	await expect(
-		searchRag('query', 'another-index', 5, { embeddings, vectors })
-	).rejects.toThrow('Index the rag folder before searching.');
+	await expect(searchRag('query', 'another-index', 5, { embeddings, vectors })).rejects.toThrow(
+		'Index the rag folder before searching.'
+	);
 	expect(embed).not.toHaveBeenCalled();
 });
 
 it('requires query disclosure even when an existing local index can be searched', async () => {
 	configuration.mockReturnValue({ embeddingConsent: null });
-	await expect(searchRag('query', 'knowledge-base', 5, { embeddings, vectors })).rejects.toThrow('Confirm remote embedding');
+	await expect(searchRag('query', 'knowledge-base', 5, { embeddings, vectors })).rejects.toThrow(
+		'Confirm remote embedding'
+	);
 	expect(embed).not.toHaveBeenCalled();
 });

@@ -31,7 +31,8 @@ export async function verifyWikiEvidence(
 		}
 		excerpt = locator;
 	}
-	if (!excerpt.trim()) throw new Error(`Wiki evidence locator resolved to an empty excerpt: ${locator}`);
+	if (!excerpt.trim())
+		throw new Error(`Wiki evidence locator resolved to an empty excerpt: ${locator}`);
 	const excerptHash = createHash('sha256').update(excerpt, 'utf8').digest('hex');
 	if (evidence.excerptHash && evidence.excerptHash !== excerptHash) {
 		throw new Error(`Wiki evidence excerpt hash mismatch: ${evidence.sourceId}:${locator}`);

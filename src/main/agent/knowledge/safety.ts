@@ -8,6 +8,6 @@ export function assertWikiSourceSafe(source: SourceSafetyInput): void {
 	if (SECRET_FILE.test(normalized))
 		throw new Error(`Refusing to ingest credential-like file: ${normalized}`);
 	if (containsSecret(source.content) || containsSecret(normalized)) {
-		throw new Error(`Refusing to ingest source containing credential-like content: ${normalized}`);
+		throw new Error('Refusing to ingest source containing credential-like content.');
 	}
 }

@@ -26,7 +26,8 @@ export async function searchRag(
 		}
 
 		assertRagConsent(getRagConfiguration(), index.providerId, index.modelId, selectedIndexName);
-		if (query.length > 16_000 || containsSecret(query)) throw new Error('Query is oversized or contains credential-like content.');
+		if (query.length > 16_000 || containsSecret(query))
+			throw new Error('Query is oversized or contains credential-like content.');
 		const embedded = await embeddingProvider.embed(
 			{
 				texts: [query],

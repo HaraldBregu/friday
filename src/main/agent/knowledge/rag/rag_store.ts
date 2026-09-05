@@ -33,14 +33,29 @@ export const ragConfigurationStorePath = store.path;
 restrictSettingsFile(store.path);
 
 export function getRagConfiguration(): RagConfiguration {
-	const configuration = { ...DEFAULT_RAG_CONFIGURATION, ...store.store, folders: [...store.get('folders')] };
+	const configuration = {
+		...DEFAULT_RAG_CONFIGURATION,
+		...store.store,
+		folders: [...store.get('folders')],
+	};
 	for (const kind of ['embedding', 'mirror'] as const) {
 		const key = kind === 'embedding' ? 'embeddingConsent' : 'mirrorConsent';
 		const consent = configuration[key];
 		try {
-			if (consent?.version !== 1 || consent.recipient !== ragRecipient(kind, configuration.embeddingProviderId, configuration.embeddingModelId, configuration.indexName))
+			if (
+				consent?.version !== 1 ||
+				consent.recipient !==
+					ragRecipient(
+						kind,
+						configuration.embeddingProviderId,
+						configuration.embeddingModelId,
+						configuration.indexName
+					)
+			)
 				configuration[key] = null;
-		} catch { configuration[key] = null; }
+		} catch {
+			configuration[key] = null;
+		}
 	}
 	return configuration;
 }
@@ -67,10 +82,18 @@ export function saveRagConfiguration(configuration: RagConfiguration): RagConfig
 				? {
 						providerId: configuration.embeddingConsent.providerId.trim(),
 						modelId: configuration.embeddingConsent.modelId.trim(),
-						...(configuration.embeddingConsent.version === 1 ? { version: 1 as const, recipient: configuration.embeddingConsent.recipient } : {}),
+						...(configuration.embeddingConsent.version === 1
+							? { version: 1 as const, recipient: configuration.embeddingConsent.recipient }
+							: {}),
 					}
 				: null,
-		mirrorConsent: configuration.mirrorConsent?.version === 1 ? { ...configuration.mirrorConsent, indexName: normalizeRagIndexName(configuration.mirrorConsent.indexName) } : null,
+		mirrorConsent:
+			configuration.mirrorConsent?.version === 1
+				? {
+						...configuration.mirrorConsent,
+						indexName: normalizeRagIndexName(configuration.mirrorConsent.indexName),
+					}
+				: null,
 		folders,
 		scheduleEnabled: configuration.scheduleEnabled,
 		cronExpression: cronExpression || DEFAULT_RAG_CONFIGURATION.cronExpression,

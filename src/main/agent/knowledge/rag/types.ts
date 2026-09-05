@@ -155,6 +155,12 @@ export interface RecordRow {
 }
 
 export interface RagMirror {
-	upload(indexName: string, generation: string, dimensions: number, records: readonly VectorRecord[], signal?: AbortSignal): Promise<void>;
+	upload(
+		indexName: string,
+		generation: string,
+		dimensions: number,
+		records: readonly VectorRecord[],
+		signal?: AbortSignal
+	): Promise<void>;
 	discard(indexName: string, generation: string, signal?: AbortSignal): Promise<void>;
 }

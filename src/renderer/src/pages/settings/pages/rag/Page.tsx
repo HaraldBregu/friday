@@ -265,17 +265,30 @@ const RagPage: React.FC = () => {
 					/>
 					<SettingsRow
 						title={t('settings.rag.mirrorConsent')}
-						description={t('settings.rag.mirrorConsentDescription', { index: ragConfiguration?.indexName ?? '' })}
+						description={t('settings.rag.mirrorConsentDescription', {
+							index: ragConfiguration?.indexName ?? '',
+						})}
 						className="grid-cols-[minmax(0,1fr)_auto]"
 						actionClassName="ml-auto w-auto justify-end"
-						actions={<Switch
-							checked={Boolean(ragConfiguration?.mirrorConsent?.recipient && ragConfiguration.mirrorConsent.indexName === ragConfiguration.indexName)}
-							disabled={!ragConfiguration || savingRagConfiguration || indexing}
-							aria-label={t('settings.rag.mirrorConsent')}
-							onCheckedChange={(enabled) => {
-								if (ragConfiguration) void saveRagConfiguration({ ...ragConfiguration, mirrorConsent: enabled ? { version: 1, indexName: ragConfiguration.indexName } : null });
-							}}
-						/>}
+						actions={
+							<Switch
+								checked={Boolean(
+									ragConfiguration?.mirrorConsent?.recipient &&
+									ragConfiguration.mirrorConsent.indexName === ragConfiguration.indexName
+								)}
+								disabled={!ragConfiguration || savingRagConfiguration || indexing}
+								aria-label={t('settings.rag.mirrorConsent')}
+								onCheckedChange={(enabled) => {
+									if (ragConfiguration)
+										void saveRagConfiguration({
+											...ragConfiguration,
+											mirrorConsent: enabled
+												? { version: 1, indexName: ragConfiguration.indexName }
+												: null,
+										});
+								}}
+							/>
+						}
 					/>
 				</SettingsPanel>
 			</SettingsSection>

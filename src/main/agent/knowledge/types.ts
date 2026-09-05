@@ -1,4 +1,8 @@
-export interface KnowledgeScanBudget { entries: number; files: number; bytes: number }
+export interface KnowledgeScanBudget {
+	entries: number;
+	files: number;
+	bytes: number;
+}
 
 export type KnowledgeRoute = 'wiki' | 'primary_evidence' | 'rag' | 'abstain';
 

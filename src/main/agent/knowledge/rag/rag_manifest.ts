@@ -12,7 +12,12 @@ function manifestPath(): string {
 
 export function readRagManifest(): RagManifest | undefined {
 	try {
-		return JSON.parse(readFileBoundedSync(path.join(knowledgeRoot(path.dirname(manifestPath())), 'index.json'), 64 * 1024).content.toString('utf8')) as RagManifest;
+		return JSON.parse(
+			readFileBoundedSync(
+				path.join(knowledgeRoot(path.dirname(manifestPath())), 'index.json'),
+				64 * 1024
+			).content.toString('utf8')
+		) as RagManifest;
 	} catch {
 		return undefined;
 	}
@@ -23,7 +28,11 @@ export function writeRagManifest(manifest: RagManifest): void {
 	const temporaryFile = `${file}.${randomUUID()}.tmp`;
 	mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
 	try {
-		writeFileSync(temporaryFile, JSON.stringify(manifest), { encoding: 'utf8', mode: 0o600, flag: 'wx' });
+		writeFileSync(temporaryFile, JSON.stringify(manifest), {
+			encoding: 'utf8',
+			mode: 0o600,
+			flag: 'wx',
+		});
 		renameSync(temporaryFile, file);
 	} finally {
 		rmSync(temporaryFile, { force: true });

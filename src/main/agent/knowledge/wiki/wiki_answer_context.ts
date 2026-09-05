@@ -20,9 +20,7 @@ export async function buildWikiAnswerContext(
 	const contradictions: WikiContradiction[] = [];
 	for (const page of compiledWiki) {
 		signal?.throwIfAborted();
-		const parsed = matter(
-			await readKnowledgeText(targetPath, page.path, signal)
-		);
+		const parsed = matter(await readKnowledgeText(targetPath, page.path, signal));
 		if (Array.isArray(parsed.data.contradictions)) {
 			for (const contradiction of parsed.data.contradictions as WikiContradiction[]) {
 				if (!contradictions.some((item) => item.id === contradiction.id))
@@ -47,7 +45,9 @@ export async function buildWikiAnswerContext(
 			signal?.throwIfAborted();
 			const record = repository.sources.store.sources[sourceId];
 			if (!record || record.status !== 'integrated') continue;
-			const content = await readWikiArchive(record, signal, repository.paths.evidence).catch(() => '');
+			const content = await readWikiArchive(record, signal, repository.paths.evidence).catch(
+				() => ''
+			);
 			signal?.throwIfAborted();
 			if (!content) continue;
 			const match = term ? content.toLowerCase().indexOf(term) : -1;

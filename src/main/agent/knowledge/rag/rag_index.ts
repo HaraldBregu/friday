@@ -2,7 +2,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { createRagMirror } from './mirror';
 import { assertRagConsent } from './consent';
-import { KNOWLEDGE_MAX_RECORDS, KNOWLEDGE_MAX_VECTOR_VALUES, KNOWLEDGE_TIMEOUT_MS } from '../limits';
+import {
+	KNOWLEDGE_MAX_RECORDS,
+	KNOWLEDGE_MAX_VECTOR_VALUES,
+	KNOWLEDGE_TIMEOUT_MS,
+} from '../limits';
 import { SelectedEmbeddingProvider } from './embedding';
 import { normalizeRagIndexName } from './rag_index_name';
 import { collectRagSources } from './source';
@@ -10,11 +14,7 @@ import { writeRagManifest } from './rag_manifest';
 import { getRagConfiguration } from './rag_store';
 import { chunkSpans } from './spans';
 import { ragVectorStore } from './vector';
-import type {
-	RagIndexDependencies,
-	RagIndexResult,
-	VectorRecord,
-} from './types';
+import type { RagIndexDependencies, RagIndexResult, VectorRecord } from './types';
 
 const BATCH_SIZE = 64;
 
@@ -69,7 +69,11 @@ export async function indexRag(
 			);
 			if (reused) {
 				vectorValues += reused.reduce((count, record) => count + record.vector.length, 0);
-				if (records.length + reused.length > KNOWLEDGE_MAX_RECORDS || vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES) throw new Error('Knowledge record or vector budget exceeded.');
+				if (
+					records.length + reused.length > KNOWLEDGE_MAX_RECORDS ||
+					vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES
+				)
+					throw new Error('Knowledge record or vector budget exceeded.');
 				dimensions ??= reused[0].vector.length;
 				records.push(...reused);
 				continue;
@@ -78,7 +82,8 @@ export async function indexRag(
 			for (let start = 0; start < chunks.length; start += BATCH_SIZE) {
 				signal.throwIfAborted();
 				const batch = chunks.slice(start, start + BATCH_SIZE);
-				if (records.length + batch.length > KNOWLEDGE_MAX_RECORDS) throw new Error('Knowledge record limit exceeded.');
+				if (records.length + batch.length > KNOWLEDGE_MAX_RECORDS)
+					throw new Error('Knowledge record limit exceeded.');
 				assertRagConsent(configuration, providerId, modelId, selectedIndexName, true);
 				assertRagConsent(getRagConfiguration(), providerId, modelId, selectedIndexName, true);
 				const embedded = await embeddingProvider.embed(
@@ -95,7 +100,18 @@ export async function indexRag(
 					throw new Error('Embedding provider did not use the selected provider and model.');
 				}
 				vectorValues += embedded.embeddings.reduce((count, vector) => count + vector.length, 0);
-				if (vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES || embedded.dimensions < 1 || embedded.dimensions > 65_536 || embedded.embeddings.length !== batch.length || embedded.embeddings.some((vector) => vector.length !== embedded.dimensions || vector.some((value) => !Number.isFinite(value)))) throw new Error('Invalid or excessive embedding vectors.');
+				if (
+					vectorValues > KNOWLEDGE_MAX_VECTOR_VALUES ||
+					embedded.dimensions < 1 ||
+					embedded.dimensions > 65_536 ||
+					embedded.embeddings.length !== batch.length ||
+					embedded.embeddings.some(
+						(vector) =>
+							vector.length !== embedded.dimensions ||
+							vector.some((value) => !Number.isFinite(value))
+					)
+				)
+					throw new Error('Invalid or excessive embedding vectors.');
 				dimensions ??= embedded.dimensions;
 				if (embedded.dimensions !== dimensions) {
 					throw new Error('Embedding dimensions changed while indexing.');
@@ -154,8 +170,14 @@ export async function indexRag(
 		return { files: indexedFiles, vectors: records.length };
 	} catch (error) {
 		if (uploadStarted && !published) {
-			try { await mirror.discard(selectedIndexName, generation, AbortSignal.timeout(15_000)); }
-			catch (cleanupError) { throw new AggregateError([error, cleanupError], 'RAG indexing failed; its staging namespace cleanup also failed: ' + generation); }
+			try {
+				await mirror.discard(selectedIndexName, generation, AbortSignal.timeout(15_000));
+			} catch (cleanupError) {
+				throw new AggregateError(
+					[error, cleanupError],
+					'RAG indexing failed; its staging namespace cleanup also failed: ' + generation
+				);
+			}
 		}
 		throw error;
 	} finally {

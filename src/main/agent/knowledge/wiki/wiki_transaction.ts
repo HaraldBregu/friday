@@ -24,10 +24,14 @@ export async function transactWiki<T>(input: WikiTransactionInput<T>): Promise<T
 			const root = knowledgeRoot(input.targetPath);
 			await mkdir(stagedPath, { recursive: true, mode: 0o700 });
 			for (const file of await listKnowledgeFiles(root, input.signal)) {
-				await writeKnowledgeText(stagedPath, file, await readFileBounded(path.join(root, file), KNOWLEDGE_MAX_FILE_BYTES, input.signal), input.signal);
+				await writeKnowledgeText(
+					stagedPath,
+					file,
+					await readFileBounded(path.join(root, file), KNOWLEDGE_MAX_FILE_BYTES, input.signal),
+					input.signal
+				);
 			}
-		}
-		else await mkdir(stagedPath, { recursive: true, mode: 0o700 });
+		} else await mkdir(stagedPath, { recursive: true, mode: 0o700 });
 		input.signal?.throwIfAborted();
 		const result = await input.apply(stagedPath);
 		input.signal?.throwIfAborted();
