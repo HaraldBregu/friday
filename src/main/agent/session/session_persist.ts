@@ -7,10 +7,19 @@ import { writeMessagesFile } from './session_write_messages';
 
 export function persist(state: SessionState): void {
 	if (!state.sessionsPath || (state.lease && !state.lease.active)) return;
+	const messages =
+		state.lease && state.pendingMessages
+			? [...state.lease.messages, ...state.pendingMessages]
+			: state.messages;
 	ensureSession(state);
 	writeMessagesFile(
 		messagesFilePath(state),
 		messagesBackupFilePath(state),
-		`${JSON.stringify(externalizeAttachments(state.messages, state), null, '\t')}\n`
+		`${JSON.stringify(externalizeAttachments(messages, state), null, '\t')}\n`
 	);
+	if (state.lease && state.pendingMessages) {
+		state.lease.messages.push(...state.pendingMessages);
+		state.messages = state.lease.messages;
+		state.pendingMessages = undefined;
+	}
 }

@@ -63,6 +63,7 @@ export interface SessionLease {
 }
 
 export interface SessionState {
+	pendingMessages?: Message[];
 	lease?: SessionLease;
 	id: string;
 	category: SessionCategory;

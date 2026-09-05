@@ -179,3 +179,62 @@ it.each(['clear', 'delete', 'edit'])(
 		}
 	}
 );
+
+it('keeps deferred prompts private until validation accepts them and preserves concurrent voice updates', () => {
+	const {
+		SessionCoordinator,
+		createSessionState,
+		init,
+		persist,
+		releaseSession,
+	} = require('../../../../src/main/agent/session');
+	const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-deferred-'));
+	const config = { location: path.join(temporaryRoot, 'agent') };
+	const coordinator = new SessionCoordinator();
+	const voice = realtimeVoiceConversationFactory(config, coordinator)(SESSION_ID, 'model');
+	const state = createSessionState();
+	try {
+		init(
+			state,
+			config,
+			{
+				task: 'chat',
+				message: 'Accepted pending prompt.',
+				sessionId: SESSION_ID,
+				deferPersist: true,
+			},
+			'main',
+			coordinator
+		);
+		voice.addAssistantTranscript('Concurrent voice answer.');
+		expect(JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location))).not.toContain(
+			'pending prompt'
+		);
+		persist(state);
+		let content = JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location));
+		expect(content).toContain('Accepted pending prompt.');
+		expect(content).toContain('Concurrent voice answer.');
+		releaseSession(state);
+		init(
+			state,
+			config,
+			{
+				task: 'chat',
+				message: 'Rejected pending prompt.',
+				sessionId: SESSION_ID,
+				deferPersist: true,
+			},
+			'main',
+			coordinator
+		);
+		releaseSession(state);
+		voice.addAssistantTranscript('Another voice answer.');
+		content = JSON.stringify(loadMessagesBySessionId(SESSION_ID, config.location));
+		expect(content).not.toContain('Rejected pending prompt.');
+		expect(content).toContain('Another voice answer.');
+	} finally {
+		voice.dispose?.();
+		releaseSession(state);
+		fs.rmSync(temporaryRoot, { recursive: true, force: true });
+	}
+});

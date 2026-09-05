@@ -20,6 +20,7 @@ export function init(
 ): void {
 	state.lease?.release();
 	state.lease = undefined;
+	state.pendingMessages = undefined;
 	state.id = resolveSessionId(input.sessionId, config.location, category);
 	state.category = category;
 	state.folderName = sessionFolderName(state.id);
@@ -37,9 +38,15 @@ export function init(
 		state.lease = coordinator.open(messagesFilePath(state), state.messages);
 		state.messages = state.lease.messages;
 	}
-	state.messages.push(...sanitizeMessages(input.messages ?? []));
+	const additions = sanitizeMessages(input.messages ?? []);
 	if (input.message || (input.files?.length ?? 0) > 0) {
-		state.messages.push({ role: 'user', content: toUserContent(input.message, input.files ?? []) });
+		additions.push({ role: 'user', content: toUserContent(input.message, input.files ?? []) });
+	}
+	if (state.lease && input.deferPersist) {
+		state.pendingMessages = additions;
+		state.messages = [...state.lease.messages, ...additions];
+	} else {
+		state.messages.push(...additions);
 	}
 	state.model = input.model ?? 'default';
 	state.maxTurns = input.maxTurns ?? input.maxIterations ?? 20;
