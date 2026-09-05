@@ -1,4 +1,5 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type { WikiSource } from './types';
@@ -18,17 +19,14 @@ export async function buildWikiContext(
 			.match(/[a-z0-9][a-z0-9-]{3,}/g)
 			?.filter((term) => term.length > 3) ?? []
 	);
-	const entries = await readdir(targetPath, { recursive: true }).catch(() => []);
+	const entries = await listKnowledgeFiles(targetPath, signal);
 	const pages: Array<{ path: string; content: string; score: number }> = [];
 
 	for (const entry of entries) {
 		signal?.throwIfAborted();
 		if (path.extname(entry).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(entry)) continue;
-		const content = await readFile(path.resolve(targetPath, entry), {
-			encoding: 'utf8',
-			signal,
-		});
+		const content = await readKnowledgeText(targetPath, entry, signal);
 		const parsed = matter(content);
 		const pageTerms =
 			`${String(parsed.data.title ?? '')} ${String(parsed.data.summary ?? '')} ${parsed.content.slice(0, 20_000)}`
@@ -38,10 +36,7 @@ export async function buildWikiContext(
 		pages.push({ path: entry.split(path.sep).join('/'), content, score });
 	}
 
-	const index = await readFile(path.resolve(targetPath, 'index.md'), {
-		encoding: 'utf8',
-		signal,
-	}).catch(() => '');
+	const index = await readKnowledgeText(targetPath, 'index.md', signal, true);
 	signal?.throwIfAborted();
 	const selected = pages
 		.sort((left, right) => right.score - left.score || left.path.localeCompare(right.path))

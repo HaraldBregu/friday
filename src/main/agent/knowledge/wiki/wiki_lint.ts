@@ -1,4 +1,5 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getWikiSettings } from './wiki_get_settings';
@@ -40,7 +41,7 @@ export async function lintWiki(
 		requiresReview: [],
 		fixed: 0,
 	};
-	const entries = await readdir(targetPath, { recursive: true }).catch(() => []);
+	const entries = await listKnowledgeFiles(targetPath);
 	const pages: Array<{
 		path: string;
 		title: string;
@@ -57,7 +58,7 @@ export async function lintWiki(
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
-		const parsed = matter(await readFile(path.resolve(targetPath, entry), 'utf8'));
+		const parsed = matter(await readKnowledgeText(targetPath, entry));
 		const title = String(parsed.data.title ?? '').trim();
 		const pageId = String(parsed.data.id ?? '').trim();
 		const pageType = String(parsed.data.page_type ?? '').trim();
@@ -235,7 +236,7 @@ export async function lintWiki(
 			});
 		}
 	}
-	const index = await readFile(path.resolve(targetPath, 'index.md'), 'utf8').catch(() => '');
+	const index = await readKnowledgeText(targetPath, 'index.md', undefined, true);
 	for (const page of pages) {
 		if (!index.includes(`[[${page.path.slice(0, -3)}|`)) {
 			result.autoFixable.push({

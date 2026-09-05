@@ -1,4 +1,5 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getWikiSettings } from './wiki_get_settings';
@@ -19,12 +20,9 @@ export async function searchWiki(
 	const limit = Math.max(1, Math.min(20, Math.trunc(count)));
 	const repository = getWikiRepository(targetPath);
 	const terms = [...new Set(normalizedQuery.match(/[\p{L}\p{N}][\p{L}\p{N}-]{1,}/gu) ?? [])];
-	const index = await readFile(path.resolve(targetPath, 'index.md'), {
-		encoding: 'utf8',
-		signal,
-	}).catch(() => '');
+	const index = await readKnowledgeText(targetPath, 'index.md', signal, true);
 	const indexLines = index.toLowerCase().split('\n');
-	const entries = await readdir(targetPath, { recursive: true }).catch(() => []);
+	const entries = await listKnowledgeFiles(targetPath, signal);
 	const pages: Array<WikiSearchResult & { aliases: string[]; links: string[]; score: number }> = [];
 
 	for (const entry of entries) {
@@ -33,7 +31,7 @@ export async function searchWiki(
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
 		const parsed = matter(
-			await readFile(path.resolve(targetPath, entry), { encoding: 'utf8', signal })
+			await readKnowledgeText(targetPath, entry, signal)
 		);
 		if (String(parsed.data.status ?? '') !== 'active') continue;
 		if (!['auto_generated', 'approved'].includes(String(parsed.data.review_status ?? ''))) continue;

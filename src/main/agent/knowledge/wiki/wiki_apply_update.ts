@@ -1,5 +1,6 @@
+import { readKnowledgeText } from '../read';
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type {
@@ -62,9 +63,7 @@ export async function applyWikiUpdate(
 	for (const page of pages) {
 		options.signal?.throwIfAborted();
 		const pagePath = path.resolve(targetPath, page.path);
-		const existing = await readFile(pagePath, { encoding: 'utf8', signal: options.signal }).catch(
-			() => undefined
-		);
+		const existing = await readKnowledgeText(targetPath, page.path, options.signal, true);
 		const previous = existing ? matter(existing) : undefined;
 		const pageType =
 			page.pageType ??

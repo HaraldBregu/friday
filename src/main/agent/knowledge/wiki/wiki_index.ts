@@ -1,10 +1,11 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { atomicWrite } from '../../../shared/atomic_write';
 
 export async function rebuildWikiIndex(targetPath: string): Promise<void> {
-	const entries = await readdir(targetPath, { recursive: true });
+	const entries = await listKnowledgeFiles(targetPath);
 	const pages: Array<{
 		category: string;
 		link: string;
@@ -19,7 +20,7 @@ export async function rebuildWikiIndex(targetPath: string): Promise<void> {
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
-		const parsed = matter(await readFile(path.resolve(targetPath, entry), 'utf8'));
+		const parsed = matter(await readKnowledgeText(targetPath, entry));
 		const sources = Array.isArray(parsed.data.sources) ? parsed.data.sources : [];
 		pages.push({
 			category:

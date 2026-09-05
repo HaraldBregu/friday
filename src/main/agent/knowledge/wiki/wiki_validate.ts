@@ -1,4 +1,5 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getWikiRepository } from './wiki_repository';
@@ -23,7 +24,7 @@ export async function validateWiki(
 ): Promise<string[]> {
 	const errors: string[] = [];
 	const ids = new Map<string, string>();
-	const entries = await readdir(targetPath, { recursive: true }).catch(() => []);
+	const entries = await listKnowledgeFiles(targetPath, signal);
 	const pages: Array<{
 		path: string;
 		title: string;
@@ -37,7 +38,7 @@ export async function validateWiki(
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
 		try {
-			const parsed = matter(await readFile(path.resolve(targetPath, entry), 'utf8'));
+			const parsed = matter(await readKnowledgeText(targetPath, entry));
 			const title = String(parsed.data.title ?? '').trim();
 			if (!title) errors.push(`Missing title: ${relativePath}`);
 			if (!String(parsed.data.summary ?? '').trim())
@@ -129,7 +130,7 @@ export async function validateWiki(
 			}
 		}
 	}
-	const index = await readFile(path.resolve(targetPath, 'index.md'), 'utf8').catch(() => '');
+	const index = await readKnowledgeText(targetPath, 'index.md', undefined, true);
 	for (const page of pages) {
 		if (!index.includes(`[[${page.path.slice(0, -3)}|`))
 			errors.push(`Index missing page: ${page.path}`);

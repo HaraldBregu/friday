@@ -1,4 +1,6 @@
-import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
+import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type { WikiClaim } from './types';
@@ -10,14 +12,14 @@ export async function markStaleWikiClaims(
 ): Promise<number> {
 	if (replacedSourceIds.length === 0) return 0;
 	const replaced = new Set(replacedSourceIds);
-	const entries = await readdir(targetPath, { recursive: true });
+	const entries = await listKnowledgeFiles(targetPath, signal);
 	let changed = 0;
 	for (const entry of entries) {
 		signal?.throwIfAborted();
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		const pagePath = path.resolve(targetPath, entry);
-		const parsed = matter(await readFile(pagePath, { encoding: 'utf8', signal }));
+		const parsed = matter(await readKnowledgeText(targetPath, entry, signal));
 		if (!Array.isArray(parsed.data.claims)) continue;
 		let content = parsed.content;
 		let pageChanged = false;

@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { readKnowledgeText } from '../read';
 import matter from 'gray-matter';
 import { getWikiSettings } from './wiki_get_settings';
 import { getWikiRepository } from './wiki_repository';
@@ -22,7 +21,7 @@ export async function buildWikiAnswerContext(
 	for (const page of compiledWiki) {
 		signal?.throwIfAborted();
 		const parsed = matter(
-			await readFile(path.resolve(targetPath, page.path), { encoding: 'utf8', signal })
+			await readKnowledgeText(targetPath, page.path, signal)
 		);
 		if (Array.isArray(parsed.data.contradictions)) {
 			for (const contradiction of parsed.data.contradictions as WikiContradiction[]) {

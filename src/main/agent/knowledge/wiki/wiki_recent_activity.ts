@@ -1,5 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { readKnowledgeText } from '../read';
 import { getWikiSettings } from './wiki_get_settings';
 import { getWikiRepository } from './wiki_repository';
 
@@ -9,7 +8,7 @@ export async function getRecentWikiActivity(
 ): Promise<string> {
 	const repository = getWikiRepository(targetPath);
 	const limit = Math.max(1, Math.min(50, Math.trunc(count)));
-	const log = await readFile(path.resolve(targetPath, 'log.md'), 'utf8').catch(() => '');
+	const log = await readKnowledgeText(targetPath, 'log.md', undefined, true);
 	const entries = log
 		.split(/(?=^## \[\d{4}-\d{2}-\d{2}\])/m)
 		.filter((entry) => entry.trim())

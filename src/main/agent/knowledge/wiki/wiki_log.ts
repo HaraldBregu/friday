@@ -1,4 +1,5 @@
-import { appendFile, readFile } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { appendFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { WikiApplyResult, WikiSource } from './types';
 
@@ -12,7 +13,7 @@ export async function appendWikiLog(
 ): Promise<void> {
 	const logPath = path.resolve(targetPath, 'log.md');
 	if (operationId) {
-		const existing = await readFile(logPath, 'utf8').catch(() => '');
+		const existing = await readKnowledgeText(targetPath, 'log.md', undefined, true);
 		if (existing.includes(`- Operation ID: ${operationId}`)) return;
 	}
 	const now = new Date();

@@ -1,4 +1,5 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readKnowledgeText } from '../read';
+import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { getWikiSettings } from './wiki_get_settings';
@@ -18,12 +19,12 @@ export async function readWikiPage(
 	) {
 		throw new Error(`Unsafe wiki page identifier: ${page}`);
 	}
-	const entries = await readdir(targetPath, { recursive: true }).catch(() => []);
+	const entries = await listKnowledgeFiles(targetPath);
 	for (const entry of entries) {
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
 		if (['index.md', 'log.md', 'AGENTS.md'].includes(relativePath)) continue;
-		const parsed = matter(await readFile(path.resolve(targetPath, entry), 'utf8'));
+		const parsed = matter(await readKnowledgeText(targetPath, entry));
 		const title = String(parsed.data.title ?? path.posix.basename(relativePath, '.md')).trim();
 		const aliases = Array.isArray(parsed.data.aliases) ? parsed.data.aliases.map(String) : [];
 		const candidates = [
