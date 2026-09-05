@@ -22,6 +22,8 @@ import { recursivePermissionRule } from './permissions/recursive_permission_rule
 import type { AgentInteractionMode } from '../../shared/agent_types';
 import { agentLocation } from '../shared/agent_location';
 import { sandboxSystemReads } from './sandbox/reads';
+import { realPath } from '../shared/real_path';
+import { isPathWithin } from './permissions/permissions_path';
 
 const WINDOWS_SANDBOX_GUIDANCE =
 	'Open Settings > Permissions and complete Windows sandbox setup; administrator or IT approval may be required. Chat and non-command tools remain available.';
@@ -43,6 +45,14 @@ export class ExecSandbox {
 	private readonly children = new Set<ChildProcess>();
 	private readonly temporaryDirectory = path.join(userDataLocation(), 'sandbox');
 	private readonly planSettings = new Map<string, string>();
+
+	requiredRoots(roots: readonly string[]): string[] {
+		const resolved = roots.map(realPath);
+		return getDefaultWritePaths().filter((value) => !value.startsWith('/dev/')).map(realPath).filter((root) =>
+			resolved.some((target) => isPathWithin(root, target)) &&
+			!resolved.some((target) => isPathWithin(target, root))
+		);
+	}
 
 	async wrap(
 		command: string,

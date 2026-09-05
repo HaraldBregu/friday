@@ -156,6 +156,7 @@ describe('exec path approval', () => {
 		}));
 		const sandbox = {
 			wrap: wrapped,
+			requiredRoots: () => [],
 			track: jest.fn(),
 			cleanup: jest.fn(),
 			annotate: jest.fn((_id: string, stderr: string) => stderr),

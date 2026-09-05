@@ -412,14 +412,25 @@ export function execTool(
 	sandbox: ExecSandbox,
 	interactionMode: AgentInteractionMode = 'default'
 ) {
-	return tool({
+	const configured = tool({
 		id: 'bash',
 		name: 'Execute command',
 		description:
 			'Run a shell command in a filesystem sandbox. Commands are trusted by working directory. Declare every directory accessed outside workdir in additionalRoots so Kucedr can request permission before execution. ' +
-			'For an intentional host operation, retry with elevated: true to request approval. Set background or yieldMs for long-running commands, timeout to stop slow commands, and pty for TTY-only CLIs.',
+			'Runtime cache access may require approval for its containing cache directory. For an intentional host operation, retry with elevated: true to request approval. Set background or yieldMs for long-running commands, timeout to stop slow commands, and pty for TTY-only CLIs.',
 		planSafe: interactionMode === 'plan',
 		inputSchema: execInputSchema,
 		execute: (input, signal) => runExec(sandbox, input, signal, interactionMode),
 	});
+	return {
+		...configured,
+		parseInput(raw: unknown): Record<string, unknown> {
+			const input = configured.parseInput(raw);
+			if (interactionMode === 'plan' || input.elevated === true) return input;
+			const required = sandbox.requiredRoots(resolveExecRoots(input, agentLocation()));
+			return required.length > 0
+				? { ...input, additionalRoots: [...((input.additionalRoots as string[] | undefined) ?? []), ...required] }
+				: input;
+		},
+	};
 }

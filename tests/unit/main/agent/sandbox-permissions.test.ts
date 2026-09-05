@@ -34,8 +34,26 @@ jest.mock('../../../../src/main/agent/agent_store', () => ({
 
 import { ExecSandbox } from '../../../../src/main/agent/sandbox';
 import { agentLocation } from '../../../../src/main/shared/agent_location';
+import { realPath } from '../../../../src/main/shared/real_path';
+import { execTool } from '../../../../src/main/agent/tools/core/bash';
 
 describe('ExecSandbox permissions', () => {
+	it('includes the cache ancestor in canonical command input before approval, preserving the working directory', () => {
+		const configured = execTool(new ExecSandbox());
+		const input = configured.parseInput({ command: 'pwd', workdir: '/tmp/claude/project' });
+		expect(input).toEqual({ command: 'pwd', workdir: '/tmp/claude/project', additionalRoots: [realPath('/tmp/claude')] });
+		expect(configured.parseInput(input)).toEqual(input);
+		expect(configured.parseInput({ command: 'pwd', additionalRoots: ['/tmp/claude/project'] })).toMatchObject({ additionalRoots: ['/tmp/claude/project', realPath('/tmp/claude')] });
+	});
+
+	it('does not expand cache scope for workspace-only, elevated, or Plan commands', () => {
+		const sandbox = new ExecSandbox();
+		expect(execTool(sandbox).parseInput({ command: 'pwd', workdir: '/workspace' })).toEqual({ command: 'pwd', workdir: '/workspace' });
+		const input = { command: 'pwd', workdir: '/tmp/claude/project', elevated: true };
+		expect(execTool(sandbox).parseInput(input)).toEqual(input);
+		expect(execTool(sandbox, 'plan').parseInput({ command: 'pwd', workdir: '/tmp/claude/project' })).toEqual({ command: 'pwd', workdir: '/tmp/claude/project' });
+	});
+
 	it('applies typed read and write denies to command execution', async () => {
 		const configuration = await (
 			new ExecSandbox() as unknown as {
