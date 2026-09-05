@@ -1,3 +1,5 @@
+import { executionScope, type ExecutionScope } from '../../execution/scope';
+import { terminateProcessTree } from '../../execution/terminate';
 import type { ChildProcess } from 'node:child_process';
 import { z } from 'zod';
 import { tool } from '../tool';
@@ -7,6 +9,7 @@ import type { ExecutionMode } from '../../../../shared/sandbox';
 const MAX_BUFFER = 500_000;
 
 export interface ProcessSession {
+	readonly scope: ExecutionScope;
 	readonly id: string;
 	readonly pid: number | undefined;
 	readonly command: string;
@@ -36,7 +39,14 @@ class SessionRegistry {
 	}
 
 	list(): ProcessSession[] {
-		return [...this.sessions.values()];
+		const scope = executionScope.getStore();
+		if (!scope) throw new Error('Process access requires an owning session.');
+		return [...this.sessions.values()].filter((session) => session.scope.ownerId === scope.ownerId &&
+			session.scope.source === scope.source && session.scope.sessionId === scope.sessionId);
+	}
+
+	owned(id: string): ProcessSession | undefined {
+		return this.list().find((session) => session.id === id);
 	}
 
 	remove(id: string): boolean {
@@ -186,7 +196,7 @@ async function runProcess(
 
 	const sessionId = input.sessionId;
 	if (!sessionId) throw new Error('process: sessionId is required.');
-	const session = registry.get(sessionId);
+	const session = registry.owned(sessionId);
 	if (!session) throw new Error(`process: session '${sessionId}' not found.`);
 
 	switch (action) {
@@ -255,7 +265,7 @@ async function runProcess(
 
 		case 'kill': {
 			const sig = (input.signal ?? 'SIGTERM') as NodeJS.Signals;
-			session.child.kill(sig);
+			terminateProcessTree(session.child, sig);
 			return { sessionId, killed: true, signal: sig };
 		}
 
@@ -266,7 +276,7 @@ async function runProcess(
 		}
 
 		case 'remove': {
-			if (!session.exited) session.child.kill('SIGTERM');
+			if (!session.exited) terminateProcessTree(session.child);
 			registry.remove(sessionId);
 			return { sessionId, removed: true };
 		}

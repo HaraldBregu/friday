@@ -106,14 +106,6 @@ const PermissionsPage: React.FC = () => {
 			setError(cause instanceof Error ? cause.message : String(cause));
 			return;
 		}
-		const locationKey = normalized.replaceAll('\\', '/').replace(/\/$/, '');
-		if (
-			newBucket === 'deny' &&
-			(locationKey === workspaceKey || locationKey.startsWith(`${workspaceKey}/`))
-		) {
-			setError(t('settings.permissions.workspaceAlwaysTrusted'));
-			return;
-		}
 		const rule = `${normalized}${/[\\/]$/.test(normalized) ? '' : '/'}**`;
 		const opposite: PermissionBucket = newBucket === 'allow' ? 'deny' : 'allow';
 		setPermissions(
@@ -173,7 +165,7 @@ const PermissionsPage: React.FC = () => {
 			/>
 
 			{error && <SettingsNotice variant="destructive" icon={AlertTriangle}>{error}</SettingsNotice>}
-			<SettingsNotice>{t('settings.permissions.locationsNotice')}</SettingsNotice>
+			<SettingsNotice>Workspace access is allowed by default. Blocked locations override grants, including inside the workspace. Sandboxed commands also respect blocked read and write locations.</SettingsNotice>
 			<Sandbox />
 
 			{!permissions ? (
@@ -184,7 +176,7 @@ const PermissionsPage: React.FC = () => {
 						<SettingsRow
 							icon={FolderCheck}
 							title={<span className="break-all font-mono text-xs">{workspace}</span>}
-							description={t('settings.permissions.workspaceDescription')}
+							description="Allowed by default; explicit blocked locations still apply."
 							actions={<Badge variant="secondary">{t('settings.permissions.trusted')}</Badge>}
 						/>
 						{customRows.map((row) => (

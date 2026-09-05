@@ -1,3 +1,6 @@
+import { executionScope } from '../../execution/scope';
+import { commandEnvironment } from '../../execution/environment';
+import { terminateProcessTree } from '../../execution/terminate';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -93,6 +96,8 @@ async function runExec(
 	interactionMode: AgentInteractionMode = 'default'
 ): Promise<ExecResult> {
 	abortSignal?.throwIfAborted();
+	const scope = executionScope.getStore();
+	if (!scope) throw new Error('Command execution requires an owning session.');
 	const {
 		command,
 		workdir,
@@ -117,21 +122,7 @@ async function runExec(
 		throw new Error("exec host 'sandbox' cannot be combined with elevated mode.");
 	}
 
-	const env: NodeJS.ProcessEnv = planMode
-		? {
-				PATH: process.env.PATH,
-				LANG: process.env.LANG,
-				LC_ALL: process.env.LC_ALL,
-				SystemRoot: process.env.SystemRoot,
-				ComSpec: process.env.ComSpec,
-				PATHEXT: process.env.PATHEXT,
-			}
-		: { ...process.env };
-	if (envInput) {
-		for (const [key, value] of Object.entries(envInput)) {
-			env[key] = value;
-		}
-	}
+	const env = commandEnvironment(envInput);
 
 	const roots = resolveExecRoots(input, agentLocation());
 	const cwd = roots[0] ?? resolveUserPath(workdir ?? '.', agentLocation());
@@ -203,13 +194,13 @@ async function runExec(
 			cwd,
 			env,
 			shell,
-			detached: true,
+			detached: process.platform !== 'win32',
 			stdio: 'ignore',
 		});
 		if (executionMode === 'sandbox') sandbox.track(child);
 		let timeoutTimer: NodeJS.Timeout | undefined;
 		if (timeoutMs !== undefined) {
-			timeoutTimer = setTimeout(() => child.kill('SIGTERM'), timeoutMs);
+			timeoutTimer = setTimeout(() => terminateProcessTree(child), timeoutMs);
 			timeoutTimer.unref();
 		}
 		return await new Promise<ExecResult>((resolve, reject) => {
@@ -219,7 +210,7 @@ async function runExec(
 				abortSignal?.removeEventListener('abort', abort);
 			};
 			const abort = (): void => {
-				child.kill('SIGTERM');
+				terminateProcessTree(child);
 				if (settled) return;
 				settled = true;
 				cleanup();
@@ -262,20 +253,9 @@ async function runExec(
 		cwd,
 		env,
 		shell,
-		detached: planMode && process.platform !== 'win32',
+		detached: process.platform !== 'win32',
 	});
-	const terminateChild = (signal: NodeJS.Signals): void => {
-		if (planMode && process.platform !== 'win32' && child.pid) {
-			try {
-				process.kill(-child.pid, signal);
-				return;
-			} catch {
-				child.kill(signal);
-				return;
-			}
-		}
-		child.kill(signal);
-	};
+
 	if (executionMode === 'sandbox') sandbox.track(child);
 	const maxOutputLength = 200000;
 	let stdout = '';
@@ -308,7 +288,6 @@ async function runExec(
 		let aborted = false;
 		let ownedSessionId: string | undefined;
 		let timeoutTimer: NodeJS.Timeout | undefined;
-		let hardKillTimer: NodeJS.Timeout | undefined;
 		const yieldTimer = planMode ? undefined : setTimeout(() => {
 			if (settled || aborted) return;
 			settled = true;
@@ -317,6 +296,7 @@ async function runExec(
 			ownedSessionId = sessionId;
 			const session = registry.register({
 				id: sessionId,
+				scope,
 				pid: child.pid,
 				command,
 				workdir: cwd,
@@ -367,8 +347,7 @@ async function runExec(
 		}, yieldMs);
 		const abort = (): void => {
 			aborted = true;
-			terminateChild('SIGTERM');
-			if (planMode) hardKillTimer = setTimeout(() => terminateChild('SIGKILL'), 1_000);
+			terminateProcessTree(child);
 			if (ownedSessionId) registry.remove(ownedSessionId);
 		};
 		abortSignal?.addEventListener('abort', abort, { once: true });
@@ -377,8 +356,7 @@ async function runExec(
 		if (timeoutMs !== undefined) {
 			timeoutTimer = setTimeout(() => {
 				timedOut = true;
-				terminateChild('SIGTERM');
-				if (planMode) hardKillTimer = setTimeout(() => terminateChild('SIGKILL'), 1_000);
+				terminateProcessTree(child);
 			}, timeoutMs);
 		}
 
@@ -386,7 +364,6 @@ async function runExec(
 			if (settled) return;
 			settled = true;
 			if (yieldTimer) clearTimeout(yieldTimer);
-			if (hardKillTimer) clearTimeout(hardKillTimer);
 			if (timeoutTimer) clearTimeout(timeoutTimer);
 			abortSignal?.removeEventListener('abort', abort);
 			cleanupSandbox();
@@ -394,7 +371,6 @@ async function runExec(
 		});
 		child.on('close', (exitCode, signal) => {
 			if (timeoutTimer) clearTimeout(timeoutTimer);
-			if (hardKillTimer) clearTimeout(hardKillTimer);
 			abortSignal?.removeEventListener('abort', abort);
 			if (settled) return;
 			settled = true;

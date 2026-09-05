@@ -1,3 +1,4 @@
+import { terminateProcessTree } from './execution/terminate';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -222,14 +223,14 @@ export class ExecSandbox {
 	}> {
 		const permissions = getPermissions();
 		const resolveRules = (rules: string[]): string[] =>
-			rules.map((rule) => resolveUserPath(rule, os.homedir()));
+			rules.map((rule) => rule === '*' ? path.parse(os.homedir()).root : resolveUserPath(rule, os.homedir()));
 		const allowRead = resolveRules(permissions.exec.allow);
 		const allowWrite = [
 			...resolveRules(permissions.exec.allow),
 			this.temporaryDirectory,
 		];
-		const denyWrite = resolveRules(permissions.exec.deny);
-		const denyRead = [os.homedir(), ...resolveRules(permissions.exec.deny)];
+		const denyWrite = resolveRules([...permissions.exec.deny, ...permissions.write.deny]);
+		const denyRead = [os.homedir(), ...resolveRules([...permissions.exec.deny, ...permissions.read.deny])];
 		const windowsPath = this.vendoredWindowsPath();
 		const seccompPath = this.vendoredSeccompPath();
 		const config: SandboxRuntimeConfig = {
@@ -293,7 +294,7 @@ export class ExecSandbox {
 				allowAllUnixSockets: false,
 			},
 			filesystem: {
-				denyRead: [path.parse(agentLocation()).root],
+				denyRead: [path.parse(agentLocation()).root, ...getPermissions().read.deny.map((rule) => rule === '*' ? path.parse(agentLocation()).root : resolveUserPath(rule, os.homedir()))],
 				allowRead: readPaths,
 				allowWrite: [this.temporaryDirectory],
 				denyWrite: [agentLocation(), ...persistentDefaults],
@@ -367,7 +368,7 @@ export class ExecSandbox {
 							clearTimeout(timer);
 							resolve();
 						});
-						child.kill('SIGTERM');
+						terminateProcessTree(child);
 					})
 			)
 		);
