@@ -25,6 +25,7 @@ const store = new Store<RagConfiguration>({
 	name: 'rag',
 	cwd: path.resolve(userDataLocation(), 'settings'),
 	accessPropertiesByDotNotation: false,
+	configFileMode: 0o600,
 	defaults: DEFAULT_RAG_CONFIGURATION,
 });
 

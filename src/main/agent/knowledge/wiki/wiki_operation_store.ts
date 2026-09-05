@@ -6,5 +6,6 @@ export const wikiOperationStore = new Store<WikiOperationRegistry>({
 	name: 'operations',
 	cwd: wikiPaths().state,
 	accessPropertiesByDotNotation: false,
+	configFileMode: 0o600,
 	defaults: { version: 1, operations: {} },
 });

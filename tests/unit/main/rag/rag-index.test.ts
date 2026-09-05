@@ -1,250 +1,95 @@
+import { mkdtemp, mkdir, realpath, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type {
-	EmbeddingProvider,
-	VectorStore,
-} from '../../../../src/main/agent/knowledge/rag/types';
+import os from 'node:os';
+import type { RagConfiguration } from '../../../../src/shared/rag_types';
+import type { RagMirror, VectorStore } from '../../../../src/main/agent/knowledge/rag/types';
 
-const lstat = jest.fn();
-const readFile = jest.fn();
-const readdir = jest.fn();
-const stat = jest.fn();
-const createIndex = jest.fn();
-const upsert = jest.fn();
-const namespace = jest.fn(() => ({ upsert }));
-const index = jest.fn(() => ({ namespace }));
-const ragClient = jest.fn(() => ({ createIndex, index }));
-const writeRagManifest = jest.fn();
 const getRagConfiguration = jest.fn();
-
-jest.mock('node:fs/promises', () => ({ lstat, readFile, readdir, stat }));
-jest.mock('../../../../src/main/agent/knowledge/rag/rag_client', () => ({ ragClient }));
-jest.mock('../../../../src/main/agent/knowledge/rag/rag_manifest', () => ({ writeRagManifest }));
+const writeRagManifest = jest.fn();
+const getProvider = jest.fn();
 jest.mock('../../../../src/main/agent/knowledge/rag/rag_store', () => ({ getRagConfiguration }));
+jest.mock('../../../../src/main/agent/knowledge/rag/rag_manifest', () => ({ writeRagManifest }));
+jest.mock('../../../../src/main/settings_store', () => ({ getProvider }));
 
 import { indexRag } from '../../../../src/main/agent/knowledge/rag/rag_index';
+import { authorizeRagDisclosure } from '../../../../src/main/agent/knowledge/rag/disclosure';
 
 const embed = jest.fn();
-const embeddings: EmbeddingProvider = { embed };
-const getReusableSource = jest.fn();
+const upload = jest.fn();
+const discard = jest.fn();
+const mirror: RagMirror = { upload, discard };
 const publish = jest.fn();
-const vectors: VectorStore = {
-	getIndex: jest.fn(),
-	getReusableSource,
-	publish,
-	search: jest.fn(),
-	exportIndex: jest.fn(),
-	purge: jest.fn(),
-	close: jest.fn(),
-};
+const reusable = jest.fn();
+const vectors: VectorStore = { getIndex: jest.fn(), getReusableSource: reusable, publish, search: jest.fn(), exportIndex: jest.fn(), purge: jest.fn(), close: jest.fn() };
+let root: string;
+let configuration: RagConfiguration;
 
-beforeEach(() => {
-	jest.clearAllMocks();
-	stat.mockResolvedValue({ isDirectory: () => true });
-	lstat.mockResolvedValue({ isFile: () => true });
-	readdir.mockResolvedValue(['guide.md']);
-	readFile.mockResolvedValue(Buffer.from('# Guide'));
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: 'openai',
-		embeddingModelId: 'text-embedding-3-small',
-		embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small' },
-	});
-	embed.mockResolvedValue({
-		providerId: 'openai',
-		modelId: 'text-embedding-3-small',
-		dimensions: 2,
-		embeddings: [[0.1, 0.2]],
-	});
-	getReusableSource.mockReturnValue(undefined);
-	createIndex.mockResolvedValue(undefined);
-	upsert.mockResolvedValue(undefined);
+beforeEach(async () => {
+	root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'kucedr-rag-index-')));
+	await writeFile(path.join(root, 'guide.md'), '# Guide');
+	process.env.PINECONE_API_KEY = 'synthetic-pinecone-account';
+	getProvider.mockReturnValue({ apiKey: 'synthetic-embedding-account' });
+	configuration = authorizeRagDisclosure({ enabled: true, indexName: 'knowledge-base', databaseId: '', databaseProviderId: '', embeddingProviderId: 'openai', embeddingModelId: 'test-model', embeddingConsent: { providerId: 'openai', modelId: 'test-model', version: 1 }, mirrorConsent: { indexName: 'knowledge-base', version: 1 }, folders: [root], scheduleEnabled: false, cronExpression: '0 3 * * *' });
+	getRagConfiguration.mockImplementation(() => configuration);
+	embed.mockImplementation(async (input) => ({ providerId: input.providerId, modelId: input.modelId, dimensions: 2, embeddings: input.texts.map(() => [0.1, 0.2]) }));
+	upload.mockResolvedValue(undefined);
+	discard.mockResolvedValue(undefined);
 });
+afterEach(async () => { await rm(root, { recursive: true, force: true }); delete process.env.PINECONE_API_KEY; });
 
-it('publishes SQLite locally and mirrors record fields to Pinecone', async () => {
-	const result = await indexRag(['/documents'], 'knowledge-base', { embeddings, vectors });
+it('publishes locally only after the authorized mirror finishes', async () => {
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).resolves.toEqual({ files: 1, vectors: 1 });
 	const publication = publish.mock.calls[0][0];
-
-	expect(result).toEqual({ files: 1, vectors: 1 });
-	expect(publication).toEqual({
-		indexName: 'knowledge-base',
-		generation: expect.stringMatching(/^kucedr-[a-f0-9-]+$/),
-		providerId: 'openai',
-		modelId: 'text-embedding-3-small',
-		dimensions: 2,
-		completedAt: expect.any(String),
-		records: [
-			expect.objectContaining({
-				id: expect.stringMatching(/^[a-f0-9]{64}#0$/),
-				path: path.join('documents', 'guide.md'),
-				text: '# Guide',
-				vector: [0.1, 0.2],
-			}),
-		],
-	});
-	expect(writeRagManifest).toHaveBeenCalledWith({
-		indexName: 'knowledge-base',
-		activeNamespace: publication.generation,
-		providerId: 'openai',
-		modelId: 'text-embedding-3-small',
-		dimensions: 2,
-		completedAt: publication.completedAt,
-	});
-	expect(upsert).toHaveBeenCalledWith({
-		records: [
-			{
-				id: publication.records[0].id,
-				values: [0.1, 0.2],
-				metadata: { path: path.join('documents', 'guide.md'), text: '# Guide' },
-			},
-		],
-	});
+	expect(upload).toHaveBeenCalledWith('knowledge-base', publication.generation, 2, expect.arrayContaining([expect.objectContaining({ text: '# Guide', vector: [0.1, 0.2] })]), expect.any(AbortSignal));
+	expect(writeRagManifest).toHaveBeenCalledWith(expect.objectContaining({ activeNamespace: publication.generation }));
+	expect(discard).not.toHaveBeenCalled();
 });
 
-it('reuses unchanged source vectors by fingerprint without another embedding call', async () => {
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: 'openai',
-		embeddingModelId: 'text-embedding-3-small',
-		embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small' },
-		databaseProviderId: '',
-	});
-	getReusableSource.mockReturnValue([
-		{
-			id: 'source#0',
-			sourceId: 'source',
-			sourceFingerprint: 'fingerprint',
-			path: 'documents/guide.md',
-			chunkIndex: 0,
-			lineStart: 1,
-			lineEnd: 1,
-			text: '# Guide',
-			checksum: 'checksum',
-			indexedAt: '2026-08-08T00:00:00.000Z',
-			vector: [0.1, 0.2],
-		},
-	]);
-
-	await indexRag(['/documents'], 'knowledge-base', { embeddings, vectors });
-
-	expect(embed).not.toHaveBeenCalled();
-	expect(publish.mock.calls[0][0].records).toHaveLength(1);
+it.each(['embedding', 'mirror', 'account', 'model', 'index'])('blocks unapproved or changed %s disclosure before any export', async (change) => {
+	if (change === 'embedding') configuration.embeddingConsent = { providerId: 'openai', modelId: 'test-model' };
+	if (change === 'mirror') configuration.mirrorConsent = null;
+	if (change === 'account') getProvider.mockReturnValue({ apiKey: 'different-account' });
+	if (change === 'model') configuration.embeddingModelId = 'changed-model';
+	await expect(indexRag([root], change === 'index' ? 'changed-index' : 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow(/Confirm/);
+	expect(embed).not.toHaveBeenCalled(); expect(upload).not.toHaveBeenCalled(); expect(publish).not.toHaveBeenCalled();
 });
 
-it('indexes nested and extensionless text files while skipping binary files', async () => {
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: 'openai',
-		embeddingModelId: 'text-embedding-3-small',
-		embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small' },
-		databaseProviderId: '',
-	});
-	readdir.mockResolvedValue(['nested', 'nested/guide.txt', 'README', 'nested/image.png']);
-	lstat.mockImplementation(async (filePath: string) => ({
-		isFile: () => filePath !== path.join('/documents', 'nested'),
-	}));
-	readFile.mockImplementation(async (filePath: string) => {
-		if (filePath.endsWith('image.png')) return Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0xff]);
-		if (filePath.endsWith('README')) return Buffer.from('Extensionless notes');
-		return Buffer.from('Nested guide');
-	});
-	embed
-		.mockResolvedValueOnce({
-			providerId: 'openai',
-			modelId: 'text-embedding-3-small',
-			dimensions: 2,
-			embeddings: [[1, 0]],
-		})
-		.mockResolvedValueOnce({
-			providerId: 'openai',
-			modelId: 'text-embedding-3-small',
-			dimensions: 2,
-			embeddings: [[0, 1]],
-		});
-
-	const result = await indexRag(['/documents'], 'knowledge-base', { embeddings, vectors });
-
-	expect(result).toEqual({ files: 2, vectors: 2 });
-	expect(embed.mock.calls.map(([request]) => request.texts[0])).toEqual([
-		'Extensionless notes',
-		'Nested guide',
-	]);
+it.each(['{"api_key":"abcdefghijklmnopqrstuvwxyz123456"}', 'sk-abcdefghijklmnopqrstuvwxyz123456', '-----BEGIN PRIVATE KEY-----'])('rejects synthetic secrets before export', async (content) => {
+	await writeFile(path.join(root, 'guide.md'), content);
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow('credential-like');
+	expect(embed).not.toHaveBeenCalled(); expect(upload).not.toHaveBeenCalled();
 });
 
-it('does not publish locally when the Pinecone mirror fails', async () => {
-	upsert.mockRejectedValueOnce(new Error('remote failure'));
-
-	await expect(
-		indexRag(['/documents'], 'knowledge-base', { embeddings, vectors })
-	).rejects.toThrow('remote failure');
-	expect(publish).not.toHaveBeenCalled();
-	expect(writeRagManifest).not.toHaveBeenCalled();
+it('reads nested and extensionless text while excluding binary content', async () => {
+	await mkdir(path.join(root, 'nested'));
+	await writeFile(path.join(root, 'nested', 'README'), 'Nested notes');
+	await writeFile(path.join(root, 'binary'), Buffer.from([0, 255]));
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).resolves.toEqual({ files: 2, vectors: 2 });
 });
 
-it('does not publish an index when its embedding run is cancelled', async () => {
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: 'openai',
-		embeddingModelId: 'text-embedding-3-small',
-		embeddingConsent: { providerId: 'openai', modelId: 'text-embedding-3-small' },
-		databaseProviderId: '',
-	});
+it('cleans only the current failed staging namespace and keeps the published index untouched', async () => {
+	upload.mockRejectedValue(new Error('partial upload failed'));
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow('partial upload failed');
+	expect(discard).toHaveBeenCalledWith('knowledge-base', upload.mock.calls[0][1], expect.any(AbortSignal));
+	expect(publish).not.toHaveBeenCalled(); expect(writeRagManifest).not.toHaveBeenCalled();
+});
+
+it('cleans a cancelled upload using a fresh cleanup signal', async () => {
 	const controller = new AbortController();
-	const reason = new Error('cancel indexing');
-	let embeddingStarted: (() => void) | undefined;
-	const started = new Promise<void>((resolve) => {
-		embeddingStarted = resolve;
-	});
-	embed.mockImplementationOnce(
-		(_input, signal: AbortSignal) =>
-			new Promise((_resolve, reject) => {
-				embeddingStarted?.();
-				signal.addEventListener('abort', () => reject(signal.reason), { once: true });
-			})
-	);
-	const result = indexRag(['/documents'], 'knowledge-base', {
-		embeddings,
-		vectors,
-		signal: controller.signal,
-	});
-	await started;
-	controller.abort(reason);
-
-	await expect(result).rejects.toBe(reason);
-	expect(embed.mock.calls[0][1]).toBe(controller.signal);
+	upload.mockImplementation(async () => controller.abort(new Error('cancelled')));
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror, signal: controller.signal })).rejects.toThrow('cancelled');
+	expect(discard.mock.calls[0][2].aborted).toBe(false);
 	expect(publish).not.toHaveBeenCalled();
-	expect(writeRagManifest).not.toHaveBeenCalled();
 });
 
-it('requires an explicit embedding provider and model', async () => {
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: '',
-		embeddingModelId: '',
-		embeddingConsent: null,
-		databaseProviderId: '',
-	});
-
-	await expect(
-		indexRag(['/documents'], 'knowledge-base', { embeddings, vectors })
-	).rejects.toThrow('Select an embedding provider and model before indexing.');
-	expect(embed).not.toHaveBeenCalled();
+it('does not remove a successfully published generation when manifest persistence fails', async () => {
+	writeRagManifest.mockImplementation(() => { throw new Error('disk full'); });
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow('disk full');
+	expect(publish).toHaveBeenCalled(); expect(discard).not.toHaveBeenCalled();
 });
 
-it('requires disclosure consent bound to the selected provider and model', async () => {
-	getRagConfiguration.mockReturnValue({
-		embeddingProviderId: 'openai',
-		embeddingModelId: 'text-embedding-3-small',
-		embeddingConsent: { providerId: 'voyage', modelId: 'voyage-3' },
-		databaseProviderId: '',
-	});
-
-	await expect(
-		indexRag(['/documents'], 'knowledge-base', { embeddings, vectors })
-	).rejects.toThrow('Confirm remote embedding disclosure');
-	expect(embed).not.toHaveBeenCalled();
-});
-
-it('refuses to upload credential-like text files', async () => {
-	readdir.mockResolvedValue(['.env']);
-	readFile.mockResolvedValue(Buffer.from('API_KEY=abcdefghijklmnopqrstuvwxyz123456'));
-
-	await expect(
-		indexRag(['/documents'], 'knowledge-base', { embeddings, vectors })
-	).rejects.toThrow('Refusing to ingest credential-like file: .env');
-	expect(embed).not.toHaveBeenCalled();
+it('stops when consent is revoked between embedding batches and publication', async () => {
+	embed.mockImplementation(async () => { configuration.mirrorConsent = null; return { providerId: 'openai', modelId: 'test-model', dimensions: 2, embeddings: [[1, 2]] }; });
+	await expect(indexRag([root], 'knowledge-base', { embeddings: { embed }, vectors, mirror })).rejects.toThrow('Confirm Pinecone');
+	expect(upload).not.toHaveBeenCalled();
 });

@@ -6,5 +6,6 @@ export const wikiStateStore = new Store<WikiState>({
 	name: 'state',
 	cwd: wikiLocation(),
 	accessPropertiesByDotNotation: false,
+	configFileMode: 0o600,
 	defaults: { sources: {} },
 });

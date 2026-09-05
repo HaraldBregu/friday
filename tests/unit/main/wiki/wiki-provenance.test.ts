@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import matter from 'gray-matter';
@@ -25,7 +25,9 @@ describe('wiki evidence provenance', () => {
 	it('computes excerpt hashes and rejects locator, hash, and archive tampering durably', async () => {
 		const root = await mkdtemp(path.join(os.tmpdir(), 'kucedr-wiki-provenance-'));
 		const target = path.join(root, 'wiki');
-		const archive = path.join(root, 'evidence.md');
+		const repository = getWikiRepository(target);
+		await mkdir(repository.paths.evidence, { recursive: true });
+		const archive = path.join(repository.paths.evidence, 'evidence.md');
 		const content = '# Evidence\nKucedr stores durable facts.\nA final line.\n';
 		const checksum = createHash('sha256').update(content).digest('hex');
 		const source: WikiSource = {
@@ -36,7 +38,6 @@ describe('wiki evidence provenance', () => {
 			sourceId: `source-${checksum.slice(0, 16)}`,
 			archivePath: archive,
 		};
-		const repository = getWikiRepository(target);
 		await writeFile(archive, content, 'utf8');
 		repository.sources.store = {
 			version: 1,

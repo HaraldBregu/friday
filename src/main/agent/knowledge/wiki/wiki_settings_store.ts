@@ -30,6 +30,7 @@ export const wikiSettingsStore = new Store<WikiSettings>({
 	name: 'wiki',
 	cwd: settingsDirectory,
 	accessPropertiesByDotNotation: false,
+	configFileMode: 0o600,
 	defaults: DEFAULT_WIKI_SETTINGS,
 });
 
