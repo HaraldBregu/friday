@@ -211,7 +211,9 @@ async function* loop(
 			closeMcp = mcp.close;
 			mcpDiscovery = mcp.diagnostics;
 		}
-		const childTools = filterTools(tools, input.toolsAllow, input.toolsDeny);
+		const childTools = filterTools(tools, input.toolsAllow, input.toolsDeny).filter((tool) =>
+			tool.id !== 'use_web_browser' || (input.agentId !== 'channels' && input.scope?.source !== 'channel')
+		);
 		const childRuntime = {
 			type: input.type,
 			interactionMode: input.interactionMode,

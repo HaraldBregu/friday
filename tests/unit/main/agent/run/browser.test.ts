@@ -20,12 +20,17 @@ jest.mock('../../../../../src/main/agent/runner/run_model_turn', () => ({
 jest.mock('../../../../../src/main/agent/skills', () => ({
 	createSkillRegistrySnapshot: () => ({ skills: [], diagnostics: [] }),
 }));
+jest.mock('../../../../../src/main/agent/tools/mcp/loader', () => ({
+	loadMcpTools: async () => ({ tools: [], close: async () => undefined }),
+}));
 
 import { stream } from '../../../../../src/main/agent/runner/run_stream';
 import { createSessionState } from '../../../../../src/main/agent/session';
 import { useWebBrowserTool } from '../../../../../src/main/agent/tools/web/use_web_browser';
 import { createBackgroundBrowser } from '../../../../../src/main/agent/tools/web/browser/background';
 import { userDataLocation } from '../../../../../src/main/shared/user_data_location';
+import type { ExecSandbox } from '../../../../../src/main/agent/sandbox';
+import type { Tool } from '../../../../../src/main/agent/types';
 
 function browserContext() {
 	const events = new EventEmitter();
@@ -109,5 +114,29 @@ it.each([
 	}, new AbortController().signal, { tools: [useWebBrowserTool] })) {
 		if (event.type === 'tool_call_end') expect(event.isError).toBe(true);
 	}
+	expect(launchPersistentContext).not.toHaveBeenCalled();
+});
+
+it('does not let channel agents delegate browser access to a background child', async () => {
+	const requested = new Set<string>();
+	model.mockReset().mockImplementation(async function* (input: { agentId: string }, _provider: unknown, _model: unknown, _prompt: unknown, _messages: unknown, tools: Tool[]) {
+		yield* [];
+		if (input.agentId === 'subagent') expect(tools.map((tool) => tool.id)).not.toContain('use_web_browser');
+		if (requested.has(input.agentId)) return { content: 'done', model: 'test-model', toolCalls: [] };
+		requested.add(input.agentId);
+		return {
+			content: '', model: 'test-model', toolCalls: [input.agentId === 'channels'
+				? { id: 'delegate', name: 'subagent', args: { task: 'Open a browser' } }
+				: { id: 'child-start', name: 'use_web_browser', args: { action: 'start' } }],
+		};
+	});
+	for await (const event of stream({ location: userDataLocation() }, createSessionState(), {
+		runId: 'channel-parent', task: 'chat', message: 'Open browser', model: 'test-model',
+		type: 'background', agentId: 'channels', contextMode: 'minimal',
+		scope: { ownerId: 'channel', source: 'channel', sessionId: 'channel', runId: 'channel-parent' },
+	}, new AbortController().signal, { sandbox: {} as ExecSandbox })) {
+		if (event.type === 'tool_call_end') expect(event.permissionOutcome).toBe('allow');
+	}
+	expect(requested).toEqual(new Set(['channels', 'subagent']));
 	expect(launchPersistentContext).not.toHaveBeenCalled();
 });
