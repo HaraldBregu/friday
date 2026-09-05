@@ -1,6 +1,6 @@
 import { readKnowledgeText } from '../read';
 import { listKnowledgeFiles } from '../list';
-import { writeFile } from 'node:fs/promises';
+import { writeKnowledgeText } from '../write';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type { WikiClaim } from './types';
@@ -18,7 +18,6 @@ export async function markStaleWikiClaims(
 		signal?.throwIfAborted();
 		const relativePath = entry.split(path.sep).join('/');
 		if (path.posix.extname(relativePath).toLowerCase() !== '.md') continue;
-		const pagePath = path.resolve(targetPath, entry);
 		const parsed = matter(await readKnowledgeText(targetPath, entry, signal));
 		if (!Array.isArray(parsed.data.claims)) continue;
 		let content = parsed.content;
@@ -40,10 +39,7 @@ export async function markStaleWikiClaims(
 			return { ...claim, status };
 		});
 		if (!pageChanged) continue;
-		await writeFile(pagePath, matter.stringify(content, { ...parsed.data, claims }), {
-			encoding: 'utf8',
-			signal,
-		});
+		await writeKnowledgeText(targetPath, entry, matter.stringify(content, { ...parsed.data, claims }), signal);
 		changed += 1;
 	}
 	return changed;

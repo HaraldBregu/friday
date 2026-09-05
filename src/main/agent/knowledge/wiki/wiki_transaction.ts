@@ -1,3 +1,4 @@
+import { listKnowledgeFiles } from '../list';
 import { cp, mkdir, mkdtemp, rename, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { getWikiRepository } from './wiki_repository';
@@ -15,7 +16,10 @@ export async function transactWiki<T>(input: WikiTransactionInput<T>): Promise<T
 		.then((value) => value.isDirectory())
 		.catch(() => false);
 	try {
-		if (targetExists) await cp(input.targetPath, stagedPath, { recursive: true, force: false });
+		if (targetExists) {
+			await listKnowledgeFiles(input.targetPath, input.signal);
+			await cp(input.targetPath, stagedPath, { recursive: true, force: false });
+		}
 		else await mkdir(stagedPath, { recursive: true, mode: 0o700 });
 		input.signal?.throwIfAborted();
 		const result = await input.apply(stagedPath);

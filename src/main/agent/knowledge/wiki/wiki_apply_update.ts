@@ -1,6 +1,6 @@
 import { readKnowledgeText } from '../read';
 import { createHash } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { writeKnowledgeText } from '../write';
 import path from 'node:path';
 import matter from 'gray-matter';
 import type {
@@ -62,7 +62,6 @@ export async function applyWikiUpdate(
 
 	for (const page of pages) {
 		options.signal?.throwIfAborted();
-		const pagePath = path.resolve(targetPath, page.path);
 		let existing: string | undefined;
 		try { existing = await readKnowledgeText(targetPath, page.path, options.signal); }
 		catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
@@ -260,8 +259,7 @@ export async function applyWikiUpdate(
 			open_questions: openQuestions,
 			change_history: changeHistory,
 		});
-		await mkdir(path.dirname(pagePath), { recursive: true, mode: 0o700 });
-		await writeFile(pagePath, markdown, { encoding: 'utf8', signal: options.signal, mode: 0o600 });
+		await writeKnowledgeText(targetPath, page.path, markdown, options.signal);
 		if (existing === undefined) createdPages += 1;
 		else updatedPages += 1;
 	}

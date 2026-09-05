@@ -2,7 +2,7 @@ import { readKnowledgeText } from '../read';
 import { listKnowledgeFiles } from '../list';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { atomicWrite } from '../../../shared/atomic_write';
+import { writeKnowledgeText } from '../write';
 
 export async function rebuildWikiIndex(targetPath: string): Promise<void> {
 	const entries = await listKnowledgeFiles(targetPath);
@@ -49,5 +49,5 @@ export async function rebuildWikiIndex(targetPath: string): Promise<void> {
 		})
 		.join('\n\n');
 	const markdown = `# Wiki index\n\n${sections || '_No pages have been generated yet._'}\n`;
-	await atomicWrite(path.resolve(targetPath, 'index.md'), markdown);
+	await writeKnowledgeText(targetPath, 'index.md', markdown);
 }

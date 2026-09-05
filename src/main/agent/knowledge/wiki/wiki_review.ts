@@ -1,5 +1,5 @@
 import { readKnowledgeText } from '../read';
-import { writeFile } from 'node:fs/promises';
+import { writeKnowledgeText } from '../write';
 import matter from 'gray-matter';
 import { applyWikiUpdate } from './wiki_apply_update';
 import { getWikiSettings } from './wiki_get_settings';
@@ -48,12 +48,10 @@ export async function reviewWikiChange(
 					: { createdPages: 0, updatedPages: 0 };
 			if (action === 'approve') {
 				for (const page of item.proposedUpdate.pages) {
-					const pagePath = `${stagedPath}/${page.path}`;
 					const parsed = matter(await readKnowledgeText(stagedPath, page.path));
-					await writeFile(
-						pagePath,
-						matter.stringify(parsed.content, { ...parsed.data, review_status: 'approved' }),
-						'utf8'
+					await writeKnowledgeText(
+						stagedPath, page.path,
+						matter.stringify(parsed.content, { ...parsed.data, review_status: 'approved' })
 					);
 				}
 				await rebuildWikiIndex(stagedPath);

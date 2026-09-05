@@ -1,3 +1,4 @@
+import { containsSecret } from '../secrets';
 import { createHash } from 'node:crypto';
 import { applyWikiUpdate } from './wiki_apply_update';
 import { getWikiSettings } from './wiki_get_settings';
@@ -25,11 +26,7 @@ export async function saveWikiAnalysis(
 	const content = input.content.trim();
 	if (!title || !summary || !content)
 		throw new Error('Analysis title, summary, and content are required.');
-	if (
-		/(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*[:=]\s*["']?[A-Za-z0-9_\-/.+=]{20,}/i.test(
-			content
-		)
-	) {
+	if (containsSecret([title, summary, content].join("\n"))) {
 		throw new Error('Refusing to save analysis containing credential-like content.');
 	}
 	const sourceIds = [...new Set(input.sourceIds)];

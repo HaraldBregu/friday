@@ -1,3 +1,5 @@
+import { assertWikiSourceSafe } from '../safety';
+import { containsSecret } from '../secrets';
 import { LlmModel } from '../../../models/adapters/llm';
 import { getProvider } from '../../../settings_store';
 import type { WikiSettings } from '../../../../shared/wiki_types';
@@ -18,6 +20,8 @@ export async function generateWikiUpdate(
 	signal?: AbortSignal,
 	timeoutMs = WIKI_GENERATION_TIMEOUT_MS
 ): Promise<WikiUpdate> {
+	assertWikiSourceSafe(source);
+	if (containsSecret(context)) throw new Error('Wiki context contains credential-like content.');
 	const provider = getProvider(settings.providerId);
 	if (!provider) throw new Error(`Provider not configured: ${settings.providerId}`);
 	const sourcePage = wikiSourcePage(source);
