@@ -24,7 +24,7 @@ export function createRealtimeVoiceManager(
 	const manager = new RealtimeVoiceManager({
 		createAdapter: buildRealtimeVoiceAdapter,
 		resources: agent.resources,
-		createConversation: realtimeVoiceConversationFactory(agent.config),
+		createConversation: realtimeVoiceConversationFactory(agent.config, agent.sessions),
 		emit: (windowId, event) => eventBus.sendTo(windowId, RealtimeVoiceChannels.sessionEvent, event),
 		resolveConfiguration: async () => {
 			const configuredProviderId = getProviderId('realtimeVoice');

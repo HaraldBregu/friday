@@ -4,12 +4,16 @@ import {
 	createSessionState,
 	init,
 	insertUserMessage,
+	SessionCoordinator,
+	releaseSession,
 } from '../session';
 import type { Config, ToolCall } from '../types';
 import type { RealtimeVoiceHistoryMessage } from '../../models/adapters/realtime_voice';
 import { realtimeVoiceHistory } from './history';
 
 export interface RealtimeVoiceConversation {
+	readonly signal?: AbortSignal;
+	dispose?(): void;
 	readonly history: readonly RealtimeVoiceHistoryMessage[];
 	beginUserTurn(itemId: string): void;
 	finalizeUserTurn(itemId: string, transcript: string): void;
@@ -29,7 +33,7 @@ export type RealtimeVoiceConversationFactory = (
 	modelId: string
 ) => RealtimeVoiceConversation;
 
-export function realtimeVoiceConversationFactory(config: Config): RealtimeVoiceConversationFactory {
+export function realtimeVoiceConversationFactory(config: Config, coordinator = new SessionCoordinator()): RealtimeVoiceConversationFactory {
 	return (chatSessionId, modelId) => {
 		const state = createSessionState();
 		const pendingUserTurns = new Map<string, PendingUserTurn>();
@@ -37,7 +41,8 @@ export function realtimeVoiceConversationFactory(config: Config): RealtimeVoiceC
 			state,
 			config,
 			{ task: 'chat', message: '', sessionId: chatSessionId, model: modelId },
-			'main'
+			'main',
+			coordinator
 		);
 		const toolCalls = new Map<string, ToolCall>();
 		const completedToolCalls = new Set<string>();
@@ -48,6 +53,8 @@ export function realtimeVoiceConversationFactory(config: Config): RealtimeVoiceC
 			}
 		}
 		return {
+			signal: state.lease?.signal,
+			dispose: () => releaseSession(state),
 			history: realtimeVoiceHistory(state.messages),
 			beginUserTurn: (itemId) => {
 				const turn = pendingUserTurns.get(itemId) ?? {

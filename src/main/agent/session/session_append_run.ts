@@ -7,7 +7,7 @@ import { stringifyRunEntry } from './session_stringify_run_entry';
 const TRACE_BUFFER_SIZE = 16;
 
 export function appendRun(state: SessionState, entry: unknown): void {
-	if (!state.sessionsPath || state.lease?.signal.aborted) return;
+	if (!state.sessionsPath || (state.lease && !state.lease.active)) return;
 	const serialized = stringifyRunEntry(entry);
 	if (!serialized) return;
 	state.runTraceBuffer.push(serialized);

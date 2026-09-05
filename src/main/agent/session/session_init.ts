@@ -32,12 +32,12 @@ export function init(
 			: [];
 	state.messages = sanitizeMessages([
 		...(storedMessages.length > 0 ? storedMessages : legacyMessages),
-		...(input.messages ?? []),
 	]);
 	if (coordinator) {
 		state.lease = coordinator.open(messagesFilePath(state), state.messages);
 		state.messages = state.lease.messages;
 	}
+	state.messages.push(...sanitizeMessages(input.messages ?? []));
 	if (input.message || (input.files?.length ?? 0) > 0) {
 		state.messages.push({ role: 'user', content: toUserContent(input.message, input.files ?? []) });
 	}

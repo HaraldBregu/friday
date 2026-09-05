@@ -8,6 +8,7 @@ import type {
 	RealtimeVoiceAdapterEvent,
 	RealtimeVoiceConnection,
 } from '../../models/adapters/realtime_voice';
+import { rejectPendingToolPermissions } from '../permissions';
 import { parseToolArgs } from '../../shared/parse_tool_args';
 import type { RealtimeVoiceConversation } from './conversation';
 
@@ -31,6 +32,7 @@ type RealtimeVoiceToolPayload = RealtimeVoiceToolEvent extends infer Event
 
 export interface RealtimeVoiceToolRuntimeDependencies {
 	sessionId: string;
+	chatSessionId?: string;
 	windowId: number;
 	tools: Tool[];
 	signal: AbortSignal;
@@ -43,6 +45,7 @@ export interface RealtimeVoiceToolRuntimeDependencies {
 }
 
 export class RealtimeVoiceToolRuntime {
+	private readonly responses = new Map<string, { controller: AbortController; signal: AbortSignal; runId: string }>();
 	private readonly fileAccess = createRunContext().fileAccess;
 	private readonly names = new Map<string, string>();
 	private readonly arguments = new Map<string, string>();
@@ -56,7 +59,29 @@ export class RealtimeVoiceToolRuntime {
 
 	constructor(private readonly dependencies: RealtimeVoiceToolRuntimeDependencies) {}
 
+	observe(responseId: string): boolean {
+		if (!this.responses.has(responseId)) {
+			const controller = new AbortController();
+			this.responses.set(responseId, {
+				controller,
+				signal: AbortSignal.any([this.dependencies.signal, controller.signal]),
+				runId: `${this.dependencies.sessionId}:${responseId}`,
+			});
+		}
+		return !this.responses.get(responseId)!.signal.aborted;
+	}
+
+	interrupt(): void {
+		for (const response of this.responses.values()) {
+			response.controller.abort(new DOMException('Voice response interrupted.', 'AbortError'));
+			rejectPendingToolPermissions(response.runId);
+		}
+	}
+
 	handle(event: ToolAdapterEvent): void {
+		this.observe(event.responseId);
+		const response = this.responses.get(event.responseId)!;
+		if (response.signal.aborted && event.type !== 'tool_call') return;
 		if (event.type === 'tool_call_start') {
 			if (this.names.has(event.callId)) return;
 			this.names.set(event.callId, event.name);
@@ -68,7 +93,7 @@ export class RealtimeVoiceToolRuntime {
 				toolName: event.name,
 				name: event.name,
 				serviceKind: 'tool',
-			});
+			}, response.runId);
 			return;
 		}
 		if (event.type === 'tool_call_args_delta') {
@@ -82,7 +107,7 @@ export class RealtimeVoiceToolRuntime {
 				toolName: name,
 				jsonDelta: event.delta,
 				argsText,
-			});
+			}, response.runId);
 			return;
 		}
 		if (this.pending.has(event.callId) || this.completed.has(event.callId)) return;
@@ -91,7 +116,8 @@ export class RealtimeVoiceToolRuntime {
 	}
 
 	private async run(event: Extract<ToolAdapterEvent, { type: 'tool_call' }>): Promise<void> {
-		if (this.dependencies.signal.aborted || !this.dependencies.connection()) return;
+		const response = this.responses.get(event.responseId)!;
+		try {
 		const tool = this.dependencies.tools.find((candidate) => candidate.id === event.name);
 		const args = parseToolArgs(event.arguments);
 		if (!this.names.has(event.callId)) {
@@ -103,7 +129,7 @@ export class RealtimeVoiceToolRuntime {
 				toolName: event.name,
 				name: event.name,
 				serviceKind: 'tool',
-			});
+			}, response.runId);
 		}
 		this.emit({
 			type: 'tool_call_input',
@@ -114,14 +140,16 @@ export class RealtimeVoiceToolRuntime {
 			argsText: event.arguments,
 			name: event.name,
 			serviceKind: 'tool',
-		});
-		this.dependencies.onThinking();
+		}, response.runId);
+		if (!response.signal.aborted) this.dependencies.onThinking();
 		const persistedToolCall: ToolCall = { id: event.callId, name: event.name, args };
 		this.dependencies.conversation.addToolCall(persistedToolCall);
 
-		const budgetError = this.consumeBudget(event.name);
+		const budgetError = response.signal.aborted
+			? 'Error: voice response interrupted before this action completed.'
+			: this.consumeBudget(event.name);
 		if (budgetError) {
-			await this.finish(persistedToolCall, args, budgetError, true, 0);
+			await this.finish(persistedToolCall, args, budgetError, true, 0, response);
 			return;
 		}
 
@@ -129,26 +157,43 @@ export class RealtimeVoiceToolRuntime {
 		for await (const runtimeEvent of runToolCall(
 			tool,
 			toolCall,
-			this.dependencies.signal,
+			response.signal,
 			this.fileAccess,
-			{ runId: this.dependencies.sessionId, windowId: this.dependencies.windowId },
+			{
+				runId: response.runId,
+				windowId: this.dependencies.windowId,
+				...(this.dependencies.chatSessionId ? { scope: {
+					ownerId: `interactive:${this.dependencies.chatSessionId}`,
+					source: 'interactive' as const,
+					sessionId: this.dependencies.chatSessionId,
+				} } : {}),
+			},
 			this.dependencies.resources
 		)) {
-			if (runtimeEvent.type === 'tool_permission_request') this.emit(runtimeEvent);
+			if (runtimeEvent.type === 'tool_permission_request') this.emit(runtimeEvent, response.runId);
 			if (runtimeEvent.type === 'tool_call_end') {
 				await this.finish(
 					persistedToolCall,
 					runtimeEvent.input,
 					runtimeEvent.output,
 					runtimeEvent.isError === true,
-					runtimeEvent.durationMs
+					runtimeEvent.durationMs,
+					response
 				);
 			}
 		}
-		this.pending.delete(event.callId);
+		} catch (error) {
+			if (!response.signal.aborted) throw error;
+			const call: ToolCall = { id: event.callId, name: event.name, args: parseToolArgs(event.arguments) };
+			await this.finish(call, call.args, 'Error: voice response interrupted; the action may have started.', true, 0, response);
+		} finally {
+			this.pending.delete(event.callId);
+			this.arguments.delete(event.callId);
+		}
 	}
 
 	private consumeBudget(name: string): string | undefined {
+		if (this.outputBytes > MAX_TOOL_OUTPUT_BYTES) return 'Error: realtime voice tool-output budget exhausted.';
 		this.calls += 1;
 		if (this.calls > MAX_TOOL_CALLS) return 'Error: realtime voice tool-call budget exhausted.';
 		if (PAID_TOOLS.has(name)) {
@@ -167,7 +212,8 @@ export class RealtimeVoiceToolRuntime {
 		input: Record<string, unknown>,
 		output: unknown,
 		isError: boolean,
-		durationMs: number
+		durationMs: number,
+		response: { signal: AbortSignal; runId: string }
 	): Promise<void> {
 		const outputText = formatToolOutput(output);
 		this.outputBytes += Buffer.byteLength(outputText, 'utf8');
@@ -196,18 +242,18 @@ export class RealtimeVoiceToolRuntime {
 			...(finalError ? { errorText: finalOutput } : {}),
 			name: toolCall.name,
 			serviceKind: 'tool',
-		});
-		if (!this.dependencies.signal.aborted) {
+		}, response.runId);
+		if (!response.signal.aborted) {
 			await this.dependencies.connection()?.addToolResult(toolCall.id, finalOutput);
 		}
 	}
 
-	private emit(event: RealtimeVoiceToolPayload): void {
+	private emit(event: RealtimeVoiceToolPayload, runId: string): void {
 		this.dependencies.emit({
 			...event,
 			sessionId: this.dependencies.sessionId,
 			agentId: 'main',
-			runId: this.dependencies.sessionId,
+			runId,
 		} as RealtimeVoiceEvent);
 	}
 }

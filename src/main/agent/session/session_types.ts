@@ -53,6 +53,7 @@ export interface SessionTurn {
 }
 
 export interface SessionLease {
+	active: boolean;
 	messages: Message[];
 	signal: AbortSignal;
 	release(): void;

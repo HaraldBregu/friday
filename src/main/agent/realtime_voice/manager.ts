@@ -50,6 +50,7 @@ interface ActiveRealtimeVoiceSession {
 	finalTranscripts: Set<string>;
 	state: RealtimeVoiceState;
 	closed: boolean;
+	onInvalidated?: () => void;
 }
 
 export class RealtimeVoiceManager {
@@ -103,6 +104,7 @@ export class RealtimeVoiceManager {
 		} as ActiveRealtimeVoiceSession;
 		active.toolRuntime = new RealtimeVoiceToolRuntime({
 			sessionId: info.id,
+			chatSessionId,
 			windowId,
 			tools: configuration.tools,
 			signal: controller.signal,
@@ -119,6 +121,12 @@ export class RealtimeVoiceManager {
 		});
 		this.byWindow.set(windowId, active);
 		this.byId.set(info.id, active);
+		active.onInvalidated = () => { void this.close(active, true); };
+		active.conversation.signal?.addEventListener('abort', active.onInvalidated, { once: true });
+		if (active.conversation.signal?.aborted) {
+			await this.close(active, true);
+			throw new Error('Conversation is no longer active.');
+		}
 		this.emit(active, { type: 'state', sessionId: info.id, status: 'connecting' });
 
 		try {
@@ -185,6 +193,7 @@ export class RealtimeVoiceManager {
 	async interrupt(windowId: number, sessionId: string): Promise<void> {
 		const active = this.owned(windowId, sessionId);
 		if (!active?.connection) return;
+		active.toolRuntime.interrupt();
 		await active.connection.interrupt();
 		this.emit(active, { type: 'interrupted', sessionId });
 		this.setState(active, 'listening');
@@ -227,7 +236,12 @@ export class RealtimeVoiceManager {
 	): void {
 		if (active.closed || this.byId.get(active.info.id) !== active) return;
 		const sessionId = active.info.id;
+		if ('responseId' in event && !active.toolRuntime.observe(event.responseId)) {
+			if (event.type === 'tool_call') active.toolRuntime.handle(event);
+			return;
+		}
 		if (event.type === 'input_speech_started') {
+			active.toolRuntime.interrupt();
 			if (active.state === 'speaking' || active.state === 'thinking') {
 				this.emit(active, { type: 'interrupted', sessionId });
 			}
@@ -310,6 +324,9 @@ export class RealtimeVoiceManager {
 	private async close(active: ActiveRealtimeVoiceSession, stopConnection: boolean): Promise<void> {
 		if (active.closed) return;
 		active.closed = true;
+		active.toolRuntime.interrupt();
+		if (active.onInvalidated) active.conversation.signal?.removeEventListener('abort', active.onInvalidated);
+		active.conversation.dispose?.();
 		this.byId.delete(active.info.id);
 		if (this.byWindow.get(active.windowId) === active) this.byWindow.delete(active.windowId);
 		active.controller.abort(new DOMException('Realtime voice session stopped.', 'AbortError'));

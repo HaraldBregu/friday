@@ -14,15 +14,18 @@ export class SessionCoordinator {
 		this.entries.set(key, entry);
 		const controller = new AbortController();
 		entry.controllers.add(controller);
-		return {
+		const lease: SessionLease = {
+			active: true,
 			messages: entry.messages,
 			signal: controller.signal,
 			release: () => {
-				controller.abort(new DOMException('Session writer closed.', 'AbortError'));
+				lease.active = false;
 				entry.controllers.delete(controller);
 				if (entry.controllers.size === 0 && this.entries.get(key) === entry) this.entries.delete(key);
 			},
 		};
+		controller.signal.addEventListener('abort', () => { lease.active = false; }, { once: true });
+		return lease;
 	}
 
 	invalidate(key: string): void {
