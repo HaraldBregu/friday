@@ -14,8 +14,7 @@ export function getWikiStatus(): WikiStatus {
 		lastRun: getWikiState(settings.targetPath).lastRun,
 		nextRunAt: nextRun?.toISOString(),
 		settingsPath: wikiSettingsStore.path,
-		pendingReviews: repository.reviews.store.items.filter((item) => item.status === 'pending')
-			.length,
+		pendingReviews: repository.reviews.store.items.filter((item) => item.status === 'pending').length,
 		progress: wikiRuntime.progress,
 	};
 }

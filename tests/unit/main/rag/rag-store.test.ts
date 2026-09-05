@@ -5,10 +5,7 @@ jest.mock('node-cron', () => ({
 	default: { validate },
 }));
 
-import {
-	getRagConfiguration,
-	saveRagConfiguration,
-} from '../../../../src/main/agent/knowledge/rag/rag_store';
+import { getRagConfiguration, saveRagConfiguration } from '../../../../src/main/agent/knowledge/rag/rag_store';
 
 it('defaults, normalizes, and validates the configured RAG index name', () => {
 	validate.mockReturnValue(true);

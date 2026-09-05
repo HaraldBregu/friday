@@ -9,8 +9,7 @@ export function commitWikiSourceLineage(
 	const registry = repository.sources.store;
 	const previous = registry.sources[pending.previousSourceId];
 	const current = registry.sources[registered.record.sourceId];
-	if (!previous || !current)
-		throw new Error('Cannot commit wiki source lineage without both versions.');
+	if (!previous || !current) throw new Error('Cannot commit wiki source lineage without both versions.');
 	registry.sources = {
 		...registry.sources,
 		[previous.sourceId]: {

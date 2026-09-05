@@ -19,7 +19,10 @@ import { incrementWikiMetric } from './wiki_metrics';
 import { commitWikiSourceLineage } from './wiki_commit_lineage';
 import { markStaleWikiClaims } from './wiki_mark_stale_claims';
 
-export async function runWiki(relativePath?: string, signal?: AbortSignal): Promise<WikiRunResult> {
+export async function runWiki(
+	relativePath?: string,
+	signal?: AbortSignal
+): Promise<WikiRunResult> {
 	if (wikiRuntime.run) return wikiRuntime.run;
 	signal?.throwIfAborted();
 	const controller = new AbortController();
@@ -42,7 +45,7 @@ export async function runWiki(relativePath?: string, signal?: AbortSignal): Prom
 			throw new Error('Select a wiki provider and model before running.');
 		}
 		wikiRuntime.logger?.info('Wiki', 'Wiki ingest started');
-		await mkdir(settings.sourcePath, { recursive: true });
+		await mkdir(settings.sourcePath, { recursive: true, mode: 0o700 });
 		const repository = getWikiRepository(settings.targetPath);
 		const paths = repository.paths;
 		await ensureWikiSchema(settings.targetPath, paths.config, false);
@@ -80,7 +83,12 @@ export async function runWiki(relativePath?: string, signal?: AbortSignal): Prom
 				startedAt: runStartedAt,
 			};
 			const operationId = `operation-ingest-${discovered.hash.slice(0, 16)}`;
-			const registered = await registerWikiSource(discovered, operationId, repository, runSignal);
+			const registered = await registerWikiSource(
+				discovered,
+				operationId,
+				repository,
+				runSignal
+			);
 			const source = registered.source;
 			if (
 				!registered.isNew &&
