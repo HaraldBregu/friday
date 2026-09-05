@@ -8,5 +8,5 @@ export const readWikiPageTool = tool({
 	description: 'Read one compiled wiki page by path, page ID, exact title, or alias.',
 	planSafe: true,
 	inputSchema: z.object({ page: z.string().trim().min(1) }),
-	execute: async ({ page }) => JSON.stringify(await readWikiPage(page), null, 2),
+	execute: async ({ page }, signal) => JSON.stringify(await readWikiPage(page, undefined, signal), null, 2),
 });
