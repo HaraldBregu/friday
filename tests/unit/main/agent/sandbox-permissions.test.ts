@@ -38,6 +38,17 @@ import { realPath } from '../../../../src/main/shared/real_path';
 import { execTool } from '../../../../src/main/agent/tools/core/bash';
 
 describe('ExecSandbox permissions', () => {
+	it('allows the Linux sandbox helper under both execution profiles', async () => {
+		jest.replaceProperty(process, 'platform', 'linux');
+		const sandbox = new ExecSandbox();
+		await sandbox.wrap('pwd', '/workspace', 'linux-command');
+		const config = initialize.mock.calls.at(-1)?.[0];
+		expect(config.filesystem.allowRead).toContain(config.seccomp.applyPath);
+		await sandbox.wrap('pwd', agentLocation(), 'linux-plan', undefined, [], 'plan');
+		const plan = JSON.parse(writeFile.mock.calls.at(-1)?.[1] as string);
+		expect(plan.filesystem.allowRead).toContain(plan.seccomp.applyPath);
+	});
+
 	it('includes the cache ancestor in canonical command input before approval, preserving the working directory', () => {
 		const configured = execTool(new ExecSandbox());
 		const input = configured.parseInput({ command: 'pwd', workdir: '/tmp/claude/project' });

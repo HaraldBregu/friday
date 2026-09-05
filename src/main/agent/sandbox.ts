@@ -249,6 +249,7 @@ export class ExecSandbox {
 			throw new Error('Command sandbox rules must use exact paths or a trailing /**. Refine the blocked pattern before executing commands.');
 		const allowRead = [
 			...sandboxSystemReads(),
+			...(process.platform === 'linux' ? [this.vendoredSeccompPath()] : []),
 			this.temporaryDirectory,
 			...resolveRules(permissions.exec.allow),
 		].filter((rule) => {
@@ -312,6 +313,7 @@ export class ExecSandbox {
 			agentLocation(),
 			this.temporaryDirectory,
 			...sandboxSystemReads(),
+			...(process.platform === 'linux' ? [this.vendoredSeccompPath()] : []),
 		].filter((value) =>
 			permissionFor({ allow: [], deny: deniedReads }, value, 'read') !== 'deny'
 		);
