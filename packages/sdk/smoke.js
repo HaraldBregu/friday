@@ -3,14 +3,30 @@ import { createServer } from 'node:http';
 import {
 	agent,
 	app,
+	APP_WINDOW_DEFAULTS,
 	coder,
 	connect,
 	isAppStoreValue,
+	isAppWindowSettings,
 	isKucedr,
 	models,
 	terminal,
 	win,
 } from './dist/packages/sdk/index.js';
+
+assert.deepEqual(APP_WINDOW_DEFAULTS, {
+	width: 820,
+	height: 640,
+	minWidth: 620,
+	minHeight: 480,
+	resizable: true,
+	maximizable: true,
+});
+assert.equal(isAppWindowSettings({ width: 480, height: 320, resizable: false }), true);
+assert.equal(isAppWindowSettings({ width: 480, minWidth: 620 }), false);
+assert.equal(isAppWindowSettings({ height: 0 }), false);
+assert.equal(isAppWindowSettings({ width: 32769 }), false);
+assert.equal(isAppWindowSettings({ maximizable: 'false' }), false);
 
 // --- embedded mode: bound to the app's preload globals ----------------------
 

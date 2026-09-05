@@ -132,6 +132,71 @@ const stopTitlebarActions = win.onTitlebarButtonClick((buttonId) => {
 stopTitlebarActions();
 ```
 
+## App window configuration
+
+Declare initial window settings in the app's `manifest.json`. Kucedr reads the manifest before
+creating the window, so these settings take effect before the app's JavaScript runs.
+
+```json
+{
+	"title": "Notes",
+	"description": "A compact notes app",
+	"metadata": {
+		"version": "1.0.0",
+		"category": "utility",
+		"entry": "dist/index.html"
+	},
+	"window": {
+		"width": 960,
+		"height": 720,
+		"minWidth": 480,
+		"minHeight": 320,
+		"resizable": true,
+		"maximizable": true
+	}
+}
+```
+
+Every `window` field is optional. Apps without window configuration keep these defaults:
+
+| Field | Default | Meaning |
+| --- | --- | --- |
+| `width` | `820` | Initial outer window width |
+| `height` | `640` | Initial outer window height |
+| `minWidth` | `620` | Minimum outer window width |
+| `minHeight` | `480` | Minimum outer window height |
+| `resizable` | `true` | Allow the user to resize the window |
+| `maximizable` | `true` | Allow the user to maximize the window |
+
+Dimensions are positive integer device-independent pixels, at most `32768`. The outer height
+includes Kucedr's 48-pixel titlebar. An explicit minimum cannot exceed its explicit initial
+dimension. If an initial dimension is smaller than the default minimum, the omitted minimum
+is lowered to fit it.
+
+For apps imported using only `package.json`, put the same object under `kucedr.window`:
+
+```json
+{
+	"name": "notes",
+	"description": "A compact notes app",
+	"version": "1.0.0",
+	"main": "dist/index.html",
+	"kucedr": {
+		"window": { "width": 480, "height": 320, "resizable": false }
+	}
+}
+```
+
+When both files exist, `manifest.json` takes precedence. Invalid window configuration is rejected.
+The SDK exports `AppManifest`, `AppMetadata`, `App`, `AppWindowSettings`,
+`ResolvedAppWindowSettings`, `APP_WINDOW_DEFAULTS`, and `isAppWindowSettings()` for authoring
+and validating this configuration. These exports also work outside the Kucedr host.
+
+Users can change each installed app's window preferences under **Settings → Apps → app**.
+Saved preferences override the manifest and persist across host restarts and replacement uploads
+of the same app ID. Reset restores the current manifest defaults. Changes apply when a new window
+is opened; close and reopen an existing app window to use the updated settings.
+
 ## What's available
 
 - `app`: app data + settings APIs exposed by preload (`setTheme`, `getThemeData`, `getLanguage`, etc.)

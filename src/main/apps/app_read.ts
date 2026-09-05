@@ -4,6 +4,7 @@ import { appManifestPath } from './app_manifest';
 import { appsRoot } from './app_root';
 import { isAppManifest } from './app_manifest_validate';
 import { isAppEntry } from './app_entry_validate';
+import { isAppWindowSettings } from '../../shared/app_window_validate';
 import type { AppManifest } from './app_types';
 
 function cleanAppEntry(value: string): string {
@@ -46,7 +47,14 @@ function readPackageManifestFromStandardFields(directory: string): AppManifest |
 			keywords?: Array<string> | null;
 			main?: unknown;
 			exports?: unknown;
+			kucedr?: { window?: unknown };
 		};
+		if (
+			packageJson.kucedr !== undefined &&
+			(!packageJson.kucedr || typeof packageJson.kucedr !== 'object' || Array.isArray(packageJson.kucedr))
+		) return null;
+		const window = packageJson.kucedr?.window;
+		if (window !== undefined && !isAppWindowSettings(window)) return null;
 
 		const title = typeof packageJson.name === 'string' ? packageJson.name.trim() : '';
 		const description = typeof packageJson.description === 'string' ? packageJson.description.trim() : '';
@@ -67,6 +75,7 @@ function readPackageManifestFromStandardFields(directory: string): AppManifest |
 		const candidate: AppManifest = {
 			title,
 			description,
+			...(window !== undefined && { window }),
 			metadata: {
 				version,
 				category,

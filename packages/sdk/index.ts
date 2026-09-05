@@ -27,6 +27,13 @@ export type {
 	AppThemeData,
 } from '../../src/shared/app_types';
 export type { UrlMetadata } from '../../src/shared/app_types';
+export type { App, AppManifest, AppMetadata } from '../../src/shared/installed_app_types';
+export {
+	APP_WINDOW_DEFAULTS,
+	type AppWindowSettings,
+	type ResolvedAppWindowSettings,
+} from '../../src/shared/app_window_settings';
+export { isAppWindowSettings } from '../../src/shared/app_window_validate';
 export type {
 	CatalogModel,
 	ModelCapability,
