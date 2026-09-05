@@ -45,6 +45,7 @@ import { addPlanPrompt } from '../plan/context';
 import { isPlanOutputValid } from '../plan/output';
 import { filterPlanTools } from '../plan/tools';
 import { projectPromptAttachments, resolvePromptInputCapabilities } from '../attachments';
+import { createBackgroundBrowser } from '../tools/web/browser/background';
 
 export interface StreamOptions {
 	tools?: Tool[];
@@ -70,8 +71,11 @@ export async function* stream(
 	options: StreamOptions = {}
 ): AsyncGenerator<RuntimeEvent> {
 	let terminal = false;
+	const browser = input.type === 'background' && input.agentId !== 'channels' && input.scope?.source !== 'channel'
+		? createBackgroundBrowser()
+		: undefined;
 	try {
-		for await (const event of loop(config, session, input, signal, options)) {
+		for await (const event of loop(config, session, input, signal, options, browser?.tool)) {
 			tryAppendRun(session, event);
 			yield event;
 			if (event.type === 'run_finished') terminal = true;
@@ -96,6 +100,8 @@ export async function* stream(
 		}
 		if (!signal.aborted) throw error;
 		return;
+	} finally {
+		await browser?.close();
 	}
 	if (!terminal) {
 		session.stopReason = signal.aborted
@@ -115,7 +121,8 @@ async function* loop(
 	session: SessionState,
 	input: RuntimeInput,
 	signal: AbortSignal,
-	options: StreamOptions
+	options: StreamOptions,
+	backgroundBrowser?: Tool
 ): AsyncGenerator<RuntimeEvent> {
 	const provider = getResolvedProvider(input.providerId ?? getProviderId());
 	const modelId = input.model ?? getModelId();
@@ -148,6 +155,7 @@ async function* loop(
 	let tools: Tool[] = options.tools
 		? [...options.tools]
 		: builtinTools(config, options.sandbox!, options.windowFactory, input.interactionMode);
+	if (backgroundBrowser) tools = tools.map((tool) => tool.id === backgroundBrowser.id ? backgroundBrowser : tool);
 	if (!options.tools && input.interactionMode !== 'plan') {
 		tools.push(
 			undoFileTool(session.runContext.fileHistory),
@@ -361,6 +369,7 @@ async function* loop(
 				session.runContext.fileAccess,
 				{
 					runId,
+					...(input.scope ? { scope: input.scope } : {}),
 					interactionMode: input.interactionMode,
 					...(input.approvalWindowId === undefined ? {} : { windowId: input.approvalWindowId }),
 				},

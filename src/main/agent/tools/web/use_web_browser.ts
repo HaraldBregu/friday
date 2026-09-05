@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { userDataLocation } from '../../../shared/user_data_location';
 import { tool } from '../tool';
 import { runBrowserPageOperation } from './browser_abort';
+import { browserSession, type BrowserSession } from './browser/session';
 
 const ACTIONS = [
 	'status',
@@ -38,66 +39,69 @@ const SNAPSHOT_MAX_TEXT = 4_000;
 const CONSOLE_BUFFER_MAX = 100;
 const DEFAULT_TIMEOUT_MS = 15_000;
 
-let context: BrowserContext | null = null;
-const pages = new Map<string, Page>();
-const consoleLogs = new Map<string, string[]>();
-let nextTabId = 1;
-
-function trackPage(page: Page): string {
-	const id = `t${nextTabId++}`;
-	pages.set(id, page);
-	consoleLogs.set(id, []);
+function trackPage(page: Page, session: BrowserSession = browserSession()): string {
+	const id = `t${session.nextTabId++}`;
+	session.pages.set(id, page);
+	session.consoleLogs.set(id, []);
 	page.on('console', (msg) => {
-		const logs = consoleLogs.get(id);
+		const logs = session.consoleLogs.get(id);
 		if (!logs) return;
 		logs.push(`[${msg.type()}] ${msg.text()}`);
 		if (logs.length > CONSOLE_BUFFER_MAX) logs.shift();
 	});
 	page.on('close', () => {
-		pages.delete(id);
-		consoleLogs.delete(id);
+		session.pages.delete(id);
+		session.consoleLogs.delete(id);
 	});
 	return id;
 }
 
 async function ensureStarted(signal?: AbortSignal): Promise<BrowserContext> {
 	signal?.throwIfAborted();
-	if (context) return context;
-	const userDataDir = path.join(userDataLocation(), 'agent-browser');
-	let launched: BrowserContext;
-	try {
-		launched = await chromium.launchPersistentContext(userDataDir, {
+	const session = browserSession();
+	if (session.closed) throw new Error('Browser run has ended.');
+	if (session.context) return session.context;
+	if (!session.starting) {
+		const userDataDir = session.headless ? '' : path.join(userDataLocation(), 'agent-browser');
+		session.starting = chromium.launchPersistentContext(userDataDir, {
 			channel: 'chrome',
-			headless: false,
+			headless: session.headless,
 			viewport: null,
-		});
-	} catch (cause) {
-		signal?.throwIfAborted();
-		const detail = cause instanceof Error ? cause.message : String(cause);
-		throw new Error(
-			`Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Kucedr profile.\n${detail}`,
-			{ cause }
-		);
+			timeout: DEFAULT_TIMEOUT_MS,
+		}).then(async (launched) => {
+			if (session.closed || signal?.aborted) {
+				await launched.close();
+				signal?.throwIfAborted();
+				throw new Error('Browser run has ended.');
+			}
+			session.context = launched;
+			launched.setDefaultTimeout(DEFAULT_TIMEOUT_MS);
+			launched.on('page', (page) => {
+				if (![...session.pages.values()].includes(page)) trackPage(page, session);
+			});
+			launched.on('close', () => {
+				session.context = null;
+				session.pages.clear();
+				session.consoleLogs.clear();
+			});
+			for (const page of launched.pages()) trackPage(page, session);
+			return launched;
+		}, (cause: unknown) => {
+			signal?.throwIfAborted();
+			const detail = cause instanceof Error ? cause.message : String(cause);
+			throw new Error(
+				`Browser automation could not start Google Chrome. Make sure Chrome is installed, permitted by system policy, and able to write to the Kucedr profile.\n${detail}`,
+				{ cause }
+			);
+		}).finally(() => { session.starting = undefined; });
 	}
-	if (signal?.aborted) {
-		await launched.close();
-		signal.throwIfAborted();
-	}
-	context = launched;
-	context.setDefaultTimeout(DEFAULT_TIMEOUT_MS);
-	context.on('page', (page) => {
-		if (![...pages.values()].includes(page)) trackPage(page);
-	});
-	context.on('close', () => {
-		context = null;
-		pages.clear();
-		consoleLogs.clear();
-	});
-	for (const page of context.pages()) trackPage(page);
-	return context;
+	const launched = await session.starting;
+	signal?.throwIfAborted();
+	return launched;
 }
 
 function getPage(targetId?: string): { id: string; page: Page } {
+	const { pages } = browserSession();
 	if (targetId) {
 		const page = pages.get(targetId);
 		if (!page) throw new Error(`Unknown tab "${targetId}". Use action "tabs" to list open tabs.`);
@@ -153,7 +157,7 @@ const SNAPSHOT_SCRIPT = `(() => {
 
 async function tabList(signal?: AbortSignal): Promise<{ targetId: string; url: string; title: string }[]> {
 	const list: { targetId: string; url: string; title: string }[] = [];
-	for (const [targetId, page] of pages) {
+	for (const [targetId, page] of browserSession().pages) {
 		signal?.throwIfAborted();
 		list.push({ targetId, url: page.url(), title: await page.title().catch(() => '') });
 	}
@@ -283,15 +287,17 @@ export const useWebBrowserTool = tool({
 	}),
 	execute: async (params, signal) => {
 		signal?.throwIfAborted();
+		const session = browserSession();
+		if (session.closed) throw new Error('Browser run has ended.');
 		switch (params.action) {
 			case 'status':
-				return JSON.stringify({ running: context !== null, tabs: await tabList(signal) });
+				return JSON.stringify({ running: session.context !== null, tabs: await tabList(signal) });
 			case 'start': {
 				await ensureStarted(signal);
 				return JSON.stringify({ running: true, tabs: await tabList(signal) });
 			}
 			case 'stop': {
-				if (context) await context.close();
+				if (session.context) await session.context.close();
 				return JSON.stringify({ running: false });
 			}
 			case 'tabs':
@@ -301,7 +307,7 @@ export const useWebBrowserTool = tool({
 				const url = assertHttpUrl(params.url);
 				const ctx = await ensureStarted(signal);
 				const page = await ctx.newPage();
-				const targetId = [...pages.entries()].find(([, p]) => p === page)?.[0] ?? trackPage(page);
+				const targetId = [...session.pages.entries()].find(([, p]) => p === page)?.[0] ?? trackPage(page);
 				await runBrowserPageOperation(page, signal, () =>
 					page.goto(url, { waitUntil: 'domcontentloaded' })
 				);
@@ -368,7 +374,7 @@ export const useWebBrowserTool = tool({
 			}
 			case 'console': {
 				const { id } = getPage(params.targetId);
-				const logs = consoleLogs.get(id) ?? [];
+				const logs = session.consoleLogs.get(id) ?? [];
 				return JSON.stringify({ targetId: id, messages: logs.slice(-(params.limit ?? 50)) });
 			}
 			case 'act': {
