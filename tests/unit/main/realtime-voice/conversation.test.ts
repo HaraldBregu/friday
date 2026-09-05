@@ -72,3 +72,105 @@ it('excludes legacy voice placeholders from provider history', () => {
 		])
 	).toEqual([{ role: 'user', text: 'Actual transcript' }]);
 });
+
+it('preserves updates from text and two voice writers sharing one coordinator', () => {
+	const {
+		SessionCoordinator,
+		init,
+		createSessionState,
+		addAssistantMessage,
+		releaseSession,
+	} = require('../../../../src/main/agent/session');
+	const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-writers-'));
+	const config = { location: temporaryRoot };
+	const coordinator = new SessionCoordinator();
+	const factory = realtimeVoiceConversationFactory(config, coordinator);
+	const first = factory(SESSION_ID, 'model');
+	const second = factory(SESSION_ID, 'model');
+	const text = createSessionState();
+	try {
+		init(
+			text,
+			config,
+			{ task: 'chat', message: 'Text question.', sessionId: SESSION_ID },
+			'main',
+			coordinator
+		);
+		first.addAssistantTranscript('First voice.');
+		addAssistantMessage(text, 'Text answer.', []);
+		second.addAssistantTranscript('Second voice.');
+		const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot));
+		for (const expected of ['Text question.', 'First voice.', 'Text answer.', 'Second voice.']) {
+			expect(serialized).toContain(expected);
+		}
+		releaseSession(text);
+		expect(text.lease.signal.aborted).toBe(false);
+	} finally {
+		first.dispose?.();
+		second.dispose?.();
+		releaseSession(text);
+		fs.rmSync(temporaryRoot, { recursive: true, force: true });
+	}
+});
+
+it.each(['clear', 'delete', 'edit'])(
+	'invalidates old voice and text writers before %s',
+	(operation) => {
+		const {
+			SessionCoordinator,
+			init,
+			createSessionState,
+			addAssistantMessage,
+			clearMessages,
+			deleteSession,
+			updateUserMessageBySessionId,
+			appendRun,
+			persistSystemPrompt,
+			releaseSession,
+		} = require('../../../../src/main/agent/session');
+		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-session-invalidated-'));
+		const config = { location: temporaryRoot };
+		const coordinator = new SessionCoordinator();
+		const state = createSessionState();
+		init(
+			state,
+			config,
+			{ task: 'chat', message: 'Original question.', sessionId: SESSION_ID },
+			'main',
+			coordinator
+		);
+		const voice = realtimeVoiceConversationFactory(config, coordinator)(SESSION_ID, 'model');
+		try {
+			if (operation === 'clear')
+				clearMessages(createSessionState(), config, SESSION_ID, coordinator);
+			if (operation === 'delete')
+				deleteSession(createSessionState(), config, SESSION_ID, coordinator);
+			if (operation === 'edit')
+				expect(
+					updateUserMessageBySessionId(
+						SESSION_ID,
+						temporaryRoot,
+						0,
+						'Edited question.',
+						coordinator
+					)
+				).toBe(true);
+			expect(state.lease.signal.aborted).toBe(true);
+			expect(voice.signal?.aborted).toBe(true);
+			voice.addAssistantTranscript('Late voice callback.');
+			addAssistantMessage(state, 'Late text callback.', []);
+			appendRun(state, { type: 'run_finished' });
+			persistSystemPrompt(state, 'Late system prompt.');
+			const serialized = JSON.stringify(loadMessagesBySessionId(SESSION_ID, temporaryRoot));
+			expect(serialized).not.toContain('Late');
+			if (operation === 'edit') expect(serialized).toContain('Edited question.');
+			else expect(serialized).toBe('[]');
+			if (operation === 'delete')
+				expect(fs.existsSync(path.join(state.sessionsPath, state.folderName))).toBe(false);
+		} finally {
+			voice.dispose?.();
+			releaseSession(state);
+			fs.rmSync(temporaryRoot, { recursive: true, force: true });
+		}
+	}
+);

@@ -7,7 +7,11 @@ import { sessionPath } from './session_session_path';
 import { sessionsRoot } from './session_sessions_root';
 import type { SessionCoordinator } from './coordinator';
 
-export function deleteSessionBySessionId(sessionId: string, location: string, coordinator?: SessionCoordinator): void {
+export function deleteSessionBySessionId(
+	sessionId: string,
+	location: string,
+	coordinator?: SessionCoordinator
+): void {
 	const root = sessionsRoot(location);
 	if (isUuid(sessionId)) coordinator?.invalidate(messagesFile(root, sessionId));
 	if (isUuid(sessionId)) {

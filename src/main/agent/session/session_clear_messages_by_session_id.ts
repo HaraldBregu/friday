@@ -9,11 +9,16 @@ import { sessionsRoot } from './session_sessions_root';
 import type { SessionCoordinator } from './coordinator';
 import { writeMessagesFile } from './session_write_messages';
 
-export function clearMessagesBySessionId(sessionId: string, location: string, coordinator?: SessionCoordinator): void {
+export function clearMessagesBySessionId(
+	sessionId: string,
+	location: string,
+	coordinator?: SessionCoordinator
+): void {
 	const root = sessionsRoot(location);
 	if (isUuid(sessionId)) coordinator?.invalidate(messagesFile(root, sessionId));
 	const currentPath = isUuid(sessionId) ? messagesFile(root, sessionId) : undefined;
-	const filePath = currentPath && existsSync(currentPath) ? currentPath : legacyFilePath(root, sessionId);
+	const filePath =
+		currentPath && existsSync(currentPath) ? currentPath : legacyFilePath(root, sessionId);
 	if (!existsSync(filePath)) return;
 	if (isUuid(sessionId)) {
 		const backupPath = messagesBackupFile(root, sessionId);
@@ -21,8 +26,7 @@ export function clearMessagesBySessionId(sessionId: string, location: string, co
 		writeFileSync(backupPath, '[]\n', 'utf8');
 		const attachmentsPath = sessionPath(root, sessionFolderName(sessionId), 'attachments');
 		if (existsSync(attachmentsPath)) rmSync(attachmentsPath, { recursive: true, force: true });
-	}
-	else writeFileSync(filePath, '[]\n', 'utf8');
+	} else writeFileSync(filePath, '[]\n', 'utf8');
 
 	if (!isUuid(sessionId)) return;
 	const runPath = sessionPath(root, sessionFolderName(sessionId), 'run.jsonl');

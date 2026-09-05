@@ -163,7 +163,9 @@ describe('OpenAIRealtimeVoiceAdapter', () => {
 		expect(socket.sent.at(-1)).toEqual({ type: 'response.create' });
 		socket.event({
 			type: 'response.created',
+			response: { id: 'response' },
 		});
+		expect(events).toContainEqual({ type: 'response_started', responseId: 'response' });
 		await connection.interrupt();
 		expect(socket.sent.at(-1)).toEqual({ type: 'response.cancel' });
 

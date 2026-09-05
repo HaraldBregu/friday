@@ -20,6 +20,7 @@ export interface RealtimeVoiceAdapterRequest {
 }
 
 export type RealtimeVoiceAdapterEvent =
+	| { type: 'response_started'; responseId: string }
 	| { type: 'input_speech_started'; itemId: string }
 	| { type: 'input_speech_stopped'; itemId: string }
 	| { type: 'user_transcript_final'; itemId: string; transcript: string }
@@ -86,7 +87,7 @@ export type RealtimeVoiceClientEvent =
 
 export type RealtimeVoiceServerEvent =
 	| { type: 'session.updated' }
-	| { type: 'response.created' }
+	| { type: 'response.created'; response: { id: string } }
 	| { type: 'response.done' }
 	| {
 			type: 'response.output_item.added';

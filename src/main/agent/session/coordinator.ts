@@ -21,10 +21,17 @@ export class SessionCoordinator {
 			release: () => {
 				lease.active = false;
 				entry.controllers.delete(controller);
-				if (entry.controllers.size === 0 && this.entries.get(key) === entry) this.entries.delete(key);
+				if (entry.controllers.size === 0 && this.entries.get(key) === entry)
+					this.entries.delete(key);
 			},
 		};
-		controller.signal.addEventListener('abort', () => { lease.active = false; }, { once: true });
+		controller.signal.addEventListener(
+			'abort',
+			() => {
+				lease.active = false;
+			},
+			{ once: true }
+		);
 		return lease;
 	}
 

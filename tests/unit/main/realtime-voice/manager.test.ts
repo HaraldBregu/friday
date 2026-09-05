@@ -347,3 +347,59 @@ describe('RealtimeVoiceManager', () => {
 		}
 	});
 });
+
+it('rejects late tool effects from a response interrupted before its first tool event', async () => {
+	let emit: RealtimeVoiceAdapterEventHandler = () => undefined;
+	const run = jest.fn(() => 'unexpected');
+	const connection = new FakeConnection();
+	const results: unknown[] = [];
+	const manager = new RealtimeVoiceManager({
+		createAdapter: () => ({
+			connect: async (_request, handler) => {
+				emit = handler;
+				return connection;
+			},
+		}),
+		resolveConfiguration: async () => ({
+			...configuration,
+			tools: [
+				{
+					id: 'probe',
+					name: 'Probe',
+					description: 'Probe',
+					schema: { type: 'object' },
+					timeoutMs: 1000,
+					maxOutputBytes: 1000,
+					parseInput: (input) => input as Record<string, unknown>,
+					run,
+				},
+			],
+		}),
+		createConversation: () => ({
+			history: [],
+			beginUserTurn: () => undefined,
+			finalizeUserTurn: () => undefined,
+			addAssistantTranscript: () => undefined,
+			addToolCall: () => undefined,
+			addToolResult: (call) => results.push(call.result),
+		}),
+		resources: new KeyedMutex(),
+		emit: () => undefined,
+	});
+	const session = await manager.start(3, { chatSessionId: 'chat' });
+	emit({ type: 'response_started', responseId: 'old' });
+	await manager.interrupt(3, session.id);
+	emit({
+		type: 'tool_call',
+		callId: 'late',
+		itemId: 'late',
+		responseId: 'old',
+		name: 'probe',
+		arguments: '{}',
+	});
+	await new Promise((resolve) => setImmediate(resolve));
+	expect(run).not.toHaveBeenCalled();
+	expect(results).toEqual([expect.objectContaining({ isError: true })]);
+	expect(connection.toolResults).toEqual([]);
+	await manager.stopAll();
+});

@@ -85,7 +85,7 @@ it('runs native Realtime function calls through the existing tool runner and emi
 		expect(events.at(-1)).toMatchObject({
 			sessionId: 'voice-session',
 			agentId: 'main',
-			runId: 'voice-session',
+			runId: 'voice-session:response-1',
 			toolCallId: 'call-1',
 			toolName: 'echo',
 			output: 'hello',
@@ -229,7 +229,7 @@ it('preserves the existing permission request identity and returns rejected tool
 		expect(permission).toMatchObject({
 			type: 'tool_permission_request',
 			sessionId: 'voice-permission',
-			runId: 'voice-permission',
+			runId: 'voice-permission:response-permission',
 			toolCallId: 'call-permission',
 			toolName: 'write',
 			mode: 'ask',
@@ -240,7 +240,7 @@ it('preserves the existing permission request identity and returns rejected tool
 		respondToolPermission(
 			{
 				approvalId: String(permission.approvalId),
-				runId: 'voice-permission',
+				runId: 'voice-permission:response-permission',
 				toolName: 'write',
 				inputFingerprint: String(permission.inputFingerprint),
 			},
@@ -290,4 +290,130 @@ it('keeps file-access memory isolated between realtime voice runs', () => {
 	expect(secondAccess.readDirectories).toEqual(new Set());
 	expect(secondAccess.createdFiles).toEqual(new Set());
 	expect(firstAccess).not.toBe(secondAccess);
+});
+
+it('cancels queued response actions while allowing a subsequent response', async () => {
+	const executed: string[] = [];
+	let started = (): void => undefined;
+	const firstStarted = new Promise<void>((resolve) => {
+		started = resolve;
+	});
+	const results: string[] = [];
+	const runtime = new RealtimeVoiceToolRuntime({
+		sessionId: 'voice',
+		windowId: 1,
+		tools: [
+			{
+				id: 'probe',
+				name: 'Probe',
+				description: 'Probe',
+				schema: { type: 'object' },
+				timeoutMs: 1000,
+				maxOutputBytes: 1000,
+				parseInput: (input) => input as Record<string, unknown>,
+				run: async (input, signal) => {
+					const value = String(input.value);
+					executed.push(value);
+					if (value === 'first') {
+						started();
+						await new Promise<void>((_resolve, reject) => {
+							signal?.addEventListener('abort', () => reject(signal.reason), { once: true });
+						});
+					}
+					return value;
+				},
+			},
+		],
+		signal: new AbortController().signal,
+		resources: new KeyedMutex(),
+		conversation: { addToolCall: () => undefined, addToolResult: () => undefined },
+		connection: () => ({
+			appendAudio: async () => undefined,
+			interrupt: async () => undefined,
+			stop: async () => undefined,
+			addToolResult: async (_id, text) => {
+				results.push(text);
+			},
+		}),
+		emit: () => undefined,
+		onThinking: () => undefined,
+		onError: (error) => {
+			throw error;
+		},
+	});
+	for (const value of ['first', 'second'])
+		runtime.handle({
+			type: 'tool_call',
+			callId: value,
+			itemId: value,
+			responseId: 'old',
+			name: 'probe',
+			arguments: JSON.stringify({ value }),
+		});
+	await firstStarted;
+	runtime.interrupt();
+	runtime.handle({
+		type: 'tool_call',
+		callId: 'third',
+		itemId: 'third',
+		responseId: 'new',
+		name: 'probe',
+		arguments: '{"value":"third"}',
+	});
+	await new Promise((resolve) => setImmediate(resolve));
+	expect(executed).toEqual(['first', 'third']);
+	expect(results).toEqual(['third']);
+});
+
+it('denies the next action before execution after its output budget is exhausted', async () => {
+	let executed = 0;
+	const results: string[] = [];
+	const runtime = new RealtimeVoiceToolRuntime({
+		sessionId: 'voice',
+		windowId: 1,
+		tools: [
+			{
+				id: 'probe',
+				name: 'Probe',
+				description: 'Probe',
+				schema: { type: 'object' },
+				timeoutMs: 1000,
+				maxOutputBytes: 1_100_000,
+				parseInput: (input) => input as Record<string, unknown>,
+				run: () => {
+					executed += 1;
+					return 'x'.repeat(1_000_000);
+				},
+			},
+		],
+		signal: new AbortController().signal,
+		resources: new KeyedMutex(),
+		conversation: { addToolCall: () => undefined, addToolResult: () => undefined },
+		connection: () => ({
+			appendAudio: async () => undefined,
+			interrupt: async () => undefined,
+			stop: async () => undefined,
+			addToolResult: async (_id, text) => {
+				results.push(text);
+			},
+		}),
+		emit: () => undefined,
+		onThinking: () => undefined,
+		onError: (error) => {
+			throw error;
+		},
+	});
+	for (let index = 0; index < 4; index += 1)
+		runtime.handle({
+			type: 'tool_call',
+			callId: String(index),
+			itemId: String(index),
+			responseId: 'response',
+			name: 'probe',
+			arguments: '{}',
+		});
+	await new Promise((resolve) => setImmediate(resolve));
+	expect(executed).toBe(3);
+	expect(results).toHaveLength(4);
+	expect(results[3]).toContain('budget exhausted');
 });

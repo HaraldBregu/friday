@@ -33,7 +33,10 @@ export type RealtimeVoiceConversationFactory = (
 	modelId: string
 ) => RealtimeVoiceConversation;
 
-export function realtimeVoiceConversationFactory(config: Config, coordinator = new SessionCoordinator()): RealtimeVoiceConversationFactory {
+export function realtimeVoiceConversationFactory(
+	config: Config,
+	coordinator = new SessionCoordinator()
+): RealtimeVoiceConversationFactory {
 	return (chatSessionId, modelId) => {
 		const state = createSessionState();
 		const pendingUserTurns = new Map<string, PendingUserTurn>();

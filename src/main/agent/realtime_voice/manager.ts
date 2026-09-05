@@ -121,7 +121,9 @@ export class RealtimeVoiceManager {
 		});
 		this.byWindow.set(windowId, active);
 		this.byId.set(info.id, active);
-		active.onInvalidated = () => { void this.close(active, true); };
+		active.onInvalidated = () => {
+			void this.close(active, true);
+		};
 		active.conversation.signal?.addEventListener('abort', active.onInvalidated, { once: true });
 		if (active.conversation.signal?.aborted) {
 			await this.close(active, true);
@@ -130,16 +132,14 @@ export class RealtimeVoiceManager {
 		this.emit(active, { type: 'state', sessionId: info.id, status: 'connecting' });
 
 		try {
-			const connection = await this.dependencies
-				.createAdapter(provider)
-				.connect(
-					{
-						...adapterConfiguration,
-						history: [...context, ...active.conversation.history],
-					},
-					(event) => this.handleAdapterEvent(active, event),
-					controller.signal
-				);
+			const connection = await this.dependencies.createAdapter(provider).connect(
+				{
+					...adapterConfiguration,
+					history: [...context, ...active.conversation.history],
+				},
+				(event) => this.handleAdapterEvent(active, event),
+				controller.signal
+			);
 			if (
 				active.closed ||
 				this.byId.get(info.id) !== active ||
@@ -325,7 +325,8 @@ export class RealtimeVoiceManager {
 		if (active.closed) return;
 		active.closed = true;
 		active.toolRuntime.interrupt();
-		if (active.onInvalidated) active.conversation.signal?.removeEventListener('abort', active.onInvalidated);
+		if (active.onInvalidated)
+			active.conversation.signal?.removeEventListener('abort', active.onInvalidated);
 		active.conversation.dispose?.();
 		this.byId.delete(active.info.id);
 		if (this.byWindow.get(active.windowId) === active) this.byWindow.delete(active.windowId);
