@@ -11,13 +11,14 @@ import type { RagSource } from './types';
 const UTF8_DECODER = new TextDecoder('utf-8', { fatal: true });
 
 export async function* collectRagSources(sources: readonly string[], signal?: AbortSignal): AsyncGenerator<RagSource> {
+	const budget = { entries: 0, files: 0, bytes: 0 };
 	let totalBytes = 0;
 	let files = 0;
 	for (const [sourceIndex, selected] of sources.entries()) {
 		signal?.throwIfAborted();
 		const source = knowledgeRoot(selected);
 		if (!(await stat(source)).isDirectory()) throw new Error('The selected source is not a folder: ' + source);
-		for (const file of await listKnowledgeFiles(source, signal)) {
+		for (const file of await listKnowledgeFiles(source, signal, budget)) {
 			signal?.throwIfAborted();
 			assertWikiSourceSafe({ relativePath: file, content: '' });
 			if (++files > KNOWLEDGE_MAX_FILES) throw new Error('Knowledge source file limit exceeded.');

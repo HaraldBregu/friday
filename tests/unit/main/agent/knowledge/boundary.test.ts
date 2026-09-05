@@ -1,4 +1,5 @@
-import { mkdir, mkdtemp, open, realpath, rm, symlink, writeFile } from 'node:fs/promises';
+import { writeKnowledgeText } from '../../../../../src/main/agent/knowledge/write';
+import { mkdir, mkdtemp, open, realpath, rm, stat, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { readWikiPage } from '../../../../../src/main/agent/knowledge/wiki/wiki_read_page';
@@ -51,4 +52,21 @@ it('rejects replacing the configured wiki root with a symlink', async () => {
 	const linked = path.join(root, 'wiki'); await symlink(outside, linked);
 	await expect(readKnowledgeText(linked, 'page.md')).rejects.toThrow('Symbolic links');
 	await expect(listKnowledgeFiles(linked)).rejects.toThrow('Symbolic links');
+});
+
+it('creates private wiki pages and rejects a write through a linked parent', async () => {
+ const wiki = path.join(root, 'wiki');
+ await writeKnowledgeText(wiki, 'nested/page.md', '# Private page');
+ expect((await stat(path.join(wiki, 'nested/page.md'))).mode & 0o777).toBe(0o600);
+ expect((await stat(path.join(wiki, 'nested'))).mode & 0o777).toBe(0o700);
+ const outside = path.join(root, 'outside'); await mkdir(outside);
+ await symlink(outside, path.join(wiki, 'linked'));
+ await expect(writeKnowledgeText(wiki, 'linked/new/page.md', 'private')).rejects.toThrow('Symbolic links');
+ await expect(stat(path.join(outside, 'new'))).rejects.toMatchObject({ code: 'ENOENT' });
+});
+
+it('bounds depth and cumulative traversal across source folders', async () => {
+ await mkdir(path.join(root, ...Array(13).fill('nested')), { recursive: true });
+ await expect(listKnowledgeFiles(root)).rejects.toThrow('depth limit');
+ await expect(listKnowledgeFiles(root, undefined, { entries: 10000, files: 0, bytes: 0 })).rejects.toThrow('entry limit');
 });

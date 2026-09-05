@@ -1,12 +1,14 @@
 import path from 'node:path';
 
 const mkdirSync = jest.fn();
-const readFileSync = jest.fn();
+const readFileBoundedSync = jest.fn();
+jest.mock('../../../../src/main/agent/files/read_sync', () => ({ readFileBoundedSync }));
+jest.mock('../../../../src/main/agent/knowledge/root', () => ({ knowledgeRoot: (root: string) => root }));
 const renameSync = jest.fn();
 const rmSync = jest.fn();
 const writeFileSync = jest.fn();
 
-jest.mock('node:fs', () => ({ mkdirSync, readFileSync, renameSync, rmSync, writeFileSync }));
+jest.mock('node:fs', () => ({ mkdirSync, renameSync, rmSync, writeFileSync }));
 jest.mock('../../../../src/main/shared/user_data_location', () => ({
 	userDataLocation: () => '/user/data',
 }));
@@ -35,8 +37,8 @@ it('writes the RAG manifest to rag/index.json', () => {
 });
 
 it('reads the RAG manifest from rag/index.json', () => {
-	readFileSync.mockReturnValue(JSON.stringify(manifest));
+	readFileBoundedSync.mockReturnValue({ content: Buffer.from(JSON.stringify(manifest)) });
 
 	expect(readRagManifest()).toEqual(manifest);
-	expect(readFileSync).toHaveBeenCalledWith(path.join('/user/data/rag', 'index.json'), 'utf8');
+	expect(readFileBoundedSync).toHaveBeenCalledWith(path.join('/user/data/rag', 'index.json'), 64 * 1024);
 });

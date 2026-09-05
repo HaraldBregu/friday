@@ -1,8 +1,9 @@
 import path from 'node:path';
 
-const readFileSync = jest.fn();
+const readFileBoundedSync = jest.fn();
+jest.mock('../../../../src/main/agent/files/read_sync', () => ({ readFileBoundedSync }));
+jest.mock('../../../../src/main/agent/knowledge/root', () => ({ knowledgeRoot: (root: string) => root }));
 
-jest.mock('node:fs', () => ({ readFileSync }));
 jest.mock('../../../../src/main/agent/knowledge/rag/rag_location', () => ({
 	ragLocation: () => '/user/data/rag',
 }));
@@ -10,7 +11,7 @@ jest.mock('../../../../src/main/agent/knowledge/rag/rag_location', () => ({
 import { readRagArtifact } from '../../../../src/main/agent/knowledge/rag/rag_artifact';
 
 beforeEach(() => {
-	readFileSync.mockReset();
+	readFileBoundedSync.mockReset();
 });
 
 it('reads a Kucedr-owned versioned artifact from the local RAG directory', () => {
@@ -22,16 +23,16 @@ it('reads a Kucedr-owned versioned artifact from the local RAG directory', () =>
 		dimensions: 2,
 		records: [],
 	};
-	readFileSync.mockReturnValue(JSON.stringify(artifact));
+	readFileBoundedSync.mockReturnValue({ content: Buffer.from(JSON.stringify(artifact)) });
 
 	expect(readRagArtifact('embeddings-kucedr-a1b2c3d4.json')).toEqual(artifact);
-	expect(readFileSync).toHaveBeenCalledWith(
+	expect(readFileBoundedSync).toHaveBeenCalledWith(
 		path.join('/user/data/rag', 'embeddings-kucedr-a1b2c3d4.json'),
-		'utf8'
+		100 * 1024 * 1024
 	);
 });
 
 it('rejects artifact paths outside the local RAG directory', () => {
 	expect(readRagArtifact('../embeddings-kucedr-a1b2c3d4.json')).toBeUndefined();
-	expect(readFileSync).not.toHaveBeenCalled();
+	expect(readFileBoundedSync).not.toHaveBeenCalled();
 });
