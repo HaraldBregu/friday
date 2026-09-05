@@ -154,7 +154,7 @@ it.each(['clear', 'delete', 'edit'])(
 				expect(
 					updateUserMessageBySessionId(
 						SESSION_ID,
-						temporaryRoot,
+						config.location,
 						0,
 						'Edited question.',
 						coordinator
