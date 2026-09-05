@@ -16,10 +16,14 @@ beforeEach(() => {
 	Object.defineProperty(window, 'apps', {
 		configurable: true,
 		value: {
-			list: jest.fn().mockResolvedValue([{
-				id: 'my-app', title: 'My App', description: 'Uploaded app',
-				metadata: { version: '1.0.0', category: 'Tools', entry: 'index.html' },
-			}]),
+			list: jest.fn().mockResolvedValue([
+				{
+					id: 'my-app',
+					title: 'My App',
+					description: 'Uploaded app',
+					metadata: { version: '1.0.0', category: 'Tools', entry: 'index.html' },
+				},
+			]),
 			getSettings: jest.fn().mockResolvedValue(settings),
 			setSettings: jest.fn().mockResolvedValue(settings),
 			open: jest.fn().mockResolvedValue(undefined),
@@ -28,11 +32,17 @@ beforeEach(() => {
 });
 
 it('loads settings for the selected app inside its details page', async () => {
-	render(<MemoryRouter initialEntries={['/settings/apps/my-app']}>
-		<Routes><Route path="/settings/apps/:appId" element={<AppDetailsPage />} /></Routes>
-	</MemoryRouter>);
+	render(
+		<MemoryRouter initialEntries={['/settings/apps/my-app']}>
+			<Routes>
+				<Route path="/settings/apps/:appId" element={<AppDetailsPage />} />
+			</Routes>
+		</MemoryRouter>
+	);
 
-	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1200);
+	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(
+		1200
+	);
 	expect(screen.getByRole('spinbutton', { name: 'settings.apps.window.height' })).toHaveValue(900);
 	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).not.toBeChecked();
 	expect(window.apps.getSettings).toHaveBeenCalledWith('my-app');
@@ -69,15 +79,18 @@ it('resets overrides and displays current app defaults returned by the host', as
 	expect(screen.getByRole('switch', { name: 'settings.apps.window.resizable' })).toBeChecked();
 });
 
-it.each(['', '0', '-1', '1.5', '32769', '619'])('prevents saving invalid width %s', async (value) => {
-	render(<WindowSettings appId="my-app" />);
-	const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
-	fireEvent.change(width, { target: { value } });
-	expect(screen.getByRole('alert')).toHaveTextContent('settings.apps.window.invalid');
-	expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
-	fireEvent.submit(width.closest('form')!);
-	expect(window.apps.setSettings).not.toHaveBeenCalled();
-});
+it.each(['', '0', '-1', '1.5', '32769', '619'])(
+	'prevents saving invalid width %s',
+	async (value) => {
+		render(<WindowSettings appId="my-app" />);
+		const width = await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' });
+		fireEvent.change(width, { target: { value } });
+		expect(screen.getByRole('alert')).toHaveTextContent('settings.apps.window.invalid');
+		expect(screen.getByRole('button', { name: 'settings.apps.window.save' })).toBeDisabled();
+		fireEvent.submit(width.closest('form')!);
+		expect(window.apps.setSettings).not.toHaveBeenCalled();
+	}
+);
 
 it('prevents minimum height exceeding default height', async () => {
 	render(<WindowSettings appId="my-app" />);
@@ -94,7 +107,9 @@ it('offers retry after a load error and keeps the form unavailable until loaded'
 	expect(await screen.findByRole('alert')).toHaveTextContent('settings.apps.window.loadError');
 	expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
 	await user.click(screen.getByRole('button', { name: 'settings.apps.refresh' }));
-	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(1200);
+	expect(await screen.findByRole('spinbutton', { name: 'settings.apps.window.width' })).toHaveValue(
+		1200
+	);
 	expect(window.apps.getSettings).toHaveBeenCalledTimes(2);
 });
 
