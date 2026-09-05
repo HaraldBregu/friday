@@ -34,7 +34,7 @@ describe('app import', () => {
 		expect(fs.readFileSync(path.join(installed, 'index.html'), 'utf8')).toBe('installed');
 	});
 
-	it.each(['coder', 'workspace'])('rejects the privileged %s app identifier', (id) => {
+	it.each(['coder'])('rejects the privileged %s app identifier', (id) => {
 		const sourceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'kucedr-app-source-'));
 		const source = path.join(sourceRoot, id);
 		fs.mkdirSync(source, { recursive: true });
@@ -47,6 +47,25 @@ describe('app import', () => {
 		} finally {
 			fs.rmSync(sourceRoot, { recursive: true, force: true });
 		}
+	});
+
+	it('imports and discovers the workspace app with its built entry', () => {
+		const source = path.join(appLocation, 'resources', 'apps', 'workspace');
+		const manifest = JSON.parse(
+			fs.readFileSync(path.resolve('resources/apps/workspace/manifest.json'), 'utf8')
+		);
+		fs.mkdirSync(path.join(source, 'dist'), { recursive: true });
+		fs.writeFileSync(path.join(source, 'manifest.json'), JSON.stringify(manifest));
+		fs.writeFileSync(path.join(source, manifest.metadata.entry), '<h1>Workspace</h1>');
+
+		expect(importApps([source], appLocation)).toEqual({
+			imported: [{ id: 'workspace', ...manifest }],
+			skipped: [],
+		});
+		expect(listApps(appLocation)).toEqual([{ id: 'workspace', ...manifest }]);
+		expect(
+			fs.readFileSync(path.join(appLocation, 'apps', 'workspace', manifest.metadata.entry), 'utf8')
+		).toBe('<h1>Workspace</h1>');
 	});
 
 	it('replaces an installed app through a staged copy', () => {
