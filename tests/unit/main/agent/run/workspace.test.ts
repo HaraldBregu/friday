@@ -101,12 +101,12 @@ it('allows overwriting workspace names beginning with two dots', async () => {
 	expect(fs.readFileSync(path.join(workspace, '..cache/file.txt'), 'utf8')).toBe('new');
 });
 
-it.each(['kill', 'clear', 'remove'])('allows %s for an owned workspace sandbox process', async (action) => {
-	const session = { id: action, scope, workdir: workspace, roots: [workspace], executionMode: 'sandbox' } as ProcessSession;
+it.each(([undefined, 'task', 'health', 'child'] as const).flatMap((source) => ['kill', 'clear', 'remove'].map((action) => [action, source] as const)))('allows %s for an owned workspace sandbox process (source: %s)', async (action, source) => {
+	const session = { id: action, scope: source ? { ...scope, source } : scope, workdir: workspace, roots: [workspace], executionMode: 'sandbox' } as ProcessSession;
 	registry.register(session);
 	try {
 		const run = jest.fn().mockResolvedValue('done');
-		expect((await execute({ ...processTool, run }, { action, sessionId: session.id })).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow' });
+		expect((await execute({ ...processTool, run }, { action, sessionId: session.id }, undefined, source)).at(-1)).toMatchObject({ type: 'tool_call_end', permissionOutcome: 'allow' });
 		expect(run).toHaveBeenCalled();
 	} finally {
 		registry.remove(session.id);
