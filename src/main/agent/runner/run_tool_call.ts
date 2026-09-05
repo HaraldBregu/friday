@@ -29,9 +29,13 @@ import { toolPermissionTargets } from '../permissions/tool_permission_targets';
 import { captureFiles } from '../history/capture';
 import { recordFileOperation } from '../history/record';
 import type { FileHistory } from '../history/types';
+import { executionScope, type ExecutionScope } from '../execution/scope';
+import { authorizedPaths } from '../permissions/access';
+import { captureAccess } from '../permissions/capture_access';
 
 export interface ToolCallSecurityContext {
 	runId: string;
+	scope?: ExecutionScope;
 	windowId?: number;
 	interactionMode?: AgentInteractionMode;
 }
@@ -48,10 +52,15 @@ export async function* runToolCall(
 	const startedAtMs = Date.now();
 	let canonicalInput = toolCall.args;
 	let parseError: unknown;
+	let access: ReturnType<typeof captureAccess> = [];
+	const scope: ExecutionScope = security.scope ?? { ownerId: `run:${security.runId}`, source: security.windowId === undefined ? 'child' : 'interactive', sessionId: security.runId, runId: security.runId };
 	if (tool) {
 		try {
 			canonicalInput = tool.parseInput(toolCall.args);
 			toolCall.args = canonicalInput;
+			access = captureAccess(['read', 'write', 'edit', 'patch'].includes(toolCall.name)
+				? toolPermissionTargets(toolCall.name, canonicalInput, agentLocation())
+				: directoryPermissionTargets(toolCall.name, canonicalInput, agentLocation(), history));
 		} catch (error) {
 			parseError = error;
 		}
@@ -145,9 +154,12 @@ export async function* runToolCall(
 			undefined,
 			history
 		);
-		const hardApproval = typeof tool.hardApproval === 'function'
+		const capability = typeof tool.capability === 'function' ? tool.capability(canonicalInput) : tool.capability;
+		const channelAllowed = scope.source !== 'channel' || ['search_web', 'fetch_web_page', 'subagent', 'subagents'].includes(tool.id);
+		if (!capability || !channelAllowed) resolution = { ...resolution, mode: 'deny', persistable: false };
+		const hardApproval = capability?.approval === true || (typeof tool.hardApproval === 'function'
 			? tool.hardApproval(canonicalInput)
-			: tool.hardApproval === true;
+			: tool.hardApproval === true);
 		if (hardApproval && resolution.mode !== 'deny') {
 			resolution = {
 				...resolution,
@@ -155,7 +167,7 @@ export async function* runToolCall(
 				approvalTargets: resolution.approvalTargets.length > 0
 					? resolution.approvalTargets
 					: resolution.targets,
-				reason: 'destructive_operation',
+				reason: capability?.approval ? 'sensitive_operation' : 'destructive_operation',
 				persistable: false,
 			};
 		}
@@ -237,7 +249,11 @@ export async function* runToolCall(
 					? await resources.acquire(resourceTargets, toolSignal)
 					: () => undefined;
 				let abort: (() => void) | undefined;
+				let execution: Promise<unknown> | undefined;
 				try {
+					toolSignal.throwIfAborted();
+					const current = resolveToolPermissionDetails(toolCall.name, canonicalInput, context, false, 'ask', undefined, history);
+					if (current.mode === 'deny' || (permissionOutcome === 'allow' && current.mode !== 'allow' && resolution.mode === 'allow')) throw new Error('Permission changed before execution.');
 					const aborted = new Promise<never>((_, reject) => {
 						abort = () => reject(toolSignal.reason ?? new Error('Tool call aborted.'));
 						toolSignal.addEventListener('abort', abort, { once: true });
@@ -246,12 +262,13 @@ export async function* runToolCall(
 						? toolPermissionTargets(toolCall.name, canonicalInput, agentLocation())
 						: [];
 					const before = historyTargets.length > 0 ? captureFiles(historyTargets) : [];
-					const run = (): Promise<unknown> => Promise.resolve(tool.run(canonicalInput, toolSignal));
+					const run = (): Promise<unknown> => executionScope.run(scope, () => authorizedPaths.run(access, () => Promise.resolve(tool.run(canonicalInput, toolSignal))));
 					const approvedRoots = permissionOutcome === 'approve' && toolCall.name === 'bash'
 						? resolution.approvalTargets
 						: [];
+					execution = Promise.resolve().then(() => { toolSignal.throwIfAborted(); return approvedExecRoots.run(approvedRoots, run); }).finally(release);
 					output = await Promise.race([
-						approvedExecRoots.run(approvedRoots, run),
+						execution,
 						aborted,
 					]);
 					if (history && historyTargets.length > 0) {
@@ -268,18 +285,26 @@ export async function* runToolCall(
 					if (toolCall.name === 'read' && state) rememberTool(context, state);
 					if (createsFile && state) rememberTool(context, state);
 				} finally {
-					release();
+					if (!execution) release();
 					clearTimeout(timeoutTimer);
 					if (abort) toolSignal.removeEventListener('abort', abort);
 				}
 			} catch (error) {
-				if (signal?.aborted) throw error;
+				if (signal?.aborted) {
+					toolCall.result = { content: 'Cancelled; an in-flight effect may still be settling.', isError: true };
+					throw error;
+				}
 				const message = error instanceof Error ? error.message : String(error);
 				output = `Error: tool '${toolCall.name}' failed: ${message}`;
 				isError = true;
 			}
 		}
 	}
+
+	toolCall.result = {
+		content: formatToolOutput(output),
+		isError,
+	};
 
 	yield {
 		type: 'tool_call_end',
@@ -290,10 +315,5 @@ export async function* runToolCall(
 		isError,
 		durationMs: Date.now() - startedAtMs,
 		...(permissionOutcome ? { permissionOutcome } : {}),
-	};
-
-	toolCall.result = {
-		content: formatToolOutput(output),
-		isError,
 	};
 }

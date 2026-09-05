@@ -16,6 +16,8 @@ import {
 	addAssistantMessage,
 	sessionDir,
 } from './session';
+import { SessionCoordinator } from './session/coordinator';
+import { releaseSession } from './session/release';
 import { accountGoalRun } from './goal/account';
 import { applyGoalCommand } from './goal/apply';
 import { parseGoalCommand } from './goal/parse';
@@ -105,6 +107,7 @@ export class Agent {
 	private readonly runs = createRunRegistry<InternalAgentSendOptions>();
 	private readonly scheduler = new AgentRunScheduler(3);
 	readonly resources = new KeyedMutex();
+	readonly sessions = new SessionCoordinator();
 	private readonly providerLimiter = new KeyedLimiter(3);
 	private readonly subagentLimiter = new KeyedLimiter(3);
 	private readonly lastMessagesLimit = 50;
@@ -233,6 +236,7 @@ export class Agent {
 				runId: request.id,
 				task: 'chat',
 				message: parsedSkillCommand.message,
+				scope: { ownerId: `${request.category === 'main' ? 'interactive' : request.agentId}:${request.sessionId}`, source: request.category === 'main' ? 'interactive' : request.category === 'bot' ? 'channel' : request.category === 'task' ? 'task' : request.category === 'health' ? 'health' : 'child', sessionId: request.sessionId, runId: request.id },
 				agentId: request.agentId,
 				contextMode:
 					options.contextMode ??
@@ -268,7 +272,7 @@ export class Agent {
 							...(options.toolsAllow === undefined ? {} : { toolsAllow: options.toolsAllow }),
 						};
 
-			init(session, this.config, input, request.category);
+			init(session, this.config, input, request.category, this.sessions);
 			if (parsedGoalCommand) {
 				const reply = applyGoalCommand(sessionDir(session), parsedGoalCommand);
 				if (parsedGoalCommand.action === 'create') {
@@ -292,7 +296,7 @@ export class Agent {
 			});
 
 			const timeoutSignal = AbortSignal.timeout(10 * 60_000);
-			const runSignal = AbortSignal.any([controller.signal, timeoutSignal]);
+			const runSignal = AbortSignal.any([controller.signal, timeoutSignal, ...(session.lease ? [session.lease.signal] : [])]);
 			const events = stream(this.config, session, input, runSignal, {
 				streaming: options.streaming ?? true,
 				windowFactory: this.windowFactory,
@@ -337,6 +341,8 @@ export class Agent {
 			}
 			const cause = toError(error, 'Agent request failed.');
 			throw cause;
+		} finally {
+			releaseSession(session);
 		}
 	}
 
@@ -410,7 +416,8 @@ export class Agent {
 					resolvedSessionId,
 					this.config.location,
 					userOffsetFromEnd,
-					content
+					content,
+					this.sessions
 				),
 			{ priority: 'high' }
 		);
@@ -423,7 +430,7 @@ export class Agent {
 			resolvedSessionId,
 			async () => {
 				await Promise.allSettled(completions);
-				clearSessionMessages(createSessionState(), this.config, resolvedSessionId);
+				clearSessionMessages(createSessionState(), this.config, resolvedSessionId, this.sessions);
 			},
 			{ priority: 'high' }
 		);
@@ -436,7 +443,7 @@ export class Agent {
 			resolvedSessionId,
 			async () => {
 				await Promise.allSettled(completions);
-				deleteStoredSession(createSessionState(), this.config, resolvedSessionId);
+				deleteStoredSession(createSessionState(), this.config, resolvedSessionId, this.sessions);
 			},
 			{ priority: 'high' }
 		);

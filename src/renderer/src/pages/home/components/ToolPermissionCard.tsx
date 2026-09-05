@@ -42,10 +42,11 @@ export function ToolPermissionCard({
 			? input.path
 			: typeof input.directory === 'string'
 				? input.directory
-				: processPayload || undefined;
+				: processPayload || JSON.stringify(input, null, 2);
 	const action = t(`toolPermission.actions.${permission.toolName}`, {
 		defaultValue: TOOL_ACTIONS[permission.toolName] ?? `use ${permission.toolName}`,
 	});
+	const sensitiveOperation = permission.reason === 'sensitive_operation';
 	const hostExecution = permission.reason === 'host_execution';
 	const destructiveOperation = permission.reason === 'destructive_operation';
 	const reasonKey = hostExecution
@@ -91,7 +92,7 @@ export function ToolPermissionCard({
 				</CardTitle>
 				<CardAction>
 					<Badge variant={hostExecution || destructiveOperation ? 'destructive' : 'secondary'}>
-						{t(badgeKey)}
+						{sensitiveOperation ? t('toolPermission.sensitiveAccess', { defaultValue: 'Sensitive action' }) : t(badgeKey)}
 					</Badge>
 				</CardAction>
 			</CardHeader>
@@ -107,7 +108,7 @@ export function ToolPermissionCard({
 					</div>
 				)}
 				<p className="text-xs text-muted-foreground">
-					{t(reasonKey)}
+					{sensitiveOperation ? t('toolPermission.sensitiveReason', { defaultValue: 'Approve this specific action before the assistant accesses a service, records media, spends money, or saves lasting changes.' }) : t(reasonKey)}
 				</p>
 				{detail && <pre className="max-h-24 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted px-2 py-1.5 font-mono text-xs text-muted-foreground"><code>{detail}</code></pre>}
 				{error && <p className="text-xs text-destructive" aria-live="polite">{error}</p>}
