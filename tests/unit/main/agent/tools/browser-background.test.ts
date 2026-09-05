@@ -28,6 +28,10 @@ function browserContext() {
 	});
 }
 
+beforeEach(() => {
+	launchPersistentContext.mockReset();
+});
+
 afterEach(async () => {
 	await useWebBrowserTool.run({ action: 'stop' });
 });
