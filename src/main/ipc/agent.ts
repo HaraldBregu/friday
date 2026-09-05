@@ -1,3 +1,4 @@
+import { authorizeRagDisclosure } from '../agent/knowledge/rag/disclosure';
 import { BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from 'electron';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -816,13 +817,13 @@ export class AgentIpc implements IpcModule<AgentIpcDeps> {
 				mainAccess,
 				(configuration: RagConfiguration): RagConfiguration => {
 					const current = getRagConfiguration();
-					const saved = saveRagConfiguration({
+					const saved = saveRagConfiguration(authorizeRagDisclosure({
 						...configuration,
 						databaseProviderId: current.databaseProviderId,
 						databaseId: current.databaseId,
 						embeddingProviderId: current.embeddingProviderId,
 						embeddingModelId: current.embeddingModelId,
-					});
+					}));
 					rescheduleRagIndexing();
 					return saved;
 				},

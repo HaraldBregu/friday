@@ -1,6 +1,8 @@
 import path from 'node:path';
 import Store from 'electron-store';
 import cron from 'node-cron';
+import { ragRecipient } from './recipient';
+import { restrictSettingsFile } from '../../../shared/restrict_settings_file';
 import { DEFAULT_RAG_INDEX_NAME, type RagConfiguration } from '../../../../shared/rag_types';
 import { userDataLocation } from '../../../shared/user_data_location';
 import { normalizeRagIndexName } from './rag_index_name';
@@ -13,6 +15,7 @@ const DEFAULT_RAG_CONFIGURATION: RagConfiguration = {
 	embeddingProviderId: '',
 	embeddingModelId: '',
 	embeddingConsent: null,
+	mirrorConsent: null,
 	folders: [],
 	scheduleEnabled: false,
 	cronExpression: '0 3 * * *',
@@ -26,9 +29,19 @@ const store = new Store<RagConfiguration>({
 });
 
 export const ragConfigurationStorePath = store.path;
+restrictSettingsFile(store.path);
 
 export function getRagConfiguration(): RagConfiguration {
-	return { ...DEFAULT_RAG_CONFIGURATION, ...store.store, folders: [...store.get('folders')] };
+	const configuration = { ...DEFAULT_RAG_CONFIGURATION, ...store.store, folders: [...store.get('folders')] };
+	for (const kind of ['embedding', 'mirror'] as const) {
+		const key = kind === 'embedding' ? 'embeddingConsent' : 'mirrorConsent';
+		const consent = configuration[key];
+		try {
+			if (consent?.version !== 1 || consent.recipient !== ragRecipient(kind, configuration.embeddingProviderId, configuration.embeddingModelId, configuration.indexName))
+				configuration[key] = null;
+		} catch { configuration[key] = null; }
+	}
+	return configuration;
 }
 
 export function saveRagConfiguration(configuration: RagConfiguration): RagConfiguration {
@@ -53,12 +66,15 @@ export function saveRagConfiguration(configuration: RagConfiguration): RagConfig
 				? {
 						providerId: configuration.embeddingConsent.providerId.trim(),
 						modelId: configuration.embeddingConsent.modelId.trim(),
+						...(configuration.embeddingConsent.version === 1 ? { version: 1 as const, recipient: configuration.embeddingConsent.recipient } : {}),
 					}
 				: null,
+		mirrorConsent: configuration.mirrorConsent?.version === 1 ? { ...configuration.mirrorConsent, indexName: normalizeRagIndexName(configuration.mirrorConsent.indexName) } : null,
 		folders,
 		scheduleEnabled: configuration.scheduleEnabled,
 		cronExpression: cronExpression || DEFAULT_RAG_CONFIGURATION.cronExpression,
 	};
 	store.store = saved;
+	restrictSettingsFile(store.path);
 	return saved;
 }

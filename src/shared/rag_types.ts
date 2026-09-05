@@ -7,7 +7,8 @@ export interface RagConfiguration {
 	databaseId: string;
 	embeddingProviderId: string;
 	embeddingModelId: string;
-	embeddingConsent: { providerId: string; modelId: string } | null;
+	embeddingConsent: { providerId: string; modelId: string; version?: 1; recipient?: string } | null;
+	mirrorConsent?: { version: 1; indexName: string; recipient?: string } | null;
 	folders: string[];
 	scheduleEnabled: boolean;
 	cronExpression: string;
