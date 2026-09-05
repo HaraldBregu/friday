@@ -62,3 +62,13 @@ it('rejects symlinked history targets instead of following them', () => {
 	fs.symlinkSync(target, link);
 	expect(() => captureFiles([link])).toThrow('Symbolic links');
 });
+
+it('evicts oldest history entries to bound retained snapshot bytes', () => {
+	const content = 'a'.repeat(1024 * 1024);
+	for (let index = 0; index < 20; index += 1) {
+		recordFileOperation(history, 'run', String(index), 'write', [{ path: String(index), exists: false }], [{ path: String(index), exists: true, content }]);
+	}
+	expect(history.operations).toHaveLength(16);
+	expect(history.operations[0].toolCallId).toBe('4');
+	expect(history.operations.at(-1)?.toolCallId).toBe('19');
+});

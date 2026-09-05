@@ -5,6 +5,8 @@ export interface AuthorizedPath {
 	readonly exists: boolean;
 	readonly dev?: number;
 	readonly ino?: number;
+	readonly size?: number;
+	readonly modifiedAt?: number;
 }
 
 export const authorizedPaths = new AsyncLocalStorage<readonly AuthorizedPath[]>();

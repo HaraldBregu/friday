@@ -67,3 +67,12 @@ it('rejects a changed file identity before an edit can execute', () => {
 	fs.writeFileSync(target, 'after');
 	expect(() => authorizedPaths.run(grants, () => authorizeFilePath(target))).toThrow('changed after authorization');
 });
+
+it('rejects in-place edits made while file approval is pending', async () => {
+	const target = path.join(directory, 'existing');
+	fs.writeFileSync(target, 'before');
+	const grants = captureAccess([target]);
+	fs.writeFileSync(target, 'changed content');
+	await expect(authorizedPaths.run(grants, () => writeAuthorizedFile(target, 'replace'))).rejects.toThrow('changed after authorization');
+	expect(fs.readFileSync(target, 'utf8')).toBe('changed content');
+});
