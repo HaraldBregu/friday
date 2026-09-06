@@ -63,6 +63,7 @@
 	}
 
 	.landing > :focus-visible {
-		animation: none;
+		opacity: 1 !important;
+		transform: none !important;
 	}
 }
