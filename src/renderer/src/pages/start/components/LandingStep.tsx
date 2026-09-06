@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowRight, LoaderCircle } from 'lucide-react';
-import { LogoView } from '@/components/app/base/logo-view';
 import { Button } from '@/components/ui/button';
 import './landing.css';
 
@@ -12,9 +11,11 @@ type LandingStepProps = {
 export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.Element {
 	return (
 		<div className="landing mx-auto flex min-h-full w-full max-w-xl flex-col items-center justify-center px-4 pt-10 pb-20 text-center sm:px-6">
-			<div className="flex size-20 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10">
-				<LogoView className="size-14" />
-			</div>
+			<span
+				className="landing-logo size-20 shrink-0 bg-primary"
+				role="img"
+				aria-label="Kucedr logo"
+			/>
 			<h1 className="mt-6 font-heading text-5xl font-black leading-none tracking-[-0.055em] text-primary">
 				Kucedr
 			</h1>

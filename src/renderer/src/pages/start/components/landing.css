@@ -34,3 +34,7 @@
 	--primary: #c3dba3;
 	--primary-foreground: #17171a;
 }
+
+.landing-logo {
+	mask: url('@resources/icons/icon.svg') center / contain no-repeat;
+}
