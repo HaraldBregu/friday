@@ -47,20 +47,20 @@
 	}
 
 	.landing-content {
-		animation: landing-expand 600ms cubic-bezier(0.4, 0, 0.2, 1) 650ms backwards;
+		animation: landing-expand 900ms cubic-bezier(0.4, 0, 0.2, 1) 650ms backwards;
 	}
 
 	.landing-content > div > * {
 		@apply animate-in fade-in-0 slide-in-from-bottom-2 animation-duration-500 ease-out fill-mode-backwards;
-		animation-delay: 1250ms;
+		animation-delay: 1550ms;
 	}
 
 	.landing-content > div > :nth-child(2) {
-		animation-delay: 1400ms;
+		animation-delay: 1700ms;
 	}
 
 	.landing-content > div > :nth-child(3) {
-		animation-delay: 1550ms;
+		animation-delay: 1850ms;
 	}
 
 	.landing:focus-within .landing-content {
