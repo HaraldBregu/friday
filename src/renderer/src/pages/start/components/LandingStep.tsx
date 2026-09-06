@@ -26,10 +26,6 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 					<p className="mt-5 max-w-xs text-balance text-xl font-medium leading-snug tracking-tight text-foreground">
 						Personal multi-task desktop AI assistant
 					</p>
-					<p className="mt-4 max-w-sm text-pretty text-sm leading-7 text-muted-foreground">
-						Kucedr helps with everyday tasks, works across your tools, and keeps important context
-						close at hand.
-					</p>
 					<Button
 						className="mt-8 h-10 min-w-60 gap-2 px-5 hover:bg-primary/90"
 						size="lg"
