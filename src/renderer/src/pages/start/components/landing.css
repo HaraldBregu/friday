@@ -46,20 +46,16 @@
 		@apply animate-in fade-in-0 slide-in-from-bottom-2 animation-duration-500 ease-out fill-mode-backwards;
 	}
 
-	.landing > :nth-child(2) {
-		animation-delay: 75ms;
-	}
-
 	.landing > :nth-child(3) {
-		animation-delay: 150ms;
+		animation-delay: 900ms;
 	}
 
 	.landing > :nth-child(4) {
-		animation-delay: 225ms;
+		animation-delay: 1050ms;
 	}
 
 	.landing > :nth-child(5) {
-		animation-delay: 300ms;
+		animation-delay: 1200ms;
 	}
 
 	.landing > :focus-visible {
