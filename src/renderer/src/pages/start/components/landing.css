@@ -1,3 +1,5 @@
+@reference '../../../index.css';
+
 @font-face {
 	font-family: 'Archivo';
 	font-style: normal;
@@ -37,4 +39,30 @@
 
 .landing-logo {
 	mask: url('@resources/icons/icon.svg') center / contain no-repeat;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.landing > * {
+		@apply animate-in fade-in-0 slide-in-from-bottom-2 animation-duration-500 ease-out fill-mode-backwards;
+	}
+
+	.landing > :nth-child(2) {
+		animation-delay: 75ms;
+	}
+
+	.landing > :nth-child(3) {
+		animation-delay: 150ms;
+	}
+
+	.landing > :nth-child(4) {
+		animation-delay: 225ms;
+	}
+
+	.landing > :nth-child(5) {
+		animation-delay: 300ms;
+	}
+
+	.landing > :focus-visible {
+		animation: none;
+	}
 }

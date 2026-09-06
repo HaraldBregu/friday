@@ -33,9 +33,16 @@ export function LandingStep({ loading, onStart }: LandingStepProps): React.JSX.E
 				aria-busy={loading}
 				onClick={onStart}
 			>
-				{loading ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null}
+				{loading ? (
+					<LoaderCircle className="size-4 motion-safe:animate-spin" aria-hidden="true" />
+				) : null}
 				{loading ? 'Checking your session…' : 'Get started'}
-				{loading ? null : <ArrowRight className="size-4" aria-hidden="true" />}
+				{loading ? null : (
+					<ArrowRight
+						className="size-4 motion-safe:transition-transform motion-safe:duration-150 motion-safe:group-hover/button:translate-x-1 motion-safe:group-focus-visible/button:translate-x-1"
+						aria-hidden="true"
+					/>
+				)}
 			</Button>
 		</div>
 	);
